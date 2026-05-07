@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">mARC logo</title>
+  <desc id="desc">White lowercase m on a green rounded square.</desc>
+  <defs>
+    <linearGradient id="marc-logo-bg" x1="128" y1="0" x2="128" y2="256" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0b8f7c"/>
+      <stop offset="1" stop-color="#087363"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="48" fill="url(#marc-logo-bg)"/>
+  <text
+    x="50%"
+    y="53%"
+    text-anchor="middle"
+    dominant-baseline="middle"
+    fill="#ffffff"
+    font-family="ui-monospace, SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace"
+    font-size="150"
+    font-weight="800"
+    letter-spacing="0"
+  >m</text>
+</svg>

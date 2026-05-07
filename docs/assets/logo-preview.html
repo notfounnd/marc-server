@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>mARC Logo Preview</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f7f2ea;
+        --ink: #15201c;
+        --muted: #5f6f68;
+        --panel: #fffaf3;
+        --line: #dbcdbc;
+        --green: #0b8f7c;
+        --green-dark: #087363;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      }
+
+      main {
+        width: min(1100px, calc(100vw - 40px));
+        margin: 0 auto;
+        padding: 48px 0;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 28px;
+        letter-spacing: 0;
+      }
+
+      p {
+        max-width: 720px;
+        margin: 0 0 28px;
+        color: var(--muted);
+        line-height: 1.55;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 18px;
+      }
+
+      .card {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        padding: 20px;
+      }
+
+      .card h2 {
+        margin: 0 0 16px;
+        font-size: 14px;
+        color: var(--muted);
+        font-weight: 600;
+      }
+
+      .swatch {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 180px;
+        border: 1px dashed #c8b8a3;
+        border-radius: 8px;
+        background:
+          linear-gradient(45deg, #eee6dc 25%, transparent 25%),
+          linear-gradient(-45deg, #eee6dc 25%, transparent 25%),
+          linear-gradient(45deg, transparent 75%, #eee6dc 75%),
+          linear-gradient(-45deg, transparent 75%, #eee6dc 75%);
+        background-color: #faf6ef;
+        background-size: 20px 20px;
+        background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+      }
+
+      .logo {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        aspect-ratio: 1;
+        border-radius: 8px;
+        background: linear-gradient(180deg, var(--green), var(--green-dark));
+        color: #fff;
+        font-weight: 800;
+        letter-spacing: 0;
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.22),
+          0 10px 24px rgba(8, 115, 99, 0.22);
+        user-select: none;
+      }
+
+      .logo-256 {
+        width: 256px;
+        font-size: 150px;
+        border-radius: 28px;
+      }
+
+      .logo-128 {
+        width: 128px;
+        font-size: 74px;
+        border-radius: 18px;
+      }
+
+      .logo-64 {
+        width: 64px;
+        font-size: 37px;
+        border-radius: 10px;
+      }
+
+      .logo-32 {
+        width: 32px;
+        font-size: 19px;
+        border-radius: 6px;
+      }
+
+      .readme-strip {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        min-height: 180px;
+        padding: 22px;
+        border-radius: 8px;
+        background: #fff;
+        border: 1px solid var(--line);
+      }
+
+      .readme-strip strong {
+        display: block;
+        font-size: 24px;
+        margin-bottom: 4px;
+      }
+
+      .readme-strip span {
+        display: block;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .meta {
+        margin-top: 14px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .svg-logo {
+        width: 128px;
+        height: 128px;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>mARC Logo Preview</h1>
+      <p>Temporary preview for the README logo concept: a white lowercase <strong>m</strong> inside the green mARC button.</p>
+
+      <section class="grid">
+        <article class="card">
+          <h2>SVG file render</h2>
+          <div class="swatch">
+            <img class="svg-logo" src="./marc-logo.svg" alt="mARC logo SVG">
+          </div>
+          <div class="meta">docs/assets/marc-logo.svg</div>
+        </article>
+
+        <article class="card">
+          <h2>README / social 256px</h2>
+          <div class="swatch">
+            <div class="logo logo-256">m</div>
+          </div>
+          <div class="meta">256 x 256</div>
+        </article>
+
+        <article class="card">
+          <h2>Icon 128px</h2>
+          <div class="swatch">
+            <div class="logo logo-128">m</div>
+          </div>
+          <div class="meta">128 x 128</div>
+        </article>
+
+        <article class="card">
+          <h2>Small sizes</h2>
+          <div class="swatch" style="gap: 18px;">
+            <div class="logo logo-64">m</div>
+            <div class="logo logo-32">m</div>
+          </div>
+          <div class="meta">64 x 64 and 32 x 32</div>
+        </article>
+
+        <article class="card">
+          <h2>README header context</h2>
+          <div class="readme-strip">
+            <div class="logo logo-64">m</div>
+            <div>
+              <strong>mARC</strong>
+              <span>markdown Agent Relay Chat</span>
+            </div>
+          </div>
+          <div class="meta">Shows how the mark reads beside the project name.</div>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>

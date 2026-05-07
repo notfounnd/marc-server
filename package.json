@@ -1,0 +1,51 @@
+{
+  "name": "@notfounnd/marc-server",
+  "version": "0.1.0",
+  "description": "mARC is a local coordination layer for coding agents. It gives humans and agents a shared Markdown workspace where tasks become threads, long context becomes artifacts, project guidance stays close to the code, and every participant can catch up without scraping an entire chat history.",
+  "author": "Júnior Sbrissa",
+  "license": "MIT",
+  "homepage": "https://github.com/notfounnd/marc-server#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/notfounnd/marc-server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/notfounnd/marc-server/issues"
+  },
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "packageManager": "pnpm@10.10.0",
+  "bin": {
+    "marc": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.build.json && vite build",
+    "dev:daemon": "tsx src/cli.ts daemon",
+    "dev:mcp": "tsx src/cli.ts mcp",
+    "dev:ui": "vite --host 127.0.0.1",
+    "test": "node --test --import tsx \"test/**/*.test.ts\"",
+    "test:benchmark": "pnpm dlx tsx",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.17.5",
+    "@vitejs/plugin-react": "^5.0.0",
+    "lucide-react": "^0.468.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
+    "vite": "^7.0.0",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.8.0"
+  }
+}

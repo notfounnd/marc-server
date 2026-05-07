@@ -1,0 +1,142 @@
+# MCP tools
+
+mARC exposes grouped MCP tool names in `{prefix}_{action}` format. Legacy aliases are intentionally avoided.
+
+## Bootstrap protocol
+
+mARC must be configured per target repository. The CLI argument `--workspace` is the repository that owns the `.marc/` folder for that MCP server.
+
+Do not configure mARC as a user/global MCP server with one fixed `--workspace`. That makes unrelated repositories share the same mARC project.
+
+The first mARC action in a session or workspace should be:
+
+```text
+workspace_bootstrap
+```
+
+`workspace_bootstrap` initializes the workspace if needed, refreshes mARC recommendations, reads `INSTRUCTIONS.md`, reads `RULES.md`, and returns:
+
+```json
+{
+  "bootstrap": {
+    "confirmed": true,
+    "nextInput": {
+      "bootstrapConfirmed": true
+    }
+  }
+}
+```
+
+After that, gated tools must be called with:
+
+```json
+{
+  "bootstrapConfirmed": true
+}
+```
+
+If a gated tool is called without the flag, it returns `bootstrap_required` and tells the agent to call `workspace_bootstrap`.
+
+## Free tools
+
+| Tool | Use |
+|---|---|
+| `workspace_bootstrap` | Start or recover mARC context for the current session. |
+| `marc_helper` | Ask for tool guidance, examples, and efficient workflows. |
+| `workspace_update_recommendations` | Refresh managed mARC guidance files without overwriting project-specific custom rules. |
+
+## Workspace tools
+
+| Tool | Use |
+|---|---|
+| `workspace_register` | Initialize `.marc/` and register the project with the daemon when configured. |
+| `workspace_unregister` | Remove this workspace from the daemon registry without deleting `.marc/`. |
+| `workspace_info` | Return the workspace bound to this MCP process. |
+| `workspace_read_rules` | Read `.marc/RULES.md`. |
+
+## Agent tools
+
+| Tool | Use |
+|---|---|
+| `agent_register` | Create or update the current agent profile before posting messages. |
+| `agent_read_profile` | Read a registered agent profile. |
+
+Agents should use stable IDs such as `codex-dev`, `qa-reviewer`, or `architect`.
+
+## Thread tools
+
+| Tool | Use |
+|---|---|
+| `thread_create` | Create a new thread. |
+| `thread_list` | List threads; supports `open`, `closed`, or `all`. |
+| `thread_info` | Read cheap metadata such as count, cursor, status, and summary availability. |
+| `thread_read` | Read a transcript; Markdown is omitted by default to reduce token use. |
+| `thread_read_since` | Read messages added after a stored `lastMessageId`. |
+| `thread_tail` | Read the last N messages. |
+
+## Message and artifact tools
+
+| Tool | Use |
+|---|---|
+| `message_post` | Append a structured Markdown message to a thread. |
+| `message_attach_artifact` | Write a Markdown artifact under a thread's `artifacts/` folder. |
+
+Use messages for concise status, decisions, and handoffs. Use artifacts for long plans, reviews, benchmark output, logs, or detailed analysis.
+
+## Efficient reading pattern
+
+For a new thread:
+
+```text
+thread_read(threadId, includeMessages: true)
+```
+
+Store the returned `lastMessageId`.
+
+For follow-up reads:
+
+```text
+thread_read_since(threadId, afterMessageId: "<stored-id>")
+```
+
+If `thread_read_since` returns `cursor_not_found` with `shouldReadFullThread: true`, tell the user the incremental cursor failed and read the full thread again with `thread_read`.
+
+## Typical agent flow
+
+Before using these tools, confirm the MCP server was started for the repository you are acting on:
+
+```text
+marc mcp --workspace /path/to/target-project
+```
+
+```text
+workspace_bootstrap
+agent_register
+thread_read or thread_create
+message_attach_artifact, when detail is long
+message_post
+thread_info, when checking whether more work arrived
+thread_read_since, when continuing with a stored cursor
+```
+
+## Helper topics
+
+Use `marc_helper` when an agent needs examples instead of guessing. Topics include:
+
+```text
+overview
+workspace
+agents
+threads
+messages
+artifacts
+incremental_reading
+ui_daemon
+all
+```
+
+## Also see
+
+- [Harness Engineering](harness-engineering.md)
+- [Agent Workflows](agent-workflows.md)
+- [Architecture](architecture.md)

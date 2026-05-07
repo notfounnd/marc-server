@@ -1,0 +1,124 @@
+export type WorkspaceInfo = {
+  id: string;
+  name: string;
+  rootPath: string;
+  marcPath: string;
+};
+
+export type AgentProfile = {
+  id: string;
+  displayName: string;
+  role?: string;
+  model?: string;
+  notes?: string;
+};
+
+export type ThreadInfo = {
+  id: string;
+  title: string;
+  path: string;
+  createdAt: string;
+  status: "open" | "closed";
+  closedAt?: string;
+  summaryPath?: string;
+};
+
+export type ChatMessage = {
+  id: string;
+  threadId: string;
+  timestamp: string;
+  agentId: string;
+  role?: string;
+  body: string;
+  artifacts: string[];
+};
+
+export type MessageInput = {
+  agentId: string;
+  body: string;
+  role?: string;
+  artifacts?: string[];
+};
+
+export type WorkspaceRecommendationsUpdate = {
+  updated: string[];
+  alreadyCurrent: string[];
+};
+
+export type ThreadListStatus = "open" | "closed" | "all";
+
+export type ThreadListOptions = {
+  status?: ThreadListStatus;
+};
+
+export type ThreadReadOptions = {
+  includeMarkdown?: boolean;
+  includeMessages?: boolean;
+  includeSummary?: boolean;
+};
+
+export type ThreadReadResult = {
+  markdown?: string;
+  messages?: ChatMessage[];
+  summary?: string;
+  messageCount: number;
+  lastMessageId?: string;
+  updatedAt?: string;
+};
+
+export type ThreadReadSinceResult =
+  | {
+      ok: true;
+      afterMessageId: string;
+      messages: ChatMessage[];
+      messageCount: number;
+      lastMessageId?: string;
+      updatedAt?: string;
+    }
+  | {
+      ok: false;
+      error: "cursor_not_found";
+      shouldReadFullThread: true;
+      afterMessageId: string;
+      messages: [];
+      messageCount: number;
+      lastMessageId?: string;
+      updatedAt?: string;
+    };
+
+export type ThreadInfoResult = ThreadInfo & {
+  messageCount: number;
+  lastMessageId?: string;
+  updatedAt: string;
+  summaryAvailable: boolean;
+};
+
+export type ThreadTailOptions = {
+  limit?: number;
+};
+
+export type ThreadTailResult = {
+  messages: ChatMessage[];
+  messageCount: number;
+  lastMessageId?: string;
+  updatedAt?: string;
+  limit: number;
+};
+
+export type ThreadIndexEntry = ThreadInfo & {
+  chatMtimeMs: number;
+  summaryMtimeMs?: number;
+};
+
+export type ThreadIndexSnapshot = {
+  version: 1;
+  updatedAt: string;
+  threads: ThreadIndexEntry[];
+};
+
+export type DaemonConfig = {
+  dataDir: string;
+  host: string;
+  port: number;
+  token: string;
+};
