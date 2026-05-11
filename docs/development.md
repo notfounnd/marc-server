@@ -23,7 +23,10 @@ src/
     ui.ts
   mcp/
     server.ts
+  i18n/
+    index.ts
   ui/
+    i18n.ts
     main.tsx
     marc-links.ts
     styles.css
@@ -69,6 +72,7 @@ Current test areas include:
 - core workspace behavior;
 - daemon behavior;
 - MCP tool registration and bootstrap rules;
+- UI i18n catalog boundaries;
 - mARC reference parsing;
 - UI link rendering utilities.
 
@@ -77,6 +81,20 @@ Run type checking separately:
 ```bash
 pnpm typecheck
 ```
+
+## UI localization
+
+The browser UI uses `i18next` and `react-i18next`. The default and only supported locale is `en_US`.
+
+Visible product text belongs in `public/locales/en_US/translation.json`. Keep this catalog flat: each key maps directly to one string value, with no nested objects or arrays.
+
+Localization is scoped to the browser UI:
+
+- use `useTranslation()` in `src/ui/**`;
+- use `src/ui/i18n.ts` to initialize the browser runtime;
+- use `src/i18n/index.ts` only for build-time or test helpers that inspect the catalog.
+
+Do not route MCP, daemon, core, CLI, workspace files, user messages, thread content, artifacts, summaries, or custom rules through i18n. Those contracts remain literal en-US code or user-authored content.
 
 ## Documentation
 

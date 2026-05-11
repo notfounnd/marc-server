@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import ReactMarkdown from "react-markdown";
+import { useTranslation } from "react-i18next";
 import remarkGfm from "remark-gfm";
 import {
   Archive,
@@ -32,6 +33,7 @@ import {
   type ComposerAutocompleteRequest,
 } from "./composer-autocomplete.js";
 import { linkifyMarcReferences, marcReferenceLabel, transformMarkdownUrl } from "./marc-links.js";
+import "./i18n.js";
 import "./styles.css";
 
 type Workspace = {
@@ -189,10 +191,11 @@ function parseAgentProfile(markdown: string): { title: string; role?: string; mo
 }
 
 function App() {
+  const { t } = useTranslation();
   const [token, setToken] = useState(() => localStorage.getItem("marcToken") ?? "");
   const [tokenLocked, setTokenLocked] = useState(() => localStorage.getItem("marcTokenLocked") === "true");
   const [statusKind, setStatusKind] = useState<StatusKind>("idle");
-  const [status, setStatus] = useState("Token required");
+  const [status, setStatus] = useState(() => t("Token required"));
   const [toast, setToast] = useState<Toast>();
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [threads, setThreads] = useState<Thread[]>([]);
@@ -283,7 +286,7 @@ function App() {
   const api = useCallback(
     async <T,>(path: string): Promise<T> => {
       if (!tokenLocked || !token.trim()) {
-        throw new Error("Lock the daemon token first.");
+        throw new Error(t("Lock the daemon token first."));
       }
 
       const response = await fetch(path, {
@@ -298,13 +301,13 @@ function App() {
 
       return response.json() as Promise<T>;
     },
-    [token, tokenLocked],
+    [t, token, tokenLocked],
   );
 
   const apiPost = useCallback(
     async <T,>(path: string, body: unknown): Promise<T> => {
       if (!tokenLocked || !token.trim()) {
-        throw new Error("Lock the daemon token first.");
+        throw new Error(t("Lock the daemon token first."));
       }
 
       const response = await fetch(path, {
@@ -322,7 +325,7 @@ function App() {
 
       return response.json() as Promise<T>;
     },
-    [token, tokenLocked],
+    [t, token, tokenLocked],
   );
 
   const refresh = useCallback(async (options: { force?: boolean; includeThread?: boolean } = {}) => {
@@ -385,7 +388,7 @@ function App() {
       }
 
       setStatusKind("ok");
-      setStatus("Connected");
+      setStatus(t("Connected"));
       setLastSyncedAt(new Date());
     } catch (error) {
       setStatusKind("error");
@@ -419,7 +422,7 @@ function App() {
     const source = new EventSource(`/api/events?token=${encodeURIComponent(token.trim())}`);
     source.addEventListener("open", () => {
       setStatusKind("ok");
-      setStatus("Live updates connected");
+        setStatus(t("Live updates connected"));
     });
     const scheduleRefresh = () => {
       if (liveRefreshTimerRef.current) {
@@ -440,7 +443,7 @@ function App() {
     });
     source.addEventListener("error", () => {
       setStatusKind("warn");
-      setStatus("Live updates reconnecting");
+        setStatus(t("Live updates reconnecting"));
     });
 
     return () => {
@@ -456,7 +459,7 @@ function App() {
     const normalized = token.trim();
     if (!normalized) {
       setStatusKind("error");
-      setStatus("Paste the daemon token first.");
+      setStatus(t("Paste the daemon token first."));
       return;
     }
 
@@ -465,14 +468,14 @@ function App() {
     setToken(normalized);
     setTokenLocked(true);
     setStatusKind("warn");
-    setStatus("Checking daemon");
+    setStatus(t("Checking daemon"));
   }
 
   function unlockToken() {
     localStorage.setItem("marcTokenLocked", "false");
     setTokenLocked(false);
     setStatusKind("warn");
-    setStatus("Token unlocked");
+    setStatus(t("Token unlocked"));
   }
 
   async function selectWorkspace(workspace: Workspace) {
@@ -548,7 +551,7 @@ function App() {
         await api<ThreadPayload>(`/api/workspaces/${encodeURIComponent(selectedWorkspace.id)}/threads/${encodeURIComponent(selectedThread.id)}`),
       );
       setStatusKind("ok");
-      setStatus("Message posted");
+      setStatus(t("Message posted"));
       setLastSyncedAt(new Date());
     } catch (error) {
       setStatusKind("error");
@@ -562,7 +565,7 @@ function App() {
     if (!selectedWorkspace || !selectedThread || !artifactDraft || savingArtifact) return;
     if (!artifactDraft.fileName.trim() || !artifactDraft.content.trim()) {
       setStatusKind("error");
-      setStatus("Artifact name and content are required");
+      setStatus(t("Artifact name and content are required"));
       return;
     }
 
@@ -580,7 +583,7 @@ function App() {
         await api<ThreadPayload>(`/api/workspaces/${encodeURIComponent(selectedWorkspace.id)}/threads/${encodeURIComponent(selectedThread.id)}`),
       );
       setStatusKind("ok");
-      setStatus(`Artifact attached: ${response.artifact}`);
+      setStatus(t("Artifact attached: {{artifact}}", { artifact: response.artifact }));
       setLastSyncedAt(new Date());
     } catch (error) {
       setStatusKind("error");
@@ -601,7 +604,7 @@ function App() {
     const thread = [...openThreads, ...archivedThreads].find((item) => item.id === threadId);
     if (!thread) {
       setStatusKind("error");
-      setStatus(`Thread not found: ${threadId}`);
+      setStatus(t("Thread not found: {{threadId}}", { threadId }));
       return undefined;
     }
     return selectThread(thread);
@@ -638,7 +641,7 @@ function App() {
     const threadId = reference.threadId ?? selectedThreadIdRef.current;
     if (!threadId) {
       setStatusKind("error");
-      setStatus("Select a thread before opening a local artifact reference.");
+      setStatus(t("Select a thread before opening a local artifact reference."));
       return;
     }
 
@@ -665,7 +668,7 @@ function App() {
         selectAgent(agent);
       } else {
         setStatusKind("error");
-        setStatus(`Agent not found: ${reference.agentId}`);
+        setStatus(t("Agent not found: {{agentId}}", { agentId: reference.agentId }));
       }
       return;
     }
@@ -716,39 +719,39 @@ function App() {
     <div className="shell">
       <aside className="sidebar">
         <div className="brand">
-          <button className="brand-mark" onClick={goHome} title="Home" aria-label="Home">
+          <button className="brand-mark" onClick={goHome} title={t("Home")} aria-label={t("Home")}>
             m
           </button>
           <div className="content-title-block">
             <h1>mARC</h1>
           </div>
         </div>
-        <p className="brand-tagline">Shared context for coding agents</p>
+        <p className="brand-tagline">{t("Shared context for coding agents")}</p>
 
         <section className="panel token-panel">
           <div className="panel-heading">
             <KeyRound size={16} />
-            <span>Daemon token</span>
+            <span>{t("Daemon token")}</span>
           </div>
           <input
             value={token}
             disabled={tokenLocked}
             onChange={(event) => setToken(event.target.value)}
             type="password"
-            placeholder="Paste token"
+            placeholder={t("Paste token")}
           />
           <div className="token-actions">
             {tokenLocked ? (
               <Button variant="ghost" onClick={unlockToken}>
-                Change token
+                {t("Change token")}
               </Button>
             ) : (
               <Button variant="primary" onClick={lockToken}>
                 <Check size={15} />
-                Save and lock
+                {t("Save and lock")}
               </Button>
             )}
-            <Button variant="secondary" onClick={() => void refresh({ force: true, includeThread: true })} disabled={!tokenLocked || busy} title="Refresh now">
+          <Button variant="secondary" onClick={() => void refresh({ force: true, includeThread: true })} disabled={!tokenLocked || busy} title={t("Refresh now")}>
               <RefreshCw size={15} className={busy ? "spin" : ""} />
             </Button>
           </div>
@@ -761,7 +764,7 @@ function App() {
         <section className="section">
           <div className="section-title">
             <Server size={16} />
-            <h2>Workspaces</h2>
+            <h2>{t("Workspaces")}</h2>
           </div>
           <div className="stack">
             {workspaces.length ? (
@@ -776,7 +779,7 @@ function App() {
                 />
               ))
             ) : (
-              <EmptyState title="No workspaces" detail="Ask an agent to register a project in mARC." />
+              <EmptyState title={t("No workspaces")} detail={t("Ask an agent to register a project in mARC.")} />
             )}
           </div>
         </section>
@@ -787,13 +790,13 @@ function App() {
           <div className="section-title section-title-split">
             <span className="section-title-main">
               {showClosedThreads ? <Archive size={16} /> : <MessageSquareText size={16} />}
-              <h2>{showClosedThreads ? "Closed" : "Threads"}</h2>
+              <h2>{showClosedThreads ? t("Closed") : t("Threads")}</h2>
             </span>
             <Button
               variant={showClosedThreads ? "primary" : "ghost"}
               className="button-icon"
               onClick={() => setShowClosedThreads((value) => !value)}
-              title={showClosedThreads ? "Show open threads" : "Show closed threads"}
+              title={showClosedThreads ? t("Show open threads") : t("Show closed threads")}
             >
               {showClosedThreads ? <X size={15} /> : <Archive size={15} />}
             </Button>
@@ -807,7 +810,7 @@ function App() {
                   title={thread.title}
                   detail={
                     isClosedThread(thread) && thread.closedAt
-                      ? `Closed ${new Date(thread.closedAt).toLocaleString()}`
+                      ? t("Closed {{date}}", { date: new Date(thread.closedAt).toLocaleString() })
                       : thread.id
                   }
                   active={thread.id === selectedThreadId}
@@ -817,11 +820,11 @@ function App() {
               ))
             ) : (
               <EmptyState
-                title={showClosedThreads ? "No closed threads" : "No threads"}
+                title={showClosedThreads ? t("No closed threads") : t("No threads")}
                 detail={
                   showClosedThreads
-                    ? "Threads with SUMMARY.md will appear here."
-                    : "Create a thread from an agent to start the room."
+                    ? t("Threads with SUMMARY.md will appear here.")
+                    : t("Create a thread from an agent to start the room.")
                 }
               />
             )}
@@ -831,7 +834,7 @@ function App() {
         <section className="section">
           <div className="section-title">
             <AtSign size={16} />
-            <h2>Marckers</h2>
+            <h2>{t("Marckers")}</h2>
           </div>
           <div className="stack">
             {agents.length ? (
@@ -851,7 +854,7 @@ function App() {
                 );
               })
             ) : (
-              <EmptyState title="No marckers" detail="Register a user or agent before posting." />
+              <EmptyState title={t("No marckers")} detail={t("Register a user or agent before posting.")} />
             )}
           </div>
         </section>
@@ -862,7 +865,7 @@ function App() {
           <div>
             <div className="eyebrow">
               <FileText size={14} />
-              {selectedThread ? "Thread" : selectedAgent ? "Agent" : "Workspace"}
+              {selectedThread ? t("Thread") : selectedAgent ? t("Agent") : t("Workspace")}
             </div>
             <h2 className={classNames(selectedThread && isClosedThread(selectedThread) && "content-title-closed")}>
               {selectedThread?.title ?? (selectedAgent ? parseAgentProfile(selectedAgent.markdown).title : selectedWorkspace?.name ?? "mARC")}
@@ -873,25 +876,25 @@ function App() {
                 <button
                   className="copy-reference-button"
                   onClick={() => void copyReference(`marc://$${selectedThread.id}`)}
-                  title="Copy thread reference"
+                  title={t("Copy thread reference")}
                 >
                   <Copy size={13} />
                 </button>
               </p>
             ) : (
-              <p>{selectedAgent?.id ?? selectedWorkspace?.rootPath ?? "Lock the token to start syncing."}</p>
+              <p>{selectedAgent?.id ?? selectedWorkspace?.rootPath ?? t("Lock the token to start syncing.")}</p>
             )}
           </div>
           <div className="content-side">
             <div className="content-badges">
               <Badge tone={statusKind === "ok" ? "green" : statusKind === "error" || statusKind === "warn" ? "amber" : "neutral"}>
                 <Clock3 size={13} />
-                {lastSyncedAt ? `Synced ${lastSyncedAt.toLocaleTimeString()}` : "Not synced"}
+                {lastSyncedAt ? t("Synced {{time}}", { time: lastSyncedAt.toLocaleTimeString() }) : t("Not synced")}
               </Badge>
               {selectedThread && isClosedThread(selectedThread) ? (
                 <Badge tone="amber">
                   <Archive size={13} />
-                  Closed
+                  {t("Closed")}
                 </Badge>
               ) : null}
             </div>
@@ -902,7 +905,7 @@ function App() {
                     variant={showArtifactMenu ? "primary" : "secondary"}
                     className="button-icon"
                     onClick={() => setShowArtifactMenu((value) => !value)}
-                    title="Show thread artifacts"
+                    title={t("Show thread artifacts")}
                   >
                     <Paperclip size={15} />
                   </Button>
@@ -910,7 +913,7 @@ function App() {
                     <div className="artifact-menu">
                       <div className="artifact-menu-head">
                         <Paperclip size={14} />
-                        <span>Artifacts</span>
+                        <span>{t("Artifacts")}</span>
                       </div>
                       <div className="artifact-menu-list">
                         {selectedThreadArtifacts.map(({ message, artifact, href }) => (
@@ -961,7 +964,7 @@ function App() {
         ) : selectedWorkspace ? (
           <WorkspaceOverview rules={rules} onLink={handleMarkdownLink} />
         ) : (
-          <EmptyState title="No workspace selected" detail="Save the daemon token and select a workspace from the sidebar." />
+          <EmptyState title={t("No workspace selected")} detail={t("Save the daemon token and select a workspace from the sidebar.")} />
         )}
         <footer className="content-footer">
           <span aria-hidden="true" />
@@ -972,7 +975,7 @@ function App() {
               event.preventDefault();
               setShowShortcuts(true);
             }}
-            title="Keyboard shortcuts"
+            title={t("Keyboard shortcuts")}
           >
             <Keyboard size={15} />
           </a>
@@ -1023,6 +1026,7 @@ function Composer({
   onSend: () => void;
   loadThreadMessages: (threadId: string) => Promise<Message[]>;
 }) {
+  const { t } = useTranslation();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const autocompleteListRef = useRef<HTMLDivElement>(null);
   const [autocomplete, setAutocomplete] = useState<{
@@ -1130,11 +1134,11 @@ function Composer({
     <section className="composer">
         <div className="composer-head">
           <div>
-            <h3>Post to this thread</h3>
-            <p>Messages are appended to the same CHAT.md that agents read.</p>
+            <h3>{t("Post to this thread")}</h3>
+            <p>{t("Messages are appended to the same CHAT.md that agents read.")}</p>
           </div>
           <label>
-            Sender
+            {t("Sender")}
             <input value={agentId} onChange={(event) => onAgentIdChange(event.target.value)} placeholder="ui-user" />
           </label>
         </div>
@@ -1147,11 +1151,11 @@ function Composer({
               setAutocomplete(undefined);
             }}
             onKeyDown={handleComposerKeyDown}
-            placeholder="Write a note, decision, or instruction for the agents..."
+            placeholder={t("Write a note, decision, or instruction for the agents...")}
             rows={5}
           />
           {autocomplete ? (
-            <div ref={autocompleteListRef} className="composer-autocomplete" role="listbox" aria-label="mARC reference suggestions">
+            <div ref={autocompleteListRef} className="composer-autocomplete" role="listbox" aria-label={t("mARC reference suggestions")}>
               {autocomplete.options.length ? (
                 autocomplete.options.map((option, index) => (
                   <button
@@ -1175,29 +1179,29 @@ function Composer({
                     role="option"
                     aria-selected={index === autocomplete.activeIndex}
                   >
-                    <span className="composer-autocomplete-kind">{option.type}</span>
+                    <span className="composer-autocomplete-kind">{t(option.type)}</span>
                     <span className="composer-autocomplete-main">{option.label}</span>
-                    <small>{option.detail}</small>
+                    <small>{t(option.detail)}</small>
                   </button>
                 ))
               ) : (
-                <div className="composer-autocomplete-empty">No references found</div>
+                <div className="composer-autocomplete-empty">{t("No references found")}</div>
               )}
             </div>
           ) : null}
         </div>
         <div className="composer-actions">
           <span className={classNames("composer-count", isOverCharacterLimit && "composer-count-limit")}>
-            {remainingChars} chars left
+            {t("{{count}} chars left", { count: remainingChars })}
           </span>
           {!validation.ok && trimmedBody ? <span className="composer-warning">{validation.reason}</span> : null}
           <span className="composer-tip">
             <CircleHelp size={16} />
-            <span role="tooltip">For large notes, post a short message first and then attach a markdown artifact to it.</span>
+            <span role="tooltip">{t("For large notes, post a short message first and then attach a markdown artifact to it.")}</span>
           </span>
           <Button variant="primary" onClick={onSend} disabled={!canSend}>
             <MessageSquareText size={15} />
-            {sending ? "Posting" : "Post message"}
+            {sending ? t("Posting") : t("Post message")}
           </Button>
         </div>
     </section>
@@ -1205,11 +1209,12 @@ function Composer({
 }
 
 function KeyboardShortcutsModal({ onClose }: { onClose: () => void }) {
+  const { t } = useTranslation();
   const shortcuts = [
-    ["Ctrl+Space", "Open autocomplete for the current @, #, $, or marc:// reference."],
-    ["ArrowUp / ArrowDown", "Move through autocomplete suggestions."],
-    ["Enter / Tab", "Insert the active suggestion."],
-    ["Escape", "Close autocomplete or this dialog."],
+    ["Ctrl+Space", t("Open autocomplete for the current @, #, $, or marc:// reference.")],
+    ["ArrowUp / ArrowDown", t("Move through autocomplete suggestions.")],
+    ["Enter / Tab", t("Insert the active suggestion.")],
+    ["Escape", t("Close autocomplete or this dialog.")],
   ];
 
   useEffect(() => {
@@ -1229,10 +1234,10 @@ function KeyboardShortcutsModal({ onClose }: { onClose: () => void }) {
           <div>
             <h2 id="keyboard-shortcuts-title" className="modal-title-icon">
               <Keyboard size={18} />
-              Keyboard shortcuts
+              {t("Keyboard shortcuts")}
             </h2>
           </div>
-          <Button variant="ghost" className="button-icon" onClick={onClose} title="Close">
+          <Button variant="ghost" className="button-icon" onClick={onClose} title={t("Close")}>
             <X size={18} />
           </Button>
         </header>
@@ -1260,8 +1265,10 @@ function ThreadView({
   onLink: MarkdownLinkHandler;
   onCopyReference: (reference: string) => void | Promise<void>;
 }) {
+  const { t } = useTranslation();
+
   if (!payload) {
-    return <EmptyState title="Loading thread" detail="Waiting for the daemon response." />;
+    return <EmptyState title={t("Loading thread")} detail={t("Waiting for the daemon response.")} />;
   }
 
   const messages = payload.messages ?? [];
@@ -1269,7 +1276,7 @@ function ThreadView({
     <section className="summary-panel">
       <div className="section-title">
         <Archive size={16} />
-        <h2>Executive Summary</h2>
+        <h2>{t("Executive Summary")}</h2>
       </div>
       <MarkdownPanel markdown={payload.summary} compact onLink={onLink} />
     </section>
@@ -1282,7 +1289,7 @@ function ThreadView({
         {payload.markdown ? (
           <MarkdownPanel markdown={payload.markdown} onLink={onLink} />
         ) : (
-          <EmptyState title="No messages" detail="This thread has no messages yet." />
+          <EmptyState title={t("No messages")} detail={t("This thread has no messages yet.")} />
         )}
       </>
     );
@@ -1311,7 +1318,7 @@ function ThreadView({
                     variant="ghost"
                     className="button-icon message-action"
                     onClick={() => onAttachArtifact(message)}
-                    title="Attach markdown artifact"
+                    title={t("Attach markdown artifact")}
                   >
                     <Paperclip size={15} />
                   </Button>
@@ -1352,6 +1359,8 @@ function ArtifactModal({
   onClose: () => void;
   onSave: () => void;
 }) {
+  const { t } = useTranslation();
+
   return (
     <div className="modal-layer" role="presentation">
       <section className="modal-panel" role="dialog" aria-modal="true" aria-labelledby="artifact-modal-title">
@@ -1359,42 +1368,42 @@ function ArtifactModal({
           <div>
             <div className="eyebrow">
               <Paperclip size={14} />
-              Markdown artifact
+              {t("Markdown artifact")}
             </div>
-            <h2 id="artifact-modal-title">Attach artifact</h2>
+            <h2 id="artifact-modal-title">{t("Attach artifact")}</h2>
             <p>{draft.message.id}</p>
           </div>
-          <Button variant="ghost" className="button-icon" onClick={onClose} title="Close">
+          <Button variant="ghost" className="button-icon" onClick={onClose} title={t("Close")}>
             <X size={16} />
           </Button>
         </header>
 
         <label className="modal-field">
-          File name
+          {t("File name")}
           <input
             value={draft.fileName}
             onChange={(event) => onChange({ ...draft, fileName: event.target.value })}
-            placeholder="decision-notes"
+            placeholder={t("decision-notes")}
           />
         </label>
 
         <label className="modal-field modal-field-grow">
-          Markdown
+          {t("Markdown")}
           <textarea
             value={draft.content}
             onChange={(event) => onChange({ ...draft, content: event.target.value })}
-            placeholder="# Notes"
+            placeholder={t("# Notes")}
             rows={16}
           />
         </label>
 
         <footer className="modal-actions">
           <Button variant="secondary" onClick={onClose} disabled={saving}>
-            Cancel
+            {t("Cancel")}
           </Button>
           <Button variant="primary" onClick={onSave} disabled={saving || !draft.fileName.trim() || !draft.content.trim()}>
             <Paperclip size={15} />
-            {saving ? "Saving" : "Attach"}
+            {saving ? t("Saving") : t("Attach")}
           </Button>
         </footer>
       </section>
@@ -1411,6 +1420,8 @@ function ArtifactViewerModal({
   onClose: () => void;
   onLink: MarkdownLinkHandler;
 }) {
+  const { t } = useTranslation();
+
   return (
     <div className="modal-layer" role="presentation">
       <section className="modal-panel artifact-viewer" role="dialog" aria-modal="true" aria-labelledby="artifact-viewer-title">
@@ -1418,14 +1429,14 @@ function ArtifactViewerModal({
           <div>
             <div className="eyebrow">
               <Paperclip size={14} />
-              Markdown artifact
+              {t("Markdown artifact")}
             </div>
             <h2 id="artifact-viewer-title">{artifact.artifact.replace(/^artifacts\//, "")}</h2>
             <p>
               {artifact.threadId} / #{artifact.messageId}
             </p>
           </div>
-          <Button variant="ghost" className="button-icon" onClick={onClose} title="Close">
+          <Button variant="ghost" className="button-icon" onClick={onClose} title={t("Close")}>
             <X size={16} />
           </Button>
         </header>
@@ -1438,10 +1449,12 @@ function ArtifactViewerModal({
 }
 
 function WorkspaceOverview({ rules, onLink }: { rules: string; onLink: MarkdownLinkHandler }) {
+  const { t } = useTranslation();
+
   return (
     <div className="overview">
-      <h3>RULES.md</h3>
-      <MarkdownPanel markdown={rules || "No rules loaded yet."} onLink={onLink} />
+      <h3>{t("RULES.md")}</h3>
+      <MarkdownPanel markdown={rules || t("No rules loaded yet.")} onLink={onLink} />
     </div>
   );
 }

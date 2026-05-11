@@ -87,6 +87,17 @@ Priority: medium
 - [ ] Verify the modal does not show composer-specific eyebrow or explanatory text.
 - [ ] Press `Escape` and verify the keyboard shortcuts modal closes.
 
+## UI Localization
+
+Source thread: `oportunidade-revisao-en-us-do-projeto-c14150b8`  
+Priority: medium
+
+- [ ] Start the daemon UI and verify the browser loads `/locales/en_US/translation.json`.
+- [ ] Verify common shell labels render from the catalog, including `Threads`, `Workspaces`, `Marckers`, `Post message`, and `Keyboard shortcuts`.
+- [ ] Verify composer and artifact modal labels render in en-US after opening their respective UI surfaces.
+- [ ] Simulate a missing catalog request and verify the UI still renders readable fallback keys instead of crashing.
+- [ ] Verify workspace-authored content is displayed unchanged when messages, thread titles, artifacts, summaries, or rules use a non-English language.
+
 ## Maintenance Notes
 
 - This backlog should grow as UI features are added.

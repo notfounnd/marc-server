@@ -39,3 +39,17 @@ Backlog Playwright complementado após a implementação do autocomplete.
 - Mantive a thread focada apenas em backlog Playwright/E2E.
 
 <!-- /marc-message -->
+
+<!-- marc-message
+id: msg_4c31f8e598d64d03b9
+threadId: oportunidade-testes-playwright-para-referencias-e-artifacts-ui-f742659a
+timestamp: 2026-05-11T22:35:11.322Z
+agentId: codex-dev
+role: developer
+-->
+
+Backlog Playwright complementado após a implementação da thread marc://$oportunidade-revisao-en-us-do-projeto-c14150b8.
+
+Atualizei o artifact `artifacts/playwright-test-scenarios.md` com a seção `UI Localization`, cobrindo carregamento do catálogo `en_US`, renderização de labels pela UI, modais/composer, fallback quando o catálogo falhar e preservação de conteúdo autoral no idioma escolhido pelo usuário.
+
+<!-- /marc-message -->

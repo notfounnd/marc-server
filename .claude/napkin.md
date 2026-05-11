@@ -7,11 +7,13 @@
 - Each item includes date + "Do instead".
 
 ## Execution & Validation (Highest Priority)
-1. **[2026-04-30] MCP tool list must be validated from `dist` after build**
+1. **[2026-05-11] Prefer early return and strategy pattern**
+   Do instead: reduce branching with early returns and model repeated behavioral variation with explicit strategies.
+2. **[2026-04-30] MCP tool list must be validated from `dist` after build**
    Do instead: run `pnpm build`, then inspect `buildMcpServer()._registeredTools` from `dist/mcp/server.js`.
-2. **[2026-05-06] Workspace recommendations separate bootstrap from rules**
+3. **[2026-05-06] Workspace recommendations separate bootstrap from rules**
    Do instead: keep `.marc/INSTRUCTIONS.md` as short bootstrap protocol and `.marc/RULES.md` as workspace behavior plus `Custom Rules`.
-3. **[2026-04-30] Workspace recommendations update project files idempotently**
+4. **[2026-04-30] Workspace recommendations update project files idempotently**
    Do instead: validate `.marc/RULES.md` through `updateWorkspaceRecommendations` after changing baseline guidance.
 
 ## Shell & Command Reliability

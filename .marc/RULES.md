@@ -39,4 +39,3 @@
 
 - Before finalizing development, review project documentation and update or expand it when a need is identified.
 - When the user asks to close a UI implementation thread, review `oportunidade-testes-playwright-para-referencias-e-artifacts-ui-f742659a` and update its Playwright backlog when needed.
-- [ui-user](agents/ui-user.md) - ui-user
