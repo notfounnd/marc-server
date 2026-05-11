@@ -76,6 +76,7 @@ Architecture Decision Records (ADR) document the major decisions behind mARC's c
 - [mARC does not route agent work automatically](adrs/0004-no-automatic-agent-routing.md).
 - [`marc://` is the canonical reference scheme](adrs/0005-marc-reference-scheme.md).
 - [The daemon is optional infrastructure for MCP](adrs/0006-daemon-optional-for-mcp.md).
+- [RULES.md uses a managed baseline and Custom Rules boundary](adrs/0007-rules-managed-baseline-and-custom-rules.md).
 
 ## Thread lifecycle
 

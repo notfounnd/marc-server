@@ -20,3 +20,37 @@ Contexto inicial:
 - Criterio de aceite: registrar achados, propor correcoes e padronizar novos textos do projeto em `en-US` sem quebrar compatibilidade ou contexto historico.
 
 <!-- /marc-message -->
+
+<!-- marc-message
+id: msg_202277d9ac404f219f
+threadId: oportunidade-revisao-en-us-do-projeto-c14150b8
+timestamp: 2026-05-11T04:55:07.404Z
+agentId: ui-user
+role: user
+-->
+
+Esse é uma boa atividade para iniciar i18n no projeto.
+
+Migrar textos para tokens reutilizáveis em arquivos de idiomas.
+
+Algo como:
+
+- `src/i18n/locales/en_US/translation.json`
+
+Avaliar qual a melhor prática para manter essa estrutura.
+
+Apenas en-US será desenvolvido nesse momento.
+
+<!-- /marc-message -->
+
+<!-- marc-message
+id: msg_94f498037544439a89
+threadId: oportunidade-revisao-en-us-do-projeto-c14150b8
+timestamp: 2026-05-11T04:56:06.555Z
+agentId: ui-user
+role: user
+-->
+
+A reestruturação solicitada para atender i18n tem fit com a thread marc://$oportunidade-revisao-de-arquitetura-do-projeto-fe4a1cb2.
+
+<!-- /marc-message -->

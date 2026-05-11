@@ -8,6 +8,7 @@ import {
   createThread,
   getWorkspaceInfo,
   initWorkspace,
+  listAgentProfiles,
   listThreads,
   readAgentProfile,
   readRules,
@@ -162,9 +163,10 @@ const MARC_HELPER_GUIDES: Record<Exclude<MarcHelperTopic, "all">, MarcHelperGuid
       "Before an agent posts messages.",
       "When a coordinator needs to understand which participant wrote a message.",
     ],
-    relatedTools: ["agent_register", "agent_read_profile"],
+    relatedTools: ["agent_register", "agent_list", "agent_read_profile"],
     examples: [
       "agent_register with id codex-dev, displayName codex-dev, and role developer.",
+      "agent_list before writing a mention such as marc://@codex-dev.",
       "agent_read_profile for a referenced participant before assigning review work.",
     ],
     notes: [
@@ -403,6 +405,13 @@ export function buildMcpServer(options: McpOptions = {}): McpServer {
       const id = await registerAgent(workspaceRoot, input);
       return { id };
     }),
+  );
+
+  server.tool(
+    "agent_list",
+    "List registered agent profiles in this workspace.",
+    gatedShape({}),
+    async (input) => withBootstrap(input, async () => listAgentProfiles(workspaceRoot)),
   );
 
   server.tool(

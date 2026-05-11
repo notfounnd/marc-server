@@ -28,6 +28,7 @@ test("registers only canonical grouped MCP tool names", () => {
   const tools = Object.keys((server as unknown as { _registeredTools: Record<string, unknown> })._registeredTools).sort();
 
   assert.deepEqual(tools, [
+    "agent_list",
     "agent_read_profile",
     "agent_register",
     "marc_helper",
@@ -55,6 +56,14 @@ test("thread_list accepts optional status filter", () => {
   const tool = registeredTools(server).thread_list;
 
   assert.ok(tool.inputSchema.shape.status);
+});
+
+test("agent tools expose list and profile schemas", () => {
+  const server = buildMcpServer({ workspace: process.cwd() });
+  const tools = registeredTools(server);
+
+  assert.ok(tools.agent_list);
+  assert.ok(tools.agent_read_profile.inputSchema.shape.agentId);
 });
 
 test("thread read tools expose incremental cursor schemas", () => {

@@ -12,3 +12,4 @@ Architecture Decision Records (ADR) are intentionally short. They explain the de
 - [0004 - mARC does not route agent work automatically](0004-no-automatic-agent-routing.md)
 - [0005 - `marc://` is the canonical reference scheme](0005-marc-reference-scheme.md)
 - [0006 - The daemon is optional infrastructure for MCP](0006-daemon-optional-for-mcp.md)
+- [0007 - RULES.md uses a managed baseline and Custom Rules boundary](0007-rules-managed-baseline-and-custom-rules.md)

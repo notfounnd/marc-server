@@ -51,6 +51,12 @@ test("initializes the canonical .marc layout", async () => {
   await fs.access(path.join(workspace, ".marc", "RULES.md"));
   await fs.access(path.join(workspace, ".marc", "agents"));
   await fs.access(path.join(workspace, ".marc", "threads"));
+
+  const rules = await readRules(workspace);
+  assert.match(rules, /- Use `agent_list` to discover registered agents\./);
+  assert.match(rules, /- Use `agent_read_profile` to inspect a specific agent profile\./);
+  assert.doesNotMatch(rules, /Registered Agents \(Marckers\)/);
+  assert.doesNotMatch(rules, /codex-dev/);
 });
 
 test("registers agents and appends thread messages", async () => {
@@ -74,7 +80,8 @@ test("registers agents and appends thread messages", async () => {
   const transcript = await readThread(workspace, thread.id);
 
   assert.equal(agentId, "codex-agent");
-  assert.match(rules, /codex-agent/);
+  assert.doesNotMatch(rules, /codex-agent/);
+  assert.match(agents[0].markdown, /ID: `codex-agent`/);
   assert.equal(agents.length, 1);
   assert.equal(threads.length, 1);
   assert.equal(transcript.messageCount, 1);
@@ -237,8 +244,9 @@ test("updates workspace recommendations idempotently", async () => {
   const rules = await readRules(workspace);
   const instructions = await readInstructions(workspace);
 
-  assert.deepEqual(first.updated.sort(), ["RULES.md"]);
+  assert.deepEqual(first.updated.sort(), []);
   assert.ok(first.alreadyCurrent.includes("INSTRUCTIONS.md"));
+  assert.ok(first.alreadyCurrent.includes("RULES.md"));
   assert.deepEqual(second.alreadyCurrent.sort(), ["INSTRUCTIONS.md", "RULES.md"]);
   assert.match(instructions, /^# mARC Instructions\n\n<!-- This file is generated and maintained by mARC/m);
   assert.match(
@@ -268,9 +276,12 @@ test("updates workspace recommendations idempotently", async () => {
   ]);
   assert.doesNotMatch(rules, /bootstrapConfirmed: true/);
   assert.match(rules, /`agent_register`/);
+  assert.match(rules, /`agent_list`/);
+  assert.match(rules, /`agent_read_profile`/);
   assert.match(rules, /## Context Reading/);
   assert.match(rules, /`thread_read_since`/);
   assert.doesNotMatch(rules, /`register_agent`/);
+  assert.doesNotMatch(rules, /Registered Agents \(Marckers\)/);
 });
 
 test("maintains a custom rules section at the end of RULES.md", async () => {
@@ -281,7 +292,7 @@ test("maintains a custom rules section at the end of RULES.md", async () => {
 
   assert.match(
     rules,
-    /## Custom Rules\n\n<!-- Keep project-specific custom rules below this line\. This section is preserved by workspace_update_recommendations\. -->\n$/,
+    /## Custom Rules\n\n<!-- Keep project-specific custom rules below this line\. This section is preserved by workspace_update_recommendations\. -->\n<!-- Prefer ### or deeper headings to organize project-specific rules in this section\. -->\n$/,
   );
 
   await fs.appendFile(path.join(workspace, ".marc", "RULES.md"), "- Keep domain examples in Portuguese.\n");
@@ -290,8 +301,68 @@ test("maintains a custom rules section at the end of RULES.md", async () => {
 
   assert.match(
     rules,
-    /## Custom Rules\n\n<!-- Keep project-specific custom rules below this line\. This section is preserved by workspace_update_recommendations\. -->\n- Keep domain examples in Portuguese\.\n$/,
+    /## Custom Rules\n\n<!-- Keep project-specific custom rules below this line\. This section is preserved by workspace_update_recommendations\. -->\n<!-- Prefer ### or deeper headings to organize project-specific rules in this section\. -->\n- Keep domain examples in Portuguese\.\n$/,
   );
+});
+
+test("removes legacy registered agent inventory while preserving custom rules", async () => {
+  const workspace = await tempWorkspace();
+  await initWorkspace(workspace);
+
+  await fs.writeFile(
+    path.join(workspace, ".marc", "RULES.md"),
+    [
+      "# mARC Rules",
+      "",
+      "## Workspace Maintenance",
+      "",
+      "- Run `workspace_update_recommendations` before starting work on a thread.",
+      "",
+      "## Agents",
+      "",
+      "Agents should register through `agent_register` before posting.",
+      "",
+      "## Conversation Rules",
+      "",
+      "- Keep messages useful, readable, and complete; link artifacts when relevant.",
+      "",
+      "## Message Style",
+      "",
+      "- Keep messages useful, readable, and complete.",
+      "",
+      "## Context Reading",
+      "",
+      "- Prefer `thread_read_since` with the stored cursor when checking for new messages.",
+      "",
+      "### Registered Agents (Marckers)",
+      "",
+      "- [codex-dev](agents/codex-dev.md) - codex-dev",
+      "",
+      "### Flow Rules",
+      "",
+      "- Before finalizing development, review project documentation.",
+      "",
+      "## Wrong Custom Area",
+      "",
+      "- This project rule was placed outside Custom Rules and should not be preserved.",
+      "",
+      "## Custom Rules",
+      "",
+      "<!-- Keep project-specific custom rules below this line. This section is preserved by workspace_update_recommendations. -->",
+      "<!-- Prefer ### or deeper headings to organize project-specific rules in this section. -->",
+      "",
+    ].join("\n"),
+  );
+
+  await updateWorkspaceRecommendations(workspace);
+  const rules = await readRules(workspace);
+
+  assert.doesNotMatch(rules, /Registered Agents \(Marckers\)/);
+  assert.doesNotMatch(rules, /\[codex-dev\]\(agents\/codex-dev\.md\)/);
+  assert.doesNotMatch(rules, /Wrong Custom Area/);
+  assert.doesNotMatch(rules, /This project rule was placed outside Custom Rules/);
+  assert.match(rules, /## Custom Rules[\s\S]*### Flow Rules[\s\S]*Before finalizing development/);
+  assert.doesNotMatch(rules, /## Context Reading[\s\S]*### Flow Rules[\s\S]*## Custom Rules/);
 });
 
 test("replaces stale workspace recommendation sections", async () => {
@@ -361,6 +432,7 @@ test("replaces stale workspace recommendation sections", async () => {
   assert.doesNotMatch(rules, /Keep messages concise/);
   assert.match(rules, /Keep messages useful, readable, and complete; link artifacts when relevant/);
   assert.match(rules, /## Workspace Maintenance\n\n- Run `workspace_update_recommendations` before starting work on a thread/);
+  assert.match(rules, /## Agents\n\n- Agents should register through `agent_register` before posting\.\n- Use `agent_list` to discover registered agents\.\n- Use `agent_read_profile` to inspect a specific agent profile\./);
   assertSectionOrder(rules, [
     "## Workspace Maintenance",
     "## Agents",

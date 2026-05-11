@@ -6,9 +6,7 @@
 
 ## Agents
 
-- Agents should register through `agent_register` before posting.
-- Use `agent_list` to discover registered agents.
-- Use `agent_read_profile` to inspect a specific agent profile.
+Agents should register through `agent_register` before posting.
 
 ## Conversation Rules
 
@@ -33,10 +31,3 @@
 ## Custom Rules
 
 <!-- Keep project-specific custom rules below this line. This section is preserved by workspace_update_recommendations. -->
-<!-- Prefer ### or deeper headings to organize project-specific rules in this section. -->
-
-### Flow Rules
-
-- Before finalizing development, review project documentation and update or expand it when a need is identified.
-- When the user asks to close a UI implementation thread, review `oportunidade-testes-playwright-para-referencias-e-artifacts-ui-f742659a` and update its Playwright backlog when needed.
-- [ui-user](agents/ui-user.md) - ui-user
