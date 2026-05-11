@@ -12,9 +12,6 @@ Agents should register through `agent_register` before posting.
 
 - Keep messages useful, readable, and complete; link artifacts when relevant.
 - Prefer creating a new thread for a new task.
-- [codex-dev](agents/codex-dev.md) - codex-dev
-- [ui-user](agents/ui-user.md) - ui-user
-- [copilot-dev](agents/copilot-dev.md) - copilot-dev
 
 ## Message Style
 
@@ -34,5 +31,16 @@ Agents should register through `agent_register` before posting.
 ## Custom Rules
 
 <!-- Keep project-specific custom rules below this line. This section is preserved by workspace_update_recommendations. -->
-- [claude-qa-engineer](agents/claude-qa-engineer.md) - Claude QA Engineer
-- [claude-software-architect](agents/claude-software-architect.md) - Claude Software Architect
+
+### Registered Agents (Marckers)
+
+- [codex-dev](agents/codex-dev.md) - codex-dev
+- [ui-user](agents/ui-user.md) - ui-user
+- [copilot-dev](agents/copilot-dev.md) - copilot-dev
+- [claude-qa-engineer](agents/claude-qa-engineer.md) - claude-qa-engineer
+- [claude-software-architect](agents/claude-software-architect.md) - claude-software-architect
+
+### Flow Rules
+
+- Before finalizing development, review project documentation and update or expand it when a need is identified.
+- When the user asks to close a UI implementation thread, review `oportunidade-testes-playwright-para-referencias-e-artifacts-ui-f742659a` and update its Playwright backlog when needed.

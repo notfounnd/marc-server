@@ -58,6 +58,33 @@ Messages are appended as structured Markdown blocks in `CHAT.md`. The UI display
 
 Visible IDs can be copied as canonical `marc://` references when the UI supports it.
 
+## Composer autocomplete
+
+The message composer supports manual autocomplete for internal references. It opens only after the user types a reference trigger and presses `Ctrl+Space`.
+
+Supported triggers:
+
+- `@` suggests registered agents and inserts `marc://@agent-id`.
+- `$` suggests workspace threads and inserts `marc://$thread-id`.
+- `#` suggests messages and artifacts from the current thread.
+- `marc://$thread-id/#` suggests messages and artifacts from the referenced thread.
+
+The autocomplete does not search messages and artifacts globally. Cross-thread message and artifact suggestions are available only after the user has already referenced a specific thread.
+
+Suggestion order follows the same workspace and thread order used by the UI:
+
+- `$` lists open threads first by `createdAt` descending, then closed threads by `closedAt` descending.
+- `#` lists messages in `CHAT.md` order, oldest first.
+- artifacts appear immediately below their parent message.
+
+Keyboard behavior:
+
+- `ArrowUp` and `ArrowDown` move the active suggestion.
+- `Enter` and `Tab` insert the active suggestion.
+- `Escape` closes the suggestion list.
+
+The content column footer exposes a keyboard icon link that opens the global keyboard shortcuts modal.
+
 ## Artifacts
 
 Artifacts are Markdown files attached to messages. The UI can open them in a modal, and the thread artifact menu can list artifacts posted across the thread.

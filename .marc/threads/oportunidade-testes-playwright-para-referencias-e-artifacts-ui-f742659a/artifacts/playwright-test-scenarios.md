@@ -58,6 +58,35 @@ Priority: high
 - [ ] Verify an oversized message disables `Post message` and shows guidance to use an artifact.
 - [ ] Verify the composer help tooltip explains using artifacts for large messages.
 
+## Composer Autocomplete
+
+Source thread: `oportunidade-autocomplete-de-referencias-no-composer-2341bc9f`  
+Priority: high
+
+- [ ] Type `@`, press `Ctrl+Space`, and verify registered agents appear as canonical `marc://@agent-id` suggestions.
+- [ ] Type `$`, press `Ctrl+Space`, and verify workspace threads appear with open threads before closed threads.
+- [ ] Verify closed thread suggestions are visually distinguished from open thread suggestions.
+- [ ] Type `#`, press `Ctrl+Space`, and verify current-thread messages appear in `CHAT.md` order, oldest first.
+- [ ] Verify artifact suggestions appear directly below and indented under their parent message.
+- [ ] Select a suggestion with `ArrowUp` and `ArrowDown`, then insert it with `Enter`.
+- [ ] Select a suggestion with `ArrowUp` and `ArrowDown`, then insert it with `Tab`.
+- [ ] Hover a suggestion and verify only one item is visually selected at a time.
+- [ ] Move the mouse away from a hovered suggestion and verify the last active suggestion remains selected for keyboard continuation.
+- [ ] Type `marc://$thread-id/#`, press `Ctrl+Space`, and verify messages and artifacts are suggested only from that referenced thread.
+- [ ] Verify cross-thread autocomplete does not change the selected thread while suggesting remote messages or artifacts.
+- [ ] Press `Escape` while suggestions are open and verify the suggestion list closes.
+
+## Keyboard Shortcuts Modal
+
+Source thread: `oportunidade-autocomplete-de-referencias-no-composer-2341bc9f`  
+Priority: medium
+
+- [ ] Verify the content column footer shows an icon-only keyboard shortcuts link on workspace, agent, rules/workspace overview, and thread views.
+- [ ] Click the keyboard shortcuts link and verify the modal opens centered in the full viewport.
+- [ ] Verify the modal title includes the keyboard icon and `Keyboard shortcuts` text.
+- [ ] Verify the modal does not show composer-specific eyebrow or explanatory text.
+- [ ] Press `Escape` and verify the keyboard shortcuts modal closes.
+
 ## Maintenance Notes
 
 - This backlog should grow as UI features are added.

@@ -22,3 +22,20 @@ Backlog vivo de testes Playwright para a UI do mARC.
 - Quando algum cenário Playwright for implementado no futuro, atualize o status no artifact e comente aqui o que saiu do backlog.
 
 <!-- /marc-message -->
+
+<!-- marc-message
+id: msg_b0b5b54b48fc4ac39c
+threadId: oportunidade-testes-playwright-para-referencias-e-artifacts-ui-f742659a
+timestamp: 2026-05-11T00:44:05.113Z
+agentId: codex-dev
+role: developer
+-->
+
+Backlog Playwright complementado após a implementação do autocomplete.
+
+- Atualizei `artifacts/playwright-test-scenarios.md` com a seção `Composer Autocomplete`.
+- Incluí cenários E2E para `Ctrl+Space`, sugestões de `@`, `$`, `#`, cross-thread explícito, navegação por setas, inserção por `Enter`/`Tab`, artifacts indentados e seleção visual única.
+- Incluí a seção `Keyboard Shortcuts Modal` para o link de ícone no footer global da terceira coluna e modal centralizado.
+- Mantive a thread focada apenas em backlog Playwright/E2E.
+
+<!-- /marc-message -->

@@ -66,6 +66,9 @@ button {
 }
 
 .content {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   padding: 24px;
   overflow: auto;
 }
@@ -773,6 +776,11 @@ h3 {
   z-index: 20;
 }
 
+.modal-layer-global {
+  inset: 0;
+  align-items: center;
+}
+
 .modal-panel {
   width: min(860px, calc(100vw - 680px - 64px));
   max-height: calc(100vh - 64px);
@@ -788,11 +796,21 @@ h3 {
   box-shadow: 0 24px 80px rgba(31, 41, 51, 0.22);
 }
 
+.modal-layer-global .modal-panel {
+  width: min(860px, calc(100vw - 64px));
+}
+
 .modal-head {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 14px;
+}
+
+.modal-title-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .modal-head p {
@@ -932,12 +950,95 @@ h3 {
   padding: 7px 9px;
 }
 
+.composer-input-wrap {
+  position: relative;
+}
+
 .composer textarea {
   width: 100%;
   resize: vertical;
   min-height: 120px;
   padding: 10px;
   line-height: 1.45;
+}
+
+.composer-autocomplete {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(100% + 8px);
+  z-index: 35;
+  display: grid;
+  gap: 4px;
+  max-height: 240px;
+  overflow: auto;
+  padding: 6px;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: 7px;
+  box-shadow: var(--shadow);
+}
+
+.composer-autocomplete-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 2px 8px;
+  align-items: center;
+  width: 100%;
+  padding: 7px 8px;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  text-align: left;
+}
+
+.composer-autocomplete-item.active {
+  background: rgba(13, 148, 136, 0.14);
+  border-color: rgba(13, 148, 136, 0.45);
+  box-shadow: inset 3px 0 0 var(--teal);
+}
+
+.composer-autocomplete-child {
+  margin-left: 28px;
+  width: calc(100% - 28px);
+}
+
+.composer-autocomplete-closed .composer-autocomplete-main {
+  color: var(--ink-muted);
+  text-decoration: line-through;
+}
+
+.composer-autocomplete-kind {
+  grid-row: span 2;
+  min-width: 58px;
+  padding: 2px 6px;
+  color: var(--teal);
+  background: rgba(13, 148, 136, 0.12);
+  border: 1px solid rgba(13, 148, 136, 0.2);
+  border-radius: 999px;
+  font-size: 11px;
+  text-align: center;
+}
+
+.composer-autocomplete-main {
+  overflow: hidden;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.composer-autocomplete-item small,
+.composer-autocomplete-empty {
+  overflow: hidden;
+  color: var(--ink-muted);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.composer-autocomplete-empty {
+  padding: 8px;
 }
 
 .composer-actions {
@@ -947,6 +1048,33 @@ h3 {
   justify-content: flex-end;
   gap: 10px;
   margin-top: 10px;
+}
+
+.content-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-height: 34px;
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid rgba(180, 160, 130, 0.24);
+}
+
+.content-footer-link {
+  width: auto;
+  height: auto;
+  display: inline-grid;
+  place-items: center;
+  color: var(--ink-muted);
+  background: transparent;
+  border: 0;
+  text-decoration: none;
+}
+
+.content-footer-link:hover,
+.content-footer-link:focus-visible {
+  color: var(--teal);
+  outline: none;
 }
 
 .composer-count {
@@ -1001,6 +1129,36 @@ h3 {
   text-align: right;
   font-size: 12px;
   line-height: 1.35;
+}
+
+.shortcut-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.shortcut-row {
+  display: grid;
+  grid-template-columns: 124px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  padding: 9px 0;
+  border-top: 1px solid var(--line);
+}
+
+.shortcut-row:first-child {
+  border-top: 0;
+}
+
+.shortcut-row dt {
+  color: var(--teal);
+  font-weight: 700;
+}
+
+.shortcut-row dd {
+  color: var(--ink-muted);
+  margin: 0;
+  line-height: 1.4;
 }
 
 .spin {

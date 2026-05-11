@@ -13,6 +13,7 @@ import {
   Copy,
   FileText,
   KeyRound,
+  Keyboard,
   MessageSquareText,
   Paperclip,
   RefreshCw,
@@ -22,6 +23,14 @@ import {
 } from "lucide-react";
 import { MAX_MESSAGE_CHARS, validateMessageBody } from "../core/guards.js";
 import { messageArtifactReference, parseMarcReference, type MarcReference } from "../core/marc-references.js";
+import {
+  applyAutocompleteOption,
+  buildAutocompleteOptions,
+  detectAutocompleteRequest,
+  getAutocompleteRemoteThreadId,
+  type ComposerAutocompleteOption,
+  type ComposerAutocompleteRequest,
+} from "./composer-autocomplete.js";
 import { linkifyMarcReferences, marcReferenceLabel, transformMarkdownUrl } from "./marc-links.js";
 import "./styles.css";
 
@@ -201,6 +210,7 @@ function App() {
   const [artifactDraft, setArtifactDraft] = useState<ArtifactDraft>();
   const [artifactView, setArtifactView] = useState<ArtifactView>();
   const [showArtifactMenu, setShowArtifactMenu] = useState(false);
+  const [showShortcuts, setShowShortcuts] = useState(false);
   const [savingArtifact, setSavingArtifact] = useState(false);
   const [lastSyncedAt, setLastSyncedAt] = useState<Date>();
   const [busy, setBusy] = useState(false);
@@ -208,6 +218,7 @@ function App() {
   const busyRef = useRef(false);
   const selectedWorkspaceIdRef = useRef<string | undefined>(undefined);
   const selectedThreadIdRef = useRef<string | undefined>(undefined);
+  const autocompleteThreadPayloadRef = useRef(new Map<string, ThreadPayload>());
   const liveRefreshTimerRef = useRef<ReturnType<typeof window.setTimeout> | undefined>(undefined);
   const toastTimerRef = useRef<ReturnType<typeof window.setTimeout> | undefined>(undefined);
 
@@ -228,6 +239,13 @@ function App() {
     () => threads.filter((thread) => !isClosedThread(thread) && !closedThreadIds.has(thread.id)),
     [closedThreadIds, threads],
   );
+  const allWorkspaceThreads = useMemo(() => {
+    const byId = new Map<string, Thread>();
+    for (const thread of [...openThreads, ...archivedThreads]) {
+      byId.set(thread.id, thread);
+    }
+    return Array.from(byId.values());
+  }, [archivedThreads, openThreads]);
   const visibleThreads = showClosedThreads ? archivedThreads : openThreads;
   const selectedThread = useMemo(
     () => archivedThreads.find((thread) => thread.id === selectedThreadId) ?? openThreads.find((thread) => thread.id === selectedThreadId),
@@ -460,6 +478,7 @@ function App() {
   async function selectWorkspace(workspace: Workspace) {
     selectedWorkspaceIdRef.current = workspace.id;
     selectedThreadIdRef.current = undefined;
+    autocompleteThreadPayloadRef.current.clear();
     setSelectedWorkspaceId(workspace.id);
     setSelectedThreadId(undefined);
     setSelectedAgentId(undefined);
@@ -477,8 +496,36 @@ function App() {
     const payload = await api<ThreadPayload>(
       `/api/workspaces/${encodeURIComponent(selectedWorkspace.id)}/threads/${encodeURIComponent(thread.id)}`,
     );
+    autocompleteThreadPayloadRef.current.set(thread.id, payload);
     setThreadPayload(payload);
     return payload;
+  }
+
+  async function loadAutocompleteThreadMessages(threadId: string): Promise<Message[]> {
+    if (!selectedWorkspace) return [];
+    if (threadId === selectedThread?.id) {
+      return threadPayload?.messages ?? [];
+    }
+    if (!allWorkspaceThreads.some((thread) => thread.id === threadId)) {
+      return [];
+    }
+
+    const cachedPayload = autocompleteThreadPayloadRef.current.get(threadId);
+    if (cachedPayload) {
+      return cachedPayload.messages ?? [];
+    }
+
+    try {
+      const payload = await api<ThreadPayload>(
+        `/api/workspaces/${encodeURIComponent(selectedWorkspace.id)}/threads/${encodeURIComponent(threadId)}`,
+      );
+      autocompleteThreadPayloadRef.current.set(threadId, payload);
+      return payload.messages ?? [];
+    } catch (error) {
+      setStatusKind("error");
+      setStatus(error instanceof Error ? error.message : String(error));
+      return [];
+    }
   }
 
   async function sendUiMessage() {
@@ -899,10 +946,14 @@ function App() {
             <Composer
               agentId={uiAgentId}
               body={composerBody}
+              agents={agents}
+              threads={allWorkspaceThreads}
+              messages={threadPayload?.messages ?? []}
               sending={sending}
               onAgentIdChange={setUiAgentId}
               onBodyChange={setComposerBody}
               onSend={() => void sendUiMessage()}
+              loadThreadMessages={loadAutocompleteThreadMessages}
             />
           </>
         ) : selectedAgent ? (
@@ -912,6 +963,20 @@ function App() {
         ) : (
           <EmptyState title="No workspace selected" detail="Save the daemon token and select a workspace from the sidebar." />
         )}
+        <footer className="content-footer">
+          <span aria-hidden="true" />
+          <a
+            href="#keyboard-shortcuts"
+            className="content-footer-link"
+            onClick={(event) => {
+              event.preventDefault();
+              setShowShortcuts(true);
+            }}
+            title="Keyboard shortcuts"
+          >
+            <Keyboard size={15} />
+          </a>
+        </footer>
       </main>
       {artifactDraft ? (
         <ArtifactModal
@@ -925,6 +990,7 @@ function App() {
       {artifactView ? (
         <ArtifactViewerModal artifact={artifactView} onClose={() => setArtifactView(undefined)} onLink={handleMarkdownLink} />
       ) : null}
+      {showShortcuts ? <KeyboardShortcutsModal onClose={() => setShowShortcuts(false)} /> : null}
       {toast ? (
         <div className={classNames("toast", `toast-${toast.kind}`)} role="status" aria-live="polite">
           {toast.message}
@@ -937,57 +1003,249 @@ function App() {
 function Composer({
   agentId,
   body,
+  agents,
+  threads,
+  messages,
   sending,
   onAgentIdChange,
   onBodyChange,
   onSend,
+  loadThreadMessages,
 }: {
   agentId: string;
   body: string;
+  agents: Agent[];
+  threads: Thread[];
+  messages: Message[];
   sending: boolean;
   onAgentIdChange: (value: string) => void;
   onBodyChange: (value: string) => void;
   onSend: () => void;
+  loadThreadMessages: (threadId: string) => Promise<Message[]>;
 }) {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const autocompleteListRef = useRef<HTMLDivElement>(null);
+  const [autocomplete, setAutocomplete] = useState<{
+    request: ComposerAutocompleteRequest;
+    options: ComposerAutocompleteOption[];
+    activeIndex: number;
+  }>();
   const trimmedBody = body.trim();
   const validation = validateMessageBody(body);
   const remainingChars = Math.max(0, MAX_MESSAGE_CHARS - trimmedBody.length);
   const isOverCharacterLimit = trimmedBody.length > MAX_MESSAGE_CHARS;
   const canSend = Boolean(trimmedBody) && validation.ok && !sending;
 
+  useEffect(() => {
+    const activeItem = autocompleteListRef.current?.querySelector<HTMLButtonElement>(".composer-autocomplete-item.active");
+    activeItem?.scrollIntoView({ block: "nearest" });
+  }, [autocomplete?.activeIndex]);
+
+  async function openAutocomplete() {
+    const textarea = textareaRef.current;
+    const cursor = textarea?.selectionStart ?? body.length;
+    const request = detectAutocompleteRequest(body, cursor);
+    if (!request) {
+      setAutocomplete(undefined);
+      return;
+    }
+
+    const remoteThreadId = getAutocompleteRemoteThreadId(request);
+    const remoteMessages = remoteThreadId ? await loadThreadMessages(remoteThreadId) : undefined;
+    const options = buildAutocompleteOptions(request, {
+      agents,
+      threads,
+      currentMessages: messages,
+      remoteMessages,
+    });
+
+    setAutocomplete({
+      request,
+      options,
+      activeIndex: 0,
+    });
+  }
+
+  function insertAutocompleteOption(option: ComposerAutocompleteOption) {
+    if (!autocomplete) return;
+    const result = applyAutocompleteOption(body, autocomplete.request, option.value);
+    onBodyChange(result.value);
+    setAutocomplete(undefined);
+    window.setTimeout(() => {
+      textareaRef.current?.focus();
+      textareaRef.current?.setSelectionRange(result.cursor, result.cursor);
+    }, 0);
+  }
+
+  function handleComposerKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (event.ctrlKey && event.code === "Space") {
+      event.preventDefault();
+      void openAutocomplete();
+      return;
+    }
+
+    if (!autocomplete) return;
+
+    if (event.key === "Escape") {
+      event.preventDefault();
+      setAutocomplete(undefined);
+      return;
+    }
+
+    if (!autocomplete.options.length) return;
+
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      setAutocomplete((current) =>
+        current
+          ? {
+              ...current,
+              activeIndex: (current.activeIndex + 1) % current.options.length,
+            }
+          : current,
+      );
+      return;
+    }
+
+    if (event.key === "ArrowUp") {
+      event.preventDefault();
+      setAutocomplete((current) =>
+        current
+          ? {
+              ...current,
+              activeIndex: (current.activeIndex - 1 + current.options.length) % current.options.length,
+            }
+          : current,
+      );
+      return;
+    }
+
+    if (event.key === "Enter" || event.key === "Tab") {
+      event.preventDefault();
+      insertAutocompleteOption(autocomplete.options[autocomplete.activeIndex]);
+    }
+  }
+
   return (
     <section className="composer">
-      <div className="composer-head">
-        <div>
-          <h3>Post to this thread</h3>
-          <p>Messages are appended to the same CHAT.md that agents read.</p>
+        <div className="composer-head">
+          <div>
+            <h3>Post to this thread</h3>
+            <p>Messages are appended to the same CHAT.md that agents read.</p>
+          </div>
+          <label>
+            Sender
+            <input value={agentId} onChange={(event) => onAgentIdChange(event.target.value)} placeholder="ui-user" />
+          </label>
         </div>
-        <label>
-          Sender
-          <input value={agentId} onChange={(event) => onAgentIdChange(event.target.value)} placeholder="ui-user" />
-        </label>
-      </div>
-      <textarea
-        value={body}
-        onChange={(event) => onBodyChange(event.target.value)}
-        placeholder="Write a note, decision, or instruction for the agents..."
-        rows={5}
-      />
-      <div className="composer-actions">
-        <span className={classNames("composer-count", isOverCharacterLimit && "composer-count-limit")}>
-          {remainingChars} chars left
-        </span>
-        {!validation.ok && trimmedBody ? <span className="composer-warning">{validation.reason}</span> : null}
-        <span className="composer-tip">
-          <CircleHelp size={16} />
-          <span role="tooltip">For large notes, post a short message first and then attach a markdown artifact to it.</span>
-        </span>
-        <Button variant="primary" onClick={onSend} disabled={!canSend}>
-          <MessageSquareText size={15} />
-          {sending ? "Posting" : "Post message"}
-        </Button>
-      </div>
+        <div className="composer-input-wrap">
+          <textarea
+            ref={textareaRef}
+            value={body}
+            onChange={(event) => {
+              onBodyChange(event.target.value);
+              setAutocomplete(undefined);
+            }}
+            onKeyDown={handleComposerKeyDown}
+            placeholder="Write a note, decision, or instruction for the agents..."
+            rows={5}
+          />
+          {autocomplete ? (
+            <div ref={autocompleteListRef} className="composer-autocomplete" role="listbox" aria-label="mARC reference suggestions">
+              {autocomplete.options.length ? (
+                autocomplete.options.map((option, index) => (
+                  <button
+                    className={classNames(
+                      "composer-autocomplete-item",
+                      index === autocomplete.activeIndex && "active",
+                      option.closed && "composer-autocomplete-closed",
+                      option.parentMessageId && "composer-autocomplete-child",
+                    )}
+                    key={`${option.type}:${option.value}`}
+                    onFocus={() =>
+                      setAutocomplete((current) => (current ? { ...current, activeIndex: index } : current))
+                    }
+                    onMouseEnter={() =>
+                      setAutocomplete((current) => (current ? { ...current, activeIndex: index } : current))
+                    }
+                    onMouseDown={(event) => {
+                      event.preventDefault();
+                      insertAutocompleteOption(option);
+                    }}
+                    role="option"
+                    aria-selected={index === autocomplete.activeIndex}
+                  >
+                    <span className="composer-autocomplete-kind">{option.type}</span>
+                    <span className="composer-autocomplete-main">{option.label}</span>
+                    <small>{option.detail}</small>
+                  </button>
+                ))
+              ) : (
+                <div className="composer-autocomplete-empty">No references found</div>
+              )}
+            </div>
+          ) : null}
+        </div>
+        <div className="composer-actions">
+          <span className={classNames("composer-count", isOverCharacterLimit && "composer-count-limit")}>
+            {remainingChars} chars left
+          </span>
+          {!validation.ok && trimmedBody ? <span className="composer-warning">{validation.reason}</span> : null}
+          <span className="composer-tip">
+            <CircleHelp size={16} />
+            <span role="tooltip">For large notes, post a short message first and then attach a markdown artifact to it.</span>
+          </span>
+          <Button variant="primary" onClick={onSend} disabled={!canSend}>
+            <MessageSquareText size={15} />
+            {sending ? "Posting" : "Post message"}
+          </Button>
+        </div>
     </section>
+  );
+}
+
+function KeyboardShortcutsModal({ onClose }: { onClose: () => void }) {
+  const shortcuts = [
+    ["Ctrl+Space", "Open autocomplete for the current @, #, $, or marc:// reference."],
+    ["ArrowUp / ArrowDown", "Move through autocomplete suggestions."],
+    ["Enter / Tab", "Insert the active suggestion."],
+    ["Escape", "Close autocomplete or this dialog."],
+  ];
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
+  return (
+    <div className="modal-layer modal-layer-global" role="presentation">
+      <section className="modal-panel" role="dialog" aria-modal="true" aria-labelledby="keyboard-shortcuts-title">
+        <header className="modal-head">
+          <div>
+            <h2 id="keyboard-shortcuts-title" className="modal-title-icon">
+              <Keyboard size={18} />
+              Keyboard shortcuts
+            </h2>
+          </div>
+          <Button variant="ghost" className="button-icon" onClick={onClose} title="Close">
+            <X size={18} />
+          </Button>
+        </header>
+        <dl className="shortcut-list">
+          {shortcuts.map(([key, description]) => (
+            <div className="shortcut-row" key={key}>
+              <dt>{key}</dt>
+              <dd>{description}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+    </div>
   );
 }
 

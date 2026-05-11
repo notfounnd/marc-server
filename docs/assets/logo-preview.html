@@ -47,10 +47,43 @@
         line-height: 1.55;
       }
 
+      .capture-note {
+        margin: 0 0 22px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        padding: 16px 18px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.55;
+      }
+
+      .capture-note strong {
+        color: var(--ink);
+      }
+
+      .capture-note code {
+        color: var(--green-dark);
+        font-weight: 700;
+      }
+
+      .capture-note ul {
+        margin: 10px 0 0;
+        padding-left: 20px;
+      }
+
+      .capture-note li + li {
+        margin-top: 4px;
+      }
+
       .grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
         gap: 18px;
+      }
+
+      .banner-card {
+        margin-bottom: 18px;
       }
 
       .card {
@@ -147,6 +180,89 @@
         font-size: 13px;
       }
 
+      .linkedin-banner {
+        position: relative;
+        width: 1200px;
+        height: 627px;
+        overflow: hidden;
+        border-radius: 8px;
+        border: 1px solid var(--line);
+        background:
+          radial-gradient(circle at 18% 18%, rgba(11, 143, 124, 0.12), transparent 30%),
+          linear-gradient(135deg, #fffaf3 0%, #f7f2ea 62%, #efe5d6 100%);
+      }
+
+      .linkedin-banner::before {
+        content: "";
+        position: absolute;
+        inset: 38px;
+        border: 1px solid rgba(115, 99, 77, 0.16);
+        border-radius: 8px;
+        pointer-events: none;
+      }
+
+      .banner-content {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        gap: 28px;
+        padding: 72px 62px;
+      }
+
+      .banner-logo {
+        width: 196px;
+        font-size: 130px;
+        border-radius: 28px;
+        flex: 0 0 auto;
+      }
+
+      .banner-copy {
+        min-width: 0;
+      }
+
+      .banner-copy strong {
+        display: block;
+        margin-bottom: 12px;
+        color: var(--ink);
+        font-size: 70px;
+        line-height: 0.96;
+        letter-spacing: 0;
+      }
+
+      .banner-copy span {
+        display: block;
+        color: #2f3e38;
+        font-size: 30px;
+        line-height: 1.25;
+      }
+
+      .banner-copy em {
+        display: block;
+        margin-top: 18px;
+        color: var(--green-dark);
+        font-size: 27px;
+        font-style: normal;
+        font-weight: 700;
+      }
+
+      .banner-copy small {
+        display: block;
+        margin-top: 10px;
+        color: var(--muted);
+        font-size: 17px;
+        line-height: 1.35;
+        white-space: nowrap;
+      }
+
+      .banner-frame {
+        overflow: auto;
+        padding: 16px;
+        border: 1px dashed #c8b8a3;
+        border-radius: 8px;
+        background: #fbf6ee;
+      }
+
       .meta {
         margin-top: 14px;
         color: var(--muted);
@@ -164,6 +280,35 @@
     <main>
       <h1>mARC Logo Preview</h1>
       <p>Temporary preview for the README logo concept: a white lowercase <strong>m</strong> inside the green mARC button.</p>
+
+      <div class="capture-note">
+        <strong>Capture tip:</strong>
+        <ul>
+          <li>Keep browser zoom at 100%.</li>
+          <li>Open DevTools.</li>
+          <li>Select the element you want, for example <code>.linkedin-banner</code>.</li>
+          <li>Press <code>Ctrl+Shift+P</code>.</li>
+          <li>Run <code>Capture node screenshot</code>.</li>
+        </ul>
+      </div>
+
+      <article class="card banner-card">
+        <h2>LinkedIn banner 1200 x 627</h2>
+        <div class="banner-frame">
+          <div class="linkedin-banner">
+            <div class="banner-content">
+              <div class="logo banner-logo">m</div>
+              <div class="banner-copy">
+                <strong>mARC</strong>
+                <span>markdown Agent Relay Chat</span>
+                <em>Chatting is all you need.</em>
+                <small>Improving communication and harness engineering for agents</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="meta">Use browser screenshot/capture on the 1200 x 627 area for the LinkedIn post image.</div>
+      </article>
 
       <section class="grid">
         <article class="card">
