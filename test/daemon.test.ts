@@ -5,7 +5,7 @@ import path from "node:path";
 import test from "node:test";
 import { loadDaemonConfig } from "../src/daemon/config.js";
 import { createDaemonServer } from "../src/daemon/server.js";
-import { appendMessage, createThread, initWorkspace, readThread } from "../src/core/workspace.js";
+import { appendMessage, createThread, initWorkspace, readRules, readThread } from "../src/core/workspace.js";
 
 async function tempDir(prefix: string): Promise<string> {
   return fs.mkdtemp(path.join(os.tmpdir(), prefix));
@@ -114,5 +114,54 @@ test("daemon requires token and serves registered workspace threads", async () =
     assert.deepEqual(await afterUnregister.json(), []);
   } finally {
     server.close();
+  }
+});
+
+test("posting a UI message does not modify RULES.md", async () => {
+  const dataDir = await tempDir("marc-daemon-");
+  const workspaceRoot = await tempDir("marc-workspace-");
+  const workspace = await initWorkspace(workspaceRoot);
+  const thread = await createThread(workspaceRoot, "UI message");
+  const config = await loadDaemonConfig({ dataDir, token: "secret", port: 0 });
+  const server = await createDaemonServer(config);
+  const baseUrl = await listen(server);
+
+  try {
+    const register = await fetch(`${baseUrl}/api/workspaces`, {
+      method: "POST",
+      headers: {
+        authorization: "Bearer secret",
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(workspace),
+    });
+    assert.equal(register.status, 200);
+
+    const beforeRules = await readRules(workspaceRoot);
+    const post = await fetch(
+      `${baseUrl}/api/workspaces/${encodeURIComponent(workspace.id)}/threads/${encodeURIComponent(thread.id)}`,
+      {
+        method: "POST",
+        headers: {
+          authorization: "Bearer secret",
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          agentId: "ui-user",
+          displayName: "ui-user",
+          role: "user",
+          message: "Posted from the UI.",
+        }),
+      },
+    );
+    assert.equal(post.status, 200);
+
+    const afterRules = await readRules(workspaceRoot);
+    const profile = await fs.readFile(path.join(workspaceRoot, ".marc", "agents", "ui-user.md"), "utf8");
+
+    assert.equal(afterRules, beforeRules);
+    assert.match(profile, /ID: `ui-user`/);
+  } finally {
+    await new Promise<void>((resolve) => server.close(() => resolve()));
   }
 });

@@ -301,8 +301,38 @@ test("maintains a custom rules section at the end of RULES.md", async () => {
 
   assert.match(
     rules,
-    /## Custom Rules\n\n<!-- Keep project-specific custom rules below this line\. This section is preserved by workspace_update_recommendations\. -->\n<!-- Prefer ### or deeper headings to organize project-specific rules in this section\. -->\n- Keep domain examples in Portuguese\.\n$/,
+    /## Custom Rules\n\n<!-- Keep project-specific custom rules below this line\. This section is preserved by workspace_update_recommendations\. -->\n<!-- Prefer ### or deeper headings to organize project-specific rules in this section\. -->\n\n- Keep domain examples in Portuguese\.\n$/,
   );
+});
+
+test("preserves all content below the custom rules boundary", async () => {
+  const workspace = await tempWorkspace();
+  await initWorkspace(workspace);
+
+  await fs.appendFile(
+    path.join(workspace, ".marc", "RULES.md"),
+    [
+      "## Project Notes",
+      "",
+      "- Preserve this project-specific H2 section.",
+      "",
+      "### Project Workflow",
+      "",
+      "- Preserve this project-specific H3 section.",
+      "",
+    ].join("\n"),
+  );
+
+  const first = await updateWorkspaceRecommendations(workspace);
+  const rules = await readRules(workspace);
+  const second = await updateWorkspaceRecommendations(workspace);
+  const stableRules = await readRules(workspace);
+
+  assert.ok(first.updated.includes("RULES.md"));
+  assert.ok(second.alreadyCurrent.includes("RULES.md"));
+  assert.equal(stableRules, rules);
+  assert.match(rules, /## Custom Rules[\s\S]*## Project Notes[\s\S]*Preserve this project-specific H2 section/);
+  assert.match(rules, /## Custom Rules[\s\S]*### Project Workflow[\s\S]*Preserve this project-specific H3 section/);
 });
 
 test("removes legacy registered agent inventory while preserving custom rules", async () => {
@@ -338,7 +368,7 @@ test("removes legacy registered agent inventory while preserving custom rules", 
       "",
       "- [codex-dev](agents/codex-dev.md) - codex-dev",
       "",
-      "### Flow Rules",
+      "### Project Workflow",
       "",
       "- Before finalizing development, review project documentation.",
       "",
@@ -361,8 +391,8 @@ test("removes legacy registered agent inventory while preserving custom rules", 
   assert.doesNotMatch(rules, /\[codex-dev\]\(agents\/codex-dev\.md\)/);
   assert.doesNotMatch(rules, /Wrong Custom Area/);
   assert.doesNotMatch(rules, /This project rule was placed outside Custom Rules/);
-  assert.match(rules, /## Custom Rules[\s\S]*### Flow Rules[\s\S]*Before finalizing development/);
-  assert.doesNotMatch(rules, /## Context Reading[\s\S]*### Flow Rules[\s\S]*## Custom Rules/);
+  assert.match(rules, /## Custom Rules[\s\S]*### Project Workflow[\s\S]*Before finalizing development/);
+  assert.doesNotMatch(rules, /## Context Reading[\s\S]*### Project Workflow[\s\S]*## Custom Rules/);
 });
 
 test("replaces stale workspace recommendation sections", async () => {
@@ -411,10 +441,17 @@ test("replaces stale workspace recommendation sections", async () => {
     ].join("\n"),
   );
 
-  await updateWorkspaceRecommendations(workspace);
+  const first = await updateWorkspaceRecommendations(workspace);
   const rules = await readRules(workspace);
   const instructions = await readInstructions(workspace);
+  const second = await updateWorkspaceRecommendations(workspace);
+  const stableRules = await readRules(workspace);
 
+  assert.ok(first.updated.includes("RULES.md"));
+  assert.ok(first.updated.includes("INSTRUCTIONS.md"));
+  assert.ok(second.alreadyCurrent.includes("RULES.md"));
+  assert.ok(second.alreadyCurrent.includes("INSTRUCTIONS.md"));
+  assert.equal(stableRules, rules);
   assert.match(rules, /## Message Style\n\n- Keep messages useful, readable, and complete/);
   assert.doesNotMatch(instructions, /## Message Style/);
   assert.doesNotMatch(instructions, /## Context Reading/);

@@ -63,24 +63,6 @@ function normalizeTailLimit(limit: number | undefined): number {
   return Math.min(50, Math.max(1, Math.floor(limit)));
 }
 
-async function ensureSectionLines(filePath: string, heading: string, lines: string[]): Promise<boolean> {
-  const content = await readTextIfExists(filePath);
-  const section = `${heading}\n\n${lines.join("\n")}\n`;
-  const escapedHeading = heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const sectionPattern = new RegExp(`(^|\\n)${escapedHeading}\\n[\\s\\S]*?(?=\\n##\\s|$)`);
-
-  const next = sectionPattern.test(content)
-    ? content.replace(sectionPattern, (prefix) => `${prefix.startsWith("\n") ? "\n" : ""}${section}`)
-    : `${content.trimEnd()}\n\n${section}`;
-
-  if (next !== content) {
-    await fs.writeFile(filePath, next);
-    return true;
-  }
-
-  return false;
-}
-
 const CUSTOM_RULES_HEADING = "## Custom Rules";
 const CUSTOM_RULES_COMMENT =
   "<!-- Keep project-specific custom rules below this line. This section is preserved by workspace_update_recommendations. -->";
@@ -100,6 +82,10 @@ const CONTEXT_READING_GUIDE = [
 const WORKSPACE_MAINTENANCE_GUIDE = [
   "- Run `workspace_update_recommendations` before starting work on a thread.",
 ];
+const CONVERSATION_RULES_GUIDE = [
+  "- Keep messages useful, readable, and complete; link artifacts when relevant.",
+  "- Prefer creating a new thread for a new task.",
+];
 const BOOTSTRAP_INSTRUCTIONS = [
   "# mARC Instructions",
   "",
@@ -115,30 +101,49 @@ const BOOTSTRAP_INSTRUCTIONS = [
   "",
 ].join("\n");
 
+function buildCustomRulesSection(body = ""): string {
+  const normalizedBody = body.trim();
+  return [
+    CUSTOM_RULES_HEADING,
+    "",
+    CUSTOM_RULES_COMMENT,
+    CUSTOM_RULES_STRUCTURE_COMMENT,
+    ...(normalizedBody ? ["", normalizedBody] : []),
+  ].join("\n");
+}
+
+function buildRulesContent(customBody = ""): string {
+  return [
+    "# mARC Rules",
+    "",
+    "## Workspace Maintenance",
+    "",
+    ...WORKSPACE_MAINTENANCE_GUIDE,
+    "",
+    "## Agents",
+    "",
+    ...AGENTS_GUIDE,
+    "",
+    "## Conversation Rules",
+    "",
+    ...CONVERSATION_RULES_GUIDE,
+    "",
+    "## Message Style",
+    "",
+    ...MESSAGE_STYLE_GUIDE.map((line) => `- ${line}`),
+    "",
+    "## Context Reading",
+    "",
+    ...CONTEXT_READING_GUIDE,
+    "",
+    buildCustomRulesSection(customBody),
+    "",
+  ].join("\n");
+}
+
 async function ensureCustomRulesSection(filePath: string): Promise<boolean> {
   const content = await readTextIfExists(filePath);
-  let next = removeLegacyAgentInventory(content);
-  const escapedHeading = CUSTOM_RULES_HEADING.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const sectionPattern = new RegExp(`(^|\\n)${escapedHeading}\\n([\\s\\S]*?)(?=\\n##\\s|$)`);
-  const match = sectionPattern.exec(next);
-
-  if (!match) {
-    next = `${next.trimEnd()}\n\n${CUSTOM_RULES_HEADING}\n\n${CUSTOM_RULES_COMMENT}\n`;
-    next = moveMisplacedCustomSubsections(next);
-    await fs.writeFile(filePath, next);
-    return true;
-  }
-
-  const body = match[2]
-    .split(/\r?\n/)
-    .filter((line) => line.trim() !== CUSTOM_RULES_COMMENT)
-    .filter((line) => line.trim() !== CUSTOM_RULES_STRUCTURE_COMMENT)
-    .join("\n")
-    .trim();
-  const section = `${CUSTOM_RULES_HEADING}\n\n${CUSTOM_RULES_COMMENT}\n${CUSTOM_RULES_STRUCTURE_COMMENT}\n${body ? `${body}\n` : ""}`;
-  const remainder = `${next.slice(0, match.index)}${next.slice(match.index + match[0].length)}`.trimEnd();
-  next = `${remainder}${remainder ? "\n\n" : ""}${section}`;
-  next = moveMisplacedCustomSubsections(next);
+  const next = normalizeRulesContent(content);
 
   if (next !== content) {
     await fs.writeFile(filePath, next);
@@ -152,98 +157,69 @@ function removeLegacyAgentInventory(content: string): string {
   const escapedHeading = LEGACY_REGISTERED_AGENTS_HEADING.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   return content
     .replace(new RegExp(`(^|\\n)${escapedHeading}\\n[\\s\\S]*?(?=\\n#{1,6}\\s|$)`, "g"), "$1")
-    .replace(/^\s*- \[[^\]\n]+\]\(agents\/[^)\n]+\.md\) - .+\r?\n?/gm, "")
     .replace(/\n{3,}/g, "\n\n");
 }
 
-function moveMisplacedCustomSubsections(content: string): string {
-  const customIndex = content.indexOf(`\n${CUSTOM_RULES_HEADING}`);
-  const customStart = customIndex === -1
-    ? content.startsWith(CUSTOM_RULES_HEADING) ? 0 : -1
-    : customIndex + 1;
-  if (customStart === -1) return content;
+function splitCustomRules(content: string): { managed: string; custom: string } {
+  const match = /^## Custom Rules$/m.exec(content);
+  if (!match || match.index === undefined) {
+    return { managed: content, custom: "" };
+  }
 
-  const beforeCustom = content.slice(0, customStart).trimEnd();
-  let customSection = content.slice(customStart).trimStart();
-  const movedBlocks: string[] = [];
-  const managedHeadings = [
-    "## Workspace Maintenance",
-    "## Agents",
-    "## Conversation Rules",
-    "## Message Style",
-    "## Context Reading",
-  ];
-  const lastManagedIndex = Math.max(...managedHeadings.map((heading) => beforeCustom.indexOf(heading)));
-  const managedContent = lastManagedIndex === -1 ? beforeCustom : beforeCustom.slice(0, lastManagedIndex);
-  const misplacedContent = lastManagedIndex === -1 ? "" : beforeCustom.slice(lastManagedIndex);
-  const cleanedMisplacedContent = misplacedContent.replace(/(^|\n)(#{3,6} .+\n[\s\S]*?)(?=\n#{1,6}\s|$)/g, (match, prefix: string, block: string) => {
-    movedBlocks.push(block.trim());
+  return {
+    managed: content.slice(0, match.index),
+    custom: content.slice(match.index),
+  };
+}
+
+function trimBlankLines(lines: string[]): string[] {
+  let start = 0;
+  let end = lines.length;
+
+  while (start < end && lines[start].trim() === "") start += 1;
+  while (end > start && lines[end - 1].trim() === "") end -= 1;
+
+  return lines.slice(start, end);
+}
+
+function customRulesBody(customSection: string): string {
+  if (!customSection.trim()) return "";
+
+  const lines = customSection.split(/\r?\n/);
+  const bodyLines = lines
+    .slice(lines[0].trim() === CUSTOM_RULES_HEADING ? 1 : 0)
+    .filter((line) => line.trim() !== CUSTOM_RULES_COMMENT)
+    .filter((line) => line.trim() !== CUSTOM_RULES_STRUCTURE_COMMENT);
+
+  return trimBlankLines(bodyLines).join("\n");
+}
+
+function extractMisplacedCustomSubsections(managedContent: string): { managed: string; blocks: string[] } {
+  const blocks: string[] = [];
+  const managed = managedContent.replace(/(^|\n)(#{3,6} .+\n[\s\S]*?)(?=\n#{1,6}\s|$)/g, (_match, prefix: string, block: string) => {
+    blocks.push(block.trim());
     return prefix;
   }).trimEnd();
-  const cleanedBeforeCustom = `${managedContent}${cleanedMisplacedContent}`.trimEnd();
 
-  for (const block of movedBlocks) {
-    const heading = block.split(/\r?\n/, 1)[0];
-    if (customSection.includes(heading)) continue;
-    const commentBlock = `${CUSTOM_RULES_COMMENT}\n${CUSTOM_RULES_STRUCTURE_COMMENT}`;
-    const insertion = `${commentBlock}\n\n${block}`;
-    customSection = customSection.includes(commentBlock)
-      ? customSection.replace(commentBlock, insertion)
-      : customSection.includes(CUSTOM_RULES_COMMENT)
-        ? customSection.replace(CUSTOM_RULES_COMMENT, `${CUSTOM_RULES_COMMENT}\n\n${block}`)
-      : `${customSection.trimEnd()}\n\n${block}\n`;
-  }
-
-  return `${cleanedBeforeCustom}${cleanedBeforeCustom ? "\n\n" : ""}${customSection.trimEnd()}\n`;
+  return { managed, blocks };
 }
 
-async function replaceTextInFile(filePath: string, replacements: Array<[from: string, to: string]>): Promise<boolean> {
-  const content = await readTextIfExists(filePath);
-  let next = content;
-
-  for (const [from, to] of replacements) {
-    next = next.replaceAll(from, to);
-  }
-
-  if (next !== content) {
-    await fs.writeFile(filePath, next);
-    return true;
-  }
-
-  return false;
+function customSectionHeadings(body: string): Set<string> {
+  return new Set([...body.matchAll(/^#{3,6} .+$/gm)].map((match) => match[0].trim()));
 }
 
-async function ensureHeadingOrder(filePath: string, orderedHeadings: string[]): Promise<boolean> {
-  const content = await readTextIfExists(filePath);
-  const matches = [...content.matchAll(/^## .+$/gm)];
-  if (matches.length === 0 || matches[0].index === undefined) return false;
+function normalizeRulesContent(content: string): string {
+  const withoutLegacyAgents = removeLegacyAgentInventory(content);
+  const { managed, custom } = splitCustomRules(withoutLegacyAgents);
+  const { blocks } = extractMisplacedCustomSubsections(managed);
+  const body = customRulesBody(custom);
+  const existingHeadings = customSectionHeadings(body);
+  const migratedBlocks = blocks.filter((block) => {
+    const heading = block.split(/\r?\n/, 1)[0]?.trim();
+    return heading && !existingHeadings.has(heading);
+  });
 
-  const preamble = content.slice(0, matches[0].index).trimEnd();
-  const sections = new Map<string, string>();
-
-  for (let index = 0; index < matches.length; index += 1) {
-    const match = matches[index];
-    const start = match.index ?? 0;
-    const end = matches[index + 1]?.index ?? content.length;
-    const heading = match[0].trim();
-
-    sections.set(heading, content.slice(start, end).trim());
-  }
-
-  const customHeading = CUSTOM_RULES_HEADING;
-  const knownBeforeCustom = orderedHeadings.filter((heading) => heading !== customHeading && sections.has(heading));
-  const customSection = sections.has(customHeading) ? [customHeading] : [];
-  const nextSections = [...knownBeforeCustom, ...customSection]
-    .map((heading) => sections.get(heading))
-    .filter((section): section is string => section !== undefined);
-  const next = `${[preamble, ...nextSections].filter(Boolean).join("\n\n")}\n`;
-
-  if (next !== content) {
-    await fs.writeFile(filePath, next);
-    return true;
-  }
-
-  return false;
+  return buildRulesContent([...migratedBlocks, body].filter(Boolean).join("\n\n"));
 }
 
 export async function getWorkspaceInfo(workspaceRootInput?: string): Promise<WorkspaceInfo> {
@@ -277,39 +253,7 @@ export async function initWorkspace(workspaceRootInput?: string): Promise<Worksp
 
   const rulesPath = safeJoin(info.marcPath, "RULES.md");
   if (!(await exists(rulesPath))) {
-    await fs.writeFile(
-      rulesPath,
-      [
-        "# mARC Rules",
-        "",
-        "## Workspace Maintenance",
-        "",
-        ...WORKSPACE_MAINTENANCE_GUIDE,
-        "",
-        "## Agents",
-        "",
-        ...AGENTS_GUIDE,
-        "",
-        "## Conversation Rules",
-        "",
-        "- Keep messages useful, readable, and complete; link artifacts when relevant.",
-        "- Prefer creating a new thread for a new task.",
-        "",
-        "## Message Style",
-        "",
-        ...MESSAGE_STYLE_GUIDE.map((line) => `- ${line}`),
-        "",
-        "## Context Reading",
-        "",
-        ...CONTEXT_READING_GUIDE,
-        "",
-        CUSTOM_RULES_HEADING,
-        "",
-        CUSTOM_RULES_COMMENT,
-        CUSTOM_RULES_STRUCTURE_COMMENT,
-        "",
-      ].join("\n"),
-    );
+    await fs.writeFile(rulesPath, buildRulesContent());
   }
 
   return info;
@@ -324,46 +268,7 @@ export async function updateWorkspaceRecommendations(workspaceRoot: string): Pro
   (instructionsChanged ? updated : alreadyCurrent).push("INSTRUCTIONS.md");
 
   const rulesPath = safeJoin(info.marcPath, "RULES.md");
-  const rulesCustomChanged = await ensureCustomRulesSection(rulesPath);
-  const rulesStyleChanged = await ensureSectionLines(rulesPath, "## Message Style", [
-    ...MESSAGE_STYLE_GUIDE.map((line) => `- ${line}`),
-  ]);
-  const rulesContextChanged = await ensureSectionLines(rulesPath, "## Context Reading", [
-    ...CONTEXT_READING_GUIDE,
-  ]);
-  const rulesMaintenanceChanged = await ensureSectionLines(rulesPath, "## Workspace Maintenance", [
-    ...WORKSPACE_MAINTENANCE_GUIDE,
-  ]);
-  const rulesAgentsChanged = await ensureSectionLines(rulesPath, "## Agents", [
-    ...AGENTS_GUIDE,
-  ]);
-  const rulesToolNameChanged = await replaceTextInFile(rulesPath, [
-    ["Agents should register through `register_agent` before posting.", "Agents should register through `agent_register` before posting."],
-    [
-      "- Keep messages concise and link artifacts when relevant.",
-      "- Keep messages useful, readable, and complete; link artifacts when relevant.",
-    ],
-    [
-      "- Prefer short or medium messages. Use more sentences instead of one huge paragraph.",
-      "- Prefer bullets or short labeled sections when summarizing multiple points.",
-    ],
-  ]);
-  const rulesOrderChanged = await ensureHeadingOrder(rulesPath, [
-    "## Workspace Maintenance",
-    "## Agents",
-    "## Conversation Rules",
-    "## Message Style",
-    "## Context Reading",
-    CUSTOM_RULES_HEADING,
-  ]);
-  const rulesChanged =
-    rulesStyleChanged ||
-    rulesContextChanged ||
-    rulesMaintenanceChanged ||
-    rulesAgentsChanged ||
-    rulesCustomChanged ||
-    rulesToolNameChanged ||
-    rulesOrderChanged;
+  const rulesChanged = await ensureCustomRulesSection(rulesPath);
   (rulesChanged ? updated : alreadyCurrent).push("RULES.md");
 
   return { updated, alreadyCurrent };
