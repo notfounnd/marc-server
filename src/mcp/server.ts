@@ -165,7 +165,7 @@ const MARC_HELPER_GUIDES: Record<Exclude<MarcHelperTopic, "all">, MarcHelperGuid
     ],
     relatedTools: ["agent_register", "agent_list", "agent_read_profile"],
     examples: [
-      "agent_register with id codex-dev, displayName codex-dev, and role developer.",
+      "agent_register with id codex-dev, role developer, model gpt-5.5, and a short description.",
       "agent_list before writing a mention such as marc://@codex-dev.",
       "agent_read_profile for a referenced participant before assigning review work.",
     ],
@@ -343,6 +343,7 @@ export function buildMcpServer(options: McpOptions = {}): McpServer {
       const recommendations = await updateWorkspaceRecommendations(workspaceRoot);
       const instructions = await fs.readFile(safeJoin(workspace.marcPath, "INSTRUCTIONS.md"), "utf8");
       const rules = await readRules(workspaceRoot);
+      const registered = await listAgentProfiles(workspaceRoot);
 
       return text({
         bootstrap: {
@@ -354,6 +355,10 @@ export function buildMcpServer(options: McpOptions = {}): McpServer {
         recommendations,
         instructions,
         rules,
+        agents: {
+          count: registered.length,
+          registered,
+        },
       });
     },
   );
@@ -396,22 +401,23 @@ export function buildMcpServer(options: McpOptions = {}): McpServer {
     "Register an agent profile in this workspace before posting messages.",
     gatedShape({
       id: z.string().min(1),
-      displayName: z.string().min(1),
-      role: z.string().optional(),
-      model: z.string().optional(),
-      notes: z.string().optional(),
+      role: z.string().min(1),
+      model: z.string().min(1),
+      description: z.string().min(1),
+      displayName: z.string().optional(),
     }),
-    async (input) => withBootstrap(input, async () => {
-      const id = await registerAgent(workspaceRoot, input);
-      return { id };
-    }),
+    async (input) => withBootstrap(input, async () => registerAgent(workspaceRoot, input)),
   );
 
   server.tool(
     "agent_list",
     "List registered agent profiles in this workspace.",
-    gatedShape({}),
-    async (input) => withBootstrap(input, async () => listAgentProfiles(workspaceRoot)),
+    gatedShape({
+      includeMarkdown: z.boolean().optional(),
+    }),
+    async (input) => withBootstrap(input, async () => listAgentProfiles(workspaceRoot, {
+      includeMarkdown: input.includeMarkdown,
+    })),
   );
 
   server.tool(

@@ -160,7 +160,11 @@ test("posting a UI message does not modify RULES.md", async () => {
     const profile = await fs.readFile(path.join(workspaceRoot, ".marc", "agents", "ui-user.md"), "utf8");
 
     assert.equal(afterRules, beforeRules);
+    assert.match(profile, /^# ui-user$/m);
     assert.match(profile, /ID: `ui-user`/);
+    assert.match(profile, /^Role: user$/m);
+    assert.match(profile, /^Model: human$/m);
+    assert.match(profile, /^Description: Posted from the mARC web UI\.$/m);
   } finally {
     await new Promise<void>((resolve) => server.close(() => resolve()));
   }

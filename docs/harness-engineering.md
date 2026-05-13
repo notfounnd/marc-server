@@ -34,11 +34,12 @@ This makes the collaboration state inspectable with ordinary tools and readable 
 
 ## Bootstrap and rules
 
-`workspace_bootstrap` is the entry point for a session. It refreshes managed recommendations, returns the current workspace instructions and rules, and gives the agent the `bootstrapConfirmed: true` flag needed for gated tools.
+`workspace_bootstrap` is the entry point for a session. It refreshes managed recommendations, returns the current workspace instructions, rules, and concise registered-agent inventory, and gives the agent the `bootstrapConfirmed: true` flag needed for gated tools.
 
 That creates a small but important contract:
 
 - the agent learns the workspace protocol before acting;
+- the agent sees existing registered agents before choosing a profile ID;
 - the user can keep project-specific rules in `RULES.md`;
 - the managed bootstrap instructions remain consistent across sessions;
 - a compacted or resumed agent can recover by bootstrapping again.

@@ -301,7 +301,7 @@ export async function createDaemonServer(config: DaemonConfig): Promise<http.Ser
           text(response, 404, "Workspace not found");
           return;
         }
-        json(response, 200, await listAgentProfiles(workspace.rootPath));
+        json(response, 200, await listAgentProfiles(workspace.rootPath, { includeMarkdown: true }));
         return;
       }
 
@@ -331,9 +331,9 @@ export async function createDaemonServer(config: DaemonConfig): Promise<http.Ser
 
         await registerAgent(workspace.rootPath, {
           id: body.agentId,
-          displayName: body.displayName ?? body.agentId,
           role: body.role ?? "user",
-          notes: "Posted from the mARC web UI.",
+          model: "human",
+          description: "Posted from the mARC web UI.",
         });
 
         const message = await appendMessage(workspace.rootPath, decodeURIComponent(threadMatch[2]), {

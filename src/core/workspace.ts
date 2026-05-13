@@ -6,7 +6,10 @@ import { marcDir, resolveWorkspace, safeJoin } from "./paths.js";
 import { addArtifactToMessage, parseMessages, renderChatHeader, renderMessage } from "./markdown.js";
 import { JsonThreadIndexStore, ThreadIndexReconciler, threadIndexPath } from "./thread-index.js";
 import type {
+  AgentListOptions,
   AgentProfile,
+  AgentProfileSummary,
+  AgentRegistrationResult,
   ChatMessage,
   MessageInput,
   ThreadInfo,
@@ -32,6 +35,76 @@ async function exists(filePath: string): Promise<boolean> {
 
 async function readTextIfExists(filePath: string): Promise<string> {
   return (await exists(filePath)) ? fs.readFile(filePath, "utf8") : "";
+}
+
+const DESCRIPTION_MAX_LENGTH = 160;
+
+function normalizeProfileToken(value: string, options: { preserveDot?: boolean } = {}): string {
+  const allowed = options.preserveDot ? /[^a-z0-9.]+/g : /[^a-z0-9]+/g;
+  const token = value
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(allowed, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  return token || "item";
+}
+
+function normalizeAgentDescription(value: string): string {
+  return (value.split(/\r?\n/, 1)[0] ?? "").trim().slice(0, DESCRIPTION_MAX_LENGTH);
+}
+
+function agentProfileField(markdown: string, field: string): string | undefined {
+  return markdown.match(new RegExp(`^${field}:\\s+(.+)$`, "m"))?.[1]?.trim();
+}
+
+function renderAgentProfile(agentId: string, profile: AgentProfile): string {
+  const description = normalizeAgentDescription(profile.description);
+  if (!description) {
+    throw new Error("Agent description is required.");
+  }
+
+  return [
+    `# ${agentId}`,
+    "",
+    `ID: \`${agentId}\``,
+    `Role: ${normalizeProfileToken(profile.role)}`,
+    `Model: ${normalizeProfileToken(profile.model, { preserveDot: true })}`,
+    `Description: ${description}`,
+    "",
+  ].join("\n");
+}
+
+function agentProfileManualContext(markdown: string): string {
+  const descriptionMatch = /^Description:\s+.*$/m.exec(markdown);
+  if (!descriptionMatch) {
+    return "";
+  }
+
+  const lineEnd = descriptionMatch.index + descriptionMatch[0].length;
+  const rest = markdown.slice(lineEnd);
+  if (!rest.trim()) {
+    return "";
+  }
+
+  return rest.replace(/^(?:\r?\n)+/, "\n");
+}
+
+function summarizeAgentProfile(id: string, markdown: string, options: AgentListOptions = {}): AgentProfileSummary {
+  const summary: AgentProfileSummary = {
+    id,
+    role: agentProfileField(markdown, "Role"),
+    model: agentProfileField(markdown, "Model"),
+    description: agentProfileField(markdown, "Description"),
+  };
+
+  if (options.includeMarkdown) {
+    summary.markdown = markdown;
+  }
+
+  return summary;
 }
 
 async function ensureFileContent(filePath: string, content: string): Promise<boolean> {
@@ -72,6 +145,7 @@ const LEGACY_REGISTERED_AGENTS_HEADING = "### Registered Agents (Marckers)";
 const AGENTS_GUIDE = [
   "- Agents should register through `agent_register` before posting.",
   "- Use `agent_list` to discover registered agents.",
+  "- Check bootstrap or `agent_list` before choosing a new agent ID when an existing profile may already fit.",
   "- Use `agent_read_profile` to inspect a specific agent profile.",
 ];
 const CONTEXT_READING_GUIDE = [
@@ -274,24 +348,26 @@ export async function updateWorkspaceRecommendations(workspaceRoot: string): Pro
   return { updated, alreadyCurrent };
 }
 
-export async function registerAgent(workspaceRoot: string, profile: AgentProfile): Promise<string> {
+export async function registerAgent(workspaceRoot: string, profile: AgentProfile): Promise<AgentRegistrationResult> {
   const info = await initWorkspace(workspaceRoot);
   const agentId = slugify(profile.id);
   const agentPath = safeJoin(info.marcPath, "agents", `${agentId}.md`);
-  const body = [
-    `# ${profile.displayName || agentId}`,
-    "",
-    `ID: \`${agentId}\``,
-    profile.role ? `Role: ${profile.role}` : undefined,
-    profile.model ? `Model: ${profile.model}` : undefined,
-    "",
-    profile.notes ?? "",
-    "",
-  ].filter((line) => line !== undefined).join("\n");
+  const alreadyExists = await exists(agentPath);
+  const current = await readTextIfExists(agentPath);
+  const body = `${renderAgentProfile(agentId, profile)}${agentProfileManualContext(current)}`;
+  const updated = body !== current;
 
-  await fs.writeFile(agentPath, body);
+  if (updated) {
+    await fs.writeFile(agentPath, body);
+  }
 
-  return agentId;
+  return {
+    id: agentId,
+    status: !alreadyExists ? "created" : updated ? "updated" : "unchanged",
+    created: !alreadyExists,
+    alreadyExists,
+    updated: alreadyExists && updated,
+  };
 }
 
 export async function createThread(workspaceRoot: string, title: string): Promise<ThreadInfo> {
@@ -438,7 +514,10 @@ export async function readRules(workspaceRoot: string): Promise<string> {
   return fs.readFile(safeJoin(info.marcPath, "RULES.md"), "utf8");
 }
 
-export async function listAgentProfiles(workspaceRoot: string): Promise<Array<{ id: string; markdown: string }>> {
+export async function listAgentProfiles(
+  workspaceRoot: string,
+  options: AgentListOptions = {},
+): Promise<AgentProfileSummary[]> {
   const info = await initWorkspace(workspaceRoot);
   const agentsRoot = safeJoin(info.marcPath, "agents");
   const entries = await fs.readdir(agentsRoot, { withFileTypes: true });
@@ -446,10 +525,9 @@ export async function listAgentProfiles(workspaceRoot: string): Promise<Array<{ 
 
   for (const entry of entries) {
     if (!entry.isFile() || !entry.name.endsWith(".md")) continue;
-    agents.push({
-      id: entry.name.replace(/\.md$/, ""),
-      markdown: await fs.readFile(safeJoin(agentsRoot, entry.name), "utf8"),
-    });
+    const id = entry.name.replace(/\.md$/, "");
+    const markdown = await fs.readFile(safeJoin(agentsRoot, entry.name), "utf8");
+    agents.push(summarizeAgentProfile(id, markdown, options));
   }
 
   return agents.sort((a, b) => a.id.localeCompare(b.id));

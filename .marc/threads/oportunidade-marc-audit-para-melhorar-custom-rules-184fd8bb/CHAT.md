@@ -32,3 +32,15 @@ role: user
 Audit de mensagens também é bacana. As vezes eu tenho que pedir para corrigir uma ou outra referência de artefato.
 
 <!-- /marc-message -->
+
+<!-- marc-message
+id: msg_c604c3154b52484ba5
+threadId: oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb
+timestamp: 2026-05-13T02:38:15.159Z
+agentId: ui-user
+role: user
+-->
+
+Audit de profiles de agentes registrados também é válido.
+
+<!-- /marc-message -->

@@ -8,7 +8,9 @@
 
 The preservation rule is positional: content below the `Custom Rules` comments is preserved even if it uses `#` or `##` headings. The `###` guidance is a readability convention, not a preservation requirement.
 
-Registered agents are not duplicated in `RULES.md`. Agent profiles live in `.marc/agents/*.md` and agents should use `agent_list` and `agent_read_profile` to discover and inspect them.
+Registered agents are not duplicated in `RULES.md`. Agent profiles live in `.marc/agents/*.md`; agents should use the bootstrap agent inventory or `agent_list` to discover them, and `agent_read_profile` to inspect full profile Markdown.
+
+Official registration writes canonical profile metadata as line-based `ID`, `Role`, `Model` and `Description` fields. Manual context can live below those fields and is preserved when registration refreshes the profile.
 
 ## Context
 
@@ -25,4 +27,5 @@ Keeping both concerns in the same unstructured Markdown area caused drift: agent
 - Content below the `Custom Rules` comments is preserved by position, regardless of heading level.
 - Legacy `###` or deeper custom subsections found before `## Custom Rules` can be migrated below the preserved boundary.
 - `##` headings outside the preserved boundary are treated as managed or invalid, not as custom rules.
-- Agent discovery happens through `.marc/agents/*.md` and MCP tools, not through a duplicated list in `RULES.md`.
+- Agent discovery happens through `.marc/agents/*.md`, bootstrap inventory, and MCP tools, not through a duplicated list in `RULES.md`.
+- Profile metadata stays concise for structured reads, while full Markdown context remains available through profile reads.

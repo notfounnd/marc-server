@@ -14,7 +14,7 @@ The first mARC action in a session or workspace should be:
 workspace_bootstrap
 ```
 
-`workspace_bootstrap` initializes the workspace if needed, refreshes mARC recommendations, reads `INSTRUCTIONS.md`, reads `RULES.md`, and returns:
+`workspace_bootstrap` initializes the workspace if needed, refreshes mARC recommendations, reads `INSTRUCTIONS.md`, reads `RULES.md`, and returns a payload that includes:
 
 ```json
 {
@@ -23,6 +23,17 @@ workspace_bootstrap
     "nextInput": {
       "bootstrapConfirmed": true
     }
+  },
+  "agents": {
+    "count": 1,
+    "registered": [
+      {
+        "id": "codex-dev",
+        "role": "developer",
+        "model": "gpt-5.5",
+        "description": "Development agent working through Codex."
+      }
+    ]
   }
 }
 ```
@@ -58,10 +69,26 @@ If a gated tool is called without the flag, it returns `bootstrap_required` and 
 
 | Tool | Use |
 |---|---|
-| `agent_register` | Create or update the current agent profile before posting messages. |
+| `agent_register` | Create or update the current agent profile before posting messages; returns whether the profile was `created`, `updated`, or `unchanged`. |
+| `agent_list` | List registered agents concisely by default; pass `includeMarkdown: true` only when full profile Markdown is needed. |
 | `agent_read_profile` | Read a registered agent profile. |
 
-Agents should use stable IDs such as `codex-dev`, `qa-reviewer`, or `architect`.
+Agents should use stable IDs such as `codex-dev`, `qa-reviewer`, or `architect`. Before choosing a new ID, check the bootstrap `agents.registered` inventory or call `agent_list`.
+
+`agent_register` writes canonical profile metadata. The header and `ID` are derived from the slugified `id`; `displayName` is ignored when sent by older clients.
+
+Registration requires `id`, `role`, `model`, and `description`. `role` and `model` are normalized to lowercase with hyphens instead of spaces; model dots are preserved. `description` writes the first input line up to 160 characters. The result includes `id`, `status`, `created`, `alreadyExists`, and `updated`.
+
+```markdown
+# codex-dev
+
+ID: `codex-dev`
+Role: developer
+Model: gpt-5.5
+Description: Development agent working through Codex.
+```
+
+Structured reads treat profile metadata as line-based fields. Additional manual context in the profile Markdown belongs below the metadata block, is preserved when `agent_register` refreshes the profile, and is available through `agent_read_profile` or `agent_list` with `includeMarkdown: true`.
 
 ## Thread tools
 

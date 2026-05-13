@@ -7,10 +7,31 @@ export type WorkspaceInfo = {
 
 export type AgentProfile = {
   id: string;
-  displayName: string;
+  role: string;
+  model: string;
+  description: string;
+  displayName?: string;
+  notes?: string;
+};
+
+export type AgentRegistrationResult = {
+  id: string;
+  status: "created" | "updated" | "unchanged";
+  created: boolean;
+  alreadyExists: boolean;
+  updated: boolean;
+};
+
+export type AgentProfileSummary = {
+  id: string;
   role?: string;
   model?: string;
-  notes?: string;
+  description?: string;
+  markdown?: string;
+};
+
+export type AgentListOptions = {
+  includeMarkdown?: boolean;
 };
 
 export type ThreadInfo = {

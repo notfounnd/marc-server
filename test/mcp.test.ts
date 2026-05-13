@@ -63,7 +63,11 @@ test("agent tools expose list and profile schemas", () => {
   const tools = registeredTools(server);
 
   assert.ok(tools.agent_list);
+  assert.ok(tools.agent_list.inputSchema.shape.includeMarkdown);
   assert.ok(tools.agent_read_profile.inputSchema.shape.agentId);
+  assert.ok(tools.agent_register.inputSchema.shape.description);
+  assert.ok(tools.agent_register.inputSchema.shape.role);
+  assert.ok(tools.agent_register.inputSchema.shape.model);
 });
 
 test("thread read tools expose incremental cursor schemas", () => {
@@ -181,6 +185,84 @@ test("free bootstrap tools work without bootstrapConfirmed", async () => {
   assert.equal(helper.tool, "marc_helper");
   assert.ok(Array.isArray(recommendations.updated));
   assert.equal(bootstrap.bootstrap.confirmed, true);
+});
+
+test("agent_register reports registration status and agent_list is concise by default", async () => {
+  const workspace = await tempWorkspace();
+  const server = buildMcpServer({ workspace });
+  const tools = registeredTools(server);
+
+  const bootstrap = await callTool<{ agents: { count: number; registered: unknown[] } }>(tools.workspace_bootstrap);
+  assert.deepEqual(bootstrap.agents, { count: 0, registered: [] });
+
+  const created = await callTool<{
+    result: { id: string; status: string; created: boolean; alreadyExists: boolean; updated: boolean };
+  }>(tools.agent_register, {
+    id: "Codex Dev",
+    displayName: "Ignored Custom Header",
+    role: "Developer Agent",
+    model: "GPT 5.5",
+    description: "Development agent working through Codex.",
+    bootstrapConfirmed: true,
+  });
+  assert.deepEqual(created.result, {
+    id: "codex-dev",
+    status: "created",
+    created: true,
+    alreadyExists: false,
+    updated: false,
+  });
+
+  const unchanged = await callTool<{
+    result: { id: string; status: string; created: boolean; alreadyExists: boolean; updated: boolean };
+  }>(tools.agent_register, {
+    id: "codex-dev",
+    role: "developer-agent",
+    model: "gpt-5.5",
+    description: "Development agent working through Codex.",
+    bootstrapConfirmed: true,
+  });
+  assert.deepEqual(unchanged.result, {
+    id: "codex-dev",
+    status: "unchanged",
+    created: false,
+    alreadyExists: true,
+    updated: false,
+  });
+
+  const listed = await callTool<{
+    result: Array<{ id: string; role: string; model: string; description: string; markdown?: string }>;
+  }>(tools.agent_list, { bootstrapConfirmed: true });
+  assert.deepEqual(listed.result, [
+    {
+      id: "codex-dev",
+      role: "developer-agent",
+      model: "gpt-5.5",
+      description: "Development agent working through Codex.",
+    },
+  ]);
+  assert.equal(listed.result[0].markdown, undefined);
+
+  const listedWithMarkdown = await callTool<{
+    result: Array<{ id: string; role: string; model: string; description: string; markdown?: string }>;
+  }>(tools.agent_list, { includeMarkdown: true, bootstrapConfirmed: true });
+  assert.match(listedWithMarkdown.result[0].markdown ?? "", /^# codex-dev$/m);
+  assert.doesNotMatch(listedWithMarkdown.result[0].markdown ?? "", /Ignored Custom Header/);
+
+  const bootstrapped = await callTool<{
+    agents: { count: number; registered: Array<{ id: string; role: string; model: string; description: string }> };
+  }>(tools.workspace_bootstrap);
+  assert.deepEqual(bootstrapped.agents, {
+    count: 1,
+    registered: [
+      {
+        id: "codex-dev",
+        role: "developer-agent",
+        model: "gpt-5.5",
+        description: "Development agent working through Codex.",
+      },
+    ],
+  });
 });
 
 test("gated tools expose bootstrapConfirmed and wrap successful responses with a reminder", async () => {

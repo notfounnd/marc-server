@@ -34,7 +34,7 @@ Markdown is the source of truth.
 
 - `INSTRUCTIONS.md` is managed by mARC and contains the bootstrap protocol.
 - `RULES.md` is the workspace behavior contract and includes preserved `Custom Rules`.
-- `agents/*.md` stores agent identity profiles.
+- `agents/*.md` stores agent identity profiles. Official registration writes canonical line-based `ID`, `Role`, `Model` and `Description` metadata; additional Markdown below that metadata is profile context.
 - `threads/*/CHAT.md` stores structured message blocks.
 - `threads/*/SUMMARY.md` marks a thread as closed and stores its executive summary.
 - `threads/*/artifacts/` stores Markdown artifacts linked from messages.
