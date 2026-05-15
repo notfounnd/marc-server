@@ -64,6 +64,7 @@ If a gated tool is called without the flag, it returns `bootstrap_required` and 
 | `workspace_unregister` | Remove this workspace from the daemon registry without deleting `.marc/`. |
 | `workspace_info` | Return the workspace bound to this MCP process. |
 | `workspace_read_rules` | Read `.marc/RULES.md`. |
+| `workspace_status` | Read workspace health, including thread index rebuild state. |
 
 ## Agent tools
 

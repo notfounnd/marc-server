@@ -137,6 +137,27 @@ export type ThreadIndexSnapshot = {
   threads: ThreadIndexEntry[];
 };
 
+export type ThreadIndexStore = {
+  load(): Promise<ThreadIndexSnapshot | undefined>;
+  save(snapshot: ThreadIndexSnapshot): Promise<void>;
+  clear(): Promise<void>;
+};
+
+export type ThreadIndexHealth = {
+  status: "ready" | "rebuilding" | "degraded" | "unavailable";
+  rebuilding: boolean;
+  lastRebuildAt?: string;
+  lastError: string | null;
+  threadCount: number;
+};
+
+export type WorkspaceStatus = {
+  ok: boolean;
+  modules: {
+    threadIndex: ThreadIndexHealth;
+  };
+};
+
 export type DaemonConfig = {
   dataDir: string;
   host: string;

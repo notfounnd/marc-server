@@ -77,6 +77,23 @@ type ThreadPayload = {
   updatedAt?: string;
 };
 
+type ThreadIndexHealth = {
+  status: "ready" | "rebuilding" | "degraded" | "unavailable";
+  rebuilding: boolean;
+  lastRebuildAt?: string;
+  lastError: string | null;
+  threadCount: number;
+};
+
+type DaemonStatus = {
+  ok: boolean;
+  modules?: {
+    threadIndex?: {
+      workspaces?: Record<string, ThreadIndexHealth>;
+    };
+  };
+};
+
 type StatusKind = "idle" | "ok" | "warn" | "error";
 type Toast = {
   kind: Exclude<StatusKind, "idle">;
@@ -216,6 +233,7 @@ function App() {
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [savingArtifact, setSavingArtifact] = useState(false);
   const [lastSyncedAt, setLastSyncedAt] = useState<Date>();
+  const [threadIndexHealthByWorkspace, setThreadIndexHealthByWorkspace] = useState<Record<string, ThreadIndexHealth>>({});
   const [busy, setBusy] = useState(false);
   const lastRefreshAtRef = useRef(0);
   const busyRef = useRef(false);
@@ -229,6 +247,7 @@ function App() {
     () => workspaces.find((workspace) => workspace.id === selectedWorkspaceId),
     [selectedWorkspaceId, workspaces],
   );
+  const selectedThreadIndexHealth = selectedWorkspaceId ? threadIndexHealthByWorkspace[selectedWorkspaceId] : undefined;
   const selectedAgent = useMemo(() => agents.find((agent) => agent.id === selectedAgentId), [selectedAgentId, agents]);
   const archivedThreads = useMemo(() => {
     const byId = new Map<string, Thread>();
@@ -337,7 +356,8 @@ function App() {
     setBusy(true);
 
     try {
-      await api<{ ok: boolean }>("/api/status");
+      const daemonStatus = await api<DaemonStatus>("/api/status");
+      setThreadIndexHealthByWorkspace(daemonStatus.modules?.threadIndex?.workspaces ?? {});
       const nextWorkspaces = await api<Workspace[]>("/api/workspaces");
       setWorkspaces(nextWorkspaces);
 
@@ -385,6 +405,7 @@ function App() {
         setAgents([]);
         setRules("");
         setThreadPayload(undefined);
+        setThreadIndexHealthByWorkspace({});
       }
 
       setStatusKind("ok");
@@ -895,6 +916,17 @@ function App() {
                 <Badge tone="amber">
                   <Archive size={13} />
                   {t("Closed")}
+                </Badge>
+              ) : null}
+              {selectedThreadIndexHealth?.rebuilding ? (
+                <Badge tone="amber">
+                  <RefreshCw size={13} className="spin" />
+                  {t("Index rebuilding")}
+                </Badge>
+              ) : selectedThreadIndexHealth?.status === "degraded" || selectedThreadIndexHealth?.status === "unavailable" ? (
+                <Badge tone="amber">
+                  <CircleAlert size={13} />
+                  {t("Index degraded")}
                 </Badge>
               ) : null}
             </div>

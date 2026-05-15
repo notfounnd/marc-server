@@ -44,6 +44,7 @@ test("registers only canonical grouped MCP tool names", () => {
     "workspace_info",
     "workspace_read_rules",
     "workspace_register",
+    "workspace_status",
     "workspace_unregister",
     "workspace_update_recommendations",
   ]);
@@ -56,6 +57,30 @@ test("thread_list accepts optional status filter", () => {
   const tool = registeredTools(server).thread_list;
 
   assert.ok(tool.inputSchema.shape.status);
+});
+
+test("workspace_status reports thread index health after bootstrap", async () => {
+  const workspace = await tempWorkspace();
+  const server = buildMcpServer({ workspace });
+  const tools = registeredTools(server);
+
+  const blocked = await callTool<{ error: { code: string; nextTool: string } }>(tools.workspace_status);
+
+  assert.equal(blocked.error.code, "bootstrap_required");
+  assert.equal(blocked.error.nextTool, "workspace_bootstrap");
+
+  await callTool(tools.workspace_bootstrap);
+  const status = await callTool<{
+    result: {
+      ok: boolean;
+      modules: { threadIndex: { status: string; rebuilding: boolean; threadCount: number } };
+    };
+  }>(tools.workspace_status, { bootstrapConfirmed: true });
+
+  assert.equal(status.result.ok, true);
+  assert.equal(status.result.modules.threadIndex.status, "ready");
+  assert.equal(status.result.modules.threadIndex.rebuilding, false);
+  assert.equal(status.result.modules.threadIndex.threadCount, 0);
 });
 
 test("agent tools expose list and profile schemas", () => {

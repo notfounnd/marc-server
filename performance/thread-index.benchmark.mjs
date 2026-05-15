@@ -2,6 +2,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { performance } from "node:perf_hooks";
+import { BackgroundThreadIndexReconciler, JsonThreadIndexStore, ThreadIndexReconciler } from "../src/core/thread-index.js";
 
 const volumes = [100, 500, 1000, 5000, 10000];
 
@@ -72,21 +73,21 @@ async function scanThreads(threadsRoot) {
   return threads;
 }
 
-async function writeIndex(indexPath, threads) {
-  const snapshot = { version: 1, updatedAt: new Date().toISOString(), threads };
-  const tmpPath = `${indexPath}.tmp`;
-  await fs.writeFile(tmpPath, JSON.stringify(snapshot));
-  await fs.rename(tmpPath, indexPath);
-}
-
 async function rebuildIndex(threadsRoot, indexPath) {
-  const threads = await scanThreads(threadsRoot);
-  await writeIndex(indexPath, threads);
-  return threads.length;
+  return (await new ThreadIndexReconciler(threadsRoot, new JsonThreadIndexStore(indexPath)).reconcile()).threads.length;
 }
 
 async function readWarmIndex(indexPath) {
   return JSON.parse(await fs.readFile(indexPath, "utf8")).threads.length;
+}
+
+async function backgroundRebuildWithStaleRead(threadsRoot, indexPath) {
+  const reconciler = new BackgroundThreadIndexReconciler(threadsRoot, new JsonThreadIndexStore(indexPath));
+  await reconciler.rebuild();
+  const rebuild = rebuildIndex(threadsRoot, indexPath);
+  const staleRead = await time("background rebuild stale read", () => reconciler.list({ status: "all" }));
+  await rebuild;
+  return staleRead.ms;
 }
 
 function printRows(rows) {
@@ -153,6 +154,9 @@ for (const volume of volumes) {
 
     const warm = await time("json warm list", () => readWarmIndex(fixture.indexPath));
     rows.push({ volume, scenario: warm.label, ms: warm.ms });
+
+    const staleRead = await backgroundRebuildWithStaleRead(fixture.threadsRoot, fixture.indexPath);
+    rows.push({ volume, scenario: "background rebuild stale read", ms: staleRead });
 
     const rebuild10 = await time("json rebuild 10x", async () => {
       for (let index = 0; index < 10; index += 1) {

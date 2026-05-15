@@ -16,6 +16,7 @@ import {
   readThreadInfo,
   readThreadSince,
   readThreadTail,
+  readWorkspaceStatus,
   registerAgent,
   updateWorkspaceRecommendations,
 } from "../core/workspace.js";
@@ -394,6 +395,13 @@ export function buildMcpServer(options: McpOptions = {}): McpServer {
         deletedLocalFiles: false,
       };
     }),
+  );
+
+  server.tool(
+    "workspace_status",
+    "Read this workspace health/status, including thread index rebuild state.",
+    gatedShape({}),
+    async (input) => withBootstrap(input, async () => readWorkspaceStatus(workspaceRoot)),
   );
 
   server.tool(

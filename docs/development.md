@@ -49,6 +49,8 @@ Benchmarks are run through:
 pnpm test:benchmark ./performance/<file>.benchmark.mjs
 ```
 
+`performance/thread-index.benchmark.mjs` reports direct scans, JSON rebuilds, warm JSON reads, and stale reads while a background rebuild is running.
+
 ## Build
 
 ```bash

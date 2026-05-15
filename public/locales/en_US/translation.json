@@ -28,6 +28,8 @@
   "For large notes, post a short message first and then attach a markdown artifact to it.": "For large notes, post a short message first and then attach a markdown artifact to it.",
   "Home": "Home",
   "Insert the active suggestion.": "Insert the active suggestion.",
+  "Index degraded": "Index degraded",
+  "Index rebuilding": "Index rebuilding",
   "Keyboard shortcuts": "Keyboard shortcuts",
   "Live updates connected": "Live updates connected",
   "Live updates reconnecting": "Live updates reconnecting",

@@ -1,6 +1,14 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import type { ThreadIndexEntry, ThreadIndexSnapshot, ThreadInfo, ThreadListOptions, ThreadListStatus } from "./types.js";
+import type {
+  ThreadIndexEntry,
+  ThreadIndexHealth,
+  ThreadIndexSnapshot,
+  ThreadIndexStore,
+  ThreadInfo,
+  ThreadListOptions,
+  ThreadListStatus,
+} from "./types.js";
 
 const INDEX_VERSION = 1;
 const saveQueues = new Map<string, Promise<void>>();
@@ -40,10 +48,17 @@ function sortThreads(threads: ThreadInfo[], status: ThreadListStatus): ThreadInf
   return threads.sort(byCreatedDesc);
 }
 
-export interface ThreadIndexStore {
-  load(): Promise<ThreadIndexSnapshot | undefined>;
-  save(snapshot: ThreadIndexSnapshot): Promise<void>;
-  clear(): Promise<void>;
+function publicThreads(snapshot: ThreadIndexSnapshot, options: ThreadListOptions = {}): ThreadInfo[] {
+  const status = options.status ?? "open";
+  const threads = snapshot.threads
+    .filter((thread) => status === "all" || thread.status === status)
+    .map(({ chatMtimeMs: _chatMtimeMs, summaryMtimeMs: _summaryMtimeMs, ...thread }) => thread);
+
+  return sortThreads(threads, status);
+}
+
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
 }
 
 export class JsonThreadIndexStore implements ThreadIndexStore {
@@ -93,13 +108,8 @@ export class ThreadIndexReconciler {
   ) {}
 
   async list(options: ThreadListOptions = {}): Promise<ThreadInfo[]> {
-    const status = options.status ?? "open";
     const snapshot = await this.reconcile();
-    const threads = snapshot.threads
-      .filter((thread) => status === "all" || thread.status === status)
-      .map(({ chatMtimeMs: _chatMtimeMs, summaryMtimeMs: _summaryMtimeMs, ...thread }) => thread);
-
-    return sortThreads(threads, status);
+    return publicThreads(snapshot, options);
   }
 
   async reconcile(): Promise<ThreadIndexSnapshot> {
@@ -175,6 +185,80 @@ export class ThreadIndexReconciler {
       createdAt,
       status: "open",
       chatMtimeMs,
+    };
+  }
+}
+
+export class BackgroundThreadIndexReconciler {
+  private rebuildPromise?: Promise<ThreadIndexSnapshot>;
+  private lastError: string | null = null;
+  private lastRebuildAt?: string;
+
+  constructor(
+    private readonly threadsRoot: string,
+    private readonly store: ThreadIndexStore,
+  ) {}
+
+  async list(options: ThreadListOptions = {}): Promise<ThreadInfo[]> {
+    const snapshot = await this.store.load();
+    if (!snapshot) {
+      return publicThreads(await this.rebuild(), options);
+    }
+
+    return publicThreads(snapshot, options);
+  }
+
+  async rebuild(): Promise<ThreadIndexSnapshot> {
+    if (this.rebuildPromise) return this.rebuildPromise;
+
+    const reconciler = new ThreadIndexReconciler(this.threadsRoot, this.store);
+    this.rebuildPromise = reconciler
+      .reconcile()
+      .then((snapshot) => {
+        this.lastError = null;
+        this.lastRebuildAt = snapshot.updatedAt;
+        return snapshot;
+      })
+      .catch((error: unknown) => {
+        this.lastError = errorMessage(error);
+        throw error;
+      })
+      .finally(() => {
+        this.rebuildPromise = undefined;
+      });
+
+    return this.rebuildPromise;
+  }
+
+  async health(): Promise<ThreadIndexHealth> {
+    const snapshot = await this.store.load();
+
+    if (this.rebuildPromise) {
+      return {
+        status: "rebuilding",
+        rebuilding: true,
+        lastRebuildAt: this.lastRebuildAt ?? snapshot?.updatedAt,
+        lastError: this.lastError,
+        threadCount: snapshot?.threads.length ?? 0,
+      };
+    }
+
+    if (this.lastError) {
+      return {
+        status: snapshot ? "degraded" : "unavailable",
+        rebuilding: false,
+        lastRebuildAt: this.lastRebuildAt ?? snapshot?.updatedAt,
+        lastError: this.lastError,
+        threadCount: snapshot?.threads.length ?? 0,
+      };
+    }
+
+    return {
+      status: snapshot ? "ready" : "unavailable",
+      rebuilding: false,
+      lastRebuildAt: this.lastRebuildAt ?? snapshot?.updatedAt,
+      lastError: null,
+      threadCount: snapshot?.threads.length ?? 0,
     };
   }
 }

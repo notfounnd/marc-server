@@ -51,6 +51,24 @@ test("daemon requires token and serves registered workspace threads", async () =
     });
     assert.equal(register.status, 200);
 
+    const status = await fetch(`${baseUrl}/api/status`, {
+      headers: { authorization: "Bearer secret" },
+    });
+    assert.equal(status.status, 200);
+    const statusBody = (await status.json()) as {
+      ok: boolean;
+      modules: {
+        daemon: { status: string };
+        workspaceRegistry: { status: string; workspaceCount: number };
+        threadIndex: { status: string; workspaces: Record<string, { status: string; rebuilding: boolean }> };
+      };
+    };
+    assert.equal(statusBody.ok, true);
+    assert.equal(statusBody.modules.daemon.status, "ready");
+    assert.equal(statusBody.modules.workspaceRegistry.workspaceCount, 1);
+    assert.equal(statusBody.modules.threadIndex.workspaces[workspace.id].status, "ready");
+    assert.equal(statusBody.modules.threadIndex.workspaces[workspace.id].rebuilding, false);
+
     const threads = await fetch(`${baseUrl}/api/workspaces/${encodeURIComponent(workspace.id)}/threads`, {
       headers: { authorization: "Bearer secret" },
     });

@@ -107,7 +107,7 @@ The daemon API is local infrastructure for the UI and nearby tooling. MCP client
 
 | Method | Route | Use |
 |---|---|---|
-| `GET` | `/api/status` | Read daemon status. |
+| `GET` | `/api/status` | Read daemon status, including workspace registry and thread index health. |
 | `GET` | `/api/events` | Open the Server-Sent Events stream used by the UI. |
 | `GET` | `/api/workspaces` | List registered workspaces. |
 | `POST` | `/api/workspaces` | Register or update a workspace in the daemon registry. |
@@ -121,6 +121,8 @@ The daemon API is local infrastructure for the UI and nearby tooling. MCP client
 | `POST` | `/api/workspaces/:workspaceId/threads/:threadId/messages/:messageId/artifacts` | Attach a Markdown artifact to a message. |
 
 The API uses the daemon bearer token. It is not a public remote API surface.
+
+`/api/status` keeps the compatibility field `ok: boolean` and includes module health under `modules`. The thread index module reports each registered workspace as `ready`, `rebuilding`, `degraded`, or `unavailable`; the UI uses this to keep the last known thread list visible while a background rebuild finishes.
 
 ## Troubleshooting
 

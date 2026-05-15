@@ -10,13 +10,17 @@ import {
   appendMessage,
   attachArtifactToMessage,
   listAgentProfiles,
-  listThreads,
+  listThreadsCached,
   readMessageArtifact,
   readRules,
   readThread,
+  readWorkspaceStatus,
   registerAgent,
+  rebuildThreadIndexInBackground,
 } from "../core/workspace.js";
 import type { DaemonConfig, ThreadListStatus, WorkspaceInfo } from "../core/types.js";
+
+const THREAD_INDEX_REVALIDATE_INTERVAL_MS = 30000;
 
 function json(response: http.ServerResponse, status: number, body: unknown): void {
   response.writeHead(status, { "content-type": "application/json; charset=utf-8" });
@@ -117,6 +121,8 @@ class UiEventBus {
   private readonly clients = new Set<http.ServerResponse>();
   private readonly watchers = new Map<string, FSWatcher>();
   private readonly debounceTimers = new Map<string, NodeJS.Timeout>();
+  private readonly revalidateTimers = new Map<string, NodeJS.Timeout>();
+  private readonly lastRevalidateAt = new Map<string, number>();
   private keepAlive?: NodeJS.Timeout;
 
   connect(response: http.ServerResponse): void {
@@ -161,10 +167,8 @@ class UiEventBus {
         this.debounceTimers.set(
           workspace.id,
           setTimeout(() => {
-            this.send("workspace-changed", {
-              workspaceId: workspace.id,
-              at: new Date().toISOString(),
-            });
+            this.debounceTimers.delete(workspace.id);
+            this.scheduleThreadIndexRebuild(workspace);
           }, 300),
         );
       });
@@ -172,6 +176,32 @@ class UiEventBus {
     } catch {
       // File watching is best-effort. The UI still has a slow fallback refresh.
     }
+  }
+
+  scheduleThreadIndexRebuild(workspace: WorkspaceInfo, delayMs = 0): void {
+    const current = this.revalidateTimers.get(workspace.id);
+    if (current) clearTimeout(current);
+    this.revalidateTimers.set(
+      workspace.id,
+      setTimeout(() => {
+        this.lastRevalidateAt.set(workspace.id, Date.now());
+        void rebuildThreadIndexInBackground(workspace.rootPath)
+          .catch(() => undefined)
+          .finally(() => {
+            this.revalidateTimers.delete(workspace.id);
+            this.send("workspace-changed", {
+              workspaceId: workspace.id,
+              at: new Date().toISOString(),
+            });
+          });
+      }, delayMs),
+    );
+  }
+
+  scheduleFallbackRebuild(workspace: WorkspaceInfo): void {
+    const lastAt = this.lastRevalidateAt.get(workspace.id) ?? 0;
+    if (Date.now() - lastAt < THREAD_INDEX_REVALIDATE_INTERVAL_MS || this.revalidateTimers.has(workspace.id)) return;
+    this.scheduleThreadIndexRebuild(workspace, 0);
   }
 
   unwatchWorkspace(workspaceId: string): void {
@@ -182,10 +212,19 @@ class UiEventBus {
       clearTimeout(timer);
       this.debounceTimers.delete(workspaceId);
     }
+    const revalidateTimer = this.revalidateTimers.get(workspaceId);
+    if (revalidateTimer) {
+      clearTimeout(revalidateTimer);
+      this.revalidateTimers.delete(workspaceId);
+    }
+    this.lastRevalidateAt.delete(workspaceId);
   }
 
   close(): void {
     for (const timer of this.debounceTimers.values()) {
+      clearTimeout(timer);
+    }
+    for (const timer of this.revalidateTimers.values()) {
       clearTimeout(timer);
     }
     for (const watcher of this.watchers.values()) {
@@ -197,6 +236,8 @@ class UiEventBus {
     this.clients.clear();
     this.watchers.clear();
     this.debounceTimers.clear();
+    this.revalidateTimers.clear();
+    this.lastRevalidateAt.clear();
   }
 }
 
@@ -236,7 +277,23 @@ export async function createDaemonServer(config: DaemonConfig): Promise<http.Ser
       }
 
       if (request.method === "GET" && url.pathname === "/api/status") {
-        json(response, 200, { ok: true, sqlite: store.sqliteAvailable() });
+        const workspaces = await store.listWorkspaces();
+        const workspaceStatuses = await Promise.all(
+          workspaces.map(async (workspace) => [workspace.id, (await readWorkspaceStatus(workspace.rootPath)).modules.threadIndex] as const),
+        );
+        const degraded = workspaceStatuses.some(([, status]) => status.status === "degraded" || status.status === "unavailable");
+        json(response, 200, {
+          ok: !degraded,
+          sqlite: store.sqliteAvailable(),
+          modules: {
+            daemon: { status: "ready" },
+            workspaceRegistry: { status: "ready", workspaceCount: workspaces.length },
+            threadIndex: {
+              status: degraded ? "degraded" : "ready",
+              workspaces: Object.fromEntries(workspaceStatuses),
+            },
+          },
+        });
         return;
       }
 
@@ -252,6 +309,7 @@ export async function createDaemonServer(config: DaemonConfig): Promise<http.Ser
           return;
         }
         const workspace = await store.upsertWorkspace(body);
+        await rebuildThreadIndexInBackground(workspace.rootPath);
         await events.watchWorkspace(workspace);
         events.send("workspace-registered", { workspaceId: workspace.id, at: new Date().toISOString() });
         json(response, 200, workspace);
@@ -279,7 +337,9 @@ export async function createDaemonServer(config: DaemonConfig): Promise<http.Ser
           text(response, 404, "Workspace not found");
           return;
         }
-        json(response, 200, await listThreads(workspace.rootPath, { status: threadListStatus(url.searchParams.get("status")) }));
+        const threads = await listThreadsCached(workspace.rootPath, { status: threadListStatus(url.searchParams.get("status")) });
+        events.scheduleFallbackRebuild(workspace);
+        json(response, 200, threads);
         return;
       }
 

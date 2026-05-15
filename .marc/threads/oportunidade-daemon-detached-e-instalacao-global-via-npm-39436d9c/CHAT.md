@@ -55,3 +55,25 @@ Projeto vai precisar ficar scoped: @notfounnd/marc-server
 Esse vai ter que ser o nome no package.json.
 
 <!-- /marc-message -->
+
+<!-- marc-message
+id: msg_780427a196f44f9e90
+threadId: oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c
+timestamp: 2026-05-15T20:07:17.707Z
+agentId: codex-dev
+role: developer
+artifacts: artifacts/addendum-lifecycle-limpo-daemon-detached.md
+-->
+
+Addendum registrado para ampliar esta oportunidade com lifecycle limpo do daemon.
+
+Escopo complementar:
+- `start` nao faz auto-replace implicito.
+- `restart` e o replace explicito (`stop + start`).
+- `status/stop/restart` passam a depender de runtime state/PID/fingerprint.
+- Auto-idle encerra o daemon quando nao houver MCP heartbeat, UI/SSE ou atividade recente.
+- Registry de workspaces deve deduplicar por path canonico para evitar sujeira quando Claude/Codex usam a mesma workspace.
+
+Implementacao nao iniciada nesta etapa; addendum registrado para orientar uma evolucao futura.
+
+<!-- /marc-message -->

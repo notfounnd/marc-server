@@ -4,7 +4,7 @@ import { newId, slugify, workspaceId } from "./ids.js";
 import { MESSAGE_STYLE_GUIDE, validateMessageBody } from "./guards.js";
 import { marcDir, resolveWorkspace, safeJoin } from "./paths.js";
 import { addArtifactToMessage, parseMessages, renderChatHeader, renderMessage } from "./markdown.js";
-import { JsonThreadIndexStore, ThreadIndexReconciler, threadIndexPath } from "./thread-index.js";
+import { BackgroundThreadIndexReconciler, JsonThreadIndexStore, ThreadIndexReconciler, threadIndexPath } from "./thread-index.js";
 import type {
   AgentListOptions,
   AgentProfile,
@@ -22,7 +22,10 @@ import type {
   ThreadTailResult,
   WorkspaceInfo,
   WorkspaceRecommendationsUpdate,
+  WorkspaceStatus,
 } from "./types.js";
+
+const backgroundThreadIndexes = new Map<string, BackgroundThreadIndexReconciler>();
 
 async function exists(filePath: string): Promise<boolean> {
   try {
@@ -386,6 +389,44 @@ export async function listThreads(workspaceRoot: string, options: ThreadListOpti
   const threadsRoot = safeJoin(info.marcPath, "threads");
   const reconciler = new ThreadIndexReconciler(threadsRoot, new JsonThreadIndexStore(threadIndexPath(info.marcPath)));
   return reconciler.list(options);
+}
+
+async function backgroundThreadIndex(workspaceRoot: string): Promise<BackgroundThreadIndexReconciler> {
+  const info = await initWorkspace(workspaceRoot);
+  const indexPath = threadIndexPath(info.marcPath);
+  const existing = backgroundThreadIndexes.get(indexPath);
+  if (existing) return existing;
+
+  const reconciler = new BackgroundThreadIndexReconciler(
+    safeJoin(info.marcPath, "threads"),
+    new JsonThreadIndexStore(indexPath),
+  );
+  backgroundThreadIndexes.set(indexPath, reconciler);
+  return reconciler;
+}
+
+export async function listThreadsCached(workspaceRoot: string, options: ThreadListOptions = {}): Promise<ThreadInfo[]> {
+  return (await backgroundThreadIndex(workspaceRoot)).list(options);
+}
+
+export async function rebuildThreadIndexInBackground(workspaceRoot: string): Promise<void> {
+  await (await backgroundThreadIndex(workspaceRoot)).rebuild();
+}
+
+export async function readWorkspaceStatus(workspaceRoot: string): Promise<WorkspaceStatus> {
+  const index = await backgroundThreadIndex(workspaceRoot);
+  let threadIndex = await index.health();
+  if (threadIndex.status === "unavailable" && !threadIndex.rebuilding) {
+    await index.rebuild();
+    threadIndex = await index.health();
+  }
+
+  return {
+    ok: threadIndex.status !== "unavailable",
+    modules: {
+      threadIndex,
+    },
+  };
 }
 
 export async function appendMessage(

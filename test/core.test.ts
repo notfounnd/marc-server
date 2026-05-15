@@ -4,6 +4,8 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { assertInside } from "../src/core/paths.js";
+import { BackgroundThreadIndexReconciler } from "../src/core/thread-index.js";
+import type { ThreadIndexSnapshot, ThreadIndexStore } from "../src/core/types.js";
 import {
   appendMessage,
   attachArtifact,
@@ -12,6 +14,7 @@ import {
   initWorkspace,
   listAgentProfiles,
   listThreads,
+  listThreadsCached,
   readAgentProfile,
   readRules,
   readMessageArtifact,
@@ -19,6 +22,8 @@ import {
   readThreadInfo,
   readThreadSince,
   readThreadTail,
+  readWorkspaceStatus,
+  rebuildThreadIndexInBackground,
   registerAgent,
   updateWorkspaceRecommendations,
 } from "../src/core/workspace.js";
@@ -29,6 +34,16 @@ async function tempWorkspace(): Promise<string> {
 
 async function readInstructions(workspace: string): Promise<string> {
   return fs.readFile(path.join(workspace, ".marc", "INSTRUCTIONS.md"), "utf8");
+}
+
+function deferred(): { promise: Promise<void>; resolve: () => void; reject: (error: unknown) => void } {
+  let resolve!: () => void;
+  let reject!: (error: unknown) => void;
+  const promise = new Promise<void>((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+  return { promise, resolve, reject };
 }
 
 function assertSectionOrder(markdown: string, headings: string[]): void {
@@ -716,6 +731,117 @@ test("handles concurrent thread index rebuilds", async () => {
 
   assert.ok(results.some((threads) => threads.some((thread) => thread.id === open.id)));
   assert.ok(results.every((threads) => threads.some((thread) => thread.id === closed.id)));
+});
+
+test("serves cached thread index entries while a background rebuild is running", async () => {
+  const workspace = await tempWorkspace();
+  const cached = await createThread(workspace, "Cached thread");
+  const fresh = await createThread(workspace, "Fresh thread");
+  const threadsRoot = path.join(workspace, ".marc", "threads");
+  const saveGate = deferred();
+  const initialSnapshot: ThreadIndexSnapshot = {
+    version: 1,
+    updatedAt: "2026-05-01T10:00:00.000Z",
+    threads: [
+      {
+        id: cached.id,
+        title: cached.title,
+        path: cached.path,
+        createdAt: cached.createdAt,
+        status: "open",
+        chatMtimeMs: 1,
+      },
+    ],
+  };
+  let snapshot = initialSnapshot;
+  let saves = 0;
+  const store: ThreadIndexStore = {
+    async load() {
+      return snapshot;
+    },
+    async save(nextSnapshot) {
+      saves += 1;
+      await saveGate.promise;
+      snapshot = nextSnapshot;
+    },
+    async clear() {
+      snapshot = undefined as unknown as ThreadIndexSnapshot;
+    },
+  };
+  const reconciler = new BackgroundThreadIndexReconciler(threadsRoot, store);
+
+  const rebuild = reconciler.rebuild();
+  const staleThreads = await reconciler.list({ status: "all" });
+  const healthDuringRebuild = await reconciler.health();
+
+  assert.deepEqual(staleThreads.map((thread) => thread.id), [cached.id]);
+  assert.equal(healthDuringRebuild.status, "rebuilding");
+  assert.equal(healthDuringRebuild.rebuilding, true);
+  assert.equal(healthDuringRebuild.threadCount, 1);
+
+  saveGate.resolve();
+  await rebuild;
+
+  const freshThreads = await reconciler.list({ status: "all" });
+
+  assert.equal(saves, 1);
+  assert.deepEqual(freshThreads.map((thread) => thread.id), [fresh.id, cached.id]);
+});
+
+test("marks cached thread index as degraded when a background rebuild fails", async () => {
+  const workspace = await tempWorkspace();
+  const cached = await createThread(workspace, "Cached degraded thread");
+  const initialSnapshot: ThreadIndexSnapshot = {
+    version: 1,
+    updatedAt: "2026-05-01T10:00:00.000Z",
+    threads: [
+      {
+        id: cached.id,
+        title: cached.title,
+        path: cached.path,
+        createdAt: cached.createdAt,
+        status: "open",
+        chatMtimeMs: 1,
+      },
+    ],
+  };
+  const store: ThreadIndexStore = {
+    async load() {
+      return initialSnapshot;
+    },
+    async save() {
+      throw new Error("disk is unavailable");
+    },
+    async clear() {},
+  };
+  const reconciler = new BackgroundThreadIndexReconciler(path.join(workspace, ".marc", "threads"), store);
+
+  await assert.rejects(() => reconciler.rebuild(), /disk is unavailable/);
+
+  const health = await reconciler.health();
+  const staleThreads = await reconciler.list({ status: "all" });
+
+  assert.equal(health.status, "degraded");
+  assert.equal(health.rebuilding, false);
+  assert.equal(health.lastError, "disk is unavailable");
+  assert.equal(health.threadCount, 1);
+  assert.deepEqual(staleThreads.map((thread) => thread.id), [cached.id]);
+});
+
+test("workspace status reports background thread index health", async () => {
+  const workspace = await tempWorkspace();
+  const thread = await createThread(workspace, "Workspace status thread");
+
+  await rebuildThreadIndexInBackground(workspace);
+
+  const cachedThreads = await listThreadsCached(workspace, { status: "all" });
+  const status = await readWorkspaceStatus(workspace);
+
+  assert.deepEqual(cachedThreads.map((item) => item.id), [thread.id]);
+  assert.equal(status.ok, true);
+  assert.equal(status.modules.threadIndex.status, "ready");
+  assert.equal(status.modules.threadIndex.rebuilding, false);
+  assert.equal(status.modules.threadIndex.threadCount, 1);
 });
 
 test("removing SUMMARY.md reopens the thread", async () => {
