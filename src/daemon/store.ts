@@ -54,6 +54,18 @@ function migrateSqlite(db: SqliteDb): void {
   `);
 }
 
+function canonicalWorkspacePath(filePath: string): string {
+  const resolved = path.resolve(filePath);
+  return process.platform === "win32" ? resolved.toLocaleLowerCase("en-US") : resolved;
+}
+
+function sameWorkspacePath(left: WorkspaceInfo, right: WorkspaceInfo): boolean {
+  return (
+    canonicalWorkspacePath(left.rootPath) === canonicalWorkspacePath(right.rootPath) ||
+    canonicalWorkspacePath(left.marcPath) === canonicalWorkspacePath(right.marcPath)
+  );
+}
+
 export class DaemonStore {
   private readonly registryPath: string;
   private sqlite?: SqliteDb;
@@ -91,6 +103,10 @@ export class DaemonStore {
 
   async upsertWorkspace(workspace: WorkspaceInfo): Promise<WorkspaceInfo> {
     const registry = await this.readRegistry();
+    const duplicateIds = registry.workspaces
+      .filter((item) => item.id !== workspace.id && sameWorkspacePath(item, workspace))
+      .map((item) => item.id);
+    registry.workspaces = registry.workspaces.filter((item) => item.id === workspace.id || !sameWorkspacePath(item, workspace));
     const index = registry.workspaces.findIndex((item) => item.id === workspace.id);
     if (index >= 0) {
       registry.workspaces[index] = workspace;
@@ -98,6 +114,9 @@ export class DaemonStore {
       registry.workspaces.push(workspace);
     }
     await this.writeRegistry(registry);
+    for (const duplicateId of duplicateIds) {
+      this.sqlite?.prepare("DELETE FROM workspaces WHERE id = ?").run(duplicateId);
+    }
 
     this.sqlite
       ?.prepare(

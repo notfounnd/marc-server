@@ -8,10 +8,19 @@ The daemon is the local HTTP process that serves the mARC UI and keeps the brows
 pnpm dev:daemon
 ```
 
-When mARC is installed or linked as a CLI, the equivalent daemon command is:
+When mARC is installed or linked as a CLI, `marc daemon` keeps the same foreground/debug behavior:
 
 ```text
 marc daemon [--host 127.0.0.1] [--port 4187] [--data-dir .marc-daemon] [--token <token>]
+```
+
+For normal CLI usage, run the detached lifecycle commands:
+
+```text
+marc daemon start [--host 127.0.0.1] [--port 4187] [--data-dir .marc-daemon]
+marc daemon status [--data-dir .marc-daemon]
+marc daemon stop [--data-dir .marc-daemon]
+marc daemon restart [--host 127.0.0.1] [--port 4187] [--data-dir .marc-daemon]
 ```
 
 Default address:
@@ -21,6 +30,12 @@ http://127.0.0.1:4187
 ```
 
 The daemon stores its token under `.marc-daemon/token` by default. If `--token` is omitted, the daemon reuses the existing token file or generates a new token on first startup. If `--token` is provided, that value is used for the running daemon process.
+
+Detached mode also writes `.marc-daemon/daemon.json` and `.marc-daemon/daemon.log`. The state file records PID, URL, token path, log path, fingerprint, active leases, and idle information. `start` is idempotent for the same live fingerprint: running it again returns the existing daemon instead of spawning another process. `restart` is the explicit replacement flow.
+
+Detached daemons auto-idle by default. When there are no MCP leases, no UI/SSE clients, and no recent activity, the daemon closes itself after the configured timeout. Foreground mode does not auto-idle by default.
+
+`marc daemon status` uses detached runtime state when `.marc-daemon/daemon.json` exists. If no state file exists, it falls back to the local `/api/status` endpoint so foreground development daemons are reported as running instead of stopped.
 
 ## Token
 
@@ -109,6 +124,8 @@ The daemon API is local infrastructure for the UI and nearby tooling. MCP client
 |---|---|---|
 | `GET` | `/api/status` | Read daemon status, including workspace registry and thread index health. |
 | `GET` | `/api/events` | Open the Server-Sent Events stream used by the UI. |
+| `PUT` | `/api/leases/:clientId` | Create or renew an MCP lease for detached daemon idle tracking. |
+| `DELETE` | `/api/leases/:clientId` | Remove an MCP lease. |
 | `GET` | `/api/workspaces` | List registered workspaces. |
 | `POST` | `/api/workspaces` | Register or update a workspace in the daemon registry. |
 | `DELETE` | `/api/workspaces/:workspaceId` | Remove a workspace from the daemon registry. |
@@ -135,6 +152,9 @@ The API uses the daemon bearer token. It is not a public remote API surface.
 | Message or artifact post fails | Check the daemon token, target workspace, target thread, and message size. Long content should be attached as a Markdown artifact. |
 | New MCP tools do not appear | Run `pnpm build`, then reconnect or restart the MCP client because tool schemas are often cached. |
 | `node:sqlite` is unavailable | Markdown remains the source of truth; cache/index behavior can fall back safely. |
+| Detached daemon has stale state | Run `marc daemon status`; stale PID state is cleaned automatically when the process is gone. |
+| Detached daemon has a different fingerprint | Run `marc daemon restart`; `start` does not replace a live daemon implicitly. |
+| Detached daemon is idle | It exits automatically after the auto-idle timeout when no MCP lease, UI/SSE client, or recent activity remains. |
 
 ## Also see
 

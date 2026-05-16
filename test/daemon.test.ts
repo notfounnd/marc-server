@@ -4,7 +4,16 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { loadDaemonConfig } from "../src/daemon/config.js";
+import {
+  createRuntimeState,
+  getDaemonProcessStatus,
+  getDaemonStatus,
+  removeDaemonRuntimeState,
+  startDetachedDaemon,
+  writeDaemonRuntimeState,
+} from "../src/daemon/lifecycle.js";
 import { createDaemonServer } from "../src/daemon/server.js";
+import { DaemonStore } from "../src/daemon/store.js";
 import { appendMessage, createThread, initWorkspace, readRules, readThread } from "../src/core/workspace.js";
 
 async function tempDir(prefix: string): Promise<string> {
@@ -58,13 +67,16 @@ test("daemon requires token and serves registered workspace threads", async () =
     const statusBody = (await status.json()) as {
       ok: boolean;
       modules: {
-        daemon: { status: string };
+        daemon: { status: string; mode: string; activeUiClients: number; leases: unknown[] };
         workspaceRegistry: { status: string; workspaceCount: number };
         threadIndex: { status: string; workspaces: Record<string, { status: string; rebuilding: boolean }> };
       };
     };
     assert.equal(statusBody.ok, true);
     assert.equal(statusBody.modules.daemon.status, "ready");
+    assert.equal(statusBody.modules.daemon.mode, "foreground");
+    assert.equal(statusBody.modules.daemon.activeUiClients, 0);
+    assert.deepEqual(statusBody.modules.daemon.leases, []);
     assert.equal(statusBody.modules.workspaceRegistry.workspaceCount, 1);
     assert.equal(statusBody.modules.threadIndex.workspaces[workspace.id].status, "ready");
     assert.equal(statusBody.modules.threadIndex.workspaces[workspace.id].rebuilding, false);
@@ -133,6 +145,147 @@ test("daemon requires token and serves registered workspace threads", async () =
   } finally {
     server.close();
   }
+});
+
+test("daemon leases are renewed, exposed in status, and removed", async () => {
+  const dataDir = await tempDir("marc-daemon-");
+  const config = await loadDaemonConfig({ dataDir, token: "secret", port: 0 });
+  const server = await createDaemonServer(config);
+  const baseUrl = await listen(server);
+
+  try {
+    const lease = await fetch(`${baseUrl}/api/leases/client-1`, {
+      method: "PUT",
+      headers: {
+        authorization: "Bearer secret",
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        agentId: "codex-dev",
+        workspaceId: "workspace-1",
+        clientType: "mcp",
+        ttlMs: 60_000,
+      }),
+    });
+    assert.equal(lease.status, 200);
+
+    const status = await fetch(`${baseUrl}/api/status`, {
+      headers: { authorization: "Bearer secret" },
+    });
+    const body = (await status.json()) as {
+      modules: {
+        daemon: {
+          leases: Array<{ clientId: string; agentId?: string; workspaceId?: string; clientType: string }>;
+        };
+      };
+    };
+    assert.deepEqual(body.modules.daemon.leases.map((item) => item.clientId), ["client-1"]);
+    assert.equal(body.modules.daemon.leases[0].agentId, "codex-dev");
+    assert.equal(body.modules.daemon.leases[0].workspaceId, "workspace-1");
+    assert.equal(body.modules.daemon.leases[0].clientType, "mcp");
+
+    const removeLease = await fetch(`${baseUrl}/api/leases/client-1`, {
+      method: "DELETE",
+      headers: { authorization: "Bearer secret" },
+    });
+    assert.equal(removeLease.status, 200);
+
+    const statusAfterDelete = await fetch(`${baseUrl}/api/status`, {
+      headers: { authorization: "Bearer secret" },
+    });
+    const bodyAfterDelete = (await statusAfterDelete.json()) as { modules: { daemon: { leases: unknown[] } } };
+    assert.deepEqual(bodyAfterDelete.modules.daemon.leases, []);
+  } finally {
+    server.close();
+  }
+});
+
+test("daemon store deduplicates workspaces by canonical path", async () => {
+  const dataDir = await tempDir("marc-daemon-store-");
+  const workspaceRoot = await tempDir("marc-workspace-");
+  const workspace = await initWorkspace(workspaceRoot);
+  const store = await DaemonStore.open(dataDir);
+
+  await store.upsertWorkspace({
+    ...workspace,
+    id: "old-id",
+  });
+  await store.upsertWorkspace({
+    ...workspace,
+    id: "new-id",
+  });
+
+  const workspaces = await store.listWorkspaces();
+  assert.deepEqual(
+    workspaces.map((item) => item.id),
+    ["new-id"],
+  );
+});
+
+test("daemon runtime status cleans stale pid state", async () => {
+  const dataDir = await tempDir("marc-daemon-runtime-");
+  const config = await loadDaemonConfig({ dataDir, token: "secret", port: 0 });
+  const state = await createRuntimeState(config);
+  await writeDaemonRuntimeState({ ...state, pid: 999_999_999 });
+
+  const status = await getDaemonProcessStatus(config);
+  assert.equal(status.status, "stale");
+
+  const afterCleanup = await getDaemonProcessStatus(config);
+  assert.equal(afterCleanup.status, "stopped");
+  await removeDaemonRuntimeState(dataDir);
+});
+
+test("daemon status falls back to API when foreground daemon has no runtime state", async () => {
+  const dataDir = await tempDir("marc-daemon-foreground-status-");
+  const config = await loadDaemonConfig({ dataDir, token: "secret", port: 0 });
+  const server = await createDaemonServer(config);
+  const baseUrl = await listen(server);
+  const port = Number(new URL(baseUrl).port);
+
+  try {
+    const status = await getDaemonStatus({ ...config, port });
+    assert.equal(status.status, "running");
+    assert("source" in status);
+    assert.equal(status.source, "api");
+    assert.equal(status.httpStatus, 200);
+    assert.equal(status.daemon.pid, process.pid);
+    assert.equal(status.daemon.mode, "foreground");
+    assert.equal(status.daemon.dataDir, dataDir);
+  } finally {
+    server.close();
+  }
+});
+
+test("daemon start is idempotent when the same fingerprint is already running", async () => {
+  const dataDir = await tempDir("marc-daemon-idempotent-");
+  const config = await loadDaemonConfig({ dataDir, token: "secret", port: 0, mode: "detached" });
+  const state = await createRuntimeState(config);
+  await writeDaemonRuntimeState(state);
+
+  try {
+    const result = await startDetachedDaemon(config);
+    assert.equal(result.action, "already-running");
+    assert.equal(result.status.state.pid, process.pid);
+    assert.equal(result.status.fingerprintMatches, true);
+  } finally {
+    await removeDaemonRuntimeState(dataDir);
+  }
+});
+
+test("detached daemon auto-idles when there are no leases, UI clients, or activity", async () => {
+  const dataDir = await tempDir("marc-daemon-idle-");
+  const config = await loadDaemonConfig({ dataDir, token: "secret", port: 0, mode: "detached", autoIdleMs: 20 });
+  const server = await createDaemonServer(config);
+  const baseUrl = await listen(server);
+
+  const closed = new Promise<void>((resolve) => server.on("close", resolve));
+  const status = await fetch(`${baseUrl}/api/status`, {
+    headers: { authorization: "Bearer secret" },
+  });
+  assert.equal(status.status, 200);
+
+  await closed;
 });
 
 test("posting a UI message does not modify RULES.md", async () => {

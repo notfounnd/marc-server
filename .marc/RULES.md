@@ -36,7 +36,32 @@
 <!-- Keep project-specific custom rules below this line. This section is preserved by workspace_update_recommendations. -->
 <!-- Prefer ### or deeper headings to organize project-specific rules in this section. -->
 
+### Agent Tooling
+
+- Always use context-mode for repository investigation, validation, and command output review in this workspace.
+- Assume the working shell is Bash in this workspace unless the user explicitly states otherwise.
+
+### Project References
+
+- When writing messages that reference mARC project assets such as agents, threads, messages, or artifacts, use the link/reference format expected by the mARC tools.
+
+### Session Onboarding
+
+- When onboarding into `@notfounnd/marc-server`, read `README.md` and the `docs/` directory to understand the current project state.
+- After onboarding, present a structured overview of the project understanding in chat and wait for the user's next instructions.
+- Do not propose or make changes until the onboarding overview is delivered, unless the user explicitly asks for a different flow.
+
 ### Flow Rules
 
 - Before finalizing development, review project documentation and update or expand it when a need is identified.
 - When the user asks to close a UI implementation thread, review `oportunidade-testes-playwright-para-referencias-e-artifacts-ui-f742659a` and update its Playwright backlog when needed.
+
+### Code Style
+
+- Never use `else` branches in project code.
+- Do not use nested `if` blocks.
+- Keep conditionals flat and intentional.
+- Use early returns as the required pattern for defensive programming, guard clauses, validation, and short-circuit handling.
+- Use Strategy pattern or dispatch tables as the required pattern when behavior branches by action/type or equivalent variants.
+- Keep simple guards as early returns.
+- Reserve Strategy pattern for meaningful behavior variation.

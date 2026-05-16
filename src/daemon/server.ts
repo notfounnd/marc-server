@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import { URL } from "node:url";
 import { DaemonStore } from "./store.js";
 import { renderUi } from "./ui.js";
+import { createRuntimeState, patchDaemonRuntimeState, removeDaemonRuntimeState, writeDaemonRuntimeState } from "./lifecycle.js";
 import {
   appendMessage,
   attachArtifactToMessage,
@@ -18,7 +19,7 @@ import {
   registerAgent,
   rebuildThreadIndexInBackground,
 } from "../core/workspace.js";
-import type { DaemonConfig, ThreadListStatus, WorkspaceInfo } from "../core/types.js";
+import type { DaemonConfig, DaemonLease, ThreadListStatus, WorkspaceInfo } from "../core/types.js";
 
 const THREAD_INDEX_REVALIDATE_INTERVAL_MS = 30000;
 
@@ -125,6 +126,12 @@ class UiEventBus {
   private readonly lastRevalidateAt = new Map<string, number>();
   private keepAlive?: NodeJS.Timeout;
 
+  constructor(private readonly onClientCountChange?: () => void) {}
+
+  clientCount(): number {
+    return this.clients.size;
+  }
+
   connect(response: http.ServerResponse): void {
     response.writeHead(200, {
       "content-type": "text/event-stream; charset=utf-8",
@@ -133,6 +140,7 @@ class UiEventBus {
     });
     response.write(": connected\n\n");
     this.clients.add(response);
+    this.onClientCountChange?.();
     this.keepAlive ??= setInterval(() => this.send("ping", { at: new Date().toISOString() }), 25000);
 
     response.on("close", () => {
@@ -141,6 +149,7 @@ class UiEventBus {
         clearInterval(this.keepAlive);
         this.keepAlive = undefined;
       }
+      this.onClientCountChange?.();
     });
   }
 
@@ -243,7 +252,40 @@ class UiEventBus {
 
 export async function createDaemonServer(config: DaemonConfig): Promise<http.Server> {
   const store = await DaemonStore.open(config.dataDir);
-  const events = new UiEventBus();
+  const leases = new Map<string, DaemonLease>();
+  const startedAt = new Date().toISOString();
+  let lastActivityAt = startedAt;
+  let lastExternalActivityAt = startedAt;
+
+  async function syncRuntimeState(): Promise<void> {
+    if (config.mode !== "detached") return;
+    await patchDaemonRuntimeState(config.dataDir, {
+      lastActivityAt,
+      activeUiClients: events.clientCount(),
+      leases: Array.from(leases.values()),
+    });
+  }
+
+  function trackActivity(): void {
+    lastActivityAt = new Date().toISOString();
+    void syncRuntimeState();
+  }
+
+  function trackExternalActivity(): void {
+    lastExternalActivityAt = new Date().toISOString();
+    trackActivity();
+  }
+
+  function pruneExpiredLeases(): void {
+    const now = Date.now();
+    for (const [clientId, lease] of leases) {
+      if (Date.parse(lease.expiresAt) <= now) {
+        leases.delete(clientId);
+      }
+    }
+  }
+
+  const events = new UiEventBus(trackActivity);
   for (const workspace of await store.listWorkspaces()) {
     await events.watchWorkspace(workspace);
   }
@@ -251,6 +293,9 @@ export async function createDaemonServer(config: DaemonConfig): Promise<http.Ser
   const server = http.createServer(async (request, response) => {
     try {
       const url = new URL(request.url ?? "/", `http://${request.headers.host ?? "localhost"}`);
+      if (request.method !== "GET" || url.pathname !== "/api/status") {
+        trackExternalActivity();
+      }
 
       if (request.method === "GET" && !url.pathname.startsWith("/api/")) {
         if (await serveStatic(url, response)) {
@@ -277,16 +322,33 @@ export async function createDaemonServer(config: DaemonConfig): Promise<http.Ser
       }
 
       if (request.method === "GET" && url.pathname === "/api/status") {
+        pruneExpiredLeases();
+        await syncRuntimeState();
         const workspaces = await store.listWorkspaces();
         const workspaceStatuses = await Promise.all(
           workspaces.map(async (workspace) => [workspace.id, (await readWorkspaceStatus(workspace.rootPath)).modules.threadIndex] as const),
         );
         const degraded = workspaceStatuses.some(([, status]) => status.status === "degraded" || status.status === "unavailable");
+        const now = Date.now();
+        const idleForMs = Math.max(0, now - Date.parse(lastExternalActivityAt));
         json(response, 200, {
           ok: !degraded,
           sqlite: store.sqliteAvailable(),
           modules: {
-            daemon: { status: "ready" },
+            daemon: {
+              status: "ready",
+              pid: process.pid,
+              mode: config.mode,
+              uptimeMs: Math.max(0, now - Date.parse(startedAt)),
+              url: `http://${config.host}:${config.port}`,
+              dataDir: config.dataDir,
+              tokenPath: config.tokenPath,
+              fingerprint: config.fingerprint,
+              autoIdleMs: config.autoIdleMs,
+              idleForMs,
+              activeUiClients: events.clientCount(),
+              leases: Array.from(leases.values()),
+            },
             workspaceRegistry: { status: "ready", workspaceCount: workspaces.length },
             threadIndex: {
               status: degraded ? "degraded" : "ready",
@@ -294,6 +356,40 @@ export async function createDaemonServer(config: DaemonConfig): Promise<http.Ser
             },
           },
         });
+        return;
+      }
+
+      const leaseMatch = /^\/api\/leases\/([^/]+)$/.exec(url.pathname);
+      if (leaseMatch && request.method === "PUT") {
+        const clientId = decodeURIComponent(leaseMatch[1]);
+        const body = (await readBody(request)) as {
+          agentId?: unknown;
+          workspaceId?: unknown;
+          clientType?: unknown;
+          ttlMs?: unknown;
+        };
+        const previous = leases.get(clientId);
+        const now = new Date();
+        const ttlMs = typeof body.ttlMs === "number" && Number.isFinite(body.ttlMs) ? body.ttlMs : 45_000;
+        const lease: DaemonLease = {
+          clientId,
+          agentId: typeof body.agentId === "string" ? body.agentId : previous?.agentId,
+          workspaceId: typeof body.workspaceId === "string" ? body.workspaceId : previous?.workspaceId,
+          clientType: body.clientType === "mcp" || body.clientType === "ui" ? body.clientType : "unknown",
+          startedAt: previous?.startedAt ?? now.toISOString(),
+          lastSeenAt: now.toISOString(),
+          expiresAt: new Date(now.getTime() + ttlMs).toISOString(),
+        };
+        leases.set(clientId, lease);
+        trackExternalActivity();
+        json(response, 200, { lease });
+        return;
+      }
+
+      if (leaseMatch && request.method === "DELETE") {
+        leases.delete(decodeURIComponent(leaseMatch[1]));
+        trackExternalActivity();
+        json(response, 200, { deleted: true });
         return;
       }
 
@@ -474,13 +570,34 @@ export async function createDaemonServer(config: DaemonConfig): Promise<http.Ser
     }
   });
 
-  server.on("close", () => events.close());
+  let idleTimer: NodeJS.Timeout | undefined;
+  if (config.mode === "detached" && config.autoIdleMs > 0) {
+    idleTimer = setInterval(() => {
+      pruneExpiredLeases();
+      void syncRuntimeState();
+      const idleForMs = Date.now() - Date.parse(lastExternalActivityAt);
+      if (idleForMs >= config.autoIdleMs && leases.size === 0 && events.clientCount() === 0) {
+        server.close();
+      }
+    }, Math.min(config.autoIdleMs, 30_000));
+  }
+
+  server.on("close", () => {
+    if (idleTimer) clearInterval(idleTimer);
+    events.close();
+  });
   return server;
 }
 
 export async function runDaemon(config: DaemonConfig): Promise<http.Server> {
   const server = await createDaemonServer(config);
   await new Promise<void>((resolve) => server.listen(config.port, config.host, resolve));
+  if (config.mode === "detached") {
+    await writeDaemonRuntimeState(await createRuntimeState(config));
+    server.on("close", () => {
+      void removeDaemonRuntimeState(config.dataDir);
+    });
+  }
   console.log(`mARC daemon listening on http://${config.host}:${config.port}`);
   console.log(`Token: ${config.token}`);
   return server;

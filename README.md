@@ -54,10 +54,17 @@ pnpm install
 pnpm build
 ```
 
-Start the local daemon:
+Start the local daemon in foreground for development:
 
 ```bash
 pnpm dev:daemon
+```
+
+When using the built CLI, start it detached for day-to-day use:
+
+```bash
+marc daemon start
+marc daemon status
 ```
 
 Open the UI:
@@ -195,6 +202,8 @@ The daemon also creates a local data directory where it is started:
 ```text
 .marc-daemon/
   token
+  daemon.json
+  daemon.log
 ```
 
 ## Troubleshooting
@@ -205,6 +214,9 @@ The daemon also creates a local data directory where it is started:
 | Workspace does not appear | Ask an agent to call `workspace_register` with the daemon URL and token configured. |
 | Agent tools are missing | Restart the agent session and verify the MCP server list. |
 | New tools do not appear | Run `pnpm build`, then reconnect or restart the MCP client. |
+| Detached daemon looks stale | Run `marc daemon status`; use `marc daemon restart` when the status reports a different fingerprint. |
+| Detached daemon remains after clients exit | New detached daemons auto-idle after the configured timeout when there are no MCP leases, UI/SSE clients, or recent activity. |
+| `marc daemon status` during development | Foreground daemons started with `pnpm dev:daemon` are detected through the local `/api/status` fallback when no `daemon.json` exists. |
 
 See [UI and Daemon](docs/ui-and-daemon.md) for daemon, token, UI, and local API details.
 

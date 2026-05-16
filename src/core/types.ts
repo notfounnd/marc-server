@@ -163,4 +163,36 @@ export type DaemonConfig = {
   host: string;
   port: number;
   token: string;
+  tokenPath: string;
+  mode: "foreground" | "detached";
+  autoIdleMs: number;
+  fingerprint: string;
+};
+
+export type DaemonLease = {
+  clientId: string;
+  agentId?: string;
+  workspaceId?: string;
+  clientType: "mcp" | "ui" | "unknown";
+  startedAt: string;
+  lastSeenAt: string;
+  expiresAt: string;
+};
+
+export type DaemonRuntimeState = {
+  version: 1;
+  pid: number;
+  startedAt: string;
+  host: string;
+  port: number;
+  url: string;
+  dataDir: string;
+  tokenPath: string;
+  logPath: string;
+  fingerprint: string;
+  mode: "foreground" | "detached";
+  lastActivityAt: string;
+  activeUiClients: number;
+  autoIdleMs: number;
+  leases: DaemonLease[];
 };
