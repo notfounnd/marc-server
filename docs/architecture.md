@@ -30,10 +30,15 @@ Markdown is the source of truth.
       SUMMARY.md
       artifacts/
   cache/
+.agents/
+  skills/
+    marc-ops/
+      SKILL.md
 ```
 
 - `INSTRUCTIONS.md` is managed by mARC and contains the bootstrap protocol.
 - `RULES.md` is the workspace behavior contract and includes preserved `Custom Rules`.
+- `.agents/skills/marc-ops/SKILL.md` is managed by mARC and helps agents apply bootstrap and `RULES.md` as an operational workflow.
 - `agents/*.md` stores agent identity profiles. Official registration writes canonical line-based `ID`, `Role`, `Model` and `Description` metadata; additional Markdown below that metadata is profile context.
 - `threads/*/CHAT.md` stores structured message blocks.
 - `threads/*/SUMMARY.md` marks a thread as closed and stores its executive summary.
@@ -107,7 +112,7 @@ SQLite may be used as an optional local registry/index when available in the Nod
 
 ## Format evolution
 
-Managed recommendation files such as `INSTRUCTIONS.md` and `RULES.md` evolve through `workspace_update_recommendations` and `workspace_bootstrap`. Project-specific content belongs under preserved sections such as `Custom Rules`, while mARC-managed sections can be refreshed as the recommended protocol changes.
+Managed recommendation files such as `INSTRUCTIONS.md`, `RULES.md`, and `.agents/skills/marc-ops/SKILL.md` evolve through `workspace_update_recommendations` and `workspace_bootstrap`. Project-specific content belongs under preserved sections such as `Custom Rules`, while mARC-managed sections can be refreshed as the recommended protocol changes.
 
 Thread transcripts, summaries, artifacts, and cache/index files should remain readable as Markdown. When the format needs to evolve, the preferred path is additive: preserve existing files, update managed guidance idempotently, and rebuild derived cache from the Markdown source of truth.
 

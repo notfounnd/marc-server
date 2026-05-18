@@ -40,6 +40,7 @@ test("registers only canonical grouped MCP tool names", () => {
     "thread_read",
     "thread_read_since",
     "thread_tail",
+    "workspace_audit",
     "workspace_bootstrap",
     "workspace_info",
     "workspace_read_rules",
@@ -81,6 +82,41 @@ test("workspace_status reports thread index health after bootstrap", async () =>
   assert.equal(status.result.modules.threadIndex.status, "ready");
   assert.equal(status.result.modules.threadIndex.rebuilding, false);
   assert.equal(status.result.modules.threadIndex.threadCount, 0);
+});
+
+test("workspace_audit exposes scoped audit schema and requires bootstrap", async () => {
+  const workspace = await tempWorkspace();
+  const server = buildMcpServer({ workspace });
+  const tools = registeredTools(server);
+
+  assert.ok(tools.workspace_audit);
+  assert.ok(tools.workspace_audit.inputSchema.shape.scope);
+  assert.ok(tools.workspace_audit.inputSchema.shape.threadId);
+  assert.ok(tools.workspace_audit.inputSchema.shape.messageId);
+  assert.ok(tools.workspace_audit.inputSchema.shape.severity);
+  assert.ok(tools.workspace_audit.inputSchema.shape.maxFindings);
+
+  const blocked = await callTool<{ error: { code: string; nextTool: string } }>(tools.workspace_audit, {
+    scope: "all",
+  });
+  assert.equal(blocked.error.code, "bootstrap_required");
+  assert.equal(blocked.error.nextTool, "workspace_bootstrap");
+
+  await callTool(tools.workspace_bootstrap);
+  const result = await callTool<{
+    result: {
+      ok: boolean;
+      summary: { totalFindings: number };
+      findings: unknown[];
+    };
+  }>(tools.workspace_audit, {
+    scope: "rules",
+    bootstrapConfirmed: true,
+  });
+
+  assert.equal(typeof result.result.ok, "boolean");
+  assert.equal(typeof result.result.summary.totalFindings, "number");
+  assert.ok(Array.isArray(result.result.findings));
 });
 
 test("agent tools expose list and profile schemas", () => {

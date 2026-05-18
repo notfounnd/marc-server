@@ -3,6 +3,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
+import { auditWorkspace } from "../core/audit.js";
 import {
   appendMessage,
   attachArtifact,
@@ -453,6 +454,28 @@ export function buildMcpServer(options: McpOptions = {}): McpServer {
     "Read this workspace health/status, including thread index rebuild state.",
     gatedShape({}),
     async (input) => withBootstrap(input, async () => readWorkspaceStatus(workspaceRoot)),
+  );
+
+  server.tool(
+    "workspace_audit",
+    "Audit mARC workspace content and return structured feedback for rules, messages, agents, references, artifacts, and preflight checks.",
+    gatedShape({
+      scope: z.enum(["all", "rules", "messages", "agents", "references", "artifacts", "preflight"]).optional(),
+      threadId: z.string().min(1).optional(),
+      messageId: z.string().min(1).optional(),
+      severity: z.enum(["all", "critical", "warning", "suggestion"]).optional(),
+      maxFindings: z.number().int().min(1).max(100).optional(),
+    }),
+    async (input) =>
+      withBootstrap(input, async () =>
+        auditWorkspace(workspaceRoot, {
+          scope: input.scope,
+          threadId: input.threadId,
+          messageId: input.messageId,
+          severity: input.severity,
+          maxFindings: input.maxFindings,
+        }),
+      ),
   );
 
   server.tool(

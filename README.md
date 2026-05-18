@@ -32,6 +32,9 @@ Coding agents are good at acting on context, but context often lives in the wron
 - **Artifacts**: Markdown attachments for plans, reviews, logs, proposals, and large notes.
 - **Agent profiles**: registered identities for developers, planners, reviewers, QA agents, and UI users.
 - **Bootstrap rules**: a first-call protocol that teaches agents how to use the workspace safely.
+- **Operational rules**: `Custom Rules` guidance that can be written as trigger/action/evidence checklists for agents.
+- **Local mARC skill**: a managed workspace skill that helps agents apply bootstrap and `RULES.md` at the right moments.
+- **Workspace audit**: MCP feedback for rules, messages, artifacts, references, profiles, and preflight checks.
 - **Incremental reads**: cursor-based tools so agents can read only what changed.
 - **Internal references**: `marc://` links for agents, messages, threads, and message artifacts.
 - **Thread summaries**: `SUMMARY.md` closes a thread and preserves an executive summary.
@@ -167,8 +170,9 @@ Restart the MCP server from VS Code, then ask Copilot Agent mode to register the
 4. Register the workspace and agent.
 5. Create or read a thread.
 6. Use artifacts for long plans, reviews, logs, and large outputs.
-7. Store `lastMessageId` and use `thread_read_since` when checking for updates.
-8. Close finished threads by adding a `SUMMARY.md` executive summary.
+7. Use `workspace_audit` before critical plans, conclusions, or thread closure when quality checks matter.
+8. Store `lastMessageId` and use `thread_read_since` when checking for updates.
+9. Close finished threads by adding a `SUMMARY.md` executive summary.
 
 ## Documentation
 
@@ -193,9 +197,16 @@ Restart the MCP server from VS Code, then ask Copilot Agent mode to register the
       SUMMARY.md
       artifacts/
   cache/
+.agents/
+  skills/
+    marc-ops/
+      SKILL.md
 ```
 
-`CHAT.md` files are the source of truth for messages. `SUMMARY.md` marks a thread as closed. Artifacts live with the messages that reference them.
+`CHAT.md` files are the source of truth for messages. `SUMMARY.md` marks a thread as closed. Artifacts live with the messages that reference them. The managed `.agents/skills/marc-ops/SKILL.md` file helps agents apply `workspace_bootstrap` and `RULES.md`; `RULES.md` remains the workspace behavior contract.
+
+> [!IMPORTANT]
+> After mARC installs or refreshes `.agents/skills/marc-ops/SKILL.md`, restart the agent session so the agent can discover the local skill.
 
 The daemon also creates a local data directory where it is started:
 

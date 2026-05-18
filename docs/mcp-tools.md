@@ -65,6 +65,15 @@ If a gated tool is called without the flag, it returns `bootstrap_required` and 
 | `workspace_info` | Return the workspace bound to this MCP process. |
 | `workspace_read_rules` | Read `.marc/RULES.md`. |
 | `workspace_status` | Read workspace health, including thread index rebuild state. |
+| `workspace_audit` | Audit mARC workspace content for structural compliance across rules, messages, artifacts, references, agents, and preflight checks. |
+
+`workspace_audit` is an on-demand compliance tool. It does not run automatically for every message, it does not fix files, and it does not judge semantic quality. Use it before critical plans, before development, before conclusion, before closing a thread, or when a user asks for a structural quality check.
+
+Supported scopes are `all`, `rules`, `messages`, `agents`, `references`, `artifacts`, and `preflight`. Use `threadId`, `messageId`, `severity`, and `maxFindings` to keep output compact.
+
+The `rules` scope reports missing managed rule sections, malformed critical operational rules, and free-form `Custom Rules` sections that have not yet been converted to the recommended `Trigger`, `Do instead`, `Evidence`, and `Severity` format. Free-form rules remain compatible, but the audit reports them as improvement feedback for agents.
+
+The audit reports objective issues such as missing artifact files, artifact references that were not attached in message metadata, malformed or unresolved `marc://` references, and incomplete agent metadata. Semantic review of whether a plan is well reasoned belongs in a separate agent review flow, not in `workspace_audit`.
 
 ## Agent tools
 
@@ -143,6 +152,7 @@ agent_register
 thread_read or thread_create
 message_attach_artifact, when detail is long
 message_post
+workspace_audit, before critical plans or closure when quality checks matter
 thread_info, when checking whether more work arrived
 thread_read_since, when continuing with a stored cursor
 ```

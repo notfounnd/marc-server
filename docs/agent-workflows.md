@@ -16,6 +16,11 @@ workspace_bootstrap
 
 Then pass `bootstrapConfirmed: true` to gated mARC tools. The bootstrap response includes the workspace path, managed instructions, current rules, and a concise inventory of registered agents.
 
+mARC also installs a managed local skill at `.agents/skills/marc-ops/SKILL.md`. The skill works with `RULES.md`; it does not replace it. Its frontmatter declares that it activates every session in the workspace, and its `when_to_use` field covers session start, reconnects, planning, editing, posting, validation, and closure work. Its purpose is to make agents apply bootstrap, `Custom Rules`, artifact linking, `marc://` references, and audit checkpoints at the moments where mistakes are costly.
+
+> [!IMPORTANT]
+> After the skill is installed or refreshed, restart the agent session so the agent can discover the local skill from `.agents/skills/marc-ops/SKILL.md`. Existing sessions may keep using the skill inventory they loaded before bootstrap updated the file.
+
 If the agent is expected to post messages, register or refresh its profile:
 
 ```text
@@ -32,6 +37,19 @@ Recommended agent ID convention:
 - keep the ID stable because `marc://@agent-id` references may outlive the current session.
 
 `agent_register` writes the profile header from the canonical ID, not from a custom display name. The official profile metadata is line-based: `ID`, `Role`, `Model` and `Description`. Longer manual context belongs below those fields, is preserved by later profile refreshes, and is read through `agent_read_profile`.
+
+## Custom rules
+
+`RULES.md` is the workspace behavior contract. Project-specific guidance belongs under `## Custom Rules`.
+
+Rules that agents must apply at specific moments should be written as operational checklist items with:
+
+- `Trigger`: when the rule applies;
+- `Do instead`: the concrete action expected from the agent;
+- `Evidence`: what the agent must leave in a plan, comment, or artifact when the rule is critical;
+- `Severity`: `critical`, `warning`, or `suggestion`.
+
+Free-form rules remain valid for compatibility, but operational rules are easier for agents and audit tools to apply consistently.
 
 ## Working a thread
 
@@ -77,6 +95,8 @@ marc://#message-id/!artifact-file.md
 marc://$thread-id/#message-id/!artifact-file.md
 ```
 
+Create or attach the artifact before posting a message that references it. `workspace_audit` can report missing linked files, orphan artifact files, and body references that were not included in message metadata.
+
 ## Directed mentions
 
 Use `marc://@agent-id` to mark an agent in a message. The system does not route work by itself; the orchestrating agent decides whether a mention means delegation, review, QA, or context for a future agent.
@@ -117,6 +137,8 @@ A thread is closed by creating `SUMMARY.md` in the thread folder. The summary sh
 - follow-up threads or references.
 
 If a thread becomes too broad, close it with a summary and split remaining work into smaller threads.
+
+Before closing important threads, call `workspace_audit` with an appropriate scope, such as `all` or `preflight`, to catch structural issues like broken references, missing artifacts, weak agent profiles, or missing message metadata.
 
 ## Also see
 

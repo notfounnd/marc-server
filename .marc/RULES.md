@@ -31,6 +31,15 @@
 - Prefer `thread_read_since` with the stored cursor when checking for new messages.
 - If `thread_read_since` returns `shouldReadFullThread: true`, tell the user the incremental cursor failed and call `thread_read`.
 
+## Operational Custom Rules
+
+- Write critical project-specific rules as operational checklist items under `Custom Rules`.
+- Prefer `Trigger`, `Do instead`, `Evidence`, and `Severity` fields when a rule must guide agent behavior at a specific moment.
+- Use `Trigger` to state when the rule applies.
+- Use `Do instead` to state the concrete action expected from the agent.
+- Use `Evidence` to state what the agent must leave in a plan, comment, or artifact when the rule is critical.
+- Use `Severity` with `critical`, `warning`, or `suggestion`.
+
 ## Custom Rules
 
 <!-- Keep project-specific custom rules below this line. This section is preserved by workspace_update_recommendations. -->

@@ -66,6 +66,46 @@ export type WorkspaceRecommendationsUpdate = {
   alreadyCurrent: string[];
 };
 
+export type WorkspaceAuditScope =
+  | "all"
+  | "rules"
+  | "messages"
+  | "agents"
+  | "references"
+  | "artifacts"
+  | "preflight";
+
+export type WorkspaceAuditSeverity = "all" | "critical" | "warning" | "suggestion";
+
+export type WorkspaceAuditOptions = {
+  scope?: WorkspaceAuditScope;
+  threadId?: string;
+  messageId?: string;
+  severity?: WorkspaceAuditSeverity;
+  maxFindings?: number;
+};
+
+export type WorkspaceAuditFinding = {
+  severity: Exclude<WorkspaceAuditSeverity, "all">;
+  scope: Exclude<WorkspaceAuditScope, "all">;
+  code: string;
+  location: string;
+  message: string;
+  suggestion: string;
+};
+
+export type WorkspaceAuditResult = {
+  ok: boolean;
+  summary: {
+    scopes: Array<Exclude<WorkspaceAuditScope, "all">>;
+    totalFindings: number;
+    critical: number;
+    warning: number;
+    suggestion: number;
+  };
+  findings: WorkspaceAuditFinding[];
+};
+
 export type ThreadListStatus = "open" | "closed" | "all";
 
 export type ThreadListOptions = {
