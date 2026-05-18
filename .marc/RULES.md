@@ -45,32 +45,92 @@
 <!-- Keep project-specific custom rules below this line. This section is preserved by workspace_update_recommendations. -->
 <!-- Prefer ### or deeper headings to organize project-specific rules in this section. -->
 
+### Architecture Rules
+
+1. **Preserve Markdown as source of truth**
+   - Trigger: changing storage, cache, indexing, daemon, UI, thread, message, artifact, summary, or workspace persistence behavior.
+   - Do instead: keep Markdown files as the authoritative state and treat caches, indexes, daemon state, and UI projections as rebuildable derivatives.
+   - Evidence: state how the change preserves Markdown as source of truth when the change touches persistence or projections.
+   - Severity: critical
+
 ### Agent Tooling
 
-- Always use context-mode for repository investigation, validation, and command output review in this workspace.
-- Assume the working shell is Bash in this workspace unless the user explicitly states otherwise.
+1. **Use context-mode for repo work**
+   - Trigger: repository investigation, validation, or command output review in this workspace.
+   - Do instead: use context-mode to inspect files, search project content, and review command output before relying on conclusions.
+   - Evidence: mention the context-mode inspection or validation source when reporting findings, plans, or completion.
+   - Severity: critical
 
-### Project References
-
-- When writing messages that reference mARC project assets such as agents, threads, messages, or artifacts, use the link/reference format expected by the mARC tools.
+2. **Assume Bash for workspace commands**
+   - Trigger: choosing shell syntax or writing commands for this workspace.
+   - Do instead: assume Bash unless the user explicitly states another shell for the current task.
+   - Evidence: use Bash-compatible command examples or note the user-provided shell override.
+   - Severity: warning
 
 ### Session Onboarding
 
-- When onboarding into `@notfounnd/marc-server`, read `README.md` and the `docs/` directory to understand the current project state.
-- After onboarding, present a structured overview of the project understanding in chat and wait for the user's next instructions.
-- Do not propose or make changes until the onboarding overview is delivered, unless the user explicitly asks for a different flow.
+1. **Read project docs during onboarding**
+   - Trigger: onboarding into `@notfounnd/marc-server`.
+   - Do instead: read `README.md` and the `docs/` directory to understand the current project state.
+   - Evidence: cite the project areas or documents reviewed in the onboarding overview.
+   - Severity: critical
+
+2. **Complete onboarding before proposing changes**
+   - Trigger: after onboarding and before proposing or making changes.
+   - Do instead: present a structured overview of project understanding in chat and wait for the user's next instructions, unless the user explicitly asks for a different flow.
+   - Evidence: provide the overview in chat before the first proposal or change.
+   - Severity: critical
+
+### Project References
+
+1. **Use mARC reference format**
+   - Trigger: writing messages that reference mARC project assets such as agents, threads, messages, or artifacts.
+   - Do instead: use the link or reference format expected by the mARC tools.
+   - Evidence: include the concrete mARC reference in the message body or artifact metadata.
+   - Severity: critical
 
 ### Flow Rules
 
-- Before finalizing development, review project documentation and update or expand it when a need is identified.
-- When the user asks to close a UI implementation thread, review `oportunidade-testes-playwright-para-referencias-e-artifacts-ui-f742659a` and update its Playwright backlog when needed.
+1. **Review docs before final development completion**
+   - Trigger: before finalizing development work.
+   - Do instead: review project documentation and update or expand it when a need is identified.
+   - Evidence: state whether documentation was updated or why no documentation change was needed.
+   - Severity: warning
+
+2. **Check UI Playwright backlog before closing UI threads**
+   - Trigger: user asks to close a UI implementation thread.
+   - Do instead: review `marc://$oportunidade-testes-playwright-para-referencias-e-artifacts-ui-f742659a` and update its Playwright backlog when needed.
+   - Evidence: mention the backlog check and any update made before thread closure.
+   - Severity: warning
 
 ### Code Style
 
-- Never use `else` branches in project code.
-- Do not use nested `if` blocks.
-- Keep conditionals flat and intentional.
-- Use early returns as the required pattern for defensive programming, guard clauses, validation, and short-circuit handling.
-- Use Strategy pattern or dispatch tables as the required pattern when behavior branches by action/type or equivalent variants.
-- Keep simple guards as early returns.
-- Reserve Strategy pattern for meaningful behavior variation.
+1. **Never use else branches**
+   - Trigger: writing or modifying project code.
+   - Do instead: never use `else` branches in project code.
+   - Evidence: keep control flow flat in the edited code and mention this check when the change touches branching logic.
+   - Severity: critical
+
+2. **Do not nest if blocks**
+   - Trigger: writing or modifying conditionals in project code.
+   - Do instead: keep conditionals flat and do not use nested `if` blocks.
+   - Evidence: keep guard clauses flat in the edited code and mention this check when the change touches conditional logic.
+   - Severity: critical
+
+3. **Use early returns for guards**
+   - Trigger: writing defensive programming, guard clauses, validation, or short-circuit handling.
+   - Do instead: use early returns as the required pattern.
+   - Evidence: show guards as early returns in the edited code or state that no guard logic was changed.
+   - Severity: critical
+
+4. **Use strategy for behavior variation**
+   - Trigger: behavior branches by action, type, or equivalent variants.
+   - Do instead: use Strategy pattern or dispatch tables as the required pattern.
+   - Evidence: use a strategy or dispatch table in the edited code, or state why the change only required a simple guard.
+   - Severity: critical
+
+5. **Keep simple guards simple**
+   - Trigger: a conditional only protects a simple precondition or invalid state.
+   - Do instead: keep the guard as an early return.
+   - Evidence: avoid introducing Strategy pattern for a simple guard.
+   - Severity: warning
