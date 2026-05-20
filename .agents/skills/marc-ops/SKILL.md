@@ -80,7 +80,9 @@ Before posting a plan, proposal, design, API/tool change, or completion note, ch
 
 - Keep thread messages concise and action-oriented.
 - Put long plans, investigation notes, or detailed designs in artifacts.
-- Attach the artifact first, then reference the attached path in the message.
+- Attach artifacts through message metadata so the UI can display them.
+- Do not repeat `artifacts/...` paths in the message body just to show an attached artifact.
+- Mention artifact paths or `marc://` artifact references only when the identifier itself is important to the message.
 - Do not say an artifact is attached when only a plain text path was written.
 - Prefer incremental thread comments that say what changed, what was validated, and what remains pending.
 

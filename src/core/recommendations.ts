@@ -36,7 +36,7 @@ const WORKSPACE_MAINTENANCE_GUIDE = [
   "- Run `workspace_update_recommendations` before starting work on a thread."
 ];
 const CONVERSATION_RULES_GUIDE = [
-  "- Keep messages useful, readable, and complete; link artifacts when relevant.",
+  "- Keep messages useful, readable, and complete; use artifact metadata when relevant.",
   "- Prefer creating a new thread for a new task."
 ];
 const WORKSPACE_SKILL_PATH = ".agents/skills/marc-ops/SKILL.md";

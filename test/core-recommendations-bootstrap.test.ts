@@ -69,3 +69,26 @@ test("guides agents to reuse known workspace context without ritual bootstrap", 
     /Reuse the current workspace contract while it remains known/
   );
 });
+
+test("guides agents to attach artifacts through message metadata", async () => {
+  const workspace = await tempWorkspace();
+
+  await updateWorkspaceRecommendations(workspace);
+  const rules = await readRules(workspace);
+  const skill = await readWorkspaceSkill(workspace);
+
+  assert.doesNotMatch(skill, /reference the attached path in the message/);
+  assert.match(
+    skill,
+    /Attach artifacts through message metadata so the UI can display them/
+  );
+  assert.match(
+    skill,
+    /Do not repeat `artifacts\/.*` paths in the message body just to show an attached artifact/
+  );
+  assert.match(
+    rules,
+    /Use artifact metadata for long plans, logs, reviews, or detailed analysis/
+  );
+  assert.doesNotMatch(rules, /link artifacts when relevant/i);
+});

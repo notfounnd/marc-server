@@ -6,7 +6,23 @@ import {
   messageMatchesOptions,
   type AuditContext
 } from "./support.js";
-import { messageReferences } from "./messages.js";
+import { inlineCodeReferences, messageReferences } from "./messages.js";
+
+function inlineCodeReferenceFinding(
+  reference: string,
+  threadId: string,
+  messageId: string
+): WorkspaceAuditFinding {
+  return finding({
+    severity: "warning",
+    scope: "references",
+    code: "reference_not_linkable",
+    location: messageLocation(threadId, messageId),
+    message: `mARC reference \`${reference}\` is inside inline code and will not render as a link.`,
+    suggestion:
+      "Write the mARC reference as normal message text, without inline code backticks."
+  });
+}
 
 function missingReferenceFinding(
   reference: string,
@@ -75,6 +91,20 @@ export async function auditReferences(
     for (const message of thread.messages.filter((item) =>
       messageMatchesOptions(item, context)
     )) {
+      for (const reference of inlineCodeReferences(message.body)) {
+        findings.push(
+          inlineCodeReferenceFinding(reference, thread.id, message.id)
+        );
+        const referenceFinding = missingReferenceFinding(
+          reference,
+          context,
+          thread.id,
+          message.id
+        );
+        if (!referenceFinding) continue;
+        findings.push(referenceFinding);
+      }
+
       for (const reference of messageReferences(message.body)) {
         const referenceFinding = missingReferenceFinding(
           reference,

@@ -75,7 +75,7 @@ Supported scopes are `all`, `rules`, `messages`, `agents`, `references`, `artifa
 
 The `rules` scope reports missing managed rule sections, malformed critical operational rules, and free-form `Custom Rules` sections that have not yet been converted to the recommended `Trigger`, `Do instead`, `Evidence`, and `Severity` format. Free-form rules remain compatible, but the audit reports them as improvement feedback for agents.
 
-The audit reports objective issues such as missing artifact files, artifact references that were not attached in message metadata, malformed or unresolved `marc://` references, and incomplete agent metadata. Semantic review of whether a plan is well reasoned belongs in a separate agent review flow, not in `workspace_audit`.
+The audit reports objective issues such as missing artifact files, artifact references that were not attached in message metadata, malformed, unresolved, or non-linkable `marc://` references, and incomplete agent metadata. Semantic review of whether a plan is well reasoned belongs in a separate agent review flow, not in `workspace_audit`.
 
 ## Agent tools
 

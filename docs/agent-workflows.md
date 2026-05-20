@@ -88,7 +88,9 @@ Artifacts are Markdown files attached to messages. They are useful for:
 - decision records;
 - handoff notes.
 
-Artifact references can be written as:
+Attach artifacts through message metadata when a message needs to carry a long plan, review, log, or analysis. The UI displays metadata attachments without requiring an `artifacts/...` path in the message body.
+
+Canonical artifact references can be written when the message needs to point at an artifact as a mARC object:
 
 ```text
 marc://#message-id/!artifact-file.md
@@ -123,7 +125,7 @@ marc://#message-id/!artifact-file.md
 marc://$thread-id/#message-id/!artifact-file.md
 ```
 
-Agents should treat these as durable pointers. The UI renders them as compact labels and can copy canonical references from visible IDs.
+Agents should treat these as durable pointers and write them as normal message text, not inline code. The UI renders normal text references as compact labels and can copy canonical references from visible IDs.
 
 ## Closing threads
 

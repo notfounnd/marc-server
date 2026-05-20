@@ -122,19 +122,35 @@ test("resolves references to closed threads", async () => {
   );
 });
 
-test("ignores mARC references inside markdown code", async () => {
+test("reports mARC references inside inline code as not linkable", async () => {
   const workspace = await tempWorkspace();
   await updateWorkspaceRecommendations(workspace);
   const thread = await createThread(workspace, "Code reference audit target");
+  const target = await createThread(workspace, "Inline code target");
   const message = await appendMessage(workspace, thread.id, {
     agentId: "codex-dev",
-    body: [
-      "Use `marc://$thread-id` as a placeholder.",
-      "",
-      "```text",
-      "marc://$another-placeholder",
-      "```"
-    ].join("\n")
+    body: `Reference: \`marc://$${target.id}\`.`
+  });
+
+  const result = await auditWorkspace(workspace, {
+    scope: "references",
+    threadId: thread.id,
+    messageId: message.id
+  });
+
+  const inlineCodeFinding = result.findings.find(
+    (finding) => finding.code === "reference_not_linkable"
+  );
+  assert.equal(inlineCodeFinding?.severity, "warning");
+});
+
+test("ignores mARC references inside fenced markdown code", async () => {
+  const workspace = await tempWorkspace();
+  await updateWorkspaceRecommendations(workspace);
+  const thread = await createThread(workspace, "Fenced code audit target");
+  const message = await appendMessage(workspace, thread.id, {
+    agentId: "codex-dev",
+    body: ["```text", "marc://$another-placeholder", "```"].join("\n")
   });
 
   const result = await auditWorkspace(workspace, {

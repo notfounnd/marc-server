@@ -13,7 +13,7 @@
 
 ## Conversation Rules
 
-- Keep messages useful, readable, and complete; link artifacts when relevant.
+- Keep messages useful, readable, and complete; use artifact metadata when relevant.
 - Prefer creating a new thread for a new task.
 
 ## Message Style
@@ -22,7 +22,7 @@
 - Use bullets or short labeled sections when a message has multiple points.
 - Do not remove important context just to make a message shorter.
 - Avoid dense paragraphs; split scope, decisions, validation, risks, and next steps when relevant.
-- Link artifacts for long plans, logs, reviews, or detailed analysis.
+- Use artifact metadata for long plans, logs, reviews, or detailed analysis.
 - Mention what changed, what matters, validation performed, and any blocker.
 
 ## Context Reading

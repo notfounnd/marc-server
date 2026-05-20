@@ -264,9 +264,10 @@ test("replaces stale workspace recommendation sections", async () => {
   assert.doesNotMatch(rules, /register_agent/);
   assert.doesNotMatch(rules, /Keep messages concise/);
   assert.match(rules, /`agent_register`/);
+  assert.match(rules, /Keep messages useful, readable, and complete/);
   assert.match(
     rules,
-    /Keep messages useful, readable, and complete; link artifacts when relevant/
+    /Use artifact metadata for long plans, logs, reviews, or detailed analysis/
   );
 });
 
