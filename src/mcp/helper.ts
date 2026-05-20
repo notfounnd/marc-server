@@ -44,7 +44,7 @@ const MARC_HELPER_GUIDES: Record<
     ],
     examples: [
       "Call workspace_info to confirm which project this MCP server is bound to.",
-      "Call workspace_bootstrap before using gated mARC tools in a session/workspace.",
+      "Call workspace_bootstrap at the start of a session/workspace or when bootstrap context is missing, stale, or uncertain.",
       "Call thread_list before choosing a thread to continue.",
       "Call marc_helper with topic incremental_reading before reading a long active thread."
     ],
@@ -73,7 +73,8 @@ const MARC_HELPER_GUIDES: Record<
       "workspace_update_recommendations refreshes the recommended bootstrap protocol and workspace rules without overwriting Custom Rules."
     ],
     notes: [
-      "Call workspace_bootstrap before gated tools, then send bootstrapConfirmed: true after a successful bootstrap.",
+      "Establish bootstrap context before gated tools, then reuse the current workspace contract while it remains known.",
+      "Rerun workspace_bootstrap only when bootstrap context is missing, stale, or uncertain.",
       "workspace_update_recommendations remains free so recommended instructions and rules can be refreshed manually.",
       "Keep project-specific behavior in RULES.md under Custom Rules; INSTRUCTIONS.md should stay short and procedural.",
       "Markdown remains the source of truth for project-readable mARC content.",
@@ -114,7 +115,8 @@ const MARC_HELPER_GUIDES: Record<
     examples: [
       "thread_create with a clear task title for new work.",
       "thread_list defaults to open threads; pass status closed or all when needed.",
-      "thread_info gives cheap metadata before deciding whether to read content."
+      "thread_info gives cheap metadata before deciding whether to read content.",
+      "When the user gives a specific mARC source, read that source before broad workspace investigation."
     ],
     notes: [
       "Closed threads are controlled by SUMMARY.md in the thread folder.",
@@ -176,7 +178,8 @@ const MARC_HELPER_GUIDES: Record<
     ],
     notes: [
       "thread_read omits markdown by default to avoid duplicating markdown plus parsed messages.",
-      "Use includeMarkdown true only when raw CHAT.md content is specifically needed."
+      "Use includeMarkdown true only when raw CHAT.md content is specifically needed.",
+      "Prefer the smallest read that answers the current question."
     ]
   },
   ui_daemon: {

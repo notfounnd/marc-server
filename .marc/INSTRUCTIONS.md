@@ -8,4 +8,5 @@
 - After a successful bootstrap, send `bootstrapConfirmed: true` when calling gated tools.
 - `workspace_bootstrap` refreshes recommendations, including this managed `INSTRUCTIONS.md` file, and reads `RULES.md` for the current workspace contract.
 - Read `RULES.md` as the workspace behavior contract before acting on mARC thread context.
+- Reuse the current workspace contract while it remains known; do not repeat bootstrap as a ritual before each mARC action.
 - If bootstrap context was lost after compaction, resume, or subagent delegation, call `workspace_bootstrap` again.

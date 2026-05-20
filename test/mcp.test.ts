@@ -188,9 +188,30 @@ test("marc_helper explains the bootstrap split between instructions and rules", 
     helper.notes.some((note: string) => note.includes("workspace_bootstrap"))
   );
   assert.ok(
-    helper.notes.some((note: string) => note.includes("bootstrapConfirmed"))
+    helper.notes.some((note: string) =>
+      note.includes("current workspace contract")
+    )
   );
   assert.ok(helper.notes.some((note: string) => note.includes("Custom Rules")));
+});
+
+test("marc_helper explains known workspace contract reuse", async () => {
+  const server = buildMcpServer({ workspace: process.cwd() });
+  const tool = registeredTools(server).marc_helper;
+
+  const response = await tool.handler({ topic: "workspace" });
+  const helper = JSON.parse(response.content[0].text);
+
+  assert.ok(
+    helper.notes.some((note: string) =>
+      note.includes("current workspace contract")
+    )
+  );
+  assert.ok(
+    helper.notes.some((note: string) =>
+      note.includes("missing, stale, or uncertain")
+    )
+  );
 });
 
 test("workspace_bootstrap returns instructions and rules without requiring confirmation", async () => {
@@ -261,7 +282,8 @@ test("gated write tools block before domain actions and wrap successful writes",
   });
 
   assert.equal(posted.bootstrap.confirmed, true);
-  assert.match(posted.bootstrap.reminder, /workspace_bootstrap/);
+  assert.match(posted.bootstrap.reminder, /missing, stale, or uncertain/);
+  assert.doesNotMatch(posted.bootstrap.reminder, /before relying/);
   assert.equal(posted.result.body, "Written after bootstrap.");
 });
 

@@ -46,6 +46,8 @@ After that, gated tools must be called with:
 }
 ```
 
+Reuse the current workspace contract while it remains known. Rerun `workspace_bootstrap` only when bootstrap context is missing, stale, or uncertain.
+
 If a gated tool is called without the flag, it returns `bootstrap_required` and tells the agent to call `workspace_bootstrap`.
 
 ## Free tools
@@ -137,6 +139,8 @@ thread_read_since(threadId, afterMessageId: "<stored-id>")
 ```
 
 If `thread_read_since` returns `cursor_not_found` with `shouldReadFullThread: true`, tell the user the incremental cursor failed and read the full thread again with `thread_read`.
+
+When the user provides a specific mARC thread, message, artifact, or agent reference as the source, read that source before broad workspace investigation.
 
 ## Typical agent flow
 

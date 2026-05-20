@@ -29,7 +29,9 @@
 
 - Store `lastMessageId` returned by `thread_read`, `thread_tail`, or `thread_info` when continuing a thread.
 - Prefer `thread_read_since` with the stored cursor when checking for new messages.
+- If the user provides a specific mARC source, read that source before broad workspace investigation.
 - If `thread_read_since` returns `shouldReadFullThread: true`, tell the user the incremental cursor failed and call `thread_read`.
+- Avoid repeating bootstrap as a ritual before each mARC action; reuse the current workspace contract while it remains known.
 
 ## Operational Custom Rules
 

@@ -20,7 +20,9 @@ const AGENTS_GUIDE = [
 const CONTEXT_READING_GUIDE = [
   "- Store `lastMessageId` returned by `thread_read`, `thread_tail`, or `thread_info` when continuing a thread.",
   "- Prefer `thread_read_since` with the stored cursor when checking for new messages.",
-  "- If `thread_read_since` returns `shouldReadFullThread: true`, tell the user the incremental cursor failed and call `thread_read`."
+  "- If the user provides a specific mARC source, read that source before broad workspace investigation.",
+  "- If `thread_read_since` returns `shouldReadFullThread: true`, tell the user the incremental cursor failed and call `thread_read`.",
+  "- Avoid repeating bootstrap as a ritual before each mARC action; reuse the current workspace contract while it remains known."
 ];
 const OPERATIONAL_CUSTOM_RULES_GUIDE = [
   "- Write critical project-specific rules as operational checklist items under `Custom Rules`.",
@@ -50,6 +52,7 @@ export const BOOTSTRAP_INSTRUCTIONS = [
   "- After a successful bootstrap, send `bootstrapConfirmed: true` when calling gated tools.",
   "- `workspace_bootstrap` refreshes recommendations, including this managed `INSTRUCTIONS.md` file, and reads `RULES.md` for the current workspace contract.",
   "- Read `RULES.md` as the workspace behavior contract before acting on mARC thread context.",
+  "- Reuse the current workspace contract while it remains known; do not repeat bootstrap as a ritual before each mARC action.",
   "- If bootstrap context was lost after compaction, resume, or subagent delegation, call `workspace_bootstrap` again.",
   ""
 ].join("\n");

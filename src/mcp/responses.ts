@@ -15,7 +15,7 @@ export function text(content: unknown) {
 }
 
 export const BOOTSTRAP_REMINDER =
-  "If bootstrap context was lost, rerun workspace_bootstrap before relying on bootstrapConfirmed.";
+  "Reuse the current workspace contract while it remains known; rerun workspace_bootstrap only when bootstrap context is missing, stale, or uncertain.";
 
 export function gatedShape<T extends z.ZodRawShape>(
   shape: T
