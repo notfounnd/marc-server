@@ -53,6 +53,20 @@
    - Evidence: state how the change preserves Markdown as source of truth when the change touches persistence or projections.
    - Severity: critical
 
+### Language Rules
+
+1. **Keep project code and product text in en-US**
+   - Trigger: writing or modifying code, tests, technical contracts, schemas, tool descriptions, product UI text, README, docs, ADRs, templates, managed recommendations, or project-owned examples.
+   - Do instead: write project-owned technical and product content in en-US.
+   - Evidence: keep new or changed project-owned content in en-US, unless the content is user-authored workspace communication.
+   - Severity: critical
+
+2. **Use pt-BR for user and mARC communication**
+   - Trigger: writing chat responses, mARC thread messages, operational plans, status comments, review notes, summaries, or other communication directed to the user or recorded as workspace conversation.
+   - Do instead: write communication in pt-BR.
+   - Evidence: keep conversational mARC content and direct user-facing agent replies in pt-BR.
+   - Severity: critical
+
 ### Agent Tooling
 
 1. **Use context-mode for repo work**
@@ -85,8 +99,8 @@
 
 1. **Use mARC reference format**
    - Trigger: writing messages that reference mARC project assets such as agents, threads, messages, or artifacts.
-   - Do instead: use the link or reference format expected by the mARC tools.
-   - Evidence: include the concrete mARC reference in the message body or artifact metadata.
+   - Do instead: write mARC references as raw normal message text so the mARC UI can parse them automatically.
+   - Evidence: include each concrete marc:// reference without inline code formatting.
    - Severity: critical
 
 ### Flow Rules
@@ -102,6 +116,12 @@
    - Do instead: review `marc://$oportunidade-testes-playwright-para-referencias-e-artifacts-ui-f742659a` and update its Playwright backlog when needed.
    - Evidence: mention the backlog check and any update made before thread closure.
    - Severity: warning
+
+3. **Run the project validation flow before completion**
+   - Trigger: before reporting code, tooling, test, build, lint, formatting, or documentation changes as complete.
+   - Do instead: run `pnpm run validate`, `pnpm test`, and `pnpm build`, unless the user explicitly narrows the validation scope.
+   - Evidence: report which commands were executed and whether each passed.
+   - Severity: critical
 
 ### Code Style
 

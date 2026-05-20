@@ -234,7 +234,7 @@ See [UI and Daemon](docs/ui-and-daemon.md) for daemon, token, UI, and local API 
 ## Development
 
 ```bash
-pnpm typecheck
+pnpm run validate
 pnpm test
 pnpm build
 ```

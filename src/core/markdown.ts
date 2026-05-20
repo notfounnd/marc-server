@@ -18,13 +18,17 @@ function parseMeta(raw: string): Record<string, string> {
   return meta;
 }
 
-export function renderChatHeader(title: string, threadId: string, createdAt: string): string {
+export function renderChatHeader(
+  title: string,
+  threadId: string,
+  createdAt: string
+): string {
   return [
     `# ${title}`,
     "",
     `Thread: \`${threadId}\``,
     `Created: \`${createdAt}\``,
-    "",
+    ""
   ].join("\n");
 }
 
@@ -36,24 +40,19 @@ export function renderMessage(message: ChatMessage): string {
     `timestamp: ${escapeMeta(message.timestamp)}`,
     `agentId: ${escapeMeta(message.agentId)}`,
     message.role ? `role: ${escapeMeta(message.role)}` : undefined,
-    message.artifacts.length ? `artifacts: ${message.artifacts.map(escapeMeta).join(", ")}` : undefined,
-    "-->",
+    message.artifacts.length
+      ? `artifacts: ${message.artifacts.map(escapeMeta).join(", ")}`
+      : undefined,
+    "-->"
   ].filter(Boolean);
 
-  return [
-    "",
-    ...meta,
-    "",
-    message.body.trim(),
-    "",
-    MESSAGE_END,
-    "",
-  ].join("\n");
+  return ["", ...meta, "", message.body.trim(), "", MESSAGE_END, ""].join("\n");
 }
 
 export function parseMessages(markdown: string): ChatMessage[] {
   const messages: ChatMessage[] = [];
-  const pattern = /<!-- marc-message([\s\S]*?)-->\s*([\s\S]*?)\s*<!-- \/marc-message -->/g;
+  const pattern =
+    /<!-- marc-message([\s\S]*?)-->\s*([\s\S]*?)\s*<!-- \/marc-message -->/g;
   let match: RegExpExecArray | null;
 
   while ((match = pattern.exec(markdown)) !== null) {
@@ -70,45 +69,63 @@ export function parseMessages(markdown: string): ChatMessage[] {
       role: meta.role || undefined,
       body: match[2].trim(),
       artifacts: meta.artifacts
-        ? meta.artifacts.split(",").map((item) => item.trim()).filter(Boolean)
-        : [],
+        ? meta.artifacts
+            .split(",")
+            .map((item) => item.trim())
+            .filter(Boolean)
+        : []
     });
   }
 
   return messages;
 }
 
-export function addArtifactToMessage(markdown: string, messageId: string, artifact: string): string {
+export function addArtifactToMessage(
+  markdown: string,
+  messageId: string,
+  artifact: string
+): string {
   let found = false;
-  const pattern = /<!-- marc-message([\s\S]*?)-->\s*([\s\S]*?)\s*<!-- \/marc-message -->/g;
+  const pattern =
+    /<!-- marc-message([\s\S]*?)-->\s*([\s\S]*?)\s*<!-- \/marc-message -->/g;
 
-  const nextMarkdown = markdown.replace(pattern, (full, rawMeta: string, body: string) => {
-    const meta = parseMeta(rawMeta);
-    if (meta.id !== messageId) {
-      return full;
+  const nextMarkdown = markdown.replace(
+    pattern,
+    (full, rawMeta: string, body: string) => {
+      const meta = parseMeta(rawMeta);
+      if (meta.id !== messageId) {
+        return full;
+      }
+
+      found = true;
+      const artifacts = meta.artifacts
+        ? meta.artifacts
+            .split(",")
+            .map((item) => item.trim())
+            .filter(Boolean)
+        : [];
+      if (!artifacts.includes(artifact)) {
+        artifacts.push(artifact);
+      }
+
+      const metaLines = [
+        MESSAGE_START,
+        `id: ${escapeMeta(meta.id)}`,
+        `threadId: ${escapeMeta(meta.threadId)}`,
+        `timestamp: ${escapeMeta(meta.timestamp)}`,
+        `agentId: ${escapeMeta(meta.agentId)}`,
+        meta.role ? `role: ${escapeMeta(meta.role)}` : undefined,
+        artifacts.length
+          ? `artifacts: ${artifacts.map(escapeMeta).join(", ")}`
+          : undefined,
+        "-->"
+      ].filter(Boolean);
+
+      return [metaLines.join("\n"), "", body.trim(), "", MESSAGE_END].join(
+        "\n"
+      );
     }
-
-    found = true;
-    const artifacts = meta.artifacts
-      ? meta.artifacts.split(",").map((item) => item.trim()).filter(Boolean)
-      : [];
-    if (!artifacts.includes(artifact)) {
-      artifacts.push(artifact);
-    }
-
-    const metaLines = [
-      MESSAGE_START,
-      `id: ${escapeMeta(meta.id)}`,
-      `threadId: ${escapeMeta(meta.threadId)}`,
-      `timestamp: ${escapeMeta(meta.timestamp)}`,
-      `agentId: ${escapeMeta(meta.agentId)}`,
-      meta.role ? `role: ${escapeMeta(meta.role)}` : undefined,
-      artifacts.length ? `artifacts: ${artifacts.map(escapeMeta).join(", ")}` : undefined,
-      "-->",
-    ].filter(Boolean);
-
-    return [metaLines.join("\n"), "", body.trim(), "", MESSAGE_END].join("\n");
-  });
+  );
 
   if (!found) {
     throw new Error(`Message not found: ${messageId}`);

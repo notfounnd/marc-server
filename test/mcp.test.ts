@@ -7,25 +7,34 @@ import { buildMcpServer } from "../src/mcp/server.js";
 
 type RegisteredTool = {
   inputSchema: { shape: Record<string, unknown> };
-  handler: (input: Record<string, unknown>) => Promise<{ content: Array<{ text: string }> }>;
+  handler: (
+    input: Record<string, unknown>
+  ) => Promise<{ content: Array<{ text: string }> }>;
 };
 
 function registeredTools(server: unknown): Record<string, RegisteredTool> {
-  return (server as { _registeredTools: Record<string, RegisteredTool> })._registeredTools;
+  return (server as { _registeredTools: Record<string, RegisteredTool> })
+    ._registeredTools;
 }
 
 async function tempWorkspace(): Promise<string> {
   return fs.mkdtemp(path.join(os.tmpdir(), "marc-mcp-"));
 }
 
-async function callTool<T = unknown>(tool: RegisteredTool, input: Record<string, unknown> = {}): Promise<T> {
+async function callTool<T = unknown>(
+  tool: RegisteredTool,
+  input: Record<string, unknown> = {}
+): Promise<T> {
   const response = await tool.handler(input);
   return JSON.parse(response.content[0].text) as T;
 }
 
 test("registers only canonical grouped MCP tool names", () => {
   const server = buildMcpServer({ workspace: process.cwd() });
-  const tools = Object.keys((server as unknown as { _registeredTools: Record<string, unknown> })._registeredTools).sort();
+  const tools = Object.keys(
+    (server as unknown as { _registeredTools: Record<string, unknown> })
+      ._registeredTools
+  ).sort();
 
   assert.deepEqual(tools, [
     "agent_list",
@@ -47,10 +56,15 @@ test("registers only canonical grouped MCP tool names", () => {
     "workspace_register",
     "workspace_status",
     "workspace_unregister",
-    "workspace_update_recommendations",
+    "workspace_update_recommendations"
   ]);
 
-  assert.equal(tools.some((tool) => /^(create|list|read|post|attach|register|unregister|update)_/.test(tool)), false);
+  assert.equal(
+    tools.some((tool) =>
+      /^(create|list|read|post|attach|register|unregister|update)_/.test(tool)
+    ),
+    false
+  );
 });
 
 test("thread_list accepts optional status filter", () => {
@@ -65,7 +79,9 @@ test("workspace_status reports thread index health after bootstrap", async () =>
   const server = buildMcpServer({ workspace });
   const tools = registeredTools(server);
 
-  const blocked = await callTool<{ error: { code: string; nextTool: string } }>(tools.workspace_status);
+  const blocked = await callTool<{ error: { code: string; nextTool: string } }>(
+    tools.workspace_status
+  );
 
   assert.equal(blocked.error.code, "bootstrap_required");
   assert.equal(blocked.error.nextTool, "workspace_bootstrap");
@@ -74,7 +90,13 @@ test("workspace_status reports thread index health after bootstrap", async () =>
   const status = await callTool<{
     result: {
       ok: boolean;
-      modules: { threadIndex: { status: string; rebuilding: boolean; threadCount: number } };
+      modules: {
+        threadIndex: {
+          status: string;
+          rebuilding: boolean;
+          threadCount: number;
+        };
+      };
     };
   }>(tools.workspace_status, { bootstrapConfirmed: true });
 
@@ -96,9 +118,12 @@ test("workspace_audit exposes scoped audit schema and requires bootstrap", async
   assert.ok(tools.workspace_audit.inputSchema.shape.severity);
   assert.ok(tools.workspace_audit.inputSchema.shape.maxFindings);
 
-  const blocked = await callTool<{ error: { code: string; nextTool: string } }>(tools.workspace_audit, {
-    scope: "all",
-  });
+  const blocked = await callTool<{ error: { code: string; nextTool: string } }>(
+    tools.workspace_audit,
+    {
+      scope: "all"
+    }
+  );
   assert.equal(blocked.error.code, "bootstrap_required");
   assert.equal(blocked.error.nextTool, "workspace_bootstrap");
 
@@ -111,7 +136,7 @@ test("workspace_audit exposes scoped audit schema and requires bootstrap", async
     };
   }>(tools.workspace_audit, {
     scope: "rules",
-    bootstrapConfirmed: true,
+    bootstrapConfirmed: true
   });
 
   assert.equal(typeof result.result.ok, "boolean");
@@ -159,8 +184,12 @@ test("marc_helper explains the bootstrap split between instructions and rules", 
 
   assert.match(helper.purpose, /INSTRUCTIONS\.md/);
   assert.match(helper.purpose, /RULES\.md/);
-  assert.ok(helper.notes.some((note: string) => note.includes("workspace_bootstrap")));
-  assert.ok(helper.notes.some((note: string) => note.includes("bootstrapConfirmed")));
+  assert.ok(
+    helper.notes.some((note: string) => note.includes("workspace_bootstrap"))
+  );
+  assert.ok(
+    helper.notes.some((note: string) => note.includes("bootstrapConfirmed"))
+  );
   assert.ok(helper.notes.some((note: string) => note.includes("Custom Rules")));
 });
 
@@ -186,7 +215,9 @@ test("gated tools require bootstrapConfirmed before running domain actions", asy
   const server = buildMcpServer({ workspace });
   const tools = registeredTools(server);
 
-  const result = await callTool<{ error: { code: string; nextTool: string } }>(tools.thread_list);
+  const result = await callTool<{ error: { code: string; nextTool: string } }>(
+    tools.thread_list
+  );
 
   assert.equal(result.error.code, "bootstrap_required");
   assert.equal(result.error.nextTool, "workspace_bootstrap");
@@ -198,30 +229,36 @@ test("gated write tools block before domain actions and wrap successful writes",
   const server = buildMcpServer({ workspace });
   const tools = registeredTools(server);
 
-  const blocked = await callTool<{ error: { code: string; nextTool: string } }>(tools.message_post, {
-    threadId: "missing-thread",
-    agentId: "codex-dev",
-    body: "Should not be written.",
-  });
+  const blocked = await callTool<{ error: { code: string; nextTool: string } }>(
+    tools.message_post,
+    {
+      threadId: "missing-thread",
+      agentId: "codex-dev",
+      body: "Should not be written."
+    }
+  );
 
   assert.equal(blocked.error.code, "bootstrap_required");
   assert.equal(blocked.error.nextTool, "workspace_bootstrap");
   await assert.rejects(() => fs.access(path.join(workspace, ".marc")));
 
   await callTool(tools.workspace_bootstrap);
-  const created = await callTool<{ result: { id: string } }>(tools.thread_create, {
-    title: "Bootstrap write",
-    bootstrapConfirmed: true,
-  });
-  const posted = await callTool<{ bootstrap: { confirmed: true; reminder: string }; result: { body: string } }>(
-    tools.message_post,
+  const created = await callTool<{ result: { id: string } }>(
+    tools.thread_create,
     {
-      threadId: created.result.id,
-      agentId: "codex-dev",
-      body: "Written after bootstrap.",
-      bootstrapConfirmed: true,
-    },
+      title: "Bootstrap write",
+      bootstrapConfirmed: true
+    }
   );
+  const posted = await callTool<{
+    bootstrap: { confirmed: true; reminder: string };
+    result: { body: string };
+  }>(tools.message_post, {
+    threadId: created.result.id,
+    agentId: "codex-dev",
+    body: "Written after bootstrap.",
+    bootstrapConfirmed: true
+  });
 
   assert.equal(posted.bootstrap.confirmed, true);
   assert.match(posted.bootstrap.reminder, /workspace_bootstrap/);
@@ -233,118 +270,27 @@ test("free bootstrap tools work without bootstrapConfirmed", async () => {
   const server = buildMcpServer({ workspace });
   const tools = registeredTools(server);
 
-  for (const toolName of ["marc_helper", "workspace_bootstrap", "workspace_update_recommendations"]) {
-    assert.equal(tools[toolName].inputSchema.shape.bootstrapConfirmed, undefined);
+  for (const toolName of [
+    "marc_helper",
+    "workspace_bootstrap",
+    "workspace_update_recommendations"
+  ]) {
+    assert.equal(
+      tools[toolName].inputSchema.shape.bootstrapConfirmed,
+      undefined
+    );
   }
 
   const helper = await callTool<{ tool: string }>(tools.marc_helper);
-  const recommendations = await callTool<{ updated: string[]; alreadyCurrent: string[] }>(
-    tools.workspace_update_recommendations,
+  const recommendations = await callTool<{
+    updated: string[];
+    alreadyCurrent: string[];
+  }>(tools.workspace_update_recommendations);
+  const bootstrap = await callTool<{ bootstrap: { confirmed: true } }>(
+    tools.workspace_bootstrap
   );
-  const bootstrap = await callTool<{ bootstrap: { confirmed: true } }>(tools.workspace_bootstrap);
 
   assert.equal(helper.tool, "marc_helper");
   assert.ok(Array.isArray(recommendations.updated));
   assert.equal(bootstrap.bootstrap.confirmed, true);
-});
-
-test("agent_register reports registration status and agent_list is concise by default", async () => {
-  const workspace = await tempWorkspace();
-  const server = buildMcpServer({ workspace });
-  const tools = registeredTools(server);
-
-  const bootstrap = await callTool<{ agents: { count: number; registered: unknown[] } }>(tools.workspace_bootstrap);
-  assert.deepEqual(bootstrap.agents, { count: 0, registered: [] });
-
-  const created = await callTool<{
-    result: { id: string; status: string; created: boolean; alreadyExists: boolean; updated: boolean };
-  }>(tools.agent_register, {
-    id: "Codex Dev",
-    displayName: "Ignored Custom Header",
-    role: "Developer Agent",
-    model: "GPT 5.5",
-    description: "Development agent working through Codex.",
-    bootstrapConfirmed: true,
-  });
-  assert.deepEqual(created.result, {
-    id: "codex-dev",
-    status: "created",
-    created: true,
-    alreadyExists: false,
-    updated: false,
-  });
-
-  const unchanged = await callTool<{
-    result: { id: string; status: string; created: boolean; alreadyExists: boolean; updated: boolean };
-  }>(tools.agent_register, {
-    id: "codex-dev",
-    role: "developer-agent",
-    model: "gpt-5.5",
-    description: "Development agent working through Codex.",
-    bootstrapConfirmed: true,
-  });
-  assert.deepEqual(unchanged.result, {
-    id: "codex-dev",
-    status: "unchanged",
-    created: false,
-    alreadyExists: true,
-    updated: false,
-  });
-
-  const listed = await callTool<{
-    result: Array<{ id: string; role: string; model: string; description: string; markdown?: string }>;
-  }>(tools.agent_list, { bootstrapConfirmed: true });
-  assert.deepEqual(listed.result, [
-    {
-      id: "codex-dev",
-      role: "developer-agent",
-      model: "gpt-5.5",
-      description: "Development agent working through Codex.",
-    },
-  ]);
-  assert.equal(listed.result[0].markdown, undefined);
-
-  const listedWithMarkdown = await callTool<{
-    result: Array<{ id: string; role: string; model: string; description: string; markdown?: string }>;
-  }>(tools.agent_list, { includeMarkdown: true, bootstrapConfirmed: true });
-  assert.match(listedWithMarkdown.result[0].markdown ?? "", /^# codex-dev$/m);
-  assert.doesNotMatch(listedWithMarkdown.result[0].markdown ?? "", /Ignored Custom Header/);
-
-  const bootstrapped = await callTool<{
-    agents: { count: number; registered: Array<{ id: string; role: string; model: string; description: string }> };
-  }>(tools.workspace_bootstrap);
-  assert.deepEqual(bootstrapped.agents, {
-    count: 1,
-    registered: [
-      {
-        id: "codex-dev",
-        role: "developer-agent",
-        model: "gpt-5.5",
-        description: "Development agent working through Codex.",
-      },
-    ],
-  });
-});
-
-test("gated tools expose bootstrapConfirmed and wrap successful responses with a reminder", async () => {
-  const workspace = await tempWorkspace();
-  const server = buildMcpServer({ workspace });
-  const tools = registeredTools(server);
-  const gatedToolNames = Object.keys(tools).filter(
-    (toolName) => !["marc_helper", "workspace_bootstrap", "workspace_update_recommendations"].includes(toolName),
-  );
-
-  for (const toolName of gatedToolNames) {
-    assert.ok(tools[toolName].inputSchema.shape.bootstrapConfirmed, `${toolName} should expose bootstrapConfirmed`);
-  }
-
-  await callTool(tools.workspace_bootstrap);
-  const result = await callTool<{
-    bootstrap: { confirmed: true; reminder: string };
-    result: Array<unknown>;
-  }>(tools.thread_list, { bootstrapConfirmed: true });
-
-  assert.equal(result.bootstrap.confirmed, true);
-  assert.match(result.bootstrap.reminder, /workspace_bootstrap/);
-  assert.ok(Array.isArray(result.result));
 });

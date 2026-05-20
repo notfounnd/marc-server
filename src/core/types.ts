@@ -75,7 +75,11 @@ export type WorkspaceAuditScope =
   | "artifacts"
   | "preflight";
 
-export type WorkspaceAuditSeverity = "all" | "critical" | "warning" | "suggestion";
+export type WorkspaceAuditSeverity =
+  | "all"
+  | "critical"
+  | "warning"
+  | "suggestion";
 
 export type WorkspaceAuditOptions = {
   scope?: WorkspaceAuditScope;

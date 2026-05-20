@@ -13,6 +13,10 @@ type SqliteDb = {
   };
 };
 
+type SqliteModule = {
+  DatabaseSync?: new (dbPath: string) => SqliteDb;
+};
+
 async function exists(filePath: string): Promise<boolean> {
   try {
     await fs.access(filePath);
@@ -24,8 +28,11 @@ async function exists(filePath: string): Promise<boolean> {
 
 async function tryOpenSqlite(dbPath: string): Promise<SqliteDb | undefined> {
   try {
-    const dynamicImport = new Function("specifier", "return import(specifier)") as (specifier: string) => Promise<any>;
-    const sqlite = await dynamicImport("node:sqlite");
+    const dynamicImport = new Function(
+      "specifier",
+      "return import(specifier)"
+    ) as (specifier: string) => Promise<unknown>;
+    const sqlite = (await dynamicImport("node:sqlite")) as SqliteModule;
     const DatabaseSync = sqlite.DatabaseSync;
     if (!DatabaseSync) return undefined;
     return new DatabaseSync(dbPath) as SqliteDb;
@@ -39,7 +46,9 @@ function migrateSqlite(db: SqliteDb): void {
   const legacyPathColumn = `${legacyName}_path`;
 
   try {
-    db.exec(`ALTER TABLE workspaces RENAME COLUMN ${legacyPathColumn} TO marc_path`);
+    db.exec(
+      `ALTER TABLE workspaces RENAME COLUMN ${legacyPathColumn} TO marc_path`
+    );
   } catch {
     // Fresh databases already use marc_path.
   }
@@ -56,13 +65,17 @@ function migrateSqlite(db: SqliteDb): void {
 
 function canonicalWorkspacePath(filePath: string): string {
   const resolved = path.resolve(filePath);
-  return process.platform === "win32" ? resolved.toLocaleLowerCase("en-US") : resolved;
+  return process.platform === "win32"
+    ? resolved.toLocaleLowerCase("en-US")
+    : resolved;
 }
 
 function sameWorkspacePath(left: WorkspaceInfo, right: WorkspaceInfo): boolean {
   return (
-    canonicalWorkspacePath(left.rootPath) === canonicalWorkspacePath(right.rootPath) ||
-    canonicalWorkspacePath(left.marcPath) === canonicalWorkspacePath(right.marcPath)
+    canonicalWorkspacePath(left.rootPath) ===
+      canonicalWorkspacePath(right.rootPath) ||
+    canonicalWorkspacePath(left.marcPath) ===
+      canonicalWorkspacePath(right.marcPath)
   );
 }
 
@@ -98,24 +111,35 @@ export class DaemonStore {
   }
 
   async listWorkspaces(): Promise<WorkspaceInfo[]> {
-    return (await this.readRegistry()).workspaces.sort((a, b) => a.name.localeCompare(b.name));
+    return (await this.readRegistry()).workspaces.sort((a, b) =>
+      a.name.localeCompare(b.name)
+    );
   }
 
   async upsertWorkspace(workspace: WorkspaceInfo): Promise<WorkspaceInfo> {
     const registry = await this.readRegistry();
     const duplicateIds = registry.workspaces
-      .filter((item) => item.id !== workspace.id && sameWorkspacePath(item, workspace))
+      .filter(
+        (item) => item.id !== workspace.id && sameWorkspacePath(item, workspace)
+      )
       .map((item) => item.id);
-    registry.workspaces = registry.workspaces.filter((item) => item.id === workspace.id || !sameWorkspacePath(item, workspace));
-    const index = registry.workspaces.findIndex((item) => item.id === workspace.id);
+    registry.workspaces = registry.workspaces.filter(
+      (item) => item.id === workspace.id || !sameWorkspacePath(item, workspace)
+    );
+    const index = registry.workspaces.findIndex(
+      (item) => item.id === workspace.id
+    );
     if (index >= 0) {
       registry.workspaces[index] = workspace;
-    } else {
+    }
+    if (index < 0) {
       registry.workspaces.push(workspace);
     }
     await this.writeRegistry(registry);
     for (const duplicateId of duplicateIds) {
-      this.sqlite?.prepare("DELETE FROM workspaces WHERE id = ?").run(duplicateId);
+      this.sqlite
+        ?.prepare("DELETE FROM workspaces WHERE id = ?")
+        .run(duplicateId);
     }
 
     this.sqlite
@@ -126,15 +150,23 @@ export class DaemonStore {
            name = excluded.name,
            root_path = excluded.root_path,
            marc_path = excluded.marc_path,
-           updated_at = excluded.updated_at`,
+           updated_at = excluded.updated_at`
       )
-      .run(workspace.id, workspace.name, workspace.rootPath, workspace.marcPath, new Date().toISOString());
+      .run(
+        workspace.id,
+        workspace.name,
+        workspace.rootPath,
+        workspace.marcPath,
+        new Date().toISOString()
+      );
 
     return workspace;
   }
 
   async getWorkspace(id: string): Promise<WorkspaceInfo | undefined> {
-    return (await this.readRegistry()).workspaces.find((workspace) => workspace.id === id);
+    return (await this.readRegistry()).workspaces.find(
+      (workspace) => workspace.id === id
+    );
   }
 
   async removeWorkspace(id: string): Promise<WorkspaceInfo | undefined> {
@@ -160,6 +192,9 @@ export class DaemonStore {
   }
 
   private async writeRegistry(registry: RegistryFile): Promise<void> {
-    await fs.writeFile(this.registryPath, `${JSON.stringify(registry, null, 2)}\n`);
+    await fs.writeFile(
+      this.registryPath,
+      `${JSON.stringify(registry, null, 2)}\n`
+    );
   }
 }

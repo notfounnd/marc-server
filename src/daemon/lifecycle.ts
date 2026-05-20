@@ -5,7 +5,12 @@ import type { DaemonConfig, DaemonRuntimeState } from "../core/types.js";
 
 export type DaemonProcessStatus =
   | { status: "stopped"; dataDir: string; statePath: string }
-  | { status: "stale"; dataDir: string; statePath: string; state: DaemonRuntimeState }
+  | {
+      status: "stale";
+      dataDir: string;
+      statePath: string;
+      state: DaemonRuntimeState;
+    }
   | {
       status: "running";
       dataDir: string;
@@ -77,31 +82,45 @@ export async function getCurrentDaemonFingerprint(): Promise<string> {
   }
 
   const entrypoint = process.argv[1] ? path.resolve(process.argv[1]) : "";
-  const entrypointMtime = entrypoint && (await pathExists(entrypoint)) ? (await fs.stat(entrypoint)).mtimeMs : 0;
+  const entrypointMtime =
+    entrypoint && (await pathExists(entrypoint))
+      ? (await fs.stat(entrypoint)).mtimeMs
+      : 0;
   return [process.execPath, entrypoint, Math.round(entrypointMtime)].join("|");
 }
 
-export async function readDaemonRuntimeState(dataDir: string): Promise<DaemonRuntimeState | undefined> {
+export async function readDaemonRuntimeState(
+  dataDir: string
+): Promise<DaemonRuntimeState | undefined> {
   const statePath = daemonStatePath(dataDir);
   if (!(await pathExists(statePath))) {
     return undefined;
   }
 
-  const parsed = JSON.parse(await fs.readFile(statePath, "utf8")) as Partial<DaemonRuntimeState>;
+  const parsed = JSON.parse(
+    await fs.readFile(statePath, "utf8")
+  ) as Partial<DaemonRuntimeState>;
   if (parsed.version !== 1 || typeof parsed.pid !== "number") {
     return undefined;
   }
   return parsed as DaemonRuntimeState;
 }
 
-export async function writeDaemonRuntimeState(state: DaemonRuntimeState): Promise<void> {
+export async function writeDaemonRuntimeState(
+  state: DaemonRuntimeState
+): Promise<void> {
   await fs.mkdir(state.dataDir, { recursive: true });
-  await fs.writeFile(daemonStatePath(state.dataDir), `${JSON.stringify(state, null, 2)}\n`);
+  await fs.writeFile(
+    daemonStatePath(state.dataDir),
+    `${JSON.stringify(state, null, 2)}\n`
+  );
 }
 
 export async function patchDaemonRuntimeState(
   dataDir: string,
-  patch: Partial<Pick<DaemonRuntimeState, "lastActivityAt" | "activeUiClients" | "leases">>,
+  patch: Partial<
+    Pick<DaemonRuntimeState, "lastActivityAt" | "activeUiClients" | "leases">
+  >
 ): Promise<void> {
   const state = await readDaemonRuntimeState(dataDir);
   if (!state) {
@@ -127,7 +146,7 @@ export function isProcessRunning(pid: number): boolean {
 function runningStatus(
   config: DaemonConfig,
   state: DaemonRuntimeState,
-  statePath: string,
+  statePath: string
 ): Extract<DaemonProcessStatus, { status: "running" }> {
   return {
     status: "running",
@@ -135,11 +154,13 @@ function runningStatus(
     statePath,
     state,
     fingerprintMatches: state.fingerprint === config.fingerprint,
-    uptimeMs: Math.max(0, Date.now() - Date.parse(state.startedAt)),
+    uptimeMs: Math.max(0, Date.now() - Date.parse(state.startedAt))
   };
 }
 
-export async function getDaemonProcessStatus(config: DaemonConfig): Promise<DaemonProcessStatus> {
+export async function getDaemonProcessStatus(
+  config: DaemonConfig
+): Promise<DaemonProcessStatus> {
   const statePath = daemonStatePath(config.dataDir);
   const state = await readDaemonRuntimeState(config.dataDir);
   if (!state) {
@@ -154,7 +175,9 @@ export async function getDaemonProcessStatus(config: DaemonConfig): Promise<Daem
   return runningStatus(config, state, statePath);
 }
 
-export async function getDaemonStatus(config: DaemonConfig): Promise<DaemonStatus> {
+export async function getDaemonStatus(
+  config: DaemonConfig
+): Promise<DaemonStatus> {
   const processStatus = await getDaemonProcessStatus(config);
   if (processStatus.status !== "stopped") {
     return processStatus;
@@ -164,7 +187,7 @@ export async function getDaemonStatus(config: DaemonConfig): Promise<DaemonStatu
   try {
     const response = await fetch(new URL("/api/status", daemonUrl), {
       headers: { authorization: `Bearer ${config.token}` },
-      signal: AbortSignal.timeout(1000),
+      signal: AbortSignal.timeout(1000)
     });
 
     if (!response.ok) {
@@ -174,18 +197,20 @@ export async function getDaemonStatus(config: DaemonConfig): Promise<DaemonStatu
         dataDir: config.dataDir,
         statePath: processStatus.statePath,
         httpStatus: response.status,
-        error: `Daemon API responded with ${response.status}: ${await response.text()}`,
+        error: `Daemon API responded with ${response.status}: ${await response.text()}`
       };
     }
 
-    const body = (await response.json()) as { modules?: { daemon?: DaemonApiStatus } };
+    const body = (await response.json()) as {
+      modules?: { daemon?: DaemonApiStatus };
+    };
     return {
       status: "running",
       source: "api",
       dataDir: config.dataDir,
       statePath: processStatus.statePath,
       daemon: body.modules?.daemon ?? { status: "ready", url: daemonUrl },
-      httpStatus: 200,
+      httpStatus: 200
     };
   } catch {
     return processStatus;
@@ -203,7 +228,9 @@ async function waitForExit(pid: number, timeoutMs: number): Promise<boolean> {
   return !isProcessRunning(pid);
 }
 
-export async function stopDaemon(config: DaemonConfig): Promise<DaemonProcessStatus> {
+export async function stopDaemon(
+  config: DaemonConfig
+): Promise<DaemonProcessStatus> {
   const status = await getDaemonProcessStatus(config);
   if (status.status !== "running") {
     return status;
@@ -218,7 +245,9 @@ export async function stopDaemon(config: DaemonConfig): Promise<DaemonProcessSta
   return getDaemonProcessStatus(config);
 }
 
-export async function createRuntimeState(config: DaemonConfig): Promise<DaemonRuntimeState> {
+export async function createRuntimeState(
+  config: DaemonConfig
+): Promise<DaemonRuntimeState> {
   const now = new Date().toISOString();
   return {
     version: 1,
@@ -235,18 +264,20 @@ export async function createRuntimeState(config: DaemonConfig): Promise<DaemonRu
     lastActivityAt: now,
     activeUiClients: 0,
     autoIdleMs: config.autoIdleMs,
-    leases: [],
+    leases: []
   };
 }
 
-export async function startDetachedDaemon(config: DaemonConfig): Promise<StartDaemonResult> {
+export async function startDetachedDaemon(
+  config: DaemonConfig
+): Promise<StartDaemonResult> {
   const current = await getDaemonProcessStatus(config);
+  if (current.status === "running" && !current.fingerprintMatches) {
+    throw new Error(
+      `Daemon is already running with a different fingerprint. Use 'marc daemon restart --data-dir ${config.dataDir}'.`
+    );
+  }
   if (current.status === "running") {
-    if (!current.fingerprintMatches) {
-      throw new Error(
-        `Daemon is already running with a different fingerprint. Use 'marc daemon restart --data-dir ${config.dataDir}'.`,
-      );
-    }
     return { action: "already-running", status: current };
   }
 
@@ -268,13 +299,13 @@ export async function startDetachedDaemon(config: DaemonConfig): Promise<StartDa
     "--data-dir",
     config.dataDir,
     "--auto-idle-ms",
-    String(config.autoIdleMs),
+    String(config.autoIdleMs)
   ];
 
   const child = spawn(process.execPath, args, {
     detached: true,
     stdio: ["ignore", logHandle.fd, logHandle.fd],
-    windowsHide: true,
+    windowsHide: true
   });
   child.unref();
 
@@ -289,10 +320,14 @@ export async function startDetachedDaemon(config: DaemonConfig): Promise<StartDa
   }
 
   await logHandle.close();
-  throw new Error(`Daemon did not report ready state in ${daemonStatePath(config.dataDir)}.`);
+  throw new Error(
+    `Daemon did not report ready state in ${daemonStatePath(config.dataDir)}.`
+  );
 }
 
-export async function restartDetachedDaemon(config: DaemonConfig): Promise<StartDaemonResult> {
+export async function restartDetachedDaemon(
+  config: DaemonConfig
+): Promise<StartDaemonResult> {
   await stopDaemon(config);
   return startDetachedDaemon(config);
 }

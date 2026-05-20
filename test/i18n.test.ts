@@ -24,7 +24,11 @@ test("keeps translation catalog flat and free of array values", () => {
   const translations = loadTranslations();
   for (const [key, value] of Object.entries(translations)) {
     assert.equal(typeof value, "string", `${key} must map to a string`);
-    assert.equal(Array.isArray(value), false, `${key} must not map to an array`);
+    assert.equal(
+      Array.isArray(value),
+      false,
+      `${key} must not map to an array`
+    );
   }
 });
 
@@ -32,17 +36,29 @@ test("keeps i18n usage scoped to the web UI", () => {
   const root = process.cwd();
   const allowed = [
     path.join("src", "i18n", "index.ts"),
+    path.join("src", "ui", "app-content.tsx"),
+    path.join("src", "ui", "app-sidebar.tsx"),
+    path.join("src", "ui", "composer.tsx"),
     path.join("src", "ui", "i18n.ts"),
     path.join("src", "ui", "main.tsx"),
-    path.join("test", "i18n.test.ts"),
+    path.join("src", "ui", "modals.tsx"),
+    path.join("src", "ui", "thread-view.tsx"),
+    path.join("src", "ui", "workspace-overview.tsx"),
+    path.join("test", "i18n.test.ts")
   ];
   const violations: string[] = [];
 
-  for (const file of walk(path.join(root, "src")).concat(walk(path.join(root, "test")))) {
+  for (const file of walk(path.join(root, "src")).concat(
+    walk(path.join(root, "test"))
+  )) {
     const relative = path.relative(root, file);
     if (allowed.includes(relative)) continue;
     const content = fs.readFileSync(file, "utf8");
-    if (/\bi18next\b|react-i18next|from ["'][^"']*i18n|import ["'][^"']*i18n/.test(content)) {
+    if (
+      /\bi18next\b|react-i18next|from ["'][^"']*i18n|import ["'][^"']*i18n/.test(
+        content
+      )
+    ) {
       violations.push(relative);
     }
   }
@@ -60,9 +76,11 @@ test("keeps backend, MCP, CLI, and workspace contract strings out of the UI cata
     /daemon registry/,
     /Markdown artifact file name must not include folders/,
     /Invalid workspace payload/,
-    /Usage:\n  marc daemon/,
+    /Usage:\n {2}marc daemon/
   ];
-  const violations = Object.keys(translations).filter((key) => forbiddenPatterns.some((pattern) => pattern.test(key)));
+  const violations = Object.keys(translations).filter((key) =>
+    forbiddenPatterns.some((pattern) => pattern.test(key))
+  );
 
   assert.deepEqual(violations, []);
 });

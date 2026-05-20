@@ -7,7 +7,7 @@ import type {
   ThreadIndexStore,
   ThreadInfo,
   ThreadListOptions,
-  ThreadListStatus,
+  ThreadListStatus
 } from "./types.js";
 
 const INDEX_VERSION = 1;
@@ -27,32 +27,52 @@ async function readTextIfExists(filePath: string): Promise<string> {
 }
 
 function parseClosedAt(summary: string, summaryMtime: Date): string {
-  return /^Closed:\s+`?([^`\n]+)`?$/m.exec(summary)?.[1]?.trim() || summaryMtime.toISOString();
+  return (
+    /^Closed:\s+`?([^`\n]+)`?$/m.exec(summary)?.[1]?.trim() ||
+    summaryMtime.toISOString()
+  );
 }
 
-function sortThreads(threads: ThreadInfo[], status: ThreadListStatus): ThreadInfo[] {
-  const byCreatedDesc = (a: ThreadInfo, b: ThreadInfo) => b.createdAt.localeCompare(a.createdAt);
-  const byClosedDesc = (a: ThreadInfo, b: ThreadInfo) => (b.closedAt ?? "").localeCompare(a.closedAt ?? "");
+function sortThreads(
+  threads: ThreadInfo[],
+  status: ThreadListStatus
+): ThreadInfo[] {
+  const byCreatedDesc = (a: ThreadInfo, b: ThreadInfo) =>
+    b.createdAt.localeCompare(a.createdAt);
+  const byClosedDesc = (a: ThreadInfo, b: ThreadInfo) =>
+    (b.closedAt ?? "").localeCompare(a.closedAt ?? "");
+  const byStatusThenDate = (a: ThreadInfo, b: ThreadInfo) => {
+    const statusOrder =
+      a.status === b.status ? 0 : a.status === "open" ? -1 : 1;
+    if (statusOrder !== 0) return statusOrder;
+    return a.status === "open" ? byCreatedDesc(a, b) : byClosedDesc(a, b);
+  };
 
   if (status === "closed") {
     return threads.sort(byClosedDesc);
   }
 
   if (status === "all") {
-    return threads.sort((a, b) => {
-      if (a.status !== b.status) return a.status === "open" ? -1 : 1;
-      return a.status === "open" ? byCreatedDesc(a, b) : byClosedDesc(a, b);
-    });
+    return threads.sort(byStatusThenDate);
   }
 
   return threads.sort(byCreatedDesc);
 }
 
-function publicThreads(snapshot: ThreadIndexSnapshot, options: ThreadListOptions = {}): ThreadInfo[] {
+function publicThreads(
+  snapshot: ThreadIndexSnapshot,
+  options: ThreadListOptions = {}
+): ThreadInfo[] {
   const status = options.status ?? "open";
   const threads = snapshot.threads
     .filter((thread) => status === "all" || thread.status === status)
-    .map(({ chatMtimeMs: _chatMtimeMs, summaryMtimeMs: _summaryMtimeMs, ...thread }) => thread);
+    .map(
+      ({
+        chatMtimeMs: _chatMtimeMs,
+        summaryMtimeMs: _summaryMtimeMs,
+        ...thread
+      }) => thread
+    );
 
   return sortThreads(threads, status);
 }
@@ -66,8 +86,11 @@ export class JsonThreadIndexStore implements ThreadIndexStore {
 
   async load(): Promise<ThreadIndexSnapshot | undefined> {
     try {
-      const parsed = JSON.parse(await fs.readFile(this.indexPath, "utf8")) as ThreadIndexSnapshot;
-      if (parsed.version !== INDEX_VERSION || !Array.isArray(parsed.threads)) return undefined;
+      const parsed = JSON.parse(
+        await fs.readFile(this.indexPath, "utf8")
+      ) as ThreadIndexSnapshot;
+      if (parsed.version !== INDEX_VERSION || !Array.isArray(parsed.threads))
+        return undefined;
       return parsed;
     } catch {
       return undefined;
@@ -104,7 +127,7 @@ export class JsonThreadIndexStore implements ThreadIndexStore {
 export class ThreadIndexReconciler {
   constructor(
     private readonly threadsRoot: string,
-    private readonly store: ThreadIndexStore,
+    private readonly store: ThreadIndexStore
   ) {}
 
   async list(options: ThreadListOptions = {}): Promise<ThreadInfo[]> {
@@ -114,7 +137,9 @@ export class ThreadIndexReconciler {
 
   async reconcile(): Promise<ThreadIndexSnapshot> {
     const previous = await this.store.load();
-    const previousById = new Map((previous?.threads ?? []).map((thread) => [thread.id, thread]));
+    const previousById = new Map(
+      (previous?.threads ?? []).map((thread) => [thread.id, thread])
+    );
     const entries = await fs.readdir(this.threadsRoot, { withFileTypes: true });
     const nextThreads: ThreadIndexEntry[] = [];
 
@@ -139,13 +164,22 @@ export class ThreadIndexReconciler {
         continue;
       }
 
-      nextThreads.push(await this.readEntry(entry.name, threadPath, chatPath, chatStat.mtimeMs, summaryPath, summaryStat));
+      nextThreads.push(
+        await this.readEntry(
+          entry.name,
+          threadPath,
+          chatPath,
+          chatStat.mtimeMs,
+          summaryPath,
+          summaryStat
+        )
+      );
     }
 
     const snapshot: ThreadIndexSnapshot = {
       version: INDEX_VERSION,
       updatedAt: new Date().toISOString(),
-      threads: nextThreads,
+      threads: nextThreads
     };
     await this.store.save(snapshot);
     return snapshot;
@@ -157,7 +191,7 @@ export class ThreadIndexReconciler {
     chatPath: string,
     chatMtimeMs: number,
     summaryPath: string,
-    summaryStat?: { mtime: Date; mtimeMs: number },
+    summaryStat?: { mtime: Date; mtimeMs: number }
   ): Promise<ThreadIndexEntry> {
     const markdown = await readTextIfExists(chatPath);
     const title = /^#\s+(.+)$/m.exec(markdown)?.[1] ?? id;
@@ -174,7 +208,7 @@ export class ThreadIndexReconciler {
         closedAt: parseClosedAt(summary, summaryStat.mtime),
         summaryPath,
         chatMtimeMs,
-        summaryMtimeMs: summaryStat.mtimeMs,
+        summaryMtimeMs: summaryStat.mtimeMs
       };
     }
 
@@ -184,7 +218,7 @@ export class ThreadIndexReconciler {
       path: threadPath,
       createdAt,
       status: "open",
-      chatMtimeMs,
+      chatMtimeMs
     };
   }
 }
@@ -196,7 +230,7 @@ export class BackgroundThreadIndexReconciler {
 
   constructor(
     private readonly threadsRoot: string,
-    private readonly store: ThreadIndexStore,
+    private readonly store: ThreadIndexStore
   ) {}
 
   async list(options: ThreadListOptions = {}): Promise<ThreadInfo[]> {
@@ -239,7 +273,7 @@ export class BackgroundThreadIndexReconciler {
         rebuilding: true,
         lastRebuildAt: this.lastRebuildAt ?? snapshot?.updatedAt,
         lastError: this.lastError,
-        threadCount: snapshot?.threads.length ?? 0,
+        threadCount: snapshot?.threads.length ?? 0
       };
     }
 
@@ -249,7 +283,7 @@ export class BackgroundThreadIndexReconciler {
         rebuilding: false,
         lastRebuildAt: this.lastRebuildAt ?? snapshot?.updatedAt,
         lastError: this.lastError,
-        threadCount: snapshot?.threads.length ?? 0,
+        threadCount: snapshot?.threads.length ?? 0
       };
     }
 
@@ -258,7 +292,7 @@ export class BackgroundThreadIndexReconciler {
       rebuilding: false,
       lastRebuildAt: this.lastRebuildAt ?? snapshot?.updatedAt,
       lastError: null,
-      threadCount: snapshot?.threads.length ?? 0,
+      threadCount: snapshot?.threads.length ?? 0
     };
   }
 }

@@ -48,10 +48,15 @@ export type ComposerAutocompleteContext = {
   remoteMessages?: ComposerAutocompleteMessage[];
 };
 
-const TOKEN_PATTERN = /(?:^|[\s([{])([@#$][A-Za-z0-9._-]*|marc:\/\/[^\s\])}]*)$/;
-const REMOTE_MESSAGE_PATTERN = /^marc:\/\/\$([A-Za-z0-9._-]+)\/#([A-Za-z0-9._-]*)$/;
+const TOKEN_PATTERN =
+  /(?:^|[\s([{])([@#$][A-Za-z0-9._-]*|marc:\/\/[^\s\])}]*)$/;
+const REMOTE_MESSAGE_PATTERN =
+  /^marc:\/\/\$([A-Za-z0-9._-]+)\/#([A-Za-z0-9._-]*)$/;
 
-export function detectAutocompleteRequest(value: string, cursor: number): ComposerAutocompleteRequest | undefined {
+export function detectAutocompleteRequest(
+  value: string,
+  cursor: number
+): ComposerAutocompleteRequest | undefined {
   const prefix = value.slice(0, cursor);
   const match = TOKEN_PATTERN.exec(prefix);
   if (!match) {
@@ -67,39 +72,74 @@ export function detectAutocompleteRequest(value: string, cursor: number): Compos
     return { kind: "thread", token, query: token.slice(1), start, end: cursor };
   }
   if (token.startsWith("#")) {
-    return { kind: "message", token, query: token.slice(1), start, end: cursor };
+    return {
+      kind: "message",
+      token,
+      query: token.slice(1),
+      start,
+      end: cursor
+    };
   }
   if (token.startsWith("marc://@")) {
-    return { kind: "agent", token, query: token.slice("marc://@".length), start, end: cursor };
+    return {
+      kind: "agent",
+      token,
+      query: token.slice("marc://@".length),
+      start,
+      end: cursor
+    };
   }
   if (token.startsWith("marc://$")) {
-    const remoteMessageMatch = REMOTE_MESSAGE_PATTERN.exec(token);
-    if (remoteMessageMatch) {
-      return {
-        kind: "message",
-        token,
-        query: remoteMessageMatch[2],
-        start,
-        end: cursor,
-        threadId: remoteMessageMatch[1],
-      };
-    }
-    return { kind: "thread", token, query: token.slice("marc://$".length), start, end: cursor };
+    return remoteThreadRequest(token, start, cursor);
   }
   if (token.startsWith("marc://#")) {
-    return { kind: "message", token, query: token.slice("marc://#".length), start, end: cursor };
+    return {
+      kind: "message",
+      token,
+      query: token.slice("marc://#".length),
+      start,
+      end: cursor
+    };
   }
 
   return undefined;
 }
 
-export function getAutocompleteRemoteThreadId(request: ComposerAutocompleteRequest): string | undefined {
+function remoteThreadRequest(
+  token: string,
+  start: number,
+  cursor: number
+): ComposerAutocompleteRequest {
+  const remoteMessageMatch = REMOTE_MESSAGE_PATTERN.exec(token);
+  if (!remoteMessageMatch) {
+    return {
+      kind: "thread",
+      token,
+      query: token.slice("marc://$".length),
+      start,
+      end: cursor
+    };
+  }
+
+  return {
+    kind: "message",
+    token,
+    query: remoteMessageMatch[2],
+    start,
+    end: cursor,
+    threadId: remoteMessageMatch[1]
+  };
+}
+
+export function getAutocompleteRemoteThreadId(
+  request: ComposerAutocompleteRequest
+): string | undefined {
   return request.threadId;
 }
 
 export function buildAutocompleteOptions(
   request: ComposerAutocompleteRequest,
-  context: ComposerAutocompleteContext,
+  context: ComposerAutocompleteContext
 ): ComposerAutocompleteOption[] {
   if (request.kind === "agent") {
     return context.agents
@@ -108,7 +148,7 @@ export function buildAutocompleteOptions(
         value: `marc://@${agent.id}`,
         label: `@${agent.id}`,
         detail: "Agent",
-        search: agent.id,
+        search: agent.id
       }))
       .filter((option) => matchesQuery(option.search, request.query))
       .map(({ search: _search, ...option }) => option);
@@ -117,21 +157,25 @@ export function buildAutocompleteOptions(
   if (request.kind === "thread") {
     return context.threads
       .map((thread) => {
-        const closed = thread.status === "closed" || Boolean(thread.closedAt || thread.summaryPath);
+        const closed =
+          thread.status === "closed" ||
+          Boolean(thread.closedAt || thread.summaryPath);
         return {
           type: "thread" as const,
           value: `marc://$${thread.id}`,
           label: `$${thread.id}`,
           detail: closed ? "Closed thread" : "Open thread",
           closed,
-          search: `${thread.id} ${thread.title} ${closed ? "closed" : "open"}`,
+          search: `${thread.id} ${thread.title} ${closed ? "closed" : "open"}`
         };
       })
       .filter((option) => matchesQuery(option.search, request.query))
       .map(({ search: _search, ...option }) => option);
   }
 
-  const messages = request.threadId ? context.remoteMessages ?? [] : context.currentMessages;
+  const messages = request.threadId
+    ? (context.remoteMessages ?? [])
+    : context.currentMessages;
   return messages
     .flatMap((message) => {
       const messageReference = request.threadId
@@ -142,10 +186,14 @@ export function buildAutocompleteOptions(
         value: messageReference,
         label: marcReferenceLabel(messageReference),
         detail: `${message.agentId}${message.role ? ` - ${message.role}` : ""}`,
-        search: `${message.id} ${message.agentId} ${message.role ?? ""} ${message.body}`,
+        search: `${message.id} ${message.agentId} ${message.role ?? ""} ${message.body}`
       };
       const artifactOptions = message.artifacts.map((artifact) => {
-        const artifactReference = messageArtifactReference(message.id, artifact, request.threadId);
+        const artifactReference = messageArtifactReference(
+          message.id,
+          artifact,
+          request.threadId
+        );
         const artifactFile = artifact.replace(/^artifacts\//, "");
         return {
           type: "artifact" as const,
@@ -153,7 +201,7 @@ export function buildAutocompleteOptions(
           label: marcReferenceLabel(artifactReference),
           detail: `Artifact from #${message.id}`,
           parentMessageId: message.id,
-          search: `${artifactFile} ${message.id} ${message.agentId} ${message.body}`,
+          search: `${artifactFile} ${message.id} ${message.agentId} ${message.body}`
         };
       });
       return [messageOption, ...artifactOptions];
@@ -165,12 +213,12 @@ export function buildAutocompleteOptions(
 export function applyAutocompleteOption(
   value: string,
   request: ComposerAutocompleteRequest,
-  reference: string,
+  reference: string
 ): { value: string; cursor: number } {
   const nextValue = `${value.slice(0, request.start)}${reference}${value.slice(request.end)}`;
   return {
     value: nextValue,
-    cursor: request.start + reference.length,
+    cursor: request.start + reference.length
   };
 }
 

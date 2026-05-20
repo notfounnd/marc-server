@@ -1,6 +1,11 @@
 #!/usr/bin/env node
 import { loadDaemonConfig } from "./daemon/config.js";
-import { getDaemonStatus, restartDetachedDaemon, startDetachedDaemon, stopDaemon } from "./daemon/lifecycle.js";
+import {
+  getDaemonStatus,
+  restartDetachedDaemon,
+  startDetachedDaemon,
+  stopDaemon
+} from "./daemon/lifecycle.js";
 import { runDaemon } from "./daemon/server.js";
 import { runMcpServer } from "./mcp/server.js";
 import type { DaemonConfig } from "./core/types.js";
@@ -26,21 +31,27 @@ function parseArgs(argv: string[]): ParsedArgs {
     const next = rest[index + 1];
     if (!next || next.startsWith("--")) {
       values[key] = true;
-    } else {
-      values[key] = next;
-      index += 1;
+      continue;
     }
+    values[key] = next;
+    index += 1;
   }
 
   return { command, args, values };
 }
 
-function stringValue(values: Record<string, string | boolean>, key: string): string | undefined {
+function stringValue(
+  values: Record<string, string | boolean>,
+  key: string
+): string | undefined {
   const value = values[key];
   return typeof value === "string" ? value : undefined;
 }
 
-function numberValue(values: Record<string, string | boolean>, key: string): number | undefined {
+function numberValue(
+  values: Record<string, string | boolean>,
+  key: string
+): number | undefined {
   const value = stringValue(values, key);
   return value ? Number(value) : undefined;
 }
@@ -63,34 +74,38 @@ const daemonCommandHandlers: Record<string, DaemonCommandHandler> = {
   start: (config) => startDetachedDaemon({ ...config, mode: "detached" }),
   stop: (config) => stopDaemon({ ...config, mode: "detached" }),
   restart: (config) => restartDetachedDaemon({ ...config, mode: "detached" }),
-  status: (config) => getDaemonStatus({ ...config, mode: "detached" }),
+  status: (config) => getDaemonStatus({ ...config, mode: "detached" })
 };
+
+async function handleDaemonCommand(parsed: ParsedArgs): Promise<void> {
+  const action = parsed.args[0];
+  const config = await loadDaemonConfig({
+    host: stringValue(parsed.values, "host"),
+    port: numberValue(parsed.values, "port"),
+    dataDir: stringValue(parsed.values, "data-dir"),
+    token: stringValue(parsed.values, "token"),
+    mode: parsed.values["detached-child"] === true ? "detached" : "foreground",
+    autoIdleMs: numberValue(parsed.values, "auto-idle-ms")
+  });
+
+  const handler = action ? daemonCommandHandlers[action] : undefined;
+  if (handler) {
+    printResult(await handler(config));
+    return;
+  }
+
+  if (action && action !== "daemon") {
+    usage();
+  }
+
+  await runDaemon(config);
+}
 
 async function main(): Promise<void> {
   const parsed = parseArgs(process.argv.slice(2));
 
   if (parsed.command === "daemon") {
-    const action = parsed.args[0];
-    const config = await loadDaemonConfig({
-      host: stringValue(parsed.values, "host"),
-      port: numberValue(parsed.values, "port"),
-      dataDir: stringValue(parsed.values, "data-dir"),
-      token: stringValue(parsed.values, "token"),
-      mode: parsed.values["detached-child"] === true ? "detached" : "foreground",
-      autoIdleMs: numberValue(parsed.values, "auto-idle-ms"),
-    });
-
-    const handler = action ? daemonCommandHandlers[action] : undefined;
-    if (handler) {
-      printResult(await handler(config));
-      return;
-    }
-
-    if (action && action !== "daemon") {
-      usage();
-    }
-
-    await runDaemon(config);
+    await handleDaemonCommand(parsed);
     return;
   }
 
@@ -98,7 +113,7 @@ async function main(): Promise<void> {
     await runMcpServer({
       workspace: stringValue(parsed.values, "workspace"),
       daemonUrl: stringValue(parsed.values, "daemon-url"),
-      token: stringValue(parsed.values, "token"),
+      token: stringValue(parsed.values, "token")
     });
     return;
   }
@@ -107,6 +122,8 @@ async function main(): Promise<void> {
 }
 
 main().catch((error) => {
-  console.error(error instanceof Error ? error.stack ?? error.message : String(error));
+  console.error(
+    error instanceof Error ? (error.stack ?? error.message) : String(error)
+  );
   process.exit(1);
 });

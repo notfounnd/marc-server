@@ -14,7 +14,7 @@ export const MESSAGE_STYLE_GUIDE = [
   "Do not remove important context just to make a message shorter.",
   "Avoid dense paragraphs; split scope, decisions, validation, risks, and next steps when relevant.",
   "Link artifacts for long plans, logs, reviews, or detailed analysis.",
-  "Mention what changed, what matters, validation performed, and any blocker.",
+  "Mention what changed, what matters, validation performed, and any blocker."
 ];
 
 export function validateMessageBody(body: string): MessageGuardResult {
@@ -29,21 +29,22 @@ export function validateMessageBody(body: string): MessageGuardResult {
   if (trimmed.length > MAX_MESSAGE_CHARS) {
     return {
       ok: false,
-      reason: `Message is too long (${trimmed.length} chars). Keep it under ${MAX_MESSAGE_CHARS} chars or attach an artifact.`,
+      reason: `Message is too long (${trimmed.length} chars). Keep it under ${MAX_MESSAGE_CHARS} chars or attach an artifact.`
     };
   }
 
   if (lines.length > MAX_MESSAGE_LINES) {
     return {
       ok: false,
-      reason: `Message has too many lines (${lines.length}). Keep it under ${MAX_MESSAGE_LINES} lines or attach an artifact.`,
+      reason: `Message has too many lines (${lines.length}). Keep it under ${MAX_MESSAGE_LINES} lines or attach an artifact.`
     };
   }
 
   if (longLines.length > MAX_LONG_LINES) {
     return {
       ok: false,
-      reason: "Message has too many very long lines. Split it into shorter sentences or attach an artifact.",
+      reason:
+        "Message has too many very long lines. Split it into shorter sentences or attach an artifact."
     };
   }
 

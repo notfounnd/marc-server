@@ -13,19 +13,22 @@ async function exists(filePath: string): Promise<boolean> {
   }
 }
 
-export async function loadDaemonConfig(options: Partial<DaemonConfig> = {}): Promise<DaemonConfig> {
-  const dataDir = path.resolve(options.dataDir ?? process.env.MARC_DAEMON_DIR ?? ".marc-daemon");
+export async function loadDaemonConfig(
+  options: Partial<DaemonConfig> = {}
+): Promise<DaemonConfig> {
+  const dataDir = path.resolve(
+    options.dataDir ?? process.env.MARC_DAEMON_DIR ?? ".marc-daemon"
+  );
   await fs.mkdir(dataDir, { recursive: true });
 
   const tokenPath = path.join(dataDir, "token");
   let token = options.token ?? process.env.MARC_TOKEN;
+  if (!token && (await exists(tokenPath))) {
+    token = (await fs.readFile(tokenPath, "utf8")).trim();
+  }
   if (!token) {
-    if (await exists(tokenPath)) {
-      token = (await fs.readFile(tokenPath, "utf8")).trim();
-    } else {
-      token = randomBytes(24).toString("hex");
-      await fs.writeFile(tokenPath, token);
-    }
+    token = randomBytes(24).toString("hex");
+    await fs.writeFile(tokenPath, token);
   }
 
   return {
@@ -35,7 +38,9 @@ export async function loadDaemonConfig(options: Partial<DaemonConfig> = {}): Pro
     token,
     tokenPath,
     mode: options.mode ?? "foreground",
-    autoIdleMs: options.autoIdleMs ?? Number(process.env.MARC_DAEMON_AUTO_IDLE_MS ?? 30 * 60 * 1000),
-    fingerprint: options.fingerprint ?? (await getCurrentDaemonFingerprint()),
+    autoIdleMs:
+      options.autoIdleMs ??
+      Number(process.env.MARC_DAEMON_AUTO_IDLE_MS ?? 30 * 60 * 1000),
+    fingerprint: options.fingerprint ?? (await getCurrentDaemonFingerprint())
   };
 }

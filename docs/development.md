@@ -39,6 +39,11 @@ pnpm dev:daemon
 pnpm dev:mcp
 pnpm dev:ui
 pnpm typecheck
+pnpm run lint:check
+pnpm run format:check
+pnpm run code:check
+pnpm run code:fix
+pnpm run validate
 pnpm test
 pnpm build
 ```
@@ -84,6 +89,19 @@ Run type checking separately:
 pnpm typecheck
 ```
 
+Run linting and formatting separately:
+
+```bash
+pnpm run lint:check
+pnpm run lint:fix
+pnpm run format:check
+pnpm run format:fix
+pnpm run code:check
+pnpm run code:fix
+```
+
+The lint configuration enforces the project file-size limit and control-flow rules for TypeScript, TSX, JavaScript, and test files. `code:fix` applies ESLint fixes and Prettier formatting. `code:check` verifies both.
+
 ## UI localization
 
 The browser UI uses `i18next` and `react-i18next`. The default and only supported locale is `en_US`.
@@ -127,7 +145,7 @@ workspace_update_recommendations
 Before calling documentation or tooling work complete:
 
 ```bash
-pnpm typecheck
+pnpm run validate
 pnpm test
 pnpm build
 ```

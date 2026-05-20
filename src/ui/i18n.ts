@@ -12,14 +12,14 @@ void i18n
     keySeparator: false,
     returnNull: false,
     backend: {
-      loadPath: "/locales/{{lng}}/translation.json",
+      loadPath: "/locales/{{lng}}/translation.json"
     },
     interpolation: {
-      escapeValue: false,
+      escapeValue: false
     },
     react: {
-      useSuspense: false,
-    },
+      useSuspense: false
+    }
   });
 
 export default i18n;

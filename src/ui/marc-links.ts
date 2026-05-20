@@ -1,20 +1,25 @@
 import { defaultUrlTransform } from "react-markdown";
-import { parseMarcReference, type MarcReference } from "../core/marc-references.js";
+import {
+  parseMarcReference,
+  type MarcReference
+} from "../core/marc-references.js";
 
 const MARC_ID = "[A-Za-z0-9_-]+";
 const MARC_ARTIFACT_FILE = "[A-Za-z0-9._-]+";
 const MARC_REFERENCE_PATTERN = new RegExp(
   `marc://(?:@${MARC_ID}|#${MARC_ID}(?:/!${MARC_ARTIFACT_FILE})?|\\$${MARC_ID}(?:/#${MARC_ID}(?:/!${MARC_ARTIFACT_FILE})?)?)`,
-  "g",
+  "g"
 );
 
 const marcReferenceLabelStrategies = {
   agent: (reference) => `@${reference.agentId}`,
   thread: (reference) => `$${reference.threadId}`,
   message: (reference) => `#${reference.messageId}`,
-  artifact: (reference) => `!${reference.artifactFile}`,
+  artifact: (reference) => `!${reference.artifactFile}`
 } satisfies {
-  [Type in MarcReference["type"]]: (reference: Extract<MarcReference, { type: Type }>) => string;
+  [Type in MarcReference["type"]]: (
+    reference: Extract<MarcReference, { type: Type }>
+  ) => string;
 };
 
 export function marcReferenceLabel(reference: string): string {
@@ -22,7 +27,9 @@ export function marcReferenceLabel(reference: string): string {
   if (!parsed) {
     return reference;
   }
-  const strategy = marcReferenceLabelStrategies[parsed.type] as (value: typeof parsed) => string;
+  const strategy = marcReferenceLabelStrategies[parsed.type] as (
+    value: typeof parsed
+  ) => string;
   return strategy(parsed);
 }
 
@@ -46,20 +53,25 @@ export function linkifyMarcReferences(markdown: string): string {
             return segment;
           }
 
-          return segment.replace(MARC_REFERENCE_PATTERN, (reference, offset) => {
-            const before = segment[offset - 1];
-            if (before === "(" || before === "<") {
-              return reference;
+          return segment.replace(
+            MARC_REFERENCE_PATTERN,
+            (reference, offset) => {
+              const before = segment[offset - 1];
+              if (before === "(" || before === "<") {
+                return reference;
+              }
+              return `[${marcReferenceLabel(reference)}](${reference})`;
             }
-            return `[${marcReferenceLabel(reference)}](${reference})`;
-          });
+          );
         })
         .join("");
     })
     .join("\n");
 }
 
-export function transformMarkdownUrl(...args: Parameters<typeof defaultUrlTransform>): string {
+export function transformMarkdownUrl(
+  ...args: Parameters<typeof defaultUrlTransform>
+): string {
   const [url] = args;
   return url.startsWith("marc://") ? url : defaultUrlTransform(...args);
 }

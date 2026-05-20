@@ -15,16 +15,40 @@ type CatalogPathStrategy = {
 const catalogPathStrategies: CatalogPathStrategy[] = [
   {
     name: "dist-public",
-    resolve: (moduleDir, locale) => path.resolve(moduleDir, "..", "public", "locales", locale, "translation.json"),
+    resolve: (moduleDir, locale) =>
+      path.resolve(
+        moduleDir,
+        "..",
+        "public",
+        "locales",
+        locale,
+        "translation.json"
+      )
   },
   {
     name: "source-public",
-    resolve: (moduleDir, locale) => path.resolve(moduleDir, "..", "..", "public", "locales", locale, "translation.json"),
+    resolve: (moduleDir, locale) =>
+      path.resolve(
+        moduleDir,
+        "..",
+        "..",
+        "public",
+        "locales",
+        locale,
+        "translation.json"
+      )
   },
   {
     name: "workspace-public",
-    resolve: (_moduleDir, locale) => path.resolve(process.cwd(), "public", "locales", locale, "translation.json"),
-  },
+    resolve: (_moduleDir, locale) =>
+      path.resolve(
+        process.cwd(),
+        "public",
+        "locales",
+        locale,
+        "translation.json"
+      )
+  }
 ];
 
 function localePath(locale: SupportedLocale = activeLocale): string {
@@ -40,7 +64,9 @@ function localePath(locale: SupportedLocale = activeLocale): string {
 
 let cachedCatalog: TranslationCatalog | undefined;
 
-export function loadTranslations(locale: SupportedLocale = activeLocale): TranslationCatalog {
+export function loadTranslations(
+  locale: SupportedLocale = activeLocale
+): TranslationCatalog {
   if (locale === activeLocale && cachedCatalog) return cachedCatalog;
 
   const raw = fs.readFileSync(localePath(locale), "utf8");
@@ -60,7 +86,11 @@ export function loadTranslations(locale: SupportedLocale = activeLocale): Transl
 
 export function t(key: string, variables: TranslationVariables = {}): string {
   const template = loadTranslations()[key] ?? key;
-  return template.replace(/\{\{\s*([A-Za-z0-9_]+)\s*\}\}/g, (match, name: string) =>
-    Object.prototype.hasOwnProperty.call(variables, name) ? String(variables[name]) : match,
+  return template.replace(
+    /\{\{\s*([A-Za-z0-9_]+)\s*\}\}/g,
+    (match, name: string) =>
+      Object.prototype.hasOwnProperty.call(variables, name)
+        ? String(variables[name])
+        : match
   );
 }

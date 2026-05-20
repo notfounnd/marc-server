@@ -13,7 +13,10 @@ export function assertInside(parent: string, candidate: string): string {
   const candidateResolved = path.resolve(candidate);
   const relative = path.relative(parentResolved, candidateResolved);
 
-  if (relative === "" || (!relative.startsWith("..") && !path.isAbsolute(relative))) {
+  if (
+    relative === "" ||
+    (!relative.startsWith("..") && !path.isAbsolute(relative))
+  ) {
     return candidateResolved;
   }
 

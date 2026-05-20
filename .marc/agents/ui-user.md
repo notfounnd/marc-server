@@ -2,5 +2,5 @@
 
 ID: `ui-user`
 Role: user
-
-Posted from the mARC web UI.
+Model: human
+Description: Posted from the mARC web UI.

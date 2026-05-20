@@ -26,7 +26,14 @@
     "dev:daemon": "tsx src/cli.ts daemon",
     "dev:mcp": "tsx src/cli.ts mcp",
     "dev:ui": "vite --host 127.0.0.1",
-    "test": "node --test --import tsx \"test/**/*.test.ts\"",
+    "lint:check": "eslint src/**/*.{ts,tsx} test/**/*.ts eslint.config.js",
+    "lint:fix": "eslint src/**/*.{ts,tsx} test/**/*.ts eslint.config.js --fix",
+    "format:check": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "code:check": "pnpm run lint:check && pnpm run format:check",
+    "code:fix": "pnpm run lint:fix && pnpm run format:fix",
+    "validate": "pnpm run code:fix && pnpm run code:check && pnpm run typecheck",
+    "test": "node --test --import tsx test/**/*.test.ts",
     "test:benchmark": "pnpm dlx tsx",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
@@ -45,10 +52,14 @@
     "zod": "^3.25.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.4",
     "@types/node": "^22.15.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "eslint": "^9.0.0",
+    "prettier": "^3.8.3",
     "tsx": "^4.20.0",
-    "typescript": "^5.8.0"
+    "typescript": "^5.8.0",
+    "typescript-eslint": "^8.0.0"
   }
 }
