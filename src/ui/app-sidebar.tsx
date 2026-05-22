@@ -19,7 +19,13 @@ import {
   isClosedThread,
   parseAgentProfile
 } from "./common.js";
-import type { Agent, StatusKind, Thread, Workspace } from "./types.js";
+import type {
+  Agent,
+  MiddleMode,
+  StatusKind,
+  Thread,
+  Workspace
+} from "./types.js";
 
 export function AppSidebar({
   token,
@@ -31,7 +37,7 @@ export function AppSidebar({
   selectedWorkspaceId,
   visibleThreads,
   selectedThreadId,
-  showClosedThreads,
+  middleMode,
   agents,
   selectedAgentId,
   uiAgentId,
@@ -40,7 +46,7 @@ export function AppSidebar({
   onUnlockToken,
   onRefresh,
   onSelectWorkspace,
-  onShowClosedThreadsChange,
+  onMiddleModeChange,
   onSelectThread,
   onSelectAgent,
   onGoHome
@@ -54,7 +60,7 @@ export function AppSidebar({
   selectedWorkspaceId?: string;
   visibleThreads: Thread[];
   selectedThreadId?: string;
-  showClosedThreads: boolean;
+  middleMode: MiddleMode;
   agents: Agent[];
   selectedAgentId?: string;
   uiAgentId: string;
@@ -63,12 +69,130 @@ export function AppSidebar({
   onUnlockToken: () => void;
   onRefresh: () => void;
   onSelectWorkspace: (workspace: Workspace) => void;
-  onShowClosedThreadsChange: (showClosedThreads: boolean) => void;
+  onMiddleModeChange: (mode: MiddleMode) => void;
   onSelectThread: (thread: Thread) => void;
   onSelectAgent: (agent: Agent) => void;
   onGoHome: () => void;
 }) {
   const { t } = useTranslation();
+  const middleHeaders = {
+    archive: {
+      icon: <Archive size={16} />,
+      title: t("Closed")
+    },
+    marckers: {
+      icon: <AtSign size={16} />,
+      title: t("Marckers")
+    },
+    threads: {
+      icon: <MessageSquareText size={16} />,
+      title: t("Threads")
+    }
+  };
+  const middleHeader = middleHeaders[middleMode];
+  const modeCloseButton = (
+    <Button
+      variant="primary"
+      className="button-icon"
+      onClick={() => onMiddleModeChange("threads")}
+      title={t("Close")}
+    >
+      <X size={15} />
+    </Button>
+  );
+  const middleActions = {
+    archive: modeCloseButton,
+    marckers: modeCloseButton,
+    threads: (
+      <>
+        <Button
+          variant="ghost"
+          className="button-icon"
+          onClick={() => onMiddleModeChange("marckers")}
+          title={t("Show Marckers")}
+        >
+          <AtSign size={15} />
+        </Button>
+        <Button
+          variant="ghost"
+          className="button-icon"
+          onClick={() => onMiddleModeChange("archive")}
+          title={t("Show closed threads")}
+        >
+          <Archive size={15} />
+        </Button>
+      </>
+    )
+  };
+  const threadEmptyState = {
+    archive: {
+      title: t("No closed threads"),
+      detail: t("Threads with SUMMARY.md will appear here.")
+    },
+    threads: {
+      title: t("No threads"),
+      detail: t("Create a thread from an agent to start the room.")
+    }
+  };
+  const threadEmpty =
+    middleMode === "archive"
+      ? threadEmptyState.archive
+      : threadEmptyState.threads;
+  const threadList = visibleThreads.length ? (
+    visibleThreads.map((thread) => (
+      <NavItem
+        key={thread.id}
+        icon={
+          isClosedThread(thread) ? (
+            <Archive size={16} />
+          ) : (
+            <MessageSquareText size={16} />
+          )
+        }
+        title={thread.title}
+        detail={
+          isClosedThread(thread) && thread.closedAt
+            ? t("Closed {{date}}", {
+                date: new Date(thread.closedAt).toLocaleString()
+              })
+            : thread.id
+        }
+        active={thread.id === selectedThreadId}
+        closed={isClosedThread(thread)}
+        onClick={() => onSelectThread(thread)}
+      />
+    ))
+  ) : (
+    <EmptyState title={threadEmpty.title} detail={threadEmpty.detail} />
+  );
+  const marckersList = agents.length ? (
+    agents.map((agent) => {
+      const profile = parseAgentProfile(agent.markdown);
+      const isUiUser =
+        agent.id === uiAgentId || profile.role?.toLowerCase() === "user";
+      return (
+        <NavItem
+          key={agent.id}
+          icon={isUiUser ? <UserRound size={16} /> : <Bot size={16} />}
+          title={profile.title}
+          detail={profile.role}
+          tag={profile.model}
+          active={agent.id === selectedAgentId}
+          onClick={() => onSelectAgent(agent)}
+        />
+      );
+    })
+  ) : (
+    <EmptyState
+      title={t("No marckers")}
+      detail={t("Register a user or agent before posting.")}
+    />
+  );
+  const middleContent = {
+    archive: threadList,
+    marckers: marckersList,
+    threads: threadList
+  };
 
   return (
     <>
@@ -157,99 +281,14 @@ export function AppSidebar({
         <section>
           <div className="section-title section-title-split">
             <span className="section-title-main">
-              {showClosedThreads ? (
-                <Archive size={16} />
-              ) : (
-                <MessageSquareText size={16} />
-              )}
-              <h2>{showClosedThreads ? t("Closed") : t("Threads")}</h2>
+              {middleHeader.icon}
+              <h2>{middleHeader.title}</h2>
             </span>
-            <Button
-              variant={showClosedThreads ? "primary" : "ghost"}
-              className="button-icon"
-              onClick={() => onShowClosedThreadsChange(!showClosedThreads)}
-              title={
-                showClosedThreads
-                  ? t("Show open threads")
-                  : t("Show closed threads")
-              }
-            >
-              {showClosedThreads ? <X size={15} /> : <Archive size={15} />}
-            </Button>
+            <div className="middle-mode-actions">
+              {middleActions[middleMode]}
+            </div>
           </div>
-          <div className="stack">
-            {visibleThreads.length ? (
-              visibleThreads.map((thread) => (
-                <NavItem
-                  key={thread.id}
-                  icon={
-                    isClosedThread(thread) ? (
-                      <Archive size={16} />
-                    ) : (
-                      <MessageSquareText size={16} />
-                    )
-                  }
-                  title={thread.title}
-                  detail={
-                    isClosedThread(thread) && thread.closedAt
-                      ? t("Closed {{date}}", {
-                          date: new Date(thread.closedAt).toLocaleString()
-                        })
-                      : thread.id
-                  }
-                  active={thread.id === selectedThreadId}
-                  closed={isClosedThread(thread)}
-                  onClick={() => onSelectThread(thread)}
-                />
-              ))
-            ) : (
-              <EmptyState
-                title={
-                  showClosedThreads ? t("No closed threads") : t("No threads")
-                }
-                detail={
-                  showClosedThreads
-                    ? t("Threads with SUMMARY.md will appear here.")
-                    : t("Create a thread from an agent to start the room.")
-                }
-              />
-            )}
-          </div>
-        </section>
-
-        <section className="section">
-          <div className="section-title">
-            <AtSign size={16} />
-            <h2>{t("Marckers")}</h2>
-          </div>
-          <div className="stack">
-            {agents.length ? (
-              agents.map((agent) => {
-                const profile = parseAgentProfile(agent.markdown);
-                const isUiUser =
-                  agent.id === uiAgentId ||
-                  profile.role?.toLowerCase() === "user";
-                return (
-                  <NavItem
-                    key={agent.id}
-                    icon={
-                      isUiUser ? <UserRound size={16} /> : <Bot size={16} />
-                    }
-                    title={profile.title}
-                    detail={profile.role}
-                    tag={profile.model}
-                    active={agent.id === selectedAgentId}
-                    onClick={() => onSelectAgent(agent)}
-                  />
-                );
-              })
-            ) : (
-              <EmptyState
-                title={t("No marckers")}
-                detail={t("Register a user or agent before posting.")}
-              />
-            )}
-          </div>
+          <div className="stack">{middleContent[middleMode]}</div>
         </section>
       </nav>
     </>

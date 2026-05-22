@@ -79,3 +79,85 @@ Rodapé com ícone de atalhos deve ficar sempre visível na terceira coluna (col
 Colocar ao lado esquerdo do botão de atalhos um texto "Desenvolvido por Júnior Sbrissa" (respeitar idioma da interface).
 
 <!-- /marc-message -->
+
+<!-- marc-message
+id: msg_cdc3ff482f0140f9b7
+threadId: oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b
+timestamp: 2026-05-21T23:58:02.298Z
+agentId: codex-dev
+role: developer
+artifacts: artifacts/plano-esquemas-visualizacao-colunas-ui.md
+-->
+
+Plano registrado. Vou iniciar o desenvolvimento seguindo a leitura corrigida da coluna do meio, do botão de arquivo e da área Marckers.
+
+<!-- /marc-message -->
+
+<!-- marc-message
+id: msg_6b6235dd16fa4a0f83
+threadId: oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b
+timestamp: 2026-05-22T01:25:39.095Z
+agentId: codex-dev
+role: developer
+-->
+
+Ajuste complementar realizado.
+
+- Corrigi a estrutura de rolagem da terceira coluna: o header permanece dentro da área rolável e o footer fica fixo fora dela.
+- Removi `overflow-y: scroll` forçado das colunas e usei rolagem automática com gutter estável, evitando deslocamento dos botões ao alternar Threads, Marckers e arquivo.
+- Ajustei o espaçamento da terceira coluna para não deslocar a scrollbar para dentro da área visual.
+
+Validação executada:
+- `pnpm run validate`: passou.
+- `pnpm test`: passou, 76 testes.
+- `pnpm build`: passou.
+
+Aguardando seu feedback para orientar a finalização da thread.
+
+<!-- /marc-message -->
+
+<!-- marc-message
+id: msg_9084a6fef4ca444ebb
+threadId: oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b
+timestamp: 2026-05-22T01:32:26.760Z
+agentId: codex-dev
+role: developer
+-->
+
+Ajuste de modal/background realizado.
+
+- Bloqueei interação e rolagem nas áreas de fundo (`sidebar`, coluna do meio e conteúdo) enquanto uma modal está aberta.
+- A camada externa da modal agora consome wheel/touch no backdrop, evitando rolagem do app por trás.
+- O painel da modal continua recebendo wheel/touch internamente, preservando rolagem do próprio modal quando necessário.
+- Mantive a diferença de layout: modal global/atalhos centralizada; modais laterais continuam abertas à direita.
+
+Validação executada:
+- `pnpm run validate`: passou.
+- `pnpm test`: passou, 76 testes.
+- `pnpm build`: passou.
+
+Aguardando feedback para orientar a finalização da thread.
+
+<!-- /marc-message -->
+
+<!-- marc-message
+id: msg_52e8ba42b35c488190
+threadId: oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b
+timestamp: 2026-05-22T01:43:47.740Z
+agentId: codex-dev
+role: developer
+-->
+
+Ajuste de assinatura realizado.
+
+- Reposicionei a assinatura `Developed by Júnior Sbrissa` para ficar imediatamente à esquerda do botão de atalhos do teclado no footer da terceira coluna.
+- Mantive o footer fixo e não alterei o comportamento de rolagem/modal.
+
+Validação executada:
+- `pnpm run validate`: passou.
+- `pnpm test`: passou, 76 testes.
+- `pnpm build`: passou.
+
+Aguardando feedback para orientar a finalização da thread.
+
+<!-- /marc-message -->

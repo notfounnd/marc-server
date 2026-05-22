@@ -3,6 +3,7 @@ import type {
   Agent,
   ArtifactDraft,
   ArtifactView,
+  MiddleMode,
   Message,
   StatusKind,
   Thread,
@@ -46,7 +47,7 @@ export function createAppActions({
   setSelectedWorkspaceId,
   setSelectedThreadId,
   setSelectedAgentId,
-  setShowClosedThreads,
+  setMiddleMode,
   setThreadPayload,
   setUiAgentId,
   setSending,
@@ -88,7 +89,7 @@ export function createAppActions({
   setSelectedWorkspaceId: (workspaceId: string | undefined) => void;
   setSelectedThreadId: (threadId: string | undefined) => void;
   setSelectedAgentId: (agentId: string | undefined) => void;
-  setShowClosedThreads: (show: boolean) => void;
+  setMiddleMode: (mode: MiddleMode) => void;
   setThreadPayload: (payload: ThreadPayload | undefined) => void;
   setUiAgentId: (agentId: string) => void;
   setSending: (sending: boolean) => void;
@@ -131,7 +132,7 @@ export function createAppActions({
     setSelectedWorkspaceId(workspace.id);
     setSelectedThreadId(undefined);
     setSelectedAgentId(undefined);
-    setShowClosedThreads(false);
+    setMiddleMode("threads");
     setThreadPayload(undefined);
     await refresh({ force: true, includeThread: false });
   }

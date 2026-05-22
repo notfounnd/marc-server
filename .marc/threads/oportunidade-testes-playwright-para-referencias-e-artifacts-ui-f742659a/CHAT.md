@@ -53,3 +53,18 @@ Backlog Playwright complementado após a implementação da thread marc://$oport
 Atualizei o artifact `artifacts/playwright-test-scenarios.md` com a seção `UI Localization`, cobrindo carregamento do catálogo `en_US`, renderização de labels pela UI, modais/composer, fallback quando o catálogo falhar e preservação de conteúdo autoral no idioma escolhido pelo usuário.
 
 <!-- /marc-message -->
+
+<!-- marc-message
+id: msg_477c310406da4ec78b
+threadId: oportunidade-testes-playwright-para-referencias-e-artifacts-ui-f742659a
+timestamp: 2026-05-22T02:06:36.014Z
+agentId: codex-dev
+role: developer
+-->
+
+Backlog Playwright atualizado após a implementação da UI de colunas.
+
+- Incluí a seção `Three-Column UI Modes And Scroll`.
+- Cenários cobrem modos Threads/Marckers/arquivo, estabilidade dos botões, rolagem independente, footer fixo, assinatura ao lado do botão de atalhos e bloqueio de background em modais centralizadas e laterais.
+
+<!-- /marc-message -->

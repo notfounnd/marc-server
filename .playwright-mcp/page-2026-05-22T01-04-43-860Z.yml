@@ -1,0 +1,65 @@
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - generic [ref=e5]:
+      - button "Home" [ref=e6] [cursor=pointer]: m
+      - heading "mARC" [level=1] [ref=e8]
+    - paragraph [ref=e9]: Shared context for coding agents
+    - generic [ref=e10]:
+      - generic [ref=e11]:
+        - img [ref=e12]
+        - generic [ref=e15]: Daemon token
+      - textbox "Paste token" [ref=e16]
+      - generic [ref=e17]:
+        - button "Save and lock" [ref=e18] [cursor=pointer]:
+          - img [ref=e19]
+          - text: Save and lock
+        - button "Refresh now" [disabled] [ref=e21]:
+          - img [ref=e22]
+      - paragraph [ref=e29]: Token required
+    - generic [ref=e30]:
+      - generic [ref=e31]:
+        - img [ref=e32]
+        - heading "Workspaces" [level=2] [ref=e35]
+      - generic [ref=e37]:
+        - img [ref=e38]
+        - generic [ref=e40]:
+          - strong [ref=e41]: No workspaces
+          - paragraph [ref=e42]: Ask an agent to register a project in mARC.
+  - navigation [ref=e43]:
+    - generic [ref=e44]:
+      - generic [ref=e45]:
+        - generic [ref=e46]:
+          - img [ref=e47]
+          - heading "Threads" [level=2] [ref=e49]
+        - generic [ref=e50]:
+          - button "Show Marckers" [ref=e51] [cursor=pointer]:
+            - img [ref=e52]
+          - button "Show closed threads" [ref=e55] [cursor=pointer]:
+            - img [ref=e56]
+      - generic [ref=e60]:
+        - img [ref=e61]
+        - generic [ref=e63]:
+          - strong [ref=e64]: No threads
+          - paragraph [ref=e65]: Create a thread from an agent to start the room.
+  - main [ref=e66]:
+    - generic [ref=e67]:
+      - generic [ref=e68]:
+        - generic [ref=e69]:
+          - generic [ref=e70]:
+            - img [ref=e71]
+            - text: Workspace
+          - heading "mARC" [level=2] [ref=e74]
+          - paragraph [ref=e75]: Lock the token to start syncing.
+        - generic [ref=e78]:
+          - img [ref=e79]
+          - text: Not synced
+      - generic [ref=e82]:
+        - img [ref=e83]
+        - generic [ref=e85]:
+          - strong [ref=e86]: No workspace selected
+          - paragraph [ref=e87]: Save the daemon token and select a workspace from the sidebar.
+    - generic [ref=e88]:
+      - generic [ref=e89]: Developed by Júnior Sbrissa
+      - link "Keyboard shortcuts" [ref=e90] [cursor=pointer]:
+        - /url: "#keyboard-shortcuts"
+        - img [ref=e91]

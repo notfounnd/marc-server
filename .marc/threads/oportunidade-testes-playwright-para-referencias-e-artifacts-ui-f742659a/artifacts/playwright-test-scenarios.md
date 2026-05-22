@@ -98,6 +98,23 @@ Priority: medium
 - [ ] Simulate a missing catalog request and verify the UI still renders readable fallback keys instead of crashing.
 - [ ] Verify workspace-authored content is displayed unchanged when messages, thread titles, artifacts, summaries, or rules use a non-English language.
 
+## Three-Column UI Modes And Scroll
+
+Source thread: `oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b`  
+Priority: high
+
+- [ ] Verify the middle column starts in the `Threads` mode and shows only open threads.
+- [ ] Click the Marckers button to the left of the archive button and verify the middle column shows only Marckers plus a close button.
+- [ ] Click the close button in Marckers mode and verify the middle column returns to open threads.
+- [ ] Click the archive button and verify the middle column shows only closed threads plus a close button.
+- [ ] Toggle between Threads, Marckers, and archive modes and verify the top action buttons do not shift horizontally.
+- [ ] Open a long thread and verify only the third column content scrolls while the workspace and middle columns keep their own scroll positions.
+- [ ] Verify the third-column header scrolls with the content while the footer remains fixed.
+- [ ] Verify `Developed by Júnior Sbrissa` appears immediately to the left of the keyboard shortcuts button.
+- [ ] Open the centered keyboard shortcuts modal and verify wheel or touch input on the backdrop does not scroll the app behind it.
+- [ ] Open the right-side artifact modal and verify wheel or touch input on the backdrop does not scroll the app behind it.
+- [ ] Verify the centered keyboard shortcuts modal remains centered and right-side artifact modals remain aligned to the content column.
+
 ## Maintenance Notes
 
 - This backlog should grow as UI features are added.

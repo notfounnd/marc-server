@@ -88,163 +88,172 @@ export function AppContent({
 
   return (
     <main className="content">
-      <header className="content-header">
-        <div>
-          <div className="eyebrow">
-            <FileText size={14} />
-            {selectedThread
-              ? t("Thread")
-              : selectedAgent
-                ? t("Agent")
-                : t("Workspace")}
-          </div>
-          <h2
-            className={classNames(
-              selectedThread &&
-                isClosedThread(selectedThread) &&
-                "content-title-closed"
-            )}
-          >
-            {selectedThread?.title ??
-              (selectedAgent
-                ? parseAgentProfile(selectedAgent.markdown).title
-                : (selectedWorkspace?.name ?? "mARC"))}
-          </h2>
-          {selectedThread ? (
-            <p className="thread-reference-row">
-              <span>{selectedThread.id}</span>
-              <button
-                className="copy-reference-button"
-                onClick={() =>
-                  void onCopyReference(`marc://$${selectedThread.id}`)
-                }
-                title={t("Copy thread reference")}
-              >
-                <Copy size={13} />
-              </button>
-            </p>
-          ) : (
-            <p>
-              {selectedAgent?.id ??
-                selectedWorkspace?.rootPath ??
-                t("Lock the token to start syncing.")}
-            </p>
-          )}
-        </div>
-        <div className="content-side">
-          <div className="content-badges">
-            <Badge
-              tone={
-                statusKind === "ok"
-                  ? "green"
-                  : statusKind === "error" || statusKind === "warn"
-                    ? "amber"
-                    : "neutral"
-              }
+      <div className="content-scroll">
+        <header className="content-header">
+          <div>
+            <div className="eyebrow">
+              <FileText size={14} />
+              {selectedThread
+                ? t("Thread")
+                : selectedAgent
+                  ? t("Agent")
+                  : t("Workspace")}
+            </div>
+            <h2
+              className={classNames(
+                selectedThread &&
+                  isClosedThread(selectedThread) &&
+                  "content-title-closed"
+              )}
             >
-              <Clock3 size={13} />
-              {lastSyncedAt
-                ? t("Synced {{time}}", {
-                    time: lastSyncedAt.toLocaleTimeString()
-                  })
-                : t("Not synced")}
-            </Badge>
-            {selectedThread && isClosedThread(selectedThread) ? (
-              <Badge tone="amber">
-                <Archive size={13} />
-                {t("Closed")}
-              </Badge>
-            ) : null}
-            {selectedThreadIndexHealth?.rebuilding ? (
-              <Badge tone="amber">
-                <RefreshCw size={13} className="spin" />
-                {t("Index rebuilding")}
-              </Badge>
-            ) : selectedThreadIndexHealth?.status === "degraded" ||
-              selectedThreadIndexHealth?.status === "unavailable" ? (
-              <Badge tone="amber">
-                <CircleAlert size={13} />
-                {t("Index degraded")}
-              </Badge>
-            ) : null}
-          </div>
-          <div className="content-actions">
-            {selectedThread && selectedThreadArtifacts.length ? (
-              <div className="header-artifacts">
-                <Button
-                  variant={showArtifactMenu ? "primary" : "secondary"}
-                  className="button-icon"
-                  onClick={() => onShowArtifactMenuChange(!showArtifactMenu)}
-                  title={t("Show thread artifacts")}
+              {selectedThread?.title ??
+                (selectedAgent
+                  ? parseAgentProfile(selectedAgent.markdown).title
+                  : (selectedWorkspace?.name ?? "mARC"))}
+            </h2>
+            {selectedThread ? (
+              <p className="thread-reference-row">
+                <span>{selectedThread.id}</span>
+                <button
+                  className="copy-reference-button"
+                  onClick={() =>
+                    void onCopyReference(`marc://$${selectedThread.id}`)
+                  }
+                  title={t("Copy thread reference")}
                 >
-                  <Paperclip size={15} />
-                </Button>
-                {showArtifactMenu ? (
-                  <div className="artifact-menu">
-                    <div className="artifact-menu-head">
-                      <Paperclip size={14} />
-                      <span>{t("Artifacts")}</span>
-                    </div>
-                    <div className="artifact-menu-list">
-                      {selectedThreadArtifacts.map(
-                        ({ message, artifact, href }) => (
-                          <button
-                            className="artifact-menu-item"
-                            key={`${message.id}:${artifact}`}
-                            onClick={() => {
-                              onShowArtifactMenuChange(false);
-                              void onOpenLink(href);
-                            }}
-                          >
-                            <span>{artifact.replace(/^artifacts\//, "")}</span>
-                            <small>#{message.id}</small>
-                          </button>
-                        )
-                      )}
-                    </div>
-                  </div>
-                ) : null}
-              </div>
-            ) : null}
+                  <Copy size={13} />
+                </button>
+              </p>
+            ) : (
+              <p>
+                {selectedAgent?.id ??
+                  selectedWorkspace?.rootPath ??
+                  t("Lock the token to start syncing.")}
+              </p>
+            )}
           </div>
-        </div>
-      </header>
+          <div className="content-side">
+            <div className="content-badges">
+              <Badge
+                tone={
+                  statusKind === "ok"
+                    ? "green"
+                    : statusKind === "error" || statusKind === "warn"
+                      ? "amber"
+                      : "neutral"
+                }
+              >
+                <Clock3 size={13} />
+                {lastSyncedAt
+                  ? t("Synced {{time}}", {
+                      time: lastSyncedAt.toLocaleTimeString()
+                    })
+                  : t("Not synced")}
+              </Badge>
+              {selectedThread && isClosedThread(selectedThread) ? (
+                <Badge tone="amber">
+                  <Archive size={13} />
+                  {t("Closed")}
+                </Badge>
+              ) : null}
+              {selectedThreadIndexHealth?.rebuilding ? (
+                <Badge tone="amber">
+                  <RefreshCw size={13} className="spin" />
+                  {t("Index rebuilding")}
+                </Badge>
+              ) : selectedThreadIndexHealth?.status === "degraded" ||
+                selectedThreadIndexHealth?.status === "unavailable" ? (
+                <Badge tone="amber">
+                  <CircleAlert size={13} />
+                  {t("Index degraded")}
+                </Badge>
+              ) : null}
+            </div>
+            <div className="content-actions">
+              {selectedThread && selectedThreadArtifacts.length ? (
+                <div className="header-artifacts">
+                  <Button
+                    variant={showArtifactMenu ? "primary" : "secondary"}
+                    className="button-icon"
+                    onClick={() => onShowArtifactMenuChange(!showArtifactMenu)}
+                    title={t("Show thread artifacts")}
+                  >
+                    <Paperclip size={15} />
+                  </Button>
+                  {showArtifactMenu ? (
+                    <div className="artifact-menu">
+                      <div className="artifact-menu-head">
+                        <Paperclip size={14} />
+                        <span>{t("Artifacts")}</span>
+                      </div>
+                      <div className="artifact-menu-list">
+                        {selectedThreadArtifacts.map(
+                          ({ message, artifact, href }) => (
+                            <button
+                              className="artifact-menu-item"
+                              key={`${message.id}:${artifact}`}
+                              onClick={() => {
+                                onShowArtifactMenuChange(false);
+                                void onOpenLink(href);
+                              }}
+                            >
+                              <span>
+                                {artifact.replace(/^artifacts\//, "")}
+                              </span>
+                              <small>#{message.id}</small>
+                            </button>
+                          )
+                        )}
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
+            </div>
+          </div>
+        </header>
 
-      {selectedThread ? (
-        <>
-          <ThreadView
-            payload={threadPayload}
-            onAttachArtifact={onAttachArtifact}
+        {selectedThread ? (
+          <>
+            <ThreadView
+              payload={threadPayload}
+              onAttachArtifact={onAttachArtifact}
+              onLink={onOpenLink}
+              onCopyReference={onCopyReference}
+            />
+            <Composer
+              agentId={uiAgentId}
+              body={composerBody}
+              agents={agents}
+              threads={allWorkspaceThreads}
+              messages={threadPayload?.messages ?? []}
+              sending={sending}
+              onAgentIdChange={onAgentIdChange}
+              onBodyChange={onBodyChange}
+              onSend={onSendMessage}
+              loadThreadMessages={onLoadThreadMessages}
+            />
+          </>
+        ) : selectedAgent ? (
+          <MarkdownPanel
+            markdown={selectedAgent.markdown}
             onLink={onOpenLink}
-            onCopyReference={onCopyReference}
           />
-          <Composer
-            agentId={uiAgentId}
-            body={composerBody}
-            agents={agents}
-            threads={allWorkspaceThreads}
-            messages={threadPayload?.messages ?? []}
-            sending={sending}
-            onAgentIdChange={onAgentIdChange}
-            onBodyChange={onBodyChange}
-            onSend={onSendMessage}
-            loadThreadMessages={onLoadThreadMessages}
+        ) : selectedWorkspace ? (
+          <WorkspaceOverview rules={rules} onLink={onOpenLink} />
+        ) : (
+          <EmptyState
+            title={t("No workspace selected")}
+            detail={t(
+              "Save the daemon token and select a workspace from the sidebar."
+            )}
           />
-        </>
-      ) : selectedAgent ? (
-        <MarkdownPanel markdown={selectedAgent.markdown} onLink={onOpenLink} />
-      ) : selectedWorkspace ? (
-        <WorkspaceOverview rules={rules} onLink={onOpenLink} />
-      ) : (
-        <EmptyState
-          title={t("No workspace selected")}
-          detail={t(
-            "Save the daemon token and select a workspace from the sidebar."
-          )}
-        />
-      )}
+        )}
+      </div>
       <footer className="content-footer">
-        <span aria-hidden="true" />
+        <span className="content-footer-credit">
+          {t("Developed by Júnior Sbrissa")}
+        </span>
         <a
           href="#keyboard-shortcuts"
           className="content-footer-link"

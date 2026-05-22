@@ -32,12 +32,21 @@ export function KeyboardShortcutsModal({ onClose }: { onClose: () => void }) {
   }, [onClose]);
 
   return (
-    <div className="modal-layer modal-layer-global" role="presentation">
+    <div
+      className="modal-layer modal-layer-global"
+      role="presentation"
+      onClick={onClose}
+      onTouchMove={(event) => event.preventDefault()}
+      onWheel={(event) => event.preventDefault()}
+    >
       <section
         className="modal-panel"
         role="dialog"
         aria-modal="true"
         aria-labelledby="keyboard-shortcuts-title"
+        onClick={(event) => event.stopPropagation()}
+        onTouchMove={(event) => event.stopPropagation()}
+        onWheel={(event) => event.stopPropagation()}
       >
         <header className="modal-head">
           <div>
@@ -84,12 +93,21 @@ export function ArtifactModal({
   const { t } = useTranslation();
 
   return (
-    <div className="modal-layer" role="presentation">
+    <div
+      className="modal-layer"
+      role="presentation"
+      onClick={onClose}
+      onTouchMove={(event) => event.preventDefault()}
+      onWheel={(event) => event.preventDefault()}
+    >
       <section
         className="modal-panel"
         role="dialog"
         aria-modal="true"
         aria-labelledby="artifact-modal-title"
+        onClick={(event) => event.stopPropagation()}
+        onTouchMove={(event) => event.stopPropagation()}
+        onWheel={(event) => event.stopPropagation()}
       >
         <header className="modal-head">
           <div>
@@ -163,12 +181,21 @@ export function ArtifactViewerModal({
   const { t } = useTranslation();
 
   return (
-    <div className="modal-layer" role="presentation">
+    <div
+      className="modal-layer"
+      role="presentation"
+      onClick={onClose}
+      onTouchMove={(event) => event.preventDefault()}
+      onWheel={(event) => event.preventDefault()}
+    >
       <section
         className="modal-panel artifact-viewer"
         role="dialog"
         aria-modal="true"
         aria-labelledby="artifact-viewer-title"
+        onClick={(event) => event.stopPropagation()}
+        onTouchMove={(event) => event.stopPropagation()}
+        onWheel={(event) => event.stopPropagation()}
       >
         <header className="modal-head">
           <div>

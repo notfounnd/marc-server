@@ -2,6 +2,7 @@ import { useCallback, useEffect } from "react";
 import type {
   Agent,
   DaemonStatus,
+  MiddleMode,
   StatusKind,
   Thread,
   ThreadIndexHealth,
@@ -37,7 +38,7 @@ export function useAppSync({
   setSelectedAgentId,
   setThreads,
   setClosedThreads,
-  setShowClosedThreads,
+  setMiddleMode,
   setAgents,
   setRules,
   setThreadPayload,
@@ -63,7 +64,7 @@ export function useAppSync({
   setSelectedAgentId: (agentId: string | undefined) => void;
   setThreads: (threads: Thread[]) => void;
   setClosedThreads: (threads: Thread[]) => void;
-  setShowClosedThreads: (showClosedThreads: boolean) => void;
+  setMiddleMode: (mode: MiddleMode) => void;
   setAgents: (agents: Agent[]) => void;
   setRules: (rules: string) => void;
   setThreadPayload: (payload: ThreadPayload | undefined) => void;
@@ -130,7 +131,7 @@ export function useAppSync({
     setSelectedAgentId(undefined);
     setThreads([]);
     setClosedThreads([]);
-    setShowClosedThreads(false);
+    setMiddleMode("threads");
     setAgents([]);
     setRules("");
     setThreadPayload(undefined);

@@ -58,6 +58,8 @@ export type DaemonStatus = {
 
 export type StatusKind = "idle" | "ok" | "warn" | "error";
 
+export type MiddleMode = "threads" | "marckers" | "archive";
+
 export type Toast = {
   kind: Exclude<StatusKind, "idle">;
   message: string;

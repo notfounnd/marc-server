@@ -4,19 +4,16 @@ import { useTranslation } from "react-i18next";
 import { messageArtifactReference } from "../core/marc-references.js";
 import { createAppActions } from "./app-actions.js";
 import { AppContent } from "./app-content.js";
+import { AppModals } from "./app-modals.js";
 import { AppSidebar } from "./app-sidebar.js";
 import { useAppSync } from "./app-sync.js";
 import { classNames, isClosedThread } from "./common.js";
-import {
-  ArtifactModal,
-  ArtifactViewerModal,
-  KeyboardShortcutsModal
-} from "./modals.js";
 import type {
   Agent,
   ArtifactDraft,
   ArtifactMenuItem,
   ArtifactView,
+  MiddleMode,
   StatusKind,
   Thread,
   ThreadIndexHealth,
@@ -41,7 +38,7 @@ function App() {
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [threads, setThreads] = useState<Thread[]>([]);
   const [closedThreads, setClosedThreads] = useState<Thread[]>([]);
-  const [showClosedThreads, setShowClosedThreads] = useState(false);
+  const [middleMode, setMiddleMode] = useState<MiddleMode>("threads");
   const [agents, setAgents] = useState<Agent[]>([]);
   const [rules, setRules] = useState("");
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string>();
@@ -110,7 +107,8 @@ function App() {
     }
     return Array.from(byId.values());
   }, [archivedThreads, openThreads]);
-  const visibleThreads = showClosedThreads ? archivedThreads : openThreads;
+  const visibleThreads =
+    middleMode === "archive" ? archivedThreads : openThreads;
   const selectedThread = useMemo(
     () =>
       archivedThreads.find((thread) => thread.id === selectedThreadId) ??
@@ -131,12 +129,20 @@ function App() {
 
   useEffect(() => {
     selectedWorkspaceIdRef.current = selectedWorkspaceId;
+    setMiddleMode("threads");
   }, [selectedWorkspaceId]);
 
   useEffect(() => {
     selectedThreadIdRef.current = selectedThreadId;
     setShowArtifactMenu(false);
   }, [selectedThreadId]);
+
+  const modalOpen = Boolean(artifactDraft || artifactView || showShortcuts);
+
+  useEffect(() => {
+    document.body.classList.toggle("modal-open", modalOpen);
+    return () => document.body.classList.remove("modal-open");
+  }, [modalOpen]);
 
   useEffect(() => {
     return () => {
@@ -163,7 +169,7 @@ function App() {
     setSelectedAgentId,
     setThreads,
     setClosedThreads,
-    setShowClosedThreads,
+    setMiddleMode,
     setAgents,
     setRules,
     setThreadPayload,
@@ -201,7 +207,7 @@ function App() {
     setSelectedWorkspaceId,
     setSelectedThreadId,
     setSelectedAgentId,
-    setShowClosedThreads,
+    setMiddleMode,
     setThreadPayload,
     setUiAgentId,
     setSending,
@@ -214,7 +220,7 @@ function App() {
   });
 
   return (
-    <div className="shell">
+    <div className={classNames("shell", modalOpen && "shell-modal-open")}>
       <AppSidebar
         token={token}
         tokenLocked={tokenLocked}
@@ -225,7 +231,7 @@ function App() {
         selectedWorkspaceId={selectedWorkspaceId}
         visibleThreads={visibleThreads}
         selectedThreadId={selectedThreadId}
-        showClosedThreads={showClosedThreads}
+        middleMode={middleMode}
         agents={agents}
         selectedAgentId={selectedAgentId}
         uiAgentId={uiAgentId}
@@ -236,7 +242,7 @@ function App() {
         onSelectWorkspace={(workspace) =>
           void appActions.selectWorkspace(workspace)
         }
-        onShowClosedThreadsChange={setShowClosedThreads}
+        onMiddleModeChange={setMiddleMode}
         onSelectThread={(thread) => void appActions.selectThread(thread)}
         onSelectAgent={appActions.selectAgent}
         onGoHome={appActions.goHome}
@@ -269,25 +275,17 @@ function App() {
         onLoadThreadMessages={appActions.loadAutocompleteThreadMessages}
         onShowShortcuts={() => setShowShortcuts(true)}
       />
-      {artifactDraft ? (
-        <ArtifactModal
-          draft={artifactDraft}
-          saving={savingArtifact}
-          onChange={setArtifactDraft}
-          onClose={() => setArtifactDraft(undefined)}
-          onSave={() => void appActions.saveArtifact()}
-        />
-      ) : null}
-      {artifactView ? (
-        <ArtifactViewerModal
-          artifact={artifactView}
-          onClose={() => setArtifactView(undefined)}
-          onLink={appActions.handleMarkdownLink}
-        />
-      ) : null}
-      {showShortcuts ? (
-        <KeyboardShortcutsModal onClose={() => setShowShortcuts(false)} />
-      ) : null}
+      <AppModals
+        artifactDraft={artifactDraft}
+        artifactView={artifactView}
+        savingArtifact={savingArtifact}
+        showShortcuts={showShortcuts}
+        onArtifactDraftChange={setArtifactDraft}
+        onArtifactSave={() => void appActions.saveArtifact()}
+        onArtifactViewClose={() => setArtifactView(undefined)}
+        onLink={appActions.handleMarkdownLink}
+        onShortcutsClose={() => setShowShortcuts(false)}
+      />
       {toast ? (
         <div
           className={classNames("toast", `toast-${toast.kind}`)}
