@@ -1,6 +1,11 @@
 import fs from "node:fs/promises";
 import { slugify } from "./ids.js";
 import { safeJoin } from "./paths.js";
+import {
+  agentWriteResource,
+  withWorkspaceWriteLock,
+  writeFileAtomically
+} from "./write-coordination.js";
 import type {
   AgentListOptions,
   AgentProfile,
@@ -16,23 +21,29 @@ export async function registerAgentInWorkspace(
   profile: AgentProfile
 ): Promise<AgentRegistrationResult> {
   const agentId = slugify(profile.id);
-  const agentPath = safeJoin(info.marcPath, "agents", `${agentId}.md`);
-  const alreadyExists = await exists(agentPath);
-  const current = await readTextIfExists(agentPath);
-  const body = `${renderAgentProfile(agentId, profile)}${agentProfileManualContext(current)}`;
-  const updated = body !== current;
+  return withWorkspaceWriteLock(
+    info.marcPath,
+    agentWriteResource(agentId),
+    async () => {
+      const agentPath = safeJoin(info.marcPath, "agents", `${agentId}.md`);
+      const alreadyExists = await exists(agentPath);
+      const current = await readTextIfExists(agentPath);
+      const body = `${renderAgentProfile(agentId, profile)}${agentProfileManualContext(current)}`;
+      const updated = body !== current;
 
-  if (updated) {
-    await fs.writeFile(agentPath, body);
-  }
+      if (updated) {
+        await writeFileAtomically(agentPath, body);
+      }
 
-  return {
-    id: agentId,
-    status: !alreadyExists ? "created" : updated ? "updated" : "unchanged",
-    created: !alreadyExists,
-    alreadyExists,
-    updated: alreadyExists && updated
-  };
+      return {
+        id: agentId,
+        status: !alreadyExists ? "created" : updated ? "updated" : "unchanged",
+        created: !alreadyExists,
+        alreadyExists,
+        updated: alreadyExists && updated
+      };
+    }
+  );
 }
 
 export async function listAgentProfilesInWorkspace(

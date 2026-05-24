@@ -271,6 +271,25 @@ test("replaces stale workspace recommendation sections", async () => {
   );
 });
 
+test("preserves custom rules during concurrent recommendation refreshes", async () => {
+  const workspace = await tempWorkspace();
+  await updateWorkspaceRecommendations(workspace);
+  await fs.appendFile(
+    path.join(workspace, ".marc", "RULES.md"),
+    ["", "### Project Rule", "", "- Preserve this custom rule.", ""].join("\n")
+  );
+
+  await Promise.all(
+    Array.from({ length: 12 }, () => updateWorkspaceRecommendations(workspace))
+  );
+
+  const rules = await readRules(workspace);
+
+  assert.match(rules, /### Project Rule/);
+  assert.match(rules, /Preserve this custom rule\./);
+  assert.equal(rules.match(/### Project Rule/g)?.length, 1);
+});
+
 test("rejects oversized chat messages and points agents to artifacts", async () => {
   const workspace = await tempWorkspace();
   const thread = await createThread(workspace, "Long note");

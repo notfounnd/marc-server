@@ -4,6 +4,10 @@ import { MESSAGE_STYLE_GUIDE } from "./guards.js";
 import { WORKSPACE_SKILL } from "./marc-ops-skill.js";
 import { safeJoin } from "./paths.js";
 import type { WorkspaceInfo, WorkspaceRecommendationsUpdate } from "./types.js";
+import {
+  withWorkspaceWriteLock,
+  writeFileAtomically
+} from "./write-coordination.js";
 
 const CUSTOM_RULES_HEADING = "## Custom Rules";
 const CUSTOM_RULES_COMMENT =
@@ -93,6 +97,14 @@ export function buildRulesContent(customBody = ""): string {
 export async function applyWorkspaceRecommendations(
   info: WorkspaceInfo
 ): Promise<WorkspaceRecommendationsUpdate> {
+  return withWorkspaceWriteLock(info.marcPath, "recommendations", () =>
+    applyWorkspaceRecommendationsUnlocked(info)
+  );
+}
+
+async function applyWorkspaceRecommendationsUnlocked(
+  info: WorkspaceInfo
+): Promise<WorkspaceRecommendationsUpdate> {
   const updated: string[] = [];
   const alreadyCurrent: string[] = [];
   const instructionsChanged = await ensureFileContent(
@@ -139,7 +151,7 @@ async function ensureFileContent(
 ): Promise<boolean> {
   const current = await readTextIfExists(filePath);
   if (current === content) return false;
-  await fs.writeFile(filePath, content);
+  await writeFileAtomically(filePath, content);
   return true;
 }
 
@@ -147,7 +159,7 @@ async function ensureCustomRulesSection(filePath: string): Promise<boolean> {
   const content = await readTextIfExists(filePath);
   const next = normalizeRulesContent(content);
   if (next === content) return false;
-  await fs.writeFile(filePath, next);
+  await writeFileAtomically(filePath, next);
   return true;
 }
 

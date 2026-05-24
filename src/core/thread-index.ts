@@ -1,5 +1,9 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import {
+  withWorkspaceWriteLock,
+  writeFileAtomically
+} from "./write-coordination.js";
 import type {
   ThreadIndexEntry,
   ThreadIndexHealth,
@@ -113,10 +117,7 @@ export class JsonThreadIndexStore implements ThreadIndexStore {
   }
 
   private async writeSnapshot(snapshot: ThreadIndexSnapshot): Promise<void> {
-    await fs.mkdir(path.dirname(this.indexPath), { recursive: true });
-    const tmpPath = `${this.indexPath}.${process.pid}.${Date.now()}.${Math.random().toString(16).slice(2)}.tmp`;
-    await fs.writeFile(tmpPath, JSON.stringify(snapshot));
-    await fs.rename(tmpPath, this.indexPath);
+    await writeFileAtomically(this.indexPath, JSON.stringify(snapshot));
   }
 
   async clear(): Promise<void> {
@@ -136,6 +137,14 @@ export class ThreadIndexReconciler {
   }
 
   async reconcile(): Promise<ThreadIndexSnapshot> {
+    return withWorkspaceWriteLock(
+      path.dirname(this.threadsRoot),
+      "thread-index",
+      () => this.reconcileUnlocked()
+    );
+  }
+
+  private async reconcileUnlocked(): Promise<ThreadIndexSnapshot> {
     const previous = await this.store.load();
     const previousById = new Map(
       (previous?.threads ?? []).map((thread) => [thread.id, thread])

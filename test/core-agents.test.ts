@@ -180,6 +180,43 @@ test("preserves manual agent profile context when refreshing registration metada
   assert.match(profile, /Keep this operational guidance\./);
 });
 
+test("preserves manual context during concurrent agent refreshes", async () => {
+  const workspace = await tempWorkspace();
+  await initWorkspace(workspace);
+  await fs.writeFile(
+    path.join(workspace, ".marc", "agents", "codex-dev.md"),
+    [
+      "# codex-dev",
+      "",
+      "ID: `codex-dev`",
+      "Role: developer",
+      "Model: gpt-5.5",
+      "Description: Initial profile.",
+      "",
+      "## Manual Context",
+      "",
+      "Preserve this note through concurrent refreshes.",
+      ""
+    ].join("\n")
+  );
+
+  await Promise.all(
+    Array.from({ length: 20 }, (_, index) =>
+      registerAgent(workspace, {
+        id: "codex-dev",
+        role: "Developer",
+        model: "gpt-5.5",
+        description: `Concurrent profile ${index}.`
+      })
+    )
+  );
+
+  const profile = await readAgentProfile(workspace, "codex-dev");
+
+  assert.match(profile, /^Description: Concurrent profile \d+\.$/m);
+  assert.match(profile, /Preserve this note through concurrent refreshes\./);
+});
+
 test("agent list parses manual profile descriptions as a single line without truncating", async () => {
   const workspace = await tempWorkspace();
   await initWorkspace(workspace);

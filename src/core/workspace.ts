@@ -31,6 +31,10 @@ import {
   readThreadSinceInWorkspace,
   readThreadTailInWorkspace
 } from "./threads.js";
+import {
+  withWorkspaceWriteLock,
+  writeFileAtomically
+} from "./write-coordination.js";
 import type {
   AgentListOptions,
   AgentProfile,
@@ -89,14 +93,20 @@ export async function initWorkspace(
   }
 
   const instructionsPath = safeJoin(info.marcPath, "INSTRUCTIONS.md");
-  if (!(await exists(instructionsPath))) {
-    await fs.writeFile(instructionsPath, BOOTSTRAP_INSTRUCTIONS);
-  }
-
   const rulesPath = safeJoin(info.marcPath, "RULES.md");
-  if (!(await exists(rulesPath))) {
-    await fs.writeFile(rulesPath, buildRulesContent());
-  }
+  const recommendationsExist =
+    (await exists(instructionsPath)) && (await exists(rulesPath));
+  if (recommendationsExist) return info;
+
+  await withWorkspaceWriteLock(info.marcPath, "recommendations", async () => {
+    if (!(await exists(instructionsPath))) {
+      await writeFileAtomically(instructionsPath, BOOTSTRAP_INSTRUCTIONS);
+    }
+
+    if (!(await exists(rulesPath))) {
+      await writeFileAtomically(rulesPath, buildRulesContent());
+    }
+  });
 
   return info;
 }

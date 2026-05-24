@@ -30,6 +30,8 @@ Markdown is the source of truth.
       SUMMARY.md
       artifacts/
   cache/
+    thread-index.json
+    write-locks/
 .agents/
   skills/
     marc-ops/
@@ -43,7 +45,7 @@ Markdown is the source of truth.
 - `threads/*/CHAT.md` stores structured message blocks.
 - `threads/*/SUMMARY.md` marks a thread as closed and stores its executive summary.
 - `threads/*/artifacts/` stores Markdown artifacts linked from messages.
-- `cache/` stores rebuildable indexes and controls; it is not the source of truth.
+- `cache/` stores rebuildable indexes and cooperative lock controls; it is not the source of truth.
 
 The daemon stores its own local runtime data separately from project threads:
 
@@ -59,6 +61,8 @@ An MCP client starts `marc mcp` over stdio. The agent calls `workspace_bootstrap
 When an agent registers a workspace, the MCP server can notify the daemon through `/api/workspaces`. The daemon records the workspace in its registry and the UI can list its threads, agents, rules, summaries, messages, and artifacts.
 
 When the UI posts a message or artifact, the daemon writes the same Markdown-backed workspace files that MCP tools use. Browser updates flow through `/api/events`.
+
+MCP and daemon writers coordinate changes to the same Markdown resource through filesystem-backed locks under `.marc/cache/write-locks/`. Content replacements are published through a completed temporary file followed by `rename`, so a cooperating reader does not observe a partially written replacement.
 
 ```text
 Agent tool
@@ -82,6 +86,8 @@ Architecture Decision Records (ADR) document the major decisions behind mARC's c
 - [`marc://` is the canonical reference scheme](adrs/0005-marc-reference-scheme.md).
 - [The daemon is optional infrastructure for MCP](adrs/0006-daemon-optional-for-mcp.md).
 - [RULES.md uses a managed baseline and Custom Rules boundary](adrs/0007-rules-managed-baseline-and-custom-rules.md).
+- [Localization is scoped to the browser UI](adrs/0008-ui-only-localization-boundary.md).
+- [Markdown writes use cooperative locks and atomic file replacement](adrs/0009-cooperative-locks-and-atomic-markdown-writes.md).
 
 ## Thread lifecycle
 
@@ -106,7 +112,7 @@ The UI renders these as compact labels. Agents can use the raw links to understa
 
 ## Cache and indexes
 
-The project treats cache files as rebuildable controls. If a cache is missing or stale, mARC can rebuild it from `.marc/threads`, `CHAT.md`, and `SUMMARY.md`.
+The project treats cache files as rebuildable controls. If the thread index is missing or stale, mARC can rebuild it from `.marc/threads`, `CHAT.md`, and `SUMMARY.md`. The `write-locks/` directory contains disposable cooperative coordination state for mARC writers.
 
 SQLite may be used as an optional local registry/index when available in the Node runtime. It is not required for correctness and does not replace the Markdown source of truth.
 
@@ -114,7 +120,7 @@ SQLite may be used as an optional local registry/index when available in the Nod
 
 Managed recommendation files such as `INSTRUCTIONS.md`, `RULES.md`, and `.agents/skills/marc-ops/SKILL.md` evolve through `workspace_update_recommendations` and `workspace_bootstrap`. Project-specific content belongs under preserved sections such as `Custom Rules`, while mARC-managed sections can be refreshed as the recommended protocol changes.
 
-Thread transcripts, summaries, artifacts, and cache/index files should remain readable as Markdown. When the format needs to evolve, the preferred path is additive: preserve existing files, update managed guidance idempotently, and rebuild derived cache from the Markdown source of truth.
+Thread transcripts, summaries, artifacts, rules, and agent profiles remain readable as Markdown. Coordination state and indexes remain disposable derived controls. When the format needs to evolve, the preferred path is additive: preserve existing Markdown, update managed guidance idempotently, and rebuild derived cache from the Markdown source of truth.
 
 ## Also see
 

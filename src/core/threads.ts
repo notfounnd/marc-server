@@ -4,6 +4,11 @@ import { MESSAGE_STYLE_GUIDE, validateMessageBody } from "./guards.js";
 import { parseMessages, renderChatHeader, renderMessage } from "./markdown.js";
 import { safeJoin } from "./paths.js";
 import {
+  threadWriteResource,
+  withWorkspaceWriteLock,
+  writeFileAtomically
+} from "./write-coordination.js";
+import {
   JsonThreadIndexStore,
   ThreadIndexReconciler,
   threadIndexPath
@@ -30,7 +35,7 @@ export async function createThreadInWorkspace(
   const id = `${slugify(title)}-${newId("thread").slice(-8)}`;
   const threadPath = safeJoin(info.marcPath, "threads", id);
   await fs.mkdir(safeJoin(threadPath, "artifacts"), { recursive: true });
-  await fs.writeFile(
+  await writeFileAtomically(
     safeJoin(threadPath, "CHAT.md"),
     renderChatHeader(title, id, createdAt)
   );
@@ -62,22 +67,28 @@ export async function appendMessageInWorkspace(
     );
   }
 
-  const chatPath = safeJoin(info.marcPath, "threads", threadId, "CHAT.md");
-  if (!(await exists(chatPath))) {
-    throw new Error(`Thread not found: ${threadId}`);
-  }
+  return withWorkspaceWriteLock(
+    info.marcPath,
+    threadWriteResource(threadId),
+    async () => {
+      const chatPath = safeJoin(info.marcPath, "threads", threadId, "CHAT.md");
+      if (!(await exists(chatPath))) {
+        throw new Error(`Thread not found: ${threadId}`);
+      }
 
-  const message: ChatMessage = {
-    id: newId("msg"),
-    threadId,
-    timestamp: new Date().toISOString(),
-    agentId: slugify(input.agentId),
-    role: input.role,
-    body: input.body,
-    artifacts: input.artifacts ?? []
-  };
-  await fs.appendFile(chatPath, renderMessage(message));
-  return message;
+      const message: ChatMessage = {
+        id: newId("msg"),
+        threadId,
+        timestamp: new Date().toISOString(),
+        agentId: slugify(input.agentId),
+        role: input.role,
+        body: input.body,
+        artifacts: input.artifacts ?? []
+      };
+      await fs.appendFile(chatPath, renderMessage(message));
+      return message;
+    }
+  );
 }
 
 export async function readThreadInWorkspace(

@@ -3,8 +3,26 @@ import path from "node:path";
 import { addArtifactToMessage } from "./markdown.js";
 import { safeJoin } from "./paths.js";
 import type { ChatMessage, WorkspaceInfo } from "./types.js";
+import {
+  threadWriteResource,
+  withWorkspaceWriteLock,
+  writeFileAtomically
+} from "./write-coordination.js";
 
 export async function attachArtifactInWorkspace(
+  info: WorkspaceInfo,
+  threadId: string,
+  fileName: string,
+  content: string
+): Promise<string> {
+  return withWorkspaceWriteLock(
+    info.marcPath,
+    threadWriteResource(threadId),
+    () => writeArtifactInWorkspace(info, threadId, fileName, content)
+  );
+}
+
+async function writeArtifactInWorkspace(
   info: WorkspaceInfo,
   threadId: string,
   fileName: string,
@@ -17,8 +35,7 @@ export async function attachArtifactInWorkspace(
     "artifacts",
     fileName
   );
-  await fs.mkdir(path.dirname(artifactPath), { recursive: true });
-  await fs.writeFile(artifactPath, content);
+  await writeFileAtomically(artifactPath, content);
   return path
     .relative(safeJoin(info.marcPath, "threads", threadId), artifactPath)
     .replace(/\\/g, "/");
@@ -33,17 +50,28 @@ export async function attachArtifactToMessageInWorkspace(
 ): Promise<string> {
   const normalizedFileName = normalizeMarkdownArtifactFileName(fileName);
   const relativeArtifactPath = `artifacts/${normalizedFileName}`;
-  const chatPath = safeJoin(info.marcPath, "threads", threadId, "CHAT.md");
-  const markdown = await fs.readFile(chatPath, "utf8");
-  const nextMarkdown = addArtifactToMessage(
-    markdown,
-    messageId,
-    relativeArtifactPath
-  );
+  return withWorkspaceWriteLock(
+    info.marcPath,
+    threadWriteResource(threadId),
+    async () => {
+      const chatPath = safeJoin(info.marcPath, "threads", threadId, "CHAT.md");
+      const markdown = await fs.readFile(chatPath, "utf8");
+      const nextMarkdown = addArtifactToMessage(
+        markdown,
+        messageId,
+        relativeArtifactPath
+      );
 
-  await attachArtifactInWorkspace(info, threadId, normalizedFileName, content);
-  await fs.writeFile(chatPath, nextMarkdown);
-  return relativeArtifactPath;
+      await writeArtifactInWorkspace(
+        info,
+        threadId,
+        normalizedFileName,
+        content
+      );
+      await writeFileAtomically(chatPath, nextMarkdown);
+      return relativeArtifactPath;
+    }
+  );
 }
 
 export async function readMessageArtifactInWorkspace(
