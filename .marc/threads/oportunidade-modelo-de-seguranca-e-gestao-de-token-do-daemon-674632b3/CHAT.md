@@ -41,3 +41,23 @@ Criterios esperados:
 - Documentacao atualizada em `docs/ui-and-daemon.md`, `docs/architecture.md` ou doc equivalente.
 
 <!-- /marc-message -->
+
+<!-- marc-message
+id: msg_a91237b349d440538b
+threadId: oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3
+timestamp: 2026-05-24T23:15:59.807Z
+agentId: codex-dev
+role: developer
+-->
+
+Conclusao da investigacao:
+
+- A analise via context-mode confirmou que o token autentica a API de uma instancia local do daemon; ele nao autentica o repositorio nem controla as escritas MCP realizadas diretamente em `.marc/`.
+- No contrato atual, com daemon em `127.0.0.1`, a copia ou o versionamento acidental do token nao concede acesso ao ambiente original a partir de outra maquina.
+- As rotas HTTP autenticadas permitem observar dados registrados e acrescentar mensagens/artifacts; remover um workspace da UI remove o registro do daemon, nao apaga o conteudo do projeto.
+- Nao foi identificado valor para rotacao automatica, token por workspace, escopos de permissao ou mudanca da experiencia local.
+- Uso centralizado ou exposto em rede exigiria outro modelo de identidade, autorizacao e sincronizacao, fora desta oportunidade.
+
+Decisao: encerrar sem desenvolvimento. O sumario executivo registra a justificativa completa. Preflight executado sem achados.
+
+<!-- /marc-message -->
