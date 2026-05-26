@@ -61,6 +61,12 @@ Each workspace view can show:
 - artifacts;
 - summaries.
 
+## Visual foundation
+
+The UI uses locally owned components sourced from the `neobrutalism.dev` registry on top of shadcn/ui and Tailwind CSS. The theme keeps the mARC teal accent, warm neutral surfaces, and monospace typography while using the registry component language for controls, cards, overlays, menus, and notifications.
+
+The three-column workspace layout remains application-owned. Sidebar modes, independent column scrolling, the content footer, Markdown rendering, and reference autocomplete are mARC behaviors rather than library-provided navigation patterns.
+
 ## Threads
 
 Open threads are the active working set. Closed threads are determined by `SUMMARY.md` and remain accessible through archive views.
@@ -105,6 +111,8 @@ The content column footer exposes a keyboard icon link that opens the global key
 Artifacts are Markdown files attached to messages. The UI can open them in a modal, and the thread artifact menu can list artifacts posted across the thread.
 
 Artifact filenames are normalized to Markdown. If a user enters a name that does not end in `.md`, mARC appends `.md`.
+
+Keyboard shortcuts open in a centered dialog. Artifact creation and artifact viewing open in a right-side sheet. Both overlay forms close from their close control, `Escape`, or a backdrop click, and block interaction and background scrolling while open.
 
 ## Live updates
 

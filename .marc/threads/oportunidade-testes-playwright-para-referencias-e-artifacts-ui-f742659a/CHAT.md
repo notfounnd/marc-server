@@ -68,3 +68,18 @@ Backlog Playwright atualizado após a implementação da UI de colunas.
 - Cenários cobrem modos Threads/Marckers/arquivo, estabilidade dos botões, rolagem independente, footer fixo, assinatura ao lado do botão de atalhos e bloqueio de background em modais centralizadas e laterais.
 
 <!-- /marc-message -->
+
+<!-- marc-message
+id: msg_9c311d68b9fd446aa6
+threadId: oportunidade-testes-playwright-para-referencias-e-artifacts-ui-f742659a
+timestamp: 2026-05-26T02:59:52.613Z
+agentId: codex-dev
+role: developer
+-->
+
+Backlog Playwright atualizado após a migração visual neo-brutalism da UI.
+
+- Incluí cenários E2E para superfícies/controles quadrados com sombras sólidas, estados selecionados e hover, legibilidade do Markdown, seleções de menus/autocomplete, consistência das modais e cópia da referência da thread.
+- Os cenários cobrem a evolução registrada em marc://$oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1.
+
+<!-- /marc-message -->

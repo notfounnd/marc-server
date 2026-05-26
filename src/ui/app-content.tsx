@@ -10,6 +10,13 @@ import {
   RefreshCw
 } from "lucide-react";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
+import {
   Badge,
   Button,
   EmptyState,
@@ -113,7 +120,6 @@ export function AppContent({
             </h2>
             {selectedThread ? (
               <p className="thread-reference-row">
-                <span>{selectedThread.id}</span>
                 <button
                   className="copy-reference-button"
                   onClick={() =>
@@ -121,6 +127,7 @@ export function AppContent({
                   }
                   title={t("Copy thread reference")}
                 >
+                  <span>{selectedThread.id}</span>
                   <Copy size={13} />
                 </button>
               </p>
@@ -172,41 +179,42 @@ export function AppContent({
             <div className="content-actions">
               {selectedThread && selectedThreadArtifacts.length ? (
                 <div className="header-artifacts">
-                  <Button
-                    variant={showArtifactMenu ? "primary" : "secondary"}
-                    className="button-icon"
-                    onClick={() => onShowArtifactMenuChange(!showArtifactMenu)}
-                    title={t("Show thread artifacts")}
+                  <DropdownMenu
+                    open={showArtifactMenu}
+                    onOpenChange={onShowArtifactMenuChange}
                   >
-                    <Paperclip size={15} />
-                  </Button>
-                  {showArtifactMenu ? (
-                    <div className="artifact-menu">
-                      <div className="artifact-menu-head">
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant={showArtifactMenu ? "primary" : "secondary"}
+                        className="button-icon"
+                        title={t("Show thread artifacts")}
+                      >
+                        <Paperclip size={14} />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="artifact-menu">
+                      <DropdownMenuLabel className="artifact-menu-head">
                         <Paperclip size={14} />
                         <span>{t("Artifacts")}</span>
-                      </div>
+                      </DropdownMenuLabel>
                       <div className="artifact-menu-list">
                         {selectedThreadArtifacts.map(
                           ({ message, artifact, href }) => (
-                            <button
+                            <DropdownMenuItem
                               className="artifact-menu-item"
                               key={`${message.id}:${artifact}`}
-                              onClick={() => {
-                                onShowArtifactMenuChange(false);
-                                void onOpenLink(href);
-                              }}
+                              onSelect={() => void onOpenLink(href)}
                             >
                               <span>
                                 {artifact.replace(/^artifacts\//, "")}
                               </span>
                               <small>#{message.id}</small>
-                            </button>
+                            </DropdownMenuItem>
                           )
                         )}
                       </div>
-                    </div>
-                  ) : null}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               ) : null}
             </div>
@@ -254,6 +262,7 @@ export function AppContent({
         <span className="content-footer-credit">
           {t("Developed by Júnior Sbrissa")}
         </span>
+        <span className="content-footer-divider" aria-hidden="true" />
         <a
           href="#keyboard-shortcuts"
           className="content-footer-link"

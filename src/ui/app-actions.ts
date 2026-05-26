@@ -36,7 +36,6 @@ export function createAppActions({
   artifactDraft,
   savingArtifact,
   agents,
-  toastTimerRef,
   api,
   apiPost,
   refresh,
@@ -55,8 +54,7 @@ export function createAppActions({
   setArtifactDraft,
   setArtifactView,
   setSavingArtifact,
-  setLastSyncedAt,
-  setToast
+  setLastSyncedAt
 }: {
   t: Translation;
   token: string;
@@ -75,7 +73,6 @@ export function createAppActions({
   artifactDraft?: ArtifactDraft;
   savingArtifact: boolean;
   agents: Agent[];
-  toastTimerRef: Ref<number | undefined>;
   api: ApiGet;
   apiPost: ApiPost;
   refresh: (options?: {
@@ -98,9 +95,6 @@ export function createAppActions({
   setArtifactView: (view: ArtifactView | undefined) => void;
   setSavingArtifact: (saving: boolean) => void;
   setLastSyncedAt: (date: Date) => void;
-  setToast: (
-    toast: { kind: Exclude<StatusKind, "idle">; message: string } | undefined
-  ) => void;
 }) {
   function lockToken() {
     const normalized = token.trim();
@@ -267,7 +261,6 @@ export function createAppActions({
     openThreads,
     archivedThreads,
     agents,
-    toastTimerRef,
     api,
     selectThread,
     setStatusKind,
@@ -275,8 +268,7 @@ export function createAppActions({
     setSelectedThreadId,
     setSelectedAgentId,
     setThreadPayload,
-    setArtifactView,
-    setToast
+    setArtifactView
   });
 
   return {

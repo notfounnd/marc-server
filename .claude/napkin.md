@@ -29,3 +29,5 @@
 ## User Directives
 1. **[2026-04-30] mARC thread work must be acknowledged in mARC**
    Do instead: after treating a thread task, post a concise status back to the relevant mARC thread.
+2. **[2026-05-24] Run Playwright through the CLI**
+   Do instead: use the Playwright CLI for browser inspection and UI validation in this workspace; do not open browser pages through Playwright MCP.

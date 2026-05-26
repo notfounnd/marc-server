@@ -1,13 +1,52 @@
-import { useEffect } from "react";
+import { type AnimationEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Keyboard, Paperclip, X } from "lucide-react";
-import { Button } from "./common.js";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle
+} from "@/components/ui/sheet";
+import { Textarea } from "@/components/ui/textarea";
 import { MarkdownPanel } from "./markdown-panel.js";
 import type {
   ArtifactDraft,
   ArtifactView,
   MarkdownLinkHandler
 } from "./types.js";
+
+function closeWhenHidden(onClose: () => void) {
+  return (open: boolean) => {
+    if (open) return;
+    onClose();
+  };
+}
+
+function useAnimatedSheetClose(onClose: () => void) {
+  const [open, setOpen] = useState(true);
+
+  function handleAnimationEnd(event: AnimationEvent<HTMLDivElement>) {
+    if (open) return;
+    if (event.currentTarget !== event.target) return;
+    onClose();
+  }
+
+  return { open, setOpen, handleAnimationEnd };
+}
 
 export function KeyboardShortcutsModal({ onClose }: { onClose: () => void }) {
   const { t } = useTranslation();
@@ -21,49 +60,31 @@ export function KeyboardShortcutsModal({ onClose }: { onClose: () => void }) {
     ["Escape", t("Close autocomplete or this dialog.")]
   ];
 
-  useEffect(() => {
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        onClose();
-      }
-    }
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onClose]);
-
   return (
-    <div
-      className="modal-layer modal-layer-global"
-      role="presentation"
-      onClick={onClose}
-      onTouchMove={(event) => event.preventDefault()}
-      onWheel={(event) => event.preventDefault()}
-    >
-      <section
-        className="modal-panel"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="keyboard-shortcuts-title"
-        onClick={(event) => event.stopPropagation()}
-        onTouchMove={(event) => event.stopPropagation()}
-        onWheel={(event) => event.stopPropagation()}
+    <Dialog open onOpenChange={closeWhenHidden(onClose)}>
+      <DialogContent
+        className="modal-panel modal-panel-global"
+        showCloseButton={false}
+        onOpenAutoFocus={(event) => event.preventDefault()}
       >
-        <header className="modal-head">
-          <div>
-            <h2 id="keyboard-shortcuts-title" className="modal-title-icon">
-              <Keyboard size={18} />
-              {t("Keyboard shortcuts")}
-            </h2>
-          </div>
-          <Button
-            variant="ghost"
-            className="button-icon"
-            onClick={onClose}
-            title={t("Close")}
-          >
-            <X size={18} />
-          </Button>
-        </header>
+        <DialogHeader className="modal-head modal-head-shortcuts">
+          <DialogTitle className="modal-title-icon">
+            <Keyboard className="modal-title-icon-glyph" size={18} />
+            {t("Keyboard shortcuts")}
+          </DialogTitle>
+          <DialogDescription className="sr-only">
+            {t("Available keyboard shortcuts.")}
+          </DialogDescription>
+          <DialogClose asChild>
+            <Button
+              className="button-icon"
+              title={t("Close")}
+              aria-label={t("Close")}
+            >
+              <X size={15} />
+            </Button>
+          </DialogClose>
+        </DialogHeader>
         <dl className="shortcut-list">
           {shortcuts.map(([key, description]) => (
             <div className="shortcut-row" key={key}>
@@ -72,8 +93,8 @@ export function KeyboardShortcutsModal({ onClose }: { onClose: () => void }) {
             </div>
           ))}
         </dl>
-      </section>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -91,57 +112,49 @@ export function ArtifactModal({
   onSave: () => void;
 }) {
   const { t } = useTranslation();
+  const { open, setOpen, handleAnimationEnd } = useAnimatedSheetClose(onClose);
 
   return (
-    <div
-      className="modal-layer"
-      role="presentation"
-      onClick={onClose}
-      onTouchMove={(event) => event.preventDefault()}
-      onWheel={(event) => event.preventDefault()}
-    >
-      <section
-        className="modal-panel"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="artifact-modal-title"
-        onClick={(event) => event.stopPropagation()}
-        onTouchMove={(event) => event.stopPropagation()}
-        onWheel={(event) => event.stopPropagation()}
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetContent
+        side="right"
+        className="modal-panel artifact-sheet"
+        showCloseButton={false}
+        onOpenAutoFocus={(event) => event.preventDefault()}
+        onAnimationEnd={handleAnimationEnd}
       >
-        <header className="modal-head">
-          <div>
-            <div className="eyebrow">
-              <Paperclip size={14} />
-              {t("Markdown artifact")}
-            </div>
-            <h2 id="artifact-modal-title">{t("Attach artifact")}</h2>
-            <p>{draft.message.id}</p>
+        <SheetHeader className="modal-head">
+          <div className="eyebrow">
+            <Paperclip size={14} />
+            {t("Markdown artifact")}
           </div>
+          <SheetTitle>{t("Attach artifact")}</SheetTitle>
+          <SheetDescription>{draft.message.id}</SheetDescription>
+        </SheetHeader>
+        <SheetClose asChild>
           <Button
-            variant="ghost"
-            className="button-icon"
-            onClick={onClose}
+            className="button-icon modal-sheet-close"
             title={t("Close")}
+            aria-label={t("Close")}
           >
-            <X size={16} />
+            <X size={15} />
           </Button>
-        </header>
+        </SheetClose>
 
-        <label className="modal-field">
+        <Label className="modal-field">
           {t("File name")}
-          <input
+          <Input
             value={draft.fileName}
             onChange={(event) =>
               onChange({ ...draft, fileName: event.target.value })
             }
             placeholder={t("decision-notes")}
           />
-        </label>
+        </Label>
 
-        <label className="modal-field modal-field-grow">
+        <Label className="modal-field modal-field-grow">
           {t("Markdown")}
-          <textarea
+          <Textarea
             value={draft.content}
             onChange={(event) =>
               onChange({ ...draft, content: event.target.value })
@@ -149,23 +162,24 @@ export function ArtifactModal({
             placeholder={t("# Notes")}
             rows={16}
           />
-        </label>
+        </Label>
 
-        <footer className="modal-actions">
-          <Button variant="secondary" onClick={onClose} disabled={saving}>
-            {t("Cancel")}
-          </Button>
+        <SheetFooter className="modal-actions">
+          <SheetClose asChild>
+            <Button variant="neutral" disabled={saving}>
+              {t("Cancel")}
+            </Button>
+          </SheetClose>
           <Button
-            variant="primary"
             onClick={onSave}
             disabled={saving || !draft.fileName.trim() || !draft.content.trim()}
           >
             <Paperclip size={15} />
             {saving ? t("Saving") : t("Attach")}
           </Button>
-        </footer>
-      </section>
-    </div>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   );
 }
 
@@ -179,50 +193,42 @@ export function ArtifactViewerModal({
   onLink: MarkdownLinkHandler;
 }) {
   const { t } = useTranslation();
+  const { open, setOpen, handleAnimationEnd } = useAnimatedSheetClose(onClose);
 
   return (
-    <div
-      className="modal-layer"
-      role="presentation"
-      onClick={onClose}
-      onTouchMove={(event) => event.preventDefault()}
-      onWheel={(event) => event.preventDefault()}
-    >
-      <section
-        className="modal-panel artifact-viewer"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="artifact-viewer-title"
-        onClick={(event) => event.stopPropagation()}
-        onTouchMove={(event) => event.stopPropagation()}
-        onWheel={(event) => event.stopPropagation()}
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetContent
+        side="right"
+        className="modal-panel artifact-sheet artifact-viewer"
+        showCloseButton={false}
+        onOpenAutoFocus={(event) => event.preventDefault()}
+        onAnimationEnd={handleAnimationEnd}
       >
-        <header className="modal-head">
-          <div>
-            <div className="eyebrow">
-              <Paperclip size={14} />
-              {t("Markdown artifact")}
-            </div>
-            <h2 id="artifact-viewer-title">
-              {artifact.artifact.replace(/^artifacts\//, "")}
-            </h2>
-            <p>
-              {artifact.threadId} / #{artifact.messageId}
-            </p>
+        <SheetHeader className="modal-head">
+          <div className="eyebrow">
+            <Paperclip size={14} />
+            {t("Markdown artifact")}
           </div>
+          <SheetTitle>
+            {artifact.artifact.replace(/^artifacts\//, "")}
+          </SheetTitle>
+          <SheetDescription>
+            {artifact.threadId} / #{artifact.messageId}
+          </SheetDescription>
+        </SheetHeader>
+        <SheetClose asChild>
           <Button
-            variant="ghost"
-            className="button-icon"
-            onClick={onClose}
+            className="button-icon modal-sheet-close"
             title={t("Close")}
+            aria-label={t("Close")}
           >
-            <X size={16} />
+            <X size={15} />
           </Button>
-        </header>
+        </SheetClose>
         <div className="artifact-viewer-body">
           <MarkdownPanel markdown={artifact.content} onLink={onLink} />
         </div>
-      </section>
-    </div>
+      </SheetContent>
+    </Sheet>
   );
 }

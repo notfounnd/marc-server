@@ -7,13 +7,21 @@
     <style>
       :root {
         color-scheme: light;
-        --bg: #f7f2ea;
-        --ink: #15201c;
-        --muted: #5f6f68;
-        --panel: #fffaf3;
-        --line: #dbcdbc;
-        --green: #0b8f7c;
-        --green-dark: #087363;
+        --app-background: #f4f1ea;
+        --background: #fffdf8;
+        --surface: #fffdf8;
+        --surface-muted: #f8f4ec;
+        --surface-strong: #eee6d8;
+        --ink: #1f2933;
+        --ink-muted: #637083;
+        --line: #d8cec0;
+        --line-strong: #b8ab98;
+        --teal: #0f766e;
+        --teal-dark: #115e59;
+        --border: var(--ink);
+        --main-foreground: #fffdf8;
+        --app-radius: 2px;
+        --shadow: 4px 4px 0 0 var(--border);
       }
 
       * {
@@ -23,9 +31,11 @@
       body {
         margin: 0;
         min-height: 100vh;
-        background: var(--bg);
+        background: var(--app-background);
         color: var(--ink);
-        font-family: ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+        font-family:
+          "Cascadia Mono", "SFMono-Regular", Consolas, "Liberation Mono", Menlo,
+          monospace;
       }
 
       main {
@@ -41,21 +51,22 @@
       }
 
       p {
-        max-width: 720px;
+        /* max-width: 720px; */
         margin: 0 0 28px;
-        color: var(--muted);
+        color: var(--ink-muted);
         line-height: 1.55;
       }
 
       .capture-note {
         margin: 0 0 22px;
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        background: var(--panel);
+        border: 2px solid var(--border);
+        border-radius: var(--app-radius);
+        background: var(--surface);
         padding: 16px 18px;
-        color: var(--muted);
+        color: var(--ink-muted);
         font-size: 13px;
         line-height: 1.55;
+        box-shadow: var(--shadow);
       }
 
       .capture-note strong {
@@ -63,7 +74,7 @@
       }
 
       .capture-note code {
-        color: var(--green-dark);
+        color: var(--teal-dark);
         font-weight: 700;
       }
 
@@ -82,22 +93,27 @@
         gap: 18px;
       }
 
+      .readme-card {
+        grid-column: span 2;
+      }
+
       .banner-card {
         margin-bottom: 18px;
       }
 
       .card {
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        background: var(--panel);
+        border: 2px solid var(--border);
+        border-radius: var(--app-radius);
+        background: var(--surface);
         padding: 20px;
+        box-shadow: var(--shadow);
       }
 
       .card h2 {
         margin: 0 0 16px;
         font-size: 14px;
-        color: var(--muted);
-        font-weight: 600;
+        color: var(--ink);
+        font-weight: 700;
       }
 
       .swatch {
@@ -105,16 +121,9 @@
         align-items: center;
         justify-content: center;
         min-height: 180px;
-        border: 1px dashed #c8b8a3;
-        border-radius: 8px;
-        background:
-          linear-gradient(45deg, #eee6dc 25%, transparent 25%),
-          linear-gradient(-45deg, #eee6dc 25%, transparent 25%),
-          linear-gradient(45deg, transparent 75%, #eee6dc 75%),
-          linear-gradient(-45deg, transparent 75%, #eee6dc 75%);
-        background-color: #faf6ef;
-        background-size: 20px 20px;
-        background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+        border: 2px solid var(--line-strong);
+        border-radius: var(--app-radius);
+        background: var(--surface-muted);
       }
 
       .logo {
@@ -122,39 +131,34 @@
         align-items: center;
         justify-content: center;
         aspect-ratio: 1;
-        border-radius: 8px;
-        background: linear-gradient(180deg, var(--green), var(--green-dark));
-        color: #fff;
+        border: 2px solid var(--border);
+        border-radius: var(--app-radius);
+        background: var(--teal);
+        color: var(--main-foreground);
         font-weight: 800;
         letter-spacing: 0;
-        box-shadow:
-          inset 0 1px 0 rgba(255, 255, 255, 0.22),
-          0 10px 24px rgba(8, 115, 99, 0.22);
+        box-shadow: var(--shadow);
         user-select: none;
       }
 
       .logo-256 {
         width: 256px;
         font-size: 150px;
-        border-radius: 28px;
       }
 
       .logo-128 {
         width: 128px;
         font-size: 74px;
-        border-radius: 18px;
       }
 
       .logo-64 {
         width: 64px;
         font-size: 37px;
-        border-radius: 10px;
       }
 
       .logo-32 {
         width: 32px;
         font-size: 19px;
-        border-radius: 6px;
       }
 
       .readme-strip {
@@ -163,9 +167,9 @@
         gap: 16px;
         min-height: 180px;
         padding: 22px;
-        border-radius: 8px;
-        background: #fff;
-        border: 1px solid var(--line);
+        border-radius: var(--app-radius);
+        background: var(--surface-muted);
+        border: 2px solid var(--line-strong);
       }
 
       .readme-strip strong {
@@ -176,28 +180,26 @@
 
       .readme-strip span {
         display: block;
-        color: var(--muted);
+        color: var(--ink-muted);
         font-size: 13px;
       }
 
       .linkedin-banner {
         position: relative;
-        width: 1200px;
-        height: 627px;
+        width: 100%;
+        height: 500px;
         overflow: hidden;
-        border-radius: 8px;
-        border: 1px solid var(--line);
-        background:
-          radial-gradient(circle at 18% 18%, rgba(11, 143, 124, 0.12), transparent 30%),
-          linear-gradient(135deg, #fffaf3 0%, #f7f2ea 62%, #efe5d6 100%);
+        border-radius: var(--app-radius);
+        border: 2px solid var(--border);
+        background: var(--surface-muted);
       }
 
       .linkedin-banner::before {
         content: "";
         position: absolute;
         inset: 38px;
-        border: 1px solid rgba(115, 99, 77, 0.16);
-        border-radius: 8px;
+        border: 2px solid var(--line-strong);
+        border-radius: var(--app-radius);
         pointer-events: none;
       }
 
@@ -207,13 +209,12 @@
         display: flex;
         align-items: center;
         gap: 28px;
-        padding: 72px 62px;
+        padding: 56px 50px;
       }
 
       .banner-logo {
-        width: 196px;
-        font-size: 130px;
-        border-radius: 28px;
+        width: 176px;
+        font-size: 116px;
         flex: 0 0 auto;
       }
 
@@ -223,7 +224,7 @@
 
       .banner-copy strong {
         display: block;
-        margin-bottom: 12px;
+        margin-bottom: 0;
         color: var(--ink);
         font-size: 70px;
         line-height: 0.96;
@@ -239,8 +240,8 @@
 
       .banner-copy em {
         display: block;
-        margin-top: 18px;
-        color: var(--green-dark);
+        margin-top: 16px;
+        color: var(--teal-dark);
         font-size: 27px;
         font-style: normal;
         font-weight: 700;
@@ -248,31 +249,47 @@
 
       .banner-copy small {
         display: block;
-        margin-top: 10px;
-        color: var(--muted);
+        margin-top: 4px;
+        color: var(--ink-muted);
         font-size: 17px;
         line-height: 1.35;
         white-space: nowrap;
       }
 
       .banner-frame {
-        overflow: auto;
+        overflow: hidden;
         padding: 16px;
-        border: 1px dashed #c8b8a3;
-        border-radius: 8px;
-        background: #fbf6ee;
+        border: 2px solid var(--line-strong);
+        border-radius: var(--app-radius);
+        background: var(--surface-strong);
       }
 
       .meta {
         margin-top: 14px;
-        color: var(--muted);
+        color: var(--ink-muted);
         font-size: 12px;
       }
 
       .svg-logo {
-        width: 128px;
-        height: 128px;
+        width: 132px;
+        height: 132px;
         display: block;
+      }
+
+      @media (max-width: 600px) {
+        .readme-card {
+          grid-column: span 1;
+        }
+
+        .banner-content {
+          gap: 20px;
+          padding: 28px 22px;
+        }
+
+        .banner-logo {
+          width: 112px;
+          font-size: 72px;
+        }
       }
     </style>
   </head>
@@ -293,7 +310,7 @@
       </div>
 
       <article class="card banner-card">
-        <h2>LinkedIn banner 1200 x 627</h2>
+        <h2>LinkedIn banner preview</h2>
         <div class="banner-frame">
           <div class="linkedin-banner">
             <div class="banner-content">
@@ -302,12 +319,12 @@
                 <strong>mARC</strong>
                 <span>markdown Agent Relay Chat</span>
                 <em>Chatting is all you need.</em>
-                <small>Improving communication and harness engineering for agents</small>
+                <small>Improving communication and harness engineering for agents.</small>
               </div>
             </div>
           </div>
         </div>
-        <div class="meta">Use browser screenshot/capture on the 1200 x 627 area for the LinkedIn post image.</div>
+        <div class="meta">Fits the available preview width with a 500px composition height.</div>
       </article>
 
       <section class="grid">
@@ -344,7 +361,7 @@
           <div class="meta">64 x 64 and 32 x 32</div>
         </article>
 
-        <article class="card">
+        <article class="card readme-card">
           <h2>README header context</h2>
           <div class="readme-strip">
             <div class="logo logo-64">m</div>

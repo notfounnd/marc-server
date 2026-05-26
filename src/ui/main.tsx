@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { useTranslation } from "react-i18next";
+import { Toaster } from "@/components/ui/sonner";
 import { messageArtifactReference } from "../core/marc-references.js";
 import { createAppActions } from "./app-actions.js";
 import { AppContent } from "./app-content.js";
@@ -18,7 +19,6 @@ import type {
   Thread,
   ThreadIndexHealth,
   ThreadPayload,
-  Toast,
   Workspace
 } from "./types.js";
 import "./i18n.js";
@@ -34,7 +34,6 @@ function App() {
   );
   const [statusKind, setStatusKind] = useState<StatusKind>("idle");
   const [status, setStatus] = useState(() => t("Token required"));
-  const [toast, setToast] = useState<Toast>();
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [threads, setThreads] = useState<Thread[]>([]);
   const [closedThreads, setClosedThreads] = useState<Thread[]>([]);
@@ -65,7 +64,6 @@ function App() {
   const selectedThreadIdRef = useRef<string | undefined>(undefined);
   const autocompleteThreadPayloadRef = useRef(new Map<string, ThreadPayload>());
   const liveRefreshTimerRef = useRef<number | undefined>(undefined);
-  const toastTimerRef = useRef<number | undefined>(undefined);
 
   const selectedWorkspace = useMemo(
     () => workspaces.find((workspace) => workspace.id === selectedWorkspaceId),
@@ -144,14 +142,6 @@ function App() {
     return () => document.body.classList.remove("modal-open");
   }, [modalOpen]);
 
-  useEffect(() => {
-    return () => {
-      if (toastTimerRef.current) {
-        window.clearTimeout(toastTimerRef.current);
-      }
-    };
-  }, []);
-
   const { api, apiPost, refresh } = useAppSync({
     t,
     token,
@@ -196,7 +186,6 @@ function App() {
     artifactDraft,
     savingArtifact,
     agents,
-    toastTimerRef,
     api,
     apiPost,
     refresh,
@@ -215,8 +204,7 @@ function App() {
     setArtifactDraft,
     setArtifactView,
     setSavingArtifact,
-    setLastSyncedAt,
-    setToast
+    setLastSyncedAt
   });
 
   return (
@@ -286,15 +274,7 @@ function App() {
         onLink={appActions.handleMarkdownLink}
         onShortcutsClose={() => setShowShortcuts(false)}
       />
-      {toast ? (
-        <div
-          className={classNames("toast", `toast-${toast.kind}`)}
-          role="status"
-          aria-live="polite"
-        >
-          {toast.message}
-        </div>
-      ) : null}
+      <Toaster position="bottom-right" />
     </div>
   );
 }

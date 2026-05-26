@@ -10,6 +10,9 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
+    "paths": {
+      "@/*": ["./src/*"]
+    },
     "outDir": "dist",
     "rootDir": "."
   },

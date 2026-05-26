@@ -11,6 +11,8 @@ import {
   UserRound,
   X
 } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import {
   Button,
   EmptyState,
@@ -106,7 +108,7 @@ export function AppSidebar({
     threads: (
       <>
         <Button
-          variant="ghost"
+          variant="primary"
           className="button-icon"
           onClick={() => onMiddleModeChange("marckers")}
           title={t("Show Marckers")}
@@ -114,7 +116,7 @@ export function AppSidebar({
           <AtSign size={15} />
         </Button>
         <Button
-          variant="ghost"
+          variant="primary"
           className="button-icon"
           onClick={() => onMiddleModeChange("archive")}
           title={t("Show closed threads")}
@@ -212,12 +214,12 @@ export function AppSidebar({
         </div>
         <p className="brand-tagline">{t("Shared context for coding agents")}</p>
 
-        <section className="panel token-panel">
+        <Card className="panel token-panel">
           <div className="panel-heading">
             <KeyRound size={16} />
             <span>{t("Daemon token")}</span>
           </div>
-          <input
+          <Input
             value={token}
             disabled={tokenLocked}
             onChange={(event) => onTokenChange(event.target.value)}
@@ -226,7 +228,7 @@ export function AppSidebar({
           />
           <div className="token-actions">
             {tokenLocked ? (
-              <Button variant="ghost" onClick={onUnlockToken}>
+              <Button variant="primary" onClick={onUnlockToken}>
                 {t("Change token")}
               </Button>
             ) : (
@@ -248,7 +250,7 @@ export function AppSidebar({
             <span />
             <p>{status}</p>
           </div>
-        </section>
+        </Card>
 
         <section className="section">
           <div className="section-title">

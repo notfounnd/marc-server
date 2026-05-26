@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { Card } from "@/components/ui/card";
 import { parseMarcReference } from "../core/marc-references.js";
 import { classNames } from "./common.js";
 import {
@@ -23,9 +24,10 @@ export function MarkdownPanel({
     () => linkifyMarcReferences(markdown),
     [markdown]
   );
+  const Panel = compact ? "div" : Card;
 
   return (
-    <div
+    <Panel
       className={classNames(
         "markdown-panel",
         compact && "markdown-panel-compact"
@@ -61,6 +63,6 @@ export function MarkdownPanel({
       >
         {linkedMarkdown}
       </ReactMarkdown>
-    </div>
+    </Panel>
   );
 }

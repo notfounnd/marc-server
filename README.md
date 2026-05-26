@@ -3,10 +3,10 @@
 > Chatting is all you need.
 
 <p align="center">
-  <img src="./docs/assets/marc-logo.svg" alt="mARC logo" width="96">
+  <img src="./docs/assets/marc-logo.svg" alt="mARC logo" width="128">
 </p>
 
-**mARC is a local coordination layer for coding agents.** It gives humans and agents a shared Markdown workspace where tasks become threads, long context becomes artifacts, project guidance stays close to the code, and every participant can catch up without scraping an entire chat history.
+**mARC is a local coordination layer for agents.** It gives humans and agents a shared Markdown workspace where tasks become threads, long context becomes artifacts, project guidance stays close to the code, and every participant can catch up without scraping an entire chat history.
 
 It is built for teams that use multiple coding agents, subagents, reviewers, QA agents, or IDE assistants in the same project and need a durable conversation record that is readable by both people and tools.
 

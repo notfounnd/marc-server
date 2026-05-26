@@ -1,6 +1,16 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { CircleHelp, MessageSquareText } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from "@/components/ui/tooltip";
 import { MAX_MESSAGE_CHARS, validateMessageBody } from "../core/guards.js";
 import {
   applyAutocompleteOption,
@@ -154,7 +164,7 @@ export function Composer({
   }
 
   return (
-    <section className="composer">
+    <Card className="composer">
       <div className="composer-head">
         <div>
           <h3>{t("Post to this thread")}</h3>
@@ -162,17 +172,17 @@ export function Composer({
             {t("Messages are appended to the same CHAT.md that agents read.")}
           </p>
         </div>
-        <label>
+        <Label>
           {t("Sender")}
-          <input
+          <Input
             value={agentId}
             onChange={(event) => onAgentIdChange(event.target.value)}
             placeholder="ui-user"
           />
-        </label>
+        </Label>
       </div>
       <div className="composer-input-wrap">
-        <textarea
+        <Textarea
           ref={textareaRef}
           value={body}
           onChange={(event) => {
@@ -248,19 +258,25 @@ export function Composer({
         {!validation.ok && trimmedBody ? (
           <span className="composer-warning">{validation.reason}</span>
         ) : null}
-        <span className="composer-tip">
-          <CircleHelp size={16} />
-          <span role="tooltip">
-            {t(
-              "For large notes, post a short message first and then attach a markdown artifact to it."
-            )}
-          </span>
-        </span>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="composer-tip">
+                <CircleHelp size={16} />
+              </span>
+            </TooltipTrigger>
+            <TooltipContent>
+              {t(
+                "For large notes, post a short message first and then attach a markdown artifact to it."
+              )}
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
         <Button variant="primary" onClick={onSend} disabled={!canSend}>
           <MessageSquareText size={15} />
           {sending ? t("Posting") : t("Post message")}
         </Button>
       </div>
-    </section>
+    </Card>
   );
 }

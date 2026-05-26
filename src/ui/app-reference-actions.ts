@@ -2,6 +2,7 @@ import {
   parseMarcReference,
   type MarcReference
 } from "../core/marc-references.js";
+import { showNotification } from "./notifications.js";
 import type {
   Agent,
   ArtifactView,
@@ -22,7 +23,6 @@ export function createAppReferenceActions({
   openThreads,
   archivedThreads,
   agents,
-  toastTimerRef,
   api,
   selectThread,
   setStatusKind,
@@ -30,8 +30,7 @@ export function createAppReferenceActions({
   setSelectedThreadId,
   setSelectedAgentId,
   setThreadPayload,
-  setArtifactView,
-  setToast
+  setArtifactView
 }: {
   t: Translation;
   selectedWorkspace?: Workspace;
@@ -39,7 +38,6 @@ export function createAppReferenceActions({
   openThreads: Thread[];
   archivedThreads: Thread[];
   agents: Agent[];
-  toastTimerRef: Ref<number | undefined>;
   api: ApiGet;
   selectThread: (thread: Thread) => Promise<ThreadPayload | undefined>;
   setStatusKind: (kind: StatusKind) => void;
@@ -48,9 +46,6 @@ export function createAppReferenceActions({
   setSelectedAgentId: (agentId: string | undefined) => void;
   setThreadPayload: (payload: ThreadPayload | undefined) => void;
   setArtifactView: (view: ArtifactView | undefined) => void;
-  setToast: (
-    toast: { kind: Exclude<StatusKind, "idle">; message: string } | undefined
-  ) => void;
 }) {
   function selectAgent(agent: Agent) {
     setSelectedAgentId(agent.id);
@@ -85,12 +80,7 @@ export function createAppReferenceActions({
     message: string,
     kind: Exclude<StatusKind, "idle"> = "ok"
   ) {
-    if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
-    setToast({ kind, message });
-    toastTimerRef.current = window.setTimeout(() => {
-      setToast(undefined);
-      toastTimerRef.current = undefined;
-    }, 2400);
+    showNotification(message, kind);
   }
 
   async function copyReference(reference: string) {

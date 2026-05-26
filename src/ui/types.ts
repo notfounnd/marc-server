@@ -60,11 +60,6 @@ export type StatusKind = "idle" | "ok" | "warn" | "error";
 
 export type MiddleMode = "threads" | "marckers" | "archive";
 
-export type Toast = {
-  kind: Exclude<StatusKind, "idle">;
-  message: string;
-};
-
 export type MarkdownLinkHandler = (href: string) => void | Promise<void>;
 
 export type ArtifactDraft = {

@@ -1,5 +1,7 @@
 import React from "react";
 import { CircleAlert } from "lucide-react";
+import { Badge as NeoBadge } from "@/components/ui/badge";
+import { Button as NeoButton } from "@/components/ui/button";
 import type { Thread } from "./types.js";
 
 export function classNames(
@@ -15,30 +17,18 @@ export function isClosedThread(thread: Thread): boolean {
 }
 
 export function Button({
-  children,
   variant = "secondary",
-  onClick,
-  disabled,
-  title,
-  className
-}: {
-  children: React.ReactNode;
+  ...props
+}: Omit<React.ComponentProps<typeof NeoButton>, "variant"> & {
   variant?: "primary" | "secondary" | "ghost";
-  onClick?: () => void;
-  disabled?: boolean;
-  title?: string;
-  className?: string;
 }) {
-  return (
-    <button
-      className={classNames("button", `button-${variant}`, className)}
-      onClick={onClick}
-      disabled={disabled}
-      title={title}
-    >
-      {children}
-    </button>
-  );
+  const variants = {
+    ghost: "noShadow",
+    primary: "default",
+    secondary: "neutral"
+  } as const;
+
+  return <NeoButton variant={variants[variant]} {...props} />;
 }
 
 export function Badge({
@@ -48,8 +38,19 @@ export function Badge({
   children: React.ReactNode;
   tone?: "neutral" | "green" | "amber";
 }) {
+  const variants = {
+    amber: "neutral",
+    green: "default",
+    neutral: "neutral"
+  } as const;
+
   return (
-    <span className={classNames("badge", `badge-${tone}`)}>{children}</span>
+    <NeoBadge
+      variant={variants[tone]}
+      className={classNames("status-badge", `status-badge-${tone}`)}
+    >
+      {children}
+    </NeoBadge>
   );
 }
 
@@ -89,9 +90,10 @@ export function NavItem({
   onClick: () => void;
 }) {
   return (
-    <button
+    <NeoButton
+      variant="neutral"
       className={classNames(
-        "nav-item",
+        "nav-item h-auto",
         active && "active",
         closed && "nav-item-closed"
       )}
@@ -105,7 +107,7 @@ export function NavItem({
           {tag ? <em>{tag}</em> : null}
         </span>
       </span>
-    </button>
+    </NeoButton>
   );
 }
 

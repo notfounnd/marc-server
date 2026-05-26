@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Archive, Paperclip } from "lucide-react";
+import { Card } from "@/components/ui/card";
 import { messageArtifactReference } from "../core/marc-references.js";
 import { Badge, Button, EmptyState } from "./common.js";
 import { MarkdownPanel } from "./markdown-panel.js";
@@ -29,13 +30,13 @@ export function ThreadView({
 
   const messages = payload.messages ?? [];
   const summary = payload.summary ? (
-    <section className="summary-panel">
+    <Card className="summary-panel">
       <div className="section-title">
         <Archive size={16} />
         <h2>{t("Executive Summary")}</h2>
       </div>
       <MarkdownPanel markdown={payload.summary} compact onLink={onLink} />
-    </section>
+    </Card>
   ) : null;
 
   if (!messages.length) {
@@ -59,7 +60,7 @@ export function ThreadView({
       {summary}
       <div className="message-list">
         {messages.map((message) => (
-          <article
+          <Card
             className="message-card"
             id={`message-${message.id}`}
             key={message.id}
@@ -114,7 +115,7 @@ export function ThreadView({
                 })}
               </div>
             ) : null}
-          </article>
+          </Card>
         ))}
       </div>
     </>

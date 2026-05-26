@@ -115,6 +115,18 @@ Priority: high
 - [ ] Open the right-side artifact modal and verify wheel or touch input on the backdrop does not scroll the app behind it.
 - [ ] Verify the centered keyboard shortcuts modal remains centered and right-side artifact modals remain aligned to the content column.
 
+## Neo-Brutalism UI Migration
+
+Source thread: `oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1`  
+Priority: medium
+
+- [ ] Load the UI and verify the three columns use the warm neutral and teal neo-brutalism theme with square bordered controls and solid lower-right shadows.
+- [ ] Select a workspace and a thread, hover each selected card, and verify the teal left inset remains visible while the black hover shadow is removed.
+- [ ] Open a thread containing rendered Markdown and verify headings, lists, inline code, fenced code, links, bold text, and italic text remain visually distinguishable.
+- [ ] Open the artifact menu and autocomplete suggestions, move the active selection, and verify the selected row keeps the teal left indicator without rounded badges or rounded menu items.
+- [ ] Open the keyboard shortcuts dialog and an artifact sheet, and verify both use consistent close controls, borders, shadows, focus indication, and close animations.
+- [ ] Copy a thread reference by clicking its displayed reference text and verify the value is copied without rendering that reference as a button-like control.
+
 ## Maintenance Notes
 
 - This backlog should grow as UI features are added.

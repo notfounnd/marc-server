@@ -1,6 +1,6 @@
 {
   "browser": {
-    "browserName": "chromium",
+    "browserName": "chrome",
     "launchOptions": { 
       "headless": true
     }
