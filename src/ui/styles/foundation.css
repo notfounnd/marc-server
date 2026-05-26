@@ -1,0 +1,78 @@
+@theme inline {
+  --color-background: var(--background);
+  --color-secondary-background: var(--secondary-background);
+  --color-foreground: var(--foreground);
+  --color-main: var(--main);
+  --color-main-foreground: var(--main-foreground);
+  --color-border: var(--border);
+  --color-line-strong: var(--line-strong);
+  --color-overlay: var(--overlay);
+  --color-ring: var(--ring);
+  --radius-base: var(--app-radius);
+  --shadow-shadow: var(--app-shadow);
+  --spacing-boxShadowX: 4px;
+  --spacing-boxShadowY: 4px;
+  --spacing-reverseBoxShadowX: -4px;
+  --spacing-reverseBoxShadowY: -4px;
+  --font-weight-base: 500;
+  --font-weight-heading: 700;
+}
+
+:root {
+  color-scheme: light;
+  --app-background: #f4f1ea;
+  --background: #fffdf8;
+  --secondary-background: #fffdf8;
+  --surface: #fffdf8;
+  --surface-muted: #f8f4ec;
+  --surface-strong: #eee6d8;
+  --ink: #1f2933;
+  --foreground: var(--ink);
+  --ink-muted: #637083;
+  --line: #d8cec0;
+  --line-strong: #b8ab98;
+  --teal: #0f766e;
+  --teal-dark: #115e59;
+  --main: var(--teal);
+  --main-foreground: #fffdf8;
+  --border: var(--ink);
+  --ring: var(--ink);
+  --overlay: rgb(31 41 51 / 0.54);
+  --green: #087443;
+  --amber: #b45309;
+  --red: #b42318;
+  --blue: #1d4ed8;
+  --app-radius: 2px;
+  --app-shadow: 4px 4px 0 0 var(--border);
+  --shadow: var(--app-shadow);
+  font-family:
+    "Cascadia Mono", "SFMono-Regular", Consolas, "Liberation Mono", Menlo,
+    monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--app-background);
+  color: var(--ink);
+  overflow: hidden;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body.modal-open {
+  overflow: hidden;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}

@@ -1,0 +1,59 @@
+@media (max-width: 1100px) {
+  body {
+    overflow: auto;
+  }
+
+  .shell {
+    grid-template-columns: 1fr;
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+
+  .sidebar,
+  .middle,
+  .content {
+    height: auto;
+    overflow: visible;
+  }
+
+  .content-scroll {
+    overflow: visible;
+  }
+
+  .sidebar,
+  .middle {
+    border-right: 0;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .composer-head {
+    display: grid;
+  }
+
+  .modal-panel {
+    width: 100%;
+    max-height: calc(100vh - 32px);
+  }
+
+  .artifact-sheet {
+    top: 16px;
+    right: 16px;
+    bottom: 16px;
+    width: calc(100vw - 32px);
+    max-width: none;
+    height: calc(100vh - 32px);
+    max-height: calc(100vh - 32px);
+  }
+
+  .modal-field:not(.modal-field-grow) textarea {
+    min-height: 340px;
+  }
+
+  .toast {
+    right: 16px;
+    left: 16px;
+    bottom: 16px;
+    max-width: none;
+  }
+}

@@ -1,7 +1,8 @@
 {
   "browser": {
-    "browserName": "chrome",
+    "browserName": "chromium",
     "launchOptions": { 
+      "channel": "chrome",
       "headless": true
     }
   },
