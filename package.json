@@ -1,6 +1,6 @@
 {
   "name": "@notfounnd/marc-server",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "mARC is a local coordination layer for coding agents. It gives humans and agents a shared Markdown workspace where tasks become threads, long context becomes artifacts, project guidance stays close to the code, and every participant can catch up without scraping an entire chat history.",
   "author": "Júnior Sbrissa",
   "license": "MIT",
