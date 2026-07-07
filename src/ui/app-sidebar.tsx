@@ -7,7 +7,6 @@ import {
   KeyRound,
   MessageSquareText,
   RefreshCw,
-  Server,
   UserRound,
   X
 } from "lucide-react";
@@ -21,8 +20,10 @@ import {
   isClosedThread,
   parseAgentProfile
 } from "./common.js";
+import { WorkspaceListSection } from "./workspace-list-section.js";
 import type {
   Agent,
+  MemoryIndexHealth,
   MiddleMode,
   StatusKind,
   Thread,
@@ -36,6 +37,7 @@ export function AppSidebar({
   status,
   busy,
   workspaces,
+  memoryHealthByWorkspace,
   selectedWorkspaceId,
   visibleThreads,
   selectedThreadId,
@@ -59,6 +61,7 @@ export function AppSidebar({
   status: string;
   busy: boolean;
   workspaces: Workspace[];
+  memoryHealthByWorkspace: Record<string, MemoryIndexHealth>;
   selectedWorkspaceId?: string;
   visibleThreads: Thread[];
   selectedThreadId?: string;
@@ -252,31 +255,13 @@ export function AppSidebar({
           </div>
         </Card>
 
-        <section className="section">
-          <div className="section-title">
-            <Server size={16} />
-            <h2>{t("Workspaces")}</h2>
-          </div>
-          <div className="stack">
-            {workspaces.length ? (
-              workspaces.map((workspace) => (
-                <NavItem
-                  key={workspace.id}
-                  icon={<Server size={16} />}
-                  title={workspace.name}
-                  detail={workspace.rootPath}
-                  active={workspace.id === selectedWorkspaceId}
-                  onClick={() => onSelectWorkspace(workspace)}
-                />
-              ))
-            ) : (
-              <EmptyState
-                title={t("No workspaces")}
-                detail={t("Ask an agent to register a project in mARC.")}
-              />
-            )}
-          </div>
-        </section>
+        <WorkspaceListSection
+          memoryHealthByWorkspace={memoryHealthByWorkspace}
+          onSelectWorkspace={onSelectWorkspace}
+          selectedWorkspaceId={selectedWorkspaceId}
+          t={t}
+          workspaces={workspaces}
+        />
       </aside>
 
       <nav className="middle">

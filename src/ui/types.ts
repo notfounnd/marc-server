@@ -47,11 +47,31 @@ export type ThreadIndexHealth = {
   threadCount: number;
 };
 
+export type MemoryIndexHealth = {
+  status:
+    | "ready"
+    | "missing"
+    | "stale"
+    | "model_missing"
+    | "incompatible"
+    | "rebuilding"
+    | "degraded";
+  ready: boolean;
+  stale: boolean;
+  modelPrepared: boolean;
+  summaryCount: number;
+  indexedSummaryCount: number;
+  message: string;
+};
+
 export type DaemonStatus = {
   ok: boolean;
   modules?: {
     threadIndex?: {
       workspaces?: Record<string, ThreadIndexHealth>;
+    };
+    memory?: {
+      workspaces?: Record<string, MemoryIndexHealth>;
     };
   };
 };

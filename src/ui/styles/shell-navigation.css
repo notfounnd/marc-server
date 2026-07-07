@@ -227,8 +227,9 @@ h3 {
 .nav-item {
   width: 100%;
   display: grid;
-  grid-template-columns: 28px minmax(0, 1fr);
+  grid-template-columns: 28px minmax(0, 1fr) auto;
   gap: 9px;
+  align-items: center;
   text-align: left;
   padding: 10px;
 }
@@ -267,6 +268,12 @@ h3 {
 
 .nav-copy {
   min-width: 0;
+}
+
+.nav-trailing {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .nav-copy strong,
@@ -309,4 +316,39 @@ h3 {
   font-size: 11px;
   font-style: normal;
   line-height: 1.45;
+}
+
+.memory-indicator {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #9db6b2;
+  border-radius: var(--app-radius);
+  background: #f4f8f7;
+  color: var(--ink-muted);
+}
+
+.memory-indicator-ready {
+  border-color: #9ad4bd;
+  background: #e8f5ee;
+  color: var(--green);
+}
+
+.memory-indicator-action {
+  border-color: #d7bd72;
+  background: #fff5cc;
+  color: #8a6500;
+}
+
+.memory-indicator-busy {
+  border-color: #87c7d8;
+  background: #e7f6fb;
+  color: #086f83;
+}
+
+.memory-indicator-error {
+  border-color: #e09b91;
+  background: #ffe9e4;
+  color: #a83220;
 }

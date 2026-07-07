@@ -77,6 +77,7 @@ export function NavItem({
   title,
   detail,
   tag,
+  trailing,
   active,
   closed,
   onClick
@@ -85,6 +86,7 @@ export function NavItem({
   title: string;
   detail?: string;
   tag?: string;
+  trailing?: React.ReactNode;
   active?: boolean;
   closed?: boolean;
   onClick: () => void;
@@ -107,6 +109,7 @@ export function NavItem({
           {tag ? <em>{tag}</em> : null}
         </span>
       </span>
+      {trailing ? <span className="nav-trailing">{trailing}</span> : null}
     </NeoButton>
   );
 }

@@ -94,6 +94,18 @@ test("daemon requires token and serves registered workspace threads", async () =
           status: string;
           workspaces: Record<string, { status: string; rebuilding: boolean }>;
         };
+        memory: {
+          status: string;
+          workspaces: Record<
+            string,
+            {
+              status: string;
+              ready: boolean;
+              stale: boolean;
+              modelPrepared: boolean;
+            }
+          >;
+        };
       };
     };
     assert.equal(statusBody.ok, true);
@@ -108,6 +120,15 @@ test("daemon requires token and serves registered workspace threads", async () =
     );
     assert.equal(
       statusBody.modules.threadIndex.workspaces[workspace.id].rebuilding,
+      false
+    );
+    assert.equal(statusBody.modules.memory.status, "model_missing");
+    assert.equal(
+      statusBody.modules.memory.workspaces[workspace.id].status,
+      "model_missing"
+    );
+    assert.equal(
+      statusBody.modules.memory.workspaces[workspace.id].modelPrepared,
       false
     );
 

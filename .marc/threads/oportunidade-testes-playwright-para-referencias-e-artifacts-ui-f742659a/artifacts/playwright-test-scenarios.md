@@ -127,6 +127,17 @@ Priority: medium
 - [ ] Open the keyboard shortcuts dialog and an artifact sheet, and verify both use consistent close controls, borders, shadows, focus indication, and close animations.
 - [ ] Copy a thread reference by clicking its displayed reference text and verify the value is copied without rendering that reference as a button-like control.
 
+## Workspace Memory Indicator
+
+Source thread: `oportunidade-indicador-visual-de-memory-na-interface-174c48b6`  
+Priority: medium
+
+- [ ] Load the UI with a valid daemon token and a workspace whose memory status is `ready`; verify the workspace card shows a `Memory ready` accessible indicator with the `database-check` icon.
+- [ ] Simulate or prepare stale/missing memory status and verify the workspace card shows the `database-backup` action state without affecting the daemon `Connected` status.
+- [ ] Simulate a memory error or incompatible index status and verify the workspace card shows the `database-x` error state with an accessible label.
+- [ ] Simulate a future rebuilding status when available and verify the workspace card shows the `database-zap` busy state without shifting the card layout.
+- [ ] Verify the indicator remains aligned inside selected and unselected workspace cards across desktop and narrow viewports.
+
 ## Maintenance Notes
 
 - This backlog should grow as UI features are added.
