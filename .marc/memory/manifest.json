@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "builtAt": "2026-07-07T05:23:41.505Z",
+  "builtAt": "2026-07-07T22:22:11.015Z",
   "embeddingProvider": {
     "id": "transformers-js-local",
     "name": "Transformers.js local multilingual embeddings",
@@ -494,6 +494,27 @@
         "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186:section:validacao",
         "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186:section:riscos-e-continuidade",
         "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186:section:referencias"
+      ]
+    },
+    {
+      "threadId": "oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb",
+      "title": "Resumo executivo",
+      "closedAt": "2026-07-07T22:15:00.000Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb/SUMMARY.md",
+      "reference": "marc://$oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb",
+      "sha256": "dc21349e9f82d68bc3f447add1250669f45baeff292dfb9c9fb838b613bb5d9c",
+      "mtimeMs": 1783462834260.844,
+      "recordIds": [
+        "oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb:summary",
+        "oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb:section:objetivo",
+        "oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb:section:resultado",
+        "oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb:section:decisoes",
+        "oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb:section:implementacao",
+        "oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb:section:validacao",
+        "oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb:section:experiencia-de-uso",
+        "oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb:section:continuidade",
+        "oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb:section:estado-final"
       ]
     },
     {

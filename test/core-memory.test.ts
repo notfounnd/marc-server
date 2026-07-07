@@ -1,7 +1,4 @@
 import assert from "node:assert/strict";
-import fs from "node:fs/promises";
-import os from "node:os";
-import path from "node:path";
 import test from "node:test";
 import {
   InMemoryMemoryVectorStore,
@@ -10,107 +7,14 @@ import {
   recallMemoryInWorkspace,
   scanThreadSummarySources
 } from "../src/core/memory/index.js";
-import type {
-  EmbeddingProvider,
-  EmbeddingProviderMetadata
-} from "../src/core/memory/types.js";
-import type { WorkspaceInfo } from "../src/core/types.js";
-
-const providerMetadata: EmbeddingProviderMetadata = {
-  id: "fake-local",
-  name: "Fake Local Embeddings",
-  model: "fake-memory-model",
-  version: "1.0.0",
-  dimensions: 3,
-  distance: "cosine",
-  quantized: false,
-  runtime: "local"
-};
-
-class FakeEmbeddingProvider implements EmbeddingProvider {
-  prepareCalls = 0;
-  documentCalls = 0;
-  queryCalls = 0;
-
-  constructor(
-    private readonly metadata: EmbeddingProviderMetadata = providerMetadata,
-    private readonly prepared = true
-  ) {}
-
-  describe(): EmbeddingProviderMetadata {
-    return this.metadata;
-  }
-
-  isPrepared(): Promise<boolean> {
-    return Promise.resolve(this.prepared);
-  }
-
-  async prepare(): Promise<void> {
-    this.prepareCalls += 1;
-  }
-
-  async embedDocuments(texts: string[]): Promise<number[][]> {
-    this.documentCalls += 1;
-    return texts.map(vectorForText);
-  }
-
-  async embedQuery(text: string): Promise<number[]> {
-    this.queryCalls += 1;
-    return vectorForText(text);
-  }
-
-  async dispose(): Promise<void> {}
-}
-
-function vectorForText(text: string): number[] {
-  const normalized = text.toLowerCase();
-  const tokenScore = tokenCount(normalized, [
-    "token",
-    "daemon",
-    "seguranca",
-    "security",
-    "rotacao",
-    "rotation",
-    "interface"
-  ]);
-  const uiScore = tokenCount(normalized, ["composer", "autocomplete", "ui"]);
-  const workflowScore = tokenCount(normalized, [
-    "bootstrap",
-    "thread",
-    "summary",
-    "workflow"
-  ]);
-  return [tokenScore, uiScore, workflowScore];
-}
-
-function tokenCount(text: string, tokens: string[]): number {
-  return tokens.reduce((total, token) => {
-    if (!text.includes(token)) return total;
-    return total + 1;
-  }, 0);
-}
-
-async function tempWorkspace(): Promise<WorkspaceInfo> {
-  const rootPath = await fs.mkdtemp(path.join(os.tmpdir(), "marc-memory-"));
-  const marcPath = path.join(rootPath, ".marc");
-  await fs.mkdir(path.join(marcPath, "threads"), { recursive: true });
-  return {
-    id: "memory-workspace",
-    name: "memory-workspace",
-    rootPath,
-    marcPath
-  };
-}
-
-async function writeSummary(
-  info: WorkspaceInfo,
-  threadId: string,
-  content: string
-): Promise<void> {
-  const threadPath = path.join(info.marcPath, "threads", threadId);
-  await fs.mkdir(threadPath, { recursive: true });
-  await fs.writeFile(path.join(threadPath, "SUMMARY.md"), content);
-}
+import {
+  FakeEmbeddingProvider,
+  ScoreOverrideStore,
+  createThreadFolder,
+  providerMetadata,
+  tempWorkspace,
+  writeSummary
+} from "./memory-test-helpers.js";
 
 test("scans only thread summaries and extracts structured metadata", async () => {
   const info = await tempWorkspace();
@@ -134,9 +38,7 @@ test("scans only thread summaries and extracts structured metadata", async () =>
       "- Nao implementar rotacao automatica do token."
     ].join("\n")
   );
-  await fs.mkdir(path.join(info.marcPath, "threads", "thread-sem-summary"), {
-    recursive: true
-  });
+  await createThreadFolder(info, "thread-sem-summary");
 
   const summaries = await scanThreadSummarySources(info);
 
@@ -253,6 +155,61 @@ test("recall returns the summary thread that matches the development intent", as
     recall.nextActions.some((action) => action.includes("thread_read"))
   );
   assert.equal(provider.queryCalls, 1);
+});
+
+test("recall reranks decision matches above generic vector neighbors", async () => {
+  const info = await tempWorkspace();
+  const provider = new FakeEmbeddingProvider();
+  const store = new ScoreOverrideStore({
+    "thread-token": 0.6,
+    "thread-ui": 0.72
+  });
+  await writeSummary(
+    info,
+    "thread-token",
+    [
+      "# Resumo - Modelo de seguranca e gestao de token",
+      "",
+      "Thread: `thread-token`",
+      "Closed: `2026-05-24T23:15:59.807Z`",
+      "",
+      "## Resultado executivo",
+      "",
+      "- O daemon usa token unico local.",
+      "",
+      "## Decisao",
+      "",
+      "- Nao implementar rotacao automatica do token.",
+      "- Nao alterar a persistencia do token na UI."
+    ].join("\n")
+  );
+  await writeSummary(
+    info,
+    "thread-ui",
+    [
+      "# Resumo - Esquemas de visualizacao das colunas da UI",
+      "",
+      "Thread: `thread-ui`",
+      "Closed: `2026-05-22T02:20:47.643Z`",
+      "",
+      "## Resultado",
+      "",
+      "- Implementar melhoria visual de interface para as colunas da UI."
+    ].join("\n")
+  );
+  await rebuildMemoryInWorkspace(info, { provider, store });
+
+  const recall = await recallMemoryInWorkspace(info, {
+    provider,
+    store,
+    query: "implementar rotacao de token da interface",
+    limit: 2
+  });
+
+  assert.equal(recall.results[0]?.threadId, "thread-token");
+  assert.match(recall.results[0]?.matchedText ?? "", /rotacao/i);
+  assert.match(recall.results[0]?.reason ?? "", /exact terms/i);
+  assert.match(recall.results[0]?.reason ?? "", /Decisao/i);
 });
 
 test("recall does not load embeddings when the local provider is not prepared", async () => {
