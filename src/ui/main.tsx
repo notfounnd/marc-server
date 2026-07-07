@@ -14,6 +14,7 @@ import type {
   ArtifactDraft,
   ArtifactMenuItem,
   ArtifactView,
+  MemoryIndexHealth,
   MiddleMode,
   StatusKind,
   Thread,
@@ -57,6 +58,9 @@ function App() {
   const [lastSyncedAt, setLastSyncedAt] = useState<Date>();
   const [threadIndexHealthByWorkspace, setThreadIndexHealthByWorkspace] =
     useState<Record<string, ThreadIndexHealth>>({});
+  const [memoryHealthByWorkspace, setMemoryHealthByWorkspace] = useState<
+    Record<string, MemoryIndexHealth>
+  >({});
   const [busy, setBusy] = useState(false);
   const lastRefreshAtRef = useRef(0);
   const busyRef = useRef(false);
@@ -153,6 +157,7 @@ function App() {
     liveRefreshTimerRef,
     setBusy,
     setThreadIndexHealthByWorkspace,
+    setMemoryHealthByWorkspace,
     setWorkspaces,
     setSelectedWorkspaceId,
     setSelectedThreadId,
@@ -216,6 +221,7 @@ function App() {
         status={status}
         busy={busy}
         workspaces={workspaces}
+        memoryHealthByWorkspace={memoryHealthByWorkspace}
         selectedWorkspaceId={selectedWorkspaceId}
         visibleThreads={visibleThreads}
         selectedThreadId={selectedThreadId}

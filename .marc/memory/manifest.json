@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "builtAt": "2026-07-07T00:58:01.633Z",
+  "builtAt": "2026-07-07T05:23:41.505Z",
   "embeddingProvider": {
     "id": "transformers-js-local",
     "name": "Transformers.js local multilingual embeddings",
@@ -225,6 +225,23 @@
         "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1:section:validacao",
         "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1:section:backlog-playwright",
         "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1:section:pendencias"
+      ]
+    },
+    {
+      "threadId": "oportunidade-indicador-visual-de-memory-na-interface-174c48b6",
+      "title": "Thread summary",
+      "closedAt": "2026-07-07T05:16:41.873Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-indicador-visual-de-memory-na-interface-174c48b6\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-indicador-visual-de-memory-na-interface-174c48b6/SUMMARY.md",
+      "reference": "marc://$oportunidade-indicador-visual-de-memory-na-interface-174c48b6",
+      "sha256": "f0ece2b2870381f2dae1fd668b612c8f064fcb42512493dc66cfe91d1b99376b",
+      "mtimeMs": 1783401425137.1577,
+      "recordIds": [
+        "oportunidade-indicador-visual-de-memory-na-interface-174c48b6:summary",
+        "oportunidade-indicador-visual-de-memory-na-interface-174c48b6:section:resultado",
+        "oportunidade-indicador-visual-de-memory-na-interface-174c48b6:section:o-que-foi-alterado",
+        "oportunidade-indicador-visual-de-memory-na-interface-174c48b6:section:validacao",
+        "oportunidade-indicador-visual-de-memory-na-interface-174c48b6:section:continuidade"
       ]
     },
     {

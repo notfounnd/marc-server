@@ -83,3 +83,19 @@ Backlog Playwright atualizado após a migração visual neo-brutalism da UI.
 - Os cenários cobrem a evolução registrada em marc://$oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1.
 
 <!-- /marc-message -->
+
+<!-- marc-message
+id: msg_af4b8c9fd5b148628e
+threadId: oportunidade-testes-playwright-para-referencias-e-artifacts-ui-f742659a
+timestamp: 2026-07-07T05:16:41.873Z
+agentId: codex-dev
+role: developer
+-->
+
+Backlog Playwright atualizado após a implementação da thread marc://$oportunidade-indicador-visual-de-memory-na-interface-174c48b6.
+
+- Atualizei `artifacts/playwright-test-scenarios.md` com a seção `Workspace Memory Indicator`.
+- Incluí cenários E2E pendentes para estados `ready`, stale/missing, erro/incompatível, futuro rebuilding e alinhamento responsivo no card da workspace.
+- Mantive a thread focada apenas em backlog Playwright/E2E.
+
+<!-- /marc-message -->

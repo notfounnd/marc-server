@@ -2,6 +2,7 @@ import { useCallback, useEffect } from "react";
 import type {
   Agent,
   DaemonStatus,
+  MemoryIndexHealth,
   MiddleMode,
   StatusKind,
   Thread,
@@ -32,6 +33,7 @@ export function useAppSync({
   liveRefreshTimerRef,
   setBusy,
   setThreadIndexHealthByWorkspace,
+  setMemoryHealthByWorkspace,
   setWorkspaces,
   setSelectedWorkspaceId,
   setSelectedThreadId,
@@ -57,6 +59,9 @@ export function useAppSync({
   setBusy: (busy: boolean) => void;
   setThreadIndexHealthByWorkspace: (
     health: Record<string, ThreadIndexHealth>
+  ) => void;
+  setMemoryHealthByWorkspace: (
+    health: Record<string, MemoryIndexHealth>
   ) => void;
   setWorkspaces: (workspaces: Workspace[]) => void;
   setSelectedWorkspaceId: (workspaceId: string | undefined) => void;
@@ -136,6 +141,7 @@ export function useAppSync({
     setRules("");
     setThreadPayload(undefined);
     setThreadIndexHealthByWorkspace({});
+    setMemoryHealthByWorkspace({});
   }
 
   const refresh = useCallback(
@@ -151,6 +157,9 @@ export function useAppSync({
         const daemonStatus = await api<DaemonStatus>("/api/status");
         setThreadIndexHealthByWorkspace(
           daemonStatus.modules?.threadIndex?.workspaces ?? {}
+        );
+        setMemoryHealthByWorkspace(
+          daemonStatus.modules?.memory?.workspaces ?? {}
         );
         const nextWorkspaces = await api<Workspace[]>("/api/workspaces");
         setWorkspaces(nextWorkspaces);

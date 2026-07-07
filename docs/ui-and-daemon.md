@@ -130,7 +130,7 @@ The daemon API is local infrastructure for the UI and nearby tooling. MCP client
 
 | Method | Route | Use |
 |---|---|---|
-| `GET` | `/api/status` | Read daemon status, including workspace registry and thread index health. |
+| `GET` | `/api/status` | Read daemon status, including workspace registry, thread index health, and memory health. |
 | `GET` | `/api/events` | Open the Server-Sent Events stream used by the UI. |
 | `PUT` | `/api/leases/:clientId` | Create or renew an MCP lease for detached daemon idle tracking. |
 | `DELETE` | `/api/leases/:clientId` | Remove an MCP lease. |
@@ -148,6 +148,8 @@ The daemon API is local infrastructure for the UI and nearby tooling. MCP client
 The API uses the daemon bearer token. It is not a public remote API surface.
 
 `/api/status` keeps the compatibility field `ok: boolean` and includes module health under `modules`. The thread index module reports each registered workspace as `ready`, `rebuilding`, `degraded`, or `unavailable`; the UI uses this to keep the last known thread list visible while a background rebuild finishes.
+
+The memory module reports each registered workspace under `modules.memory.workspaces`. Its status values mirror the summary-memory snapshot state: `ready`, `stale`, `missing`, `model_missing`, or `incompatible`. The UI renders this as a compact database icon on each workspace card. Missing or stale memory does not make the daemon disconnected; it only indicates that agents may need `memory_prepare` or `memory_rebuild` before relying on semantic recall.
 
 ## Troubleshooting
 

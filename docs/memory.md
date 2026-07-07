@@ -65,6 +65,19 @@ The manifest records:
 
 If the provider contract changes, run a full rebuild. Vectors from different providers or dimensions are not mixed.
 
+## UI indicator
+
+The daemon exposes summary-memory health per workspace through `/api/status` at `modules.memory.workspaces`.
+
+The UI renders that state on each workspace card:
+
+- `DatabaseCheck`: memory is ready and current.
+- `DatabaseBackup`: memory is stale, missing, or waiting for the local model cache.
+- `DatabaseZap`: memory rebuild is running, once background rebuild support exposes that state.
+- `DatabaseX`: memory is incompatible or degraded.
+
+This indicator is separate from `Connected`, which is daemon/token health, and `Synced`, which is the browser's last successful UI refresh.
+
 ## Recall flow
 
 Agents should call `memory_recall` before proposing or developing behavior that may overlap historical decisions:
