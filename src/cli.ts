@@ -8,6 +8,12 @@ import {
 } from "./daemon/lifecycle.js";
 import { runDaemon } from "./daemon/server.js";
 import { runMcpServer } from "./mcp/server.js";
+import {
+  prepareMemory,
+  readMemoryStatus,
+  rebuildMemory,
+  recallMemory
+} from "./core/workspace.js";
 import type { DaemonConfig } from "./core/types.js";
 
 type ParsedArgs = {
@@ -60,6 +66,7 @@ function usage(): never {
   console.error(`Usage:
   marc daemon [--host 127.0.0.1] [--port 4187] [--data-dir .marc-daemon] [--token <token>]
   marc daemon start|stop|restart|status [--host 127.0.0.1] [--port 4187] [--data-dir .marc-daemon]
+  marc memory status|prepare|rebuild|recall [--workspace <path>] [--query <text>] [--limit <n>] [--min-score <n>]
   marc mcp [--workspace <path>] [--daemon-url http://127.0.0.1:4187] [--token <token>]`);
   process.exit(1);
 }
@@ -101,6 +108,36 @@ async function handleDaemonCommand(parsed: ParsedArgs): Promise<void> {
   await runDaemon(config);
 }
 
+const memoryCommandHandlers: Record<
+  string,
+  (parsed: ParsedArgs, workspaceRoot: string) => Promise<unknown>
+> = {
+  status: (_parsed, workspaceRoot) => readMemoryStatus(workspaceRoot),
+  prepare: (_parsed, workspaceRoot) => prepareMemory(workspaceRoot),
+  rebuild: (_parsed, workspaceRoot) => rebuildMemory(workspaceRoot),
+  recall: (parsed, workspaceRoot) =>
+    recallMemory(workspaceRoot, {
+      query: stringValue(parsed.values, "query") ?? "",
+      limit: numberValue(parsed.values, "limit"),
+      minScore: numberValue(parsed.values, "min-score")
+    })
+};
+
+async function handleMemoryCommand(parsed: ParsedArgs): Promise<void> {
+  const action = parsed.args[0];
+  const handler = action ? memoryCommandHandlers[action] : undefined;
+  if (!handler) {
+    usage();
+  }
+  if (action === "recall" && !stringValue(parsed.values, "query")) {
+    usage();
+  }
+
+  const workspaceRoot =
+    stringValue(parsed.values, "workspace") ?? process.cwd();
+  printResult(await handler(parsed, workspaceRoot));
+}
+
 async function main(): Promise<void> {
   const parsed = parseArgs(process.argv.slice(2));
 
@@ -115,6 +152,11 @@ async function main(): Promise<void> {
       daemonUrl: stringValue(parsed.values, "daemon-url"),
       token: stringValue(parsed.values, "token")
     });
+    return;
+  }
+
+  if (parsed.command === "memory") {
+    await handleMemoryCommand(parsed);
     return;
   }
 

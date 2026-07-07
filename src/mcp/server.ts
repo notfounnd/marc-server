@@ -9,6 +9,7 @@ import {
   unregisterFromDaemon
 } from "./daemon.js";
 import { MARC_HELPER_TOPICS, marcHelper } from "./helper.js";
+import { registerMemoryTools } from "./memory-tools.js";
 import { gatedShape, text, withBootstrap } from "./responses.js";
 import type { McpOptions } from "./types.js";
 import {
@@ -95,6 +96,8 @@ export function buildMcpServer(options: McpOptions = {}): McpServer {
     async (input) =>
       withBootstrap(input, async () => readWorkspaceStatus(workspaceRoot))
   );
+
+  registerMemoryTools(server, workspaceRoot);
 
   server.tool(
     "workspace_audit",

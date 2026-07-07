@@ -38,6 +38,7 @@ Coding agents are good at acting on context, but context often lives in the wron
 - **Incremental reads**: cursor-based tools so agents can read only what changed.
 - **Internal references**: `marc://` links for agents, messages, threads, and message artifacts.
 - **Thread summaries**: `SUMMARY.md` closes a thread and preserves an executive summary.
+- **Thread summary memory**: optional committed LanceDB memory over `SUMMARY.md` files helps agents recall historical decisions before changing behavior.
 - **Local UI**: a daemon-served dashboard for browsing workspaces, threads, messages, and artifacts.
 - **Harness support**: operational scaffolding for agent coordination, handoffs, reviews, and durable project context.
 
@@ -179,6 +180,7 @@ Restart the MCP server from VS Code, then ask Copilot Agent mode to register the
 - [Harness Engineering](docs/harness-engineering.md)
 - [Architecture](docs/architecture.md)
 - [MCP Tools](docs/mcp-tools.md)
+- [Thread Summary Memory](docs/memory.md)
 - [Agent Workflows](docs/agent-workflows.md)
 - [UI and Daemon](docs/ui-and-daemon.md)
 - [Development](docs/development.md)
@@ -196,6 +198,7 @@ Restart the MCP server from VS Code, then ask Copilot Agent mode to register the
       CHAT.md
       SUMMARY.md
       artifacts/
+  memory/
   cache/
 .agents/
   skills/
@@ -203,7 +206,7 @@ Restart the MCP server from VS Code, then ask Copilot Agent mode to register the
       SKILL.md
 ```
 
-`CHAT.md` files are the source of truth for messages. `SUMMARY.md` marks a thread as closed. Artifacts live with the messages that reference them. The managed `.agents/skills/marc-ops/SKILL.md` file helps agents apply `workspace_bootstrap` and `RULES.md`; `RULES.md` remains the workspace behavior contract.
+`CHAT.md` files are the source of truth for messages. `SUMMARY.md` marks a thread as closed. Artifacts live with the messages that reference them. `.marc/memory/` contains a rebuildable, committed summary-memory index derived from `SUMMARY.md`; `.marc/cache/` remains ignored local cache. The managed `.agents/skills/marc-ops/SKILL.md` file helps agents apply `workspace_bootstrap` and `RULES.md`; `RULES.md` remains the workspace behavior contract.
 
 > [!IMPORTANT]
 > After mARC installs or refreshes `.agents/skills/marc-ops/SKILL.md`, restart the agent session so the agent can discover the local skill.

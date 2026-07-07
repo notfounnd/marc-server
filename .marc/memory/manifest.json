@@ -1,0 +1,515 @@
+{
+  "schemaVersion": 1,
+  "builtAt": "2026-07-07T00:58:01.633Z",
+  "embeddingProvider": {
+    "id": "transformers-js-local",
+    "name": "Transformers.js local multilingual embeddings",
+    "model": "Xenova/paraphrase-multilingual-MiniLM-L12-v2",
+    "version": "transformers-js-4.2.0",
+    "dimensions": 384,
+    "distance": "cosine",
+    "quantized": false,
+    "runtime": "local"
+  },
+  "records": [
+    {
+      "threadId": "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7",
+      "title": "Sumario executivo",
+      "closedAt": "2026-05-13T05:35:00.000Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7\\SUMMARY.md",
+      "relativeSummaryPath": "threads/bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7/SUMMARY.md",
+      "reference": "marc://$bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7",
+      "sha256": "eb0e196c8ba3b0572ba02390f98e3fa402a3127c96a7907e95bcd83744cbb241",
+      "mtimeMs": 1778651551040.6748,
+      "recordIds": [
+        "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7:summary",
+        "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7:section:resultado",
+        "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7:section:contexto",
+        "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7:section:tratativa",
+        "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7:section:validacao",
+        "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7:section:observacoes",
+        "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7:section:referencias"
+      ]
+    },
+    {
+      "threadId": "bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82",
+      "title": "Resumo Executivo",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82\\SUMMARY.md",
+      "relativeSummaryPath": "threads/bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82/SUMMARY.md",
+      "reference": "marc://$bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82",
+      "sha256": "9879d9e1ec3b937b78652701aae021e7e74ab8cb3d87f438fc1d67807dc21e25",
+      "mtimeMs": 1779256832717.4446,
+      "recordIds": [
+        "bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82:summary",
+        "bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82:section:resultado",
+        "bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82:section:o-que-foi-tratado",
+        "bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82:section:validacao",
+        "bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82:section:continuidade"
+      ]
+    },
+    {
+      "threadId": "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a",
+      "title": "Sumario executivo",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a\\SUMMARY.md",
+      "relativeSummaryPath": "threads/bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a/SUMMARY.md",
+      "reference": "marc://$bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a",
+      "sha256": "aa90537bcf875e2a53a9557c3f15785b83d03d3ad300e054b7fe5a298d2375b9",
+      "mtimeMs": 1778547887871.421,
+      "recordIds": [
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a:summary",
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a:section:resultado",
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a:section:contexto",
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a:section:tratativa",
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a:section:validacao",
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a:section:documentacao",
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a:section:referencias"
+      ]
+    },
+    {
+      "threadId": "bug-workspace-audit-ignora-referencias-marc-em-inline-code-72461180",
+      "title": "Resumo Executivo",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\bug-workspace-audit-ignora-referencias-marc-em-inline-code-72461180\\SUMMARY.md",
+      "relativeSummaryPath": "threads/bug-workspace-audit-ignora-referencias-marc-em-inline-code-72461180/SUMMARY.md",
+      "reference": "marc://$bug-workspace-audit-ignora-referencias-marc-em-inline-code-72461180",
+      "sha256": "ba2514439121b5b7d6be463b8d20968b30c2b3d39a58d867e2aa61c40d0384b7",
+      "mtimeMs": 1779296556733.692,
+      "recordIds": [
+        "bug-workspace-audit-ignora-referencias-marc-em-inline-code-72461180:summary",
+        "bug-workspace-audit-ignora-referencias-marc-em-inline-code-72461180:section:resultado",
+        "bug-workspace-audit-ignora-referencias-marc-em-inline-code-72461180:section:o-que-foi-tratado",
+        "bug-workspace-audit-ignora-referencias-marc-em-inline-code-72461180:section:validacao",
+        "bug-workspace-audit-ignora-referencias-marc-em-inline-code-72461180:section:observacoes"
+      ]
+    },
+    {
+      "threadId": "oportunidade-autocomplete-de-referencias-no-composer-2341bc9f",
+      "title": "Resumo executivo",
+      "closedAt": "2026-05-11T00:43:20.102Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-autocomplete-de-referencias-no-composer-2341bc9f\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-autocomplete-de-referencias-no-composer-2341bc9f/SUMMARY.md",
+      "reference": "marc://$oportunidade-autocomplete-de-referencias-no-composer-2341bc9f",
+      "sha256": "5ffe087a370c5ba1ceba4c79c966894e3b7c55b805c67dc4eb184048033c5572",
+      "mtimeMs": 1778460384185.6765,
+      "recordIds": [
+        "oportunidade-autocomplete-de-referencias-no-composer-2341bc9f:summary",
+        "oportunidade-autocomplete-de-referencias-no-composer-2341bc9f:section:objetivo",
+        "oportunidade-autocomplete-de-referencias-no-composer-2341bc9f:section:resultado",
+        "oportunidade-autocomplete-de-referencias-no-composer-2341bc9f:section:decisoes",
+        "oportunidade-autocomplete-de-referencias-no-composer-2341bc9f:section:testes-e-validacao",
+        "oportunidade-autocomplete-de-referencias-no-composer-2341bc9f:section:documentacao-e-continuidade",
+        "oportunidade-autocomplete-de-referencias-no-composer-2341bc9f:section:estado-final"
+      ]
+    },
+    {
+      "threadId": "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac",
+      "title": "Resumo executivo",
+      "closedAt": "2026-07-07T00:55:19.196Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac/SUMMARY.md",
+      "reference": "marc://$oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac",
+      "sha256": "25e754cdf404b9f50bf02988d3e52a700ec789c714734e162a8b050e1349dde8",
+      "mtimeMs": 1783385757172.2722,
+      "recordIds": [
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac:summary",
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac:section:objetivo",
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac:section:contexto",
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac:section:decisoes",
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac:section:implementacao",
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac:section:validacao",
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac:section:ajustes-encontrados-durante-validacao-real",
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac:section:continuidade",
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac:section:estado-final"
+      ]
+    },
+    {
+      "threadId": "oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686",
+      "title": "Resumo executivo",
+      "closedAt": "2026-05-06T15:51:43.162Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686/SUMMARY.md",
+      "reference": "marc://$oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686",
+      "sha256": "66557909af94aee6ef67e8ee1fd22aaeffa80542b4ec13b24ebee500b41a89a7",
+      "mtimeMs": 1778082739672.1833,
+      "recordIds": [
+        "oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686:summary",
+        "oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686:section:objetivo",
+        "oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686:section:resultado",
+        "oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686:section:validacao",
+        "oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686:section:estado-final"
+      ]
+    },
+    {
+      "threadId": "oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c",
+      "title": "Resumo executivo",
+      "closedAt": "2026-05-16T04:58:26.485Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c/SUMMARY.md",
+      "reference": "marc://$oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c",
+      "sha256": "632c35a4fa62e30d4ad22c53c492bc26662490d430d0ea9573e45d0b9adabe46",
+      "mtimeMs": 1778907534517.0989,
+      "recordIds": [
+        "oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c:summary",
+        "oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c:section:objetivo",
+        "oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c:section:resultado",
+        "oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c:section:decisoes",
+        "oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c:section:testes-e-validacao",
+        "oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c:section:documentacao-e-continuidade",
+        "oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c:section:estado-final"
+      ]
+    },
+    {
+      "threadId": "oportunidade-documentacao-do-projeto-e-readme-encantador-e54fb794",
+      "title": "Resumo Executivo",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-documentacao-do-projeto-e-readme-encantador-e54fb794\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-documentacao-do-projeto-e-readme-encantador-e54fb794/SUMMARY.md",
+      "reference": "marc://$oportunidade-documentacao-do-projeto-e-readme-encantador-e54fb794",
+      "sha256": "92b57b8afb8d0255128a5a42fbd4cc7899bd4f607ee0ca6c1d642fc5ddb4fc70",
+      "mtimeMs": 1778129891504.7915,
+      "recordIds": [
+        "oportunidade-documentacao-do-projeto-e-readme-encantador-e54fb794:summary",
+        "oportunidade-documentacao-do-projeto-e-readme-encantador-e54fb794:section:contexto",
+        "oportunidade-documentacao-do-projeto-e-readme-encantador-e54fb794:section:entregas-realizadas",
+        "oportunidade-documentacao-do-projeto-e-readme-encantador-e54fb794:section:decisoes",
+        "oportunidade-documentacao-do-projeto-e-readme-encantador-e54fb794:section:oportunidades-derivadas",
+        "oportunidade-documentacao-do-projeto-e-readme-encantador-e54fb794:section:validacao",
+        "oportunidade-documentacao-do-projeto-e-readme-encantador-e54fb794:section:encerramento"
+      ]
+    },
+    {
+      "threadId": "oportunidade-encerramento-de-threads-por-summary-e-indice-json-ce47939a",
+      "title": "Executive Summary",
+      "closedAt": "2026-05-01T05:04:00.000Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-encerramento-de-threads-por-summary-e-indice-json-ce47939a\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-encerramento-de-threads-por-summary-e-indice-json-ce47939a/SUMMARY.md",
+      "reference": "marc://$oportunidade-encerramento-de-threads-por-summary-e-indice-json-ce47939a",
+      "sha256": "7f159b227e9f83451c8d798a39c7ff1d3f36837b3304c410b849154b2c038fc8",
+      "mtimeMs": 1777611810415.8916,
+      "recordIds": [
+        "oportunidade-encerramento-de-threads-por-summary-e-indice-json-ce47939a:summary",
+        "oportunidade-encerramento-de-threads-por-summary-e-indice-json-ce47939a:section:resultado",
+        "oportunidade-encerramento-de-threads-por-summary-e-indice-json-ce47939a:section:validacao",
+        "oportunidade-encerramento-de-threads-por-summary-e-indice-json-ce47939a:section:benchmark",
+        "oportunidade-encerramento-de-threads-por-summary-e-indice-json-ce47939a:section:oportunidades-derivadas"
+      ]
+    },
+    {
+      "threadId": "oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b",
+      "title": "Esquemas de visualização das colunas da UI",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b/SUMMARY.md",
+      "reference": "marc://$oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b",
+      "sha256": "860d03fa3fe9c1454a8f6b17a1017fa98f459f5631a2c9487286379f40ae3eaa",
+      "mtimeMs": 1779416447643.3618,
+      "recordIds": [
+        "oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b:summary",
+        "oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b:section:resultado",
+        "oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b:section:o-que-mudou",
+        "oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b:section:validacao",
+        "oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b:section:backlog-playwright",
+        "oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b:section:pendencias"
+      ]
+    },
+    {
+      "threadId": "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1",
+      "title": "Estilo neo-brutalism para a UI",
+      "closedAt": "2026-05-26T03:01:30.000Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1/SUMMARY.md",
+      "reference": "marc://$oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1",
+      "sha256": "c9d19aace75bcf081224cc1c8744dedcd47779315fc75561808cc653e36e05fa",
+      "mtimeMs": 1779764499058.3208,
+      "recordIds": [
+        "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1:summary",
+        "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1:section:resultado",
+        "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1:section:o-que-mudou",
+        "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1:section:validacao",
+        "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1:section:backlog-playwright",
+        "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1:section:pendencias"
+      ]
+    },
+    {
+      "threadId": "oportunidade-leitura-incremental-de-threads-por-cursor-3c45fa83",
+      "title": "Resumo Executivo",
+      "closedAt": "2026-05-01T23:47:41.015Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-leitura-incremental-de-threads-por-cursor-3c45fa83\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-leitura-incremental-de-threads-por-cursor-3c45fa83/SUMMARY.md",
+      "reference": "marc://$oportunidade-leitura-incremental-de-threads-por-cursor-3c45fa83",
+      "sha256": "41e6cd49c8efb074f4c67bc3cf2e40ff905c4ec4d33983556344e03f469f083d",
+      "mtimeMs": 1777679734016.678,
+      "recordIds": [
+        "oportunidade-leitura-incremental-de-threads-por-cursor-3c45fa83:summary",
+        "oportunidade-leitura-incremental-de-threads-por-cursor-3c45fa83:section:resultado",
+        "oportunidade-leitura-incremental-de-threads-por-cursor-3c45fa83:section:entregas",
+        "oportunidade-leitura-incremental-de-threads-por-cursor-3c45fa83:section:validacao",
+        "oportunidade-leitura-incremental-de-threads-por-cursor-3c45fa83:section:oportunidades-derivadas"
+      ]
+    },
+    {
+      "threadId": "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb",
+      "title": "Summary",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb/SUMMARY.md",
+      "reference": "marc://$oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb",
+      "sha256": "9a616b43e482f76f83a187d2e94f5bfb6497952d2b24373e71c2e1d2da1490db",
+      "mtimeMs": 1779125817903.8296,
+      "recordIds": [
+        "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb:summary",
+        "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb:section:goal",
+        "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb:section:completed",
+        "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb:section:validation",
+        "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb:section:notes",
+        "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb:section:follow-up"
+      ]
+    },
+    {
+      "threadId": "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3",
+      "title": "Modelo de segurança e gestão de token do daemon",
+      "closedAt": "2026-05-24T23:15:59.807Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3/SUMMARY.md",
+      "reference": "marc://$oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3",
+      "sha256": "81b8ef36cd19ab8ba093974b50027daa2db068f864daabd044fa077d33d8d578",
+      "mtimeMs": 1779664738317.6616,
+      "recordIds": [
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3:summary",
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3:section:resultado-executivo",
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3:section:motivacao-original",
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3:section:arquitetura-verificada",
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3:section:impacto-real-de-vazamento-do-token",
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3:section:capacidade-das-rotas-atuais",
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3:section:decisao",
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3:section:fronteira-futura",
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3:section:evidencia-e-validacao"
+      ]
+    },
+    {
+      "threadId": "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9",
+      "title": "Resumo executivo",
+      "closedAt": "2026-05-05T23:18:38.188Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9/SUMMARY.md",
+      "reference": "marc://$oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9",
+      "sha256": "ec4439884726a7c0ae166d74dbf6b5c40bd94e6d1a2f305304ffccdda66f1fae",
+      "mtimeMs": 1778023132781.3145,
+      "recordIds": [
+        "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9:summary",
+        "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9:section:objetivo",
+        "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9:section:resultado",
+        "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9:section:validacao",
+        "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9:section:estado-final"
+      ]
+    },
+    {
+      "threadId": "oportunidade-organizar-agentes-registrados-no-rules-md-734062bc",
+      "title": "Executive Summary",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-organizar-agentes-registrados-no-rules-md-734062bc\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-organizar-agentes-registrados-no-rules-md-734062bc/SUMMARY.md",
+      "reference": "marc://$oportunidade-organizar-agentes-registrados-no-rules-md-734062bc",
+      "sha256": "8dc9ee6116ec1c1bcfc81fefb5ae9748285752fa0ad6526694c3c56fed1ceac5",
+      "mtimeMs": 1778474285142.0562,
+      "recordIds": [
+        "oportunidade-organizar-agentes-registrados-no-rules-md-734062bc:summary",
+        "oportunidade-organizar-agentes-registrados-no-rules-md-734062bc:section:outcome",
+        "oportunidade-organizar-agentes-registrados-no-rules-md-734062bc:section:decisions",
+        "oportunidade-organizar-agentes-registrados-no-rules-md-734062bc:section:changes",
+        "oportunidade-organizar-agentes-registrados-no-rules-md-734062bc:section:validation",
+        "oportunidade-organizar-agentes-registrados-no-rules-md-734062bc:section:notes"
+      ]
+    },
+    {
+      "threadId": "oportunidade-organizar-css-da-ui-por-dominio-aa4c94ba",
+      "title": "Resumo executivo",
+      "closedAt": "2026-05-27T01:40:53Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-organizar-css-da-ui-por-dominio-aa4c94ba\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-organizar-css-da-ui-por-dominio-aa4c94ba/SUMMARY.md",
+      "reference": "marc://$oportunidade-organizar-css-da-ui-por-dominio-aa4c94ba",
+      "sha256": "b6410771d094c314af964fe23e020b3e02b6586de3cbe2ab8db2481446c97d73",
+      "mtimeMs": 1779846073139.5576,
+      "recordIds": [
+        "oportunidade-organizar-css-da-ui-por-dominio-aa4c94ba:summary",
+        "oportunidade-organizar-css-da-ui-por-dominio-aa4c94ba:section:objetivo",
+        "oportunidade-organizar-css-da-ui-por-dominio-aa4c94ba:section:resultado",
+        "oportunidade-organizar-css-da-ui-por-dominio-aa4c94ba:section:decisoes",
+        "oportunidade-organizar-css-da-ui-por-dominio-aa4c94ba:section:testes-e-validacao",
+        "oportunidade-organizar-css-da-ui-por-dominio-aa4c94ba:section:documentacao-e-continuidade",
+        "oportunidade-organizar-css-da-ui-por-dominio-aa4c94ba:section:estado-final"
+      ]
+    },
+    {
+      "threadId": "oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f",
+      "title": "Política de concorrência e escritas no Markdown SoT",
+      "closedAt": "2026-05-24T19:23:28.258Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f/SUMMARY.md",
+      "reference": "marc://$oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f",
+      "sha256": "bd9396f61a223ad0d6794ca2602c82cb7a099930168235bcde5ffd533f4cb068",
+      "mtimeMs": 1779650630968.5913,
+      "recordIds": [
+        "oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f:summary",
+        "oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f:section:resultado",
+        "oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f:section:o-que-mudou",
+        "oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f:section:validacao",
+        "oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f:section:risco-residual"
+      ]
+    },
+    {
+      "threadId": "oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd",
+      "title": "Resumo executivo",
+      "closedAt": "2026-05-06T01:21:05.418Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd/SUMMARY.md",
+      "reference": "marc://$oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd",
+      "sha256": "45043c2e7f316e174eb6563cd2f0859af20ee3bdba7ec8f480baa20c3e06e929",
+      "mtimeMs": 1778030510003.9265,
+      "recordIds": [
+        "oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd:summary",
+        "oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd:section:objetivo",
+        "oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd:section:resultado",
+        "oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd:section:decisoes",
+        "oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd:section:melhorias-de-usabilidade",
+        "oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd:section:validacao",
+        "oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd:section:estado-final"
+      ]
+    },
+    {
+      "threadId": "oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486",
+      "title": "Resumo executivo",
+      "closedAt": "2026-05-06T05:54:55.283Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486/SUMMARY.md",
+      "reference": "marc://$oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486",
+      "sha256": "2a42d5ca54984c4f7bc4e8e2a5a4beae5618d236fb43973128107df3761c08a3",
+      "mtimeMs": 1778046921778.099,
+      "recordIds": [
+        "oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486:summary",
+        "oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486:section:objetivo",
+        "oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486:section:resultado",
+        "oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486:section:validacao",
+        "oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486:section:continuidade",
+        "oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486:section:estado-final"
+      ]
+    },
+    {
+      "threadId": "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4",
+      "title": "Resumo executivo",
+      "closedAt": "2026-05-06T05:01:27.248Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4/SUMMARY.md",
+      "reference": "marc://$oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4",
+      "sha256": "94de0a339dd3b85ae6e77b1a46af3c4d91a283ea4550b5d9ed41ce735e4c9821",
+      "mtimeMs": 1778043710476.1597,
+      "recordIds": [
+        "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4:summary",
+        "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4:section:objetivo",
+        "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4:section:resultado",
+        "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4:section:gramatica-implementada",
+        "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4:section:decisoes",
+        "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4:section:testes-e-validacao",
+        "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4:section:continuidade",
+        "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4:section:estado-final"
+      ]
+    },
+    {
+      "threadId": "oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be",
+      "title": "Summary: reformatar Custom Rules com base na auditoria",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be/SUMMARY.md",
+      "reference": "marc://$oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be",
+      "sha256": "921d36967131d9896a2b8e511bacb995683ddc178810232136ca0110aee119ee",
+      "mtimeMs": 1779147114762.3757,
+      "recordIds": [
+        "oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be:summary",
+        "oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be:section:resultado",
+        "oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be:section:artifact",
+        "oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be:section:validacao",
+        "oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be:section:observacoes"
+      ]
+    },
+    {
+      "threadId": "oportunidade-revisao-de-arquitetura-do-projeto-fe4a1cb2",
+      "title": "Resumo",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-revisao-de-arquitetura-do-projeto-fe4a1cb2\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-revisao-de-arquitetura-do-projeto-fe4a1cb2/SUMMARY.md",
+      "reference": "marc://$oportunidade-revisao-de-arquitetura-do-projeto-fe4a1cb2",
+      "sha256": "ddab36239b3e21038d4723350043d60bc337aac6e6bffe171761e47f53b54b8c",
+      "mtimeMs": 1779250239350.5532,
+      "recordIds": [
+        "oportunidade-revisao-de-arquitetura-do-projeto-fe4a1cb2:summary",
+        "oportunidade-revisao-de-arquitetura-do-projeto-fe4a1cb2:section:resultado",
+        "oportunidade-revisao-de-arquitetura-do-projeto-fe4a1cb2:section:validacao",
+        "oportunidade-revisao-de-arquitetura-do-projeto-fe4a1cb2:section:acompanhamento"
+      ]
+    },
+    {
+      "threadId": "oportunidade-revisao-en-us-do-projeto-c14150b8",
+      "title": "Resumo executivo",
+      "closedAt": "2026-05-11T22:35:27.000Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-revisao-en-us-do-projeto-c14150b8\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-revisao-en-us-do-projeto-c14150b8/SUMMARY.md",
+      "reference": "marc://$oportunidade-revisao-en-us-do-projeto-c14150b8",
+      "sha256": "38c11b054c776402bd8ced6b4cabc4c96874ccd0f8f16c36b7272587c1a4c34c",
+      "mtimeMs": 1778539052083.875,
+      "recordIds": [
+        "oportunidade-revisao-en-us-do-projeto-c14150b8:summary",
+        "oportunidade-revisao-en-us-do-projeto-c14150b8:section:objetivo",
+        "oportunidade-revisao-en-us-do-projeto-c14150b8:section:resultado",
+        "oportunidade-revisao-en-us-do-projeto-c14150b8:section:entregas",
+        "oportunidade-revisao-en-us-do-projeto-c14150b8:section:decisoes",
+        "oportunidade-revisao-en-us-do-projeto-c14150b8:section:validacao",
+        "oportunidade-revisao-en-us-do-projeto-c14150b8:section:documentacao-e-continuidade",
+        "oportunidade-revisao-en-us-do-projeto-c14150b8:section:estado-final"
+      ]
+    },
+    {
+      "threadId": "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186",
+      "title": "Resumo executivo",
+      "closedAt": "2026-05-15T17:30:00.000Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186/SUMMARY.md",
+      "reference": "marc://$oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186",
+      "sha256": "a7bcd3f9d93216c5d4f5ca8a0655f95b40b488e91590c08ec24311eb2e695efd",
+      "mtimeMs": 1778870222228.4583,
+      "recordIds": [
+        "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186:summary",
+        "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186:section:objetivo",
+        "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186:section:decisoes",
+        "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186:section:implementacao",
+        "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186:section:validacao",
+        "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186:section:riscos-e-continuidade",
+        "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186:section:referencias"
+      ]
+    },
+    {
+      "threadId": "padronizar-mensagens-marc-em-bullets-concisos-6143a9b5",
+      "title": "Resumo Executivo",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\padronizar-mensagens-marc-em-bullets-concisos-6143a9b5\\SUMMARY.md",
+      "relativeSummaryPath": "threads/padronizar-mensagens-marc-em-bullets-concisos-6143a9b5/SUMMARY.md",
+      "reference": "marc://$padronizar-mensagens-marc-em-bullets-concisos-6143a9b5",
+      "sha256": "61bd7d1f756c2ad1d86c75ff287e2b285dfcacbfb4df9ba6f3d4b4c3e03f1443",
+      "mtimeMs": 1777753612426.753,
+      "recordIds": [
+        "padronizar-mensagens-marc-em-bullets-concisos-6143a9b5:summary",
+        "padronizar-mensagens-marc-em-bullets-concisos-6143a9b5:section:resultado",
+        "padronizar-mensagens-marc-em-bullets-concisos-6143a9b5:section:o-que-foi-tratado",
+        "padronizar-mensagens-marc-em-bullets-concisos-6143a9b5:section:validacao-registrada",
+        "padronizar-mensagens-marc-em-bullets-concisos-6143a9b5:section:continuidade"
+      ]
+    },
+    {
+      "threadId": "remover-comandos-legados-do-mcp-reduzir-sobrecarga-de-contexto-034ad1bf",
+      "title": "Resumo Executivo",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\remover-comandos-legados-do-mcp-reduzir-sobrecarga-de-contexto-034ad1bf\\SUMMARY.md",
+      "relativeSummaryPath": "threads/remover-comandos-legados-do-mcp-reduzir-sobrecarga-de-contexto-034ad1bf/SUMMARY.md",
+      "reference": "marc://$remover-comandos-legados-do-mcp-reduzir-sobrecarga-de-contexto-034ad1bf",
+      "sha256": "3a42367f70c135db2832c9a447faa93e25e9e3a343aa614fdfef9ae6e75fa6f3",
+      "mtimeMs": 1777753612397.828,
+      "recordIds": [
+        "remover-comandos-legados-do-mcp-reduzir-sobrecarga-de-contexto-034ad1bf:summary",
+        "remover-comandos-legados-do-mcp-reduzir-sobrecarga-de-contexto-034ad1bf:section:resultado",
+        "remover-comandos-legados-do-mcp-reduzir-sobrecarga-de-contexto-034ad1bf:section:o-que-foi-tratado",
+        "remover-comandos-legados-do-mcp-reduzir-sobrecarga-de-contexto-034ad1bf:section:validacao-registrada",
+        "remover-comandos-legados-do-mcp-reduzir-sobrecarga-de-contexto-034ad1bf:section:continuidade"
+      ]
+    }
+  ]
+}

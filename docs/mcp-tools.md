@@ -66,7 +66,7 @@ If a gated tool is called without the flag, it returns `bootstrap_required` and 
 | `workspace_unregister` | Remove this workspace from the daemon registry without deleting `.marc/`. |
 | `workspace_info` | Return the workspace bound to this MCP process. |
 | `workspace_read_rules` | Read `.marc/RULES.md`. |
-| `workspace_status` | Read workspace health, including thread index rebuild state. |
+| `workspace_status` | Read workspace health, including thread index and summary-memory state. |
 | `workspace_audit` | Audit mARC workspace content for structural compliance across rules, messages, artifacts, references, agents, and preflight checks. |
 
 `workspace_audit` is an on-demand compliance tool. It does not run automatically for every message, it does not fix files, and it does not judge semantic quality. Use it before critical plans, before development, before conclusion, before closing a thread, or when a user asks for a structural quality check.
@@ -76,6 +76,17 @@ Supported scopes are `all`, `rules`, `messages`, `agents`, `references`, `artifa
 The `rules` scope reports missing managed rule sections, malformed critical operational rules, and free-form `Custom Rules` sections that have not yet been converted to the recommended `Trigger`, `Do instead`, `Evidence`, and `Severity` format. Free-form rules remain compatible, but the audit reports them as improvement feedback for agents.
 
 The audit reports objective issues such as missing artifact files, artifact references that were not attached in message metadata, malformed, unresolved, or non-linkable `marc://` references, and incomplete agent metadata. Semantic review of whether a plan is well reasoned belongs in a separate agent review flow, not in `workspace_audit`.
+
+## Memory tools
+
+| Tool | Use |
+|---|---|
+| `memory_prepare` | Prepare the local embedding model cache used by summary memory. |
+| `memory_status` | Check whether `.marc/memory/` is ready, stale, missing, incompatible, or waiting for the local model. |
+| `memory_rebuild` | Rebuild the committed LanceDB summary-memory index from `.marc/threads/*/SUMMARY.md`. |
+| `memory_recall` | Search historical thread summaries for a development intent and return relevant `marc://` references. |
+
+Summary memory is derived from `SUMMARY.md` only. Agents should use `memory_recall` before proposing or developing behavior that may overlap prior decisions, then read any strongly matched thread before reopening or contradicting the historical decision.
 
 ## Agent tools
 
@@ -153,6 +164,7 @@ marc mcp --workspace /path/to/target-project
 ```text
 workspace_bootstrap
 agent_register
+memory_recall, when proposing or developing behavior
 thread_read or thread_create
 message_attach_artifact, when detail is long
 message_post

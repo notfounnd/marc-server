@@ -1,5 +1,9 @@
 import { safeJoin } from "./paths.js";
 import {
+  LocalEmbeddingProvider,
+  readMemoryStatusInWorkspace
+} from "./memory/index.js";
+import {
   BackgroundThreadIndexReconciler,
   JsonThreadIndexStore,
   threadIndexPath
@@ -39,10 +43,23 @@ export async function readWorkspaceStatusInWorkspace(
     threadIndex = await index.health();
   }
 
+  const memory = await readMemoryStatusInWorkspace(info, {
+    provider: new LocalEmbeddingProvider(info)
+  });
+
   return {
     ok: threadIndex.status !== "unavailable",
     modules: {
-      threadIndex
+      threadIndex,
+      memory: {
+        status: memory.status,
+        ready: memory.ready,
+        stale: memory.stale,
+        modelPrepared: memory.modelPrepared,
+        summaryCount: memory.summaryCount,
+        indexedSummaryCount: memory.indexedSummaryCount,
+        message: memory.message
+      }
     }
   };
 }

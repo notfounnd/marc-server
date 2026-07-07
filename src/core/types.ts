@@ -195,10 +195,21 @@ export type ThreadIndexHealth = {
   threadCount: number;
 };
 
+export type MemoryIndexHealth = {
+  status: "ready" | "missing" | "stale" | "model_missing" | "incompatible";
+  ready: boolean;
+  stale: boolean;
+  modelPrepared: boolean;
+  summaryCount: number;
+  indexedSummaryCount: number;
+  message: string;
+};
+
 export type WorkspaceStatus = {
   ok: boolean;
   modules: {
     threadIndex: ThreadIndexHealth;
+    memory: MemoryIndexHealth;
   };
 };
 
