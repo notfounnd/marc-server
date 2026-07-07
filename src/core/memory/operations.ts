@@ -4,6 +4,12 @@ import {
   readMemoryManifest,
   writeMemoryManifest
 } from "./store.js";
+import {
+  memoryRecallCandidateOptions,
+  rankMemoryHits,
+  type RankedMemoryHit
+} from "./ranking.js";
+import { nextActionsForRecallResults } from "./recall-actions.js";
 import { scanThreadSummarySources } from "./summaries.js";
 import type {
   EmbeddingProvider,
@@ -104,17 +110,24 @@ export async function recallMemoryInWorkspace(
   }
 
   const vector = await options.provider.embedQuery(options.query);
-  const hits = await memoryStore(options.store).search(info, vector, {
-    limit: options.limit ?? DEFAULT_LIMIT,
-    minScore: options.minScore ?? DEFAULT_MIN_SCORE
-  });
+  const limit = options.limit ?? DEFAULT_LIMIT;
+  const minScore = options.minScore ?? DEFAULT_MIN_SCORE;
+  const hits = await memoryStore(options.store).search(
+    info,
+    vector,
+    memoryRecallCandidateOptions(limit, minScore)
+  );
   await options.provider.dispose();
-  const results = dedupeRecallHits(hitsToRecallResults(hits));
+  const results = dedupeRecallHits(
+    hitsToRecallResults(
+      rankMemoryHits(options.query, hits).filter((hit) => hit.score >= minScore)
+    )
+  ).slice(0, limit);
   return {
     query: options.query,
     indexStatus: status,
     results,
-    nextActions: nextActionsForResults(results, status)
+    nextActions: nextActionsForRecallResults(results, status)
   };
 }
 
@@ -255,9 +268,7 @@ function recallWithoutResults(
   return { query, indexStatus: status, results: [], nextActions };
 }
 
-function hitsToRecallResults(
-  hits: Array<{ record: MemoryVectorRecord; score: number }>
-): MemoryRecallHit[] {
+function hitsToRecallResults(hits: RankedMemoryHit[]): MemoryRecallHit[] {
   return hits.map((hit) => ({
     threadId: hit.record.threadId,
     title: hit.record.title,
@@ -266,7 +277,7 @@ function hitsToRecallResults(
     reference: hit.record.reference,
     matchedText: hit.record.text,
     score: hit.score,
-    reason: reasonForHit(hit.record)
+    reason: hit.reason
   }));
 }
 
@@ -279,24 +290,4 @@ function dedupeRecallHits(hits: MemoryRecallHit[]): MemoryRecallHit[] {
     results.push(hit);
   }
   return results;
-}
-
-function reasonForHit(record: MemoryVectorRecord): string {
-  const label = record.sectionTitle ?? "summary";
-  return `Matched ${label} in ${record.title}.`;
-}
-
-function nextActionsForResults(
-  results: MemoryRecallHit[],
-  status: MemoryStatus
-): string[] {
-  const actions = results.map(
-    (result) =>
-      `Call thread_read for ${result.reference} before reopening or contradicting this historical decision.`
-  );
-  if (status.status !== "stale") return actions;
-  return [
-    "Run memory_rebuild when possible because the memory index is stale.",
-    ...actions
-  ];
 }

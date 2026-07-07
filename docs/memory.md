@@ -90,10 +90,14 @@ The tool returns a compact memory pack:
 
 - relevant thread IDs and titles;
 - matching summary text;
-- similarity score;
-- reason for the match;
+- final relevance score;
+- reason for the match, including ranking signals when available;
 - canonical `marc://` thread reference;
 - next actions.
+
+Recall uses vector search to find candidates, then applies local hybrid ranking before returning the final list. The ranking combines vector score, exact normalized query terms, and a small section boost for decision-oriented sections such as `Decision`, `Decisions`, `Architecture`, `Risks`, and `Validation`.
+
+This ranking is a read-time projection only. It does not change the v1 corpus, the `SUMMARY.md` source of truth, or the committed `.marc/memory/` snapshot format.
 
 When a result is relevant, the agent should read the referenced thread before reopening or contradicting the historical decision.
 
