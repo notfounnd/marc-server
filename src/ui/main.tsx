@@ -2,17 +2,17 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { useTranslation } from "react-i18next";
 import { Toaster } from "@/components/ui/sonner";
-import { messageArtifactReference } from "../core/marc-references.js";
 import { createAppActions } from "./app-actions.js";
 import { AppContent } from "./app-content.js";
 import { AppModals } from "./app-modals.js";
 import { AppSidebar } from "./app-sidebar.js";
 import { useAppSync } from "./app-sync.js";
-import { classNames, isClosedThread } from "./common.js";
+import { classNames } from "./common.js";
+import { useMemorySearch } from "./use-memory-search.js";
+import { useThreadNavigation } from "./use-thread-navigation.js";
 import type {
   Agent,
   ArtifactDraft,
-  ArtifactMenuItem,
   ArtifactView,
   MemoryIndexHealth,
   MiddleMode,
@@ -76,58 +76,27 @@ function App() {
   const selectedThreadIndexHealth = selectedWorkspaceId
     ? threadIndexHealthByWorkspace[selectedWorkspaceId]
     : undefined;
+  const selectedMemoryHealth = selectedWorkspaceId
+    ? memoryHealthByWorkspace[selectedWorkspaceId]
+    : undefined;
   const selectedAgent = useMemo(
     () => agents.find((agent) => agent.id === selectedAgentId),
     [selectedAgentId, agents]
   );
-  const archivedThreads = useMemo(() => {
-    const byId = new Map<string, Thread>();
-    for (const thread of [...closedThreads, ...threads].filter(
-      isClosedThread
-    )) {
-      byId.set(thread.id, thread);
-    }
-    return Array.from(byId.values()).sort((a, b) =>
-      (b.closedAt ?? "").localeCompare(a.closedAt ?? "")
-    );
-  }, [closedThreads, threads]);
-  const closedThreadIds = useMemo(
-    () => new Set(archivedThreads.map((thread) => thread.id)),
-    [archivedThreads]
-  );
-  const openThreads = useMemo(
-    () =>
-      threads.filter(
-        (thread) => !isClosedThread(thread) && !closedThreadIds.has(thread.id)
-      ),
-    [closedThreadIds, threads]
-  );
-  const allWorkspaceThreads = useMemo(() => {
-    const byId = new Map<string, Thread>();
-    for (const thread of [...openThreads, ...archivedThreads]) {
-      byId.set(thread.id, thread);
-    }
-    return Array.from(byId.values());
-  }, [archivedThreads, openThreads]);
-  const visibleThreads =
-    middleMode === "archive" ? archivedThreads : openThreads;
-  const selectedThread = useMemo(
-    () =>
-      archivedThreads.find((thread) => thread.id === selectedThreadId) ??
-      openThreads.find((thread) => thread.id === selectedThreadId),
-    [archivedThreads, openThreads, selectedThreadId]
-  );
-  const selectedThreadArtifacts = useMemo<ArtifactMenuItem[]>(
-    () =>
-      (threadPayload?.messages ?? []).flatMap((message) =>
-        message.artifacts.map((artifact) => ({
-          message,
-          artifact,
-          href: messageArtifactReference(message.id, artifact)
-        }))
-      ),
-    [threadPayload?.messages]
-  );
+  const {
+    allWorkspaceThreads,
+    archivedThreads,
+    openThreads,
+    selectedThread,
+    selectedThreadArtifacts,
+    visibleThreads
+  } = useThreadNavigation({
+    closedThreads,
+    middleMode,
+    selectedThreadId,
+    threadPayload,
+    threads
+  });
 
   useEffect(() => {
     selectedWorkspaceIdRef.current = selectedWorkspaceId;
@@ -211,6 +180,18 @@ function App() {
     setSavingArtifact,
     setLastSyncedAt
   });
+  const memorySearch = useMemorySearch({
+    allWorkspaceThreads,
+    apiPost,
+    selectedMemoryHealth,
+    selectedWorkspace,
+    t,
+    onSelectThread: appActions.selectThread,
+    onStatusChange: (kind, nextStatus) => {
+      setStatusKind(kind);
+      setStatus(nextStatus);
+    }
+  });
 
   return (
     <div className={classNames("shell", modalOpen && "shell-modal-open")}>
@@ -222,13 +203,19 @@ function App() {
         busy={busy}
         workspaces={workspaces}
         memoryHealthByWorkspace={memoryHealthByWorkspace}
+        selectedMemoryHealth={selectedMemoryHealth}
         selectedWorkspaceId={selectedWorkspaceId}
+        allWorkspaceThreads={allWorkspaceThreads}
         visibleThreads={visibleThreads}
         selectedThreadId={selectedThreadId}
         middleMode={middleMode}
         agents={agents}
         selectedAgentId={selectedAgentId}
         uiAgentId={uiAgentId}
+        memorySearchQuery={memorySearch.query}
+        memorySearchResult={memorySearch.result}
+        memorySearchStatus={memorySearch.status}
+        memorySearchError={memorySearch.error}
         onTokenChange={setToken}
         onLockToken={appActions.lockToken}
         onUnlockToken={appActions.unlockToken}
@@ -239,6 +226,9 @@ function App() {
         onMiddleModeChange={setMiddleMode}
         onSelectThread={(thread) => void appActions.selectThread(thread)}
         onSelectAgent={appActions.selectAgent}
+        onMemorySearchQueryChange={memorySearch.setQuery}
+        onMemorySearchSubmit={() => void memorySearch.runSearch()}
+        onSelectMemorySearchHit={memorySearch.selectHit}
         onGoHome={appActions.goHome}
       />
       <AppContent

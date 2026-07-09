@@ -1,29 +1,16 @@
+import { Check, KeyRound, RefreshCw } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import {
-  Archive,
-  AtSign,
-  Bot,
-  Check,
-  KeyRound,
-  MessageSquareText,
-  RefreshCw,
-  UserRound,
-  X
-} from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {
-  Button,
-  EmptyState,
-  NavItem,
-  classNames,
-  isClosedThread,
-  parseAgentProfile
-} from "./common.js";
+import { Button, classNames } from "./common.js";
+import { AppSidebarMiddle } from "./app-sidebar-middle.js";
 import { WorkspaceListSection } from "./workspace-list-section.js";
 import type {
   Agent,
   MemoryIndexHealth,
+  MemoryRecallHit,
+  MemoryRecallResult,
+  MemorySearchStatus,
   MiddleMode,
   StatusKind,
   Thread,
@@ -38,13 +25,19 @@ export function AppSidebar({
   busy,
   workspaces,
   memoryHealthByWorkspace,
+  selectedMemoryHealth,
   selectedWorkspaceId,
+  allWorkspaceThreads,
   visibleThreads,
   selectedThreadId,
   middleMode,
   agents,
   selectedAgentId,
   uiAgentId,
+  memorySearchQuery,
+  memorySearchResult,
+  memorySearchStatus,
+  memorySearchError,
   onTokenChange,
   onLockToken,
   onUnlockToken,
@@ -53,6 +46,9 @@ export function AppSidebar({
   onMiddleModeChange,
   onSelectThread,
   onSelectAgent,
+  onMemorySearchQueryChange,
+  onMemorySearchSubmit,
+  onSelectMemorySearchHit,
   onGoHome
 }: {
   token: string;
@@ -62,13 +58,19 @@ export function AppSidebar({
   busy: boolean;
   workspaces: Workspace[];
   memoryHealthByWorkspace: Record<string, MemoryIndexHealth>;
+  selectedMemoryHealth?: MemoryIndexHealth;
   selectedWorkspaceId?: string;
+  allWorkspaceThreads: Thread[];
   visibleThreads: Thread[];
   selectedThreadId?: string;
   middleMode: MiddleMode;
   agents: Agent[];
   selectedAgentId?: string;
   uiAgentId: string;
+  memorySearchQuery: string;
+  memorySearchResult?: MemoryRecallResult;
+  memorySearchStatus: MemorySearchStatus;
+  memorySearchError?: string;
   onTokenChange: (token: string) => void;
   onLockToken: () => void;
   onUnlockToken: () => void;
@@ -77,128 +79,12 @@ export function AppSidebar({
   onMiddleModeChange: (mode: MiddleMode) => void;
   onSelectThread: (thread: Thread) => void;
   onSelectAgent: (agent: Agent) => void;
+  onMemorySearchQueryChange: (query: string) => void;
+  onMemorySearchSubmit: () => void;
+  onSelectMemorySearchHit: (hit: MemoryRecallHit) => void;
   onGoHome: () => void;
 }) {
   const { t } = useTranslation();
-  const middleHeaders = {
-    archive: {
-      icon: <Archive size={16} />,
-      title: t("Closed")
-    },
-    marckers: {
-      icon: <AtSign size={16} />,
-      title: t("Marckers")
-    },
-    threads: {
-      icon: <MessageSquareText size={16} />,
-      title: t("Threads")
-    }
-  };
-  const middleHeader = middleHeaders[middleMode];
-  const modeCloseButton = (
-    <Button
-      variant="primary"
-      className="button-icon"
-      onClick={() => onMiddleModeChange("threads")}
-      title={t("Close")}
-    >
-      <X size={15} />
-    </Button>
-  );
-  const middleActions = {
-    archive: modeCloseButton,
-    marckers: modeCloseButton,
-    threads: (
-      <>
-        <Button
-          variant="primary"
-          className="button-icon"
-          onClick={() => onMiddleModeChange("marckers")}
-          title={t("Show Marckers")}
-        >
-          <AtSign size={15} />
-        </Button>
-        <Button
-          variant="primary"
-          className="button-icon"
-          onClick={() => onMiddleModeChange("archive")}
-          title={t("Show closed threads")}
-        >
-          <Archive size={15} />
-        </Button>
-      </>
-    )
-  };
-  const threadEmptyState = {
-    archive: {
-      title: t("No closed threads"),
-      detail: t("Threads with SUMMARY.md will appear here.")
-    },
-    threads: {
-      title: t("No threads"),
-      detail: t("Create a thread from an agent to start the room.")
-    }
-  };
-  const threadEmpty =
-    middleMode === "archive"
-      ? threadEmptyState.archive
-      : threadEmptyState.threads;
-  const threadList = visibleThreads.length ? (
-    visibleThreads.map((thread) => (
-      <NavItem
-        key={thread.id}
-        icon={
-          isClosedThread(thread) ? (
-            <Archive size={16} />
-          ) : (
-            <MessageSquareText size={16} />
-          )
-        }
-        title={thread.title}
-        detail={
-          isClosedThread(thread) && thread.closedAt
-            ? t("Closed {{date}}", {
-                date: new Date(thread.closedAt).toLocaleString()
-              })
-            : thread.id
-        }
-        active={thread.id === selectedThreadId}
-        closed={isClosedThread(thread)}
-        onClick={() => onSelectThread(thread)}
-      />
-    ))
-  ) : (
-    <EmptyState title={threadEmpty.title} detail={threadEmpty.detail} />
-  );
-  const marckersList = agents.length ? (
-    agents.map((agent) => {
-      const profile = parseAgentProfile(agent.markdown);
-      const isUiUser =
-        agent.id === uiAgentId || profile.role?.toLowerCase() === "user";
-      return (
-        <NavItem
-          key={agent.id}
-          icon={isUiUser ? <UserRound size={16} /> : <Bot size={16} />}
-          title={profile.title}
-          detail={profile.role}
-          tag={profile.model}
-          active={agent.id === selectedAgentId}
-          onClick={() => onSelectAgent(agent)}
-        />
-      );
-    })
-  ) : (
-    <EmptyState
-      title={t("No marckers")}
-      detail={t("Register a user or agent before posting.")}
-    />
-  );
-  const middleContent = {
-    archive: threadList,
-    marckers: marckersList,
-    threads: threadList
-  };
-
   return (
     <>
       <aside className="sidebar">
@@ -264,20 +150,27 @@ export function AppSidebar({
         />
       </aside>
 
-      <nav className="middle">
-        <section>
-          <div className="section-title section-title-split">
-            <span className="section-title-main">
-              {middleHeader.icon}
-              <h2>{middleHeader.title}</h2>
-            </span>
-            <div className="middle-mode-actions">
-              {middleActions[middleMode]}
-            </div>
-          </div>
-          <div className="stack">{middleContent[middleMode]}</div>
-        </section>
-      </nav>
+      <AppSidebarMiddle
+        agents={agents}
+        allWorkspaceThreads={allWorkspaceThreads}
+        memorySearchError={memorySearchError}
+        memorySearchQuery={memorySearchQuery}
+        memorySearchResult={memorySearchResult}
+        memorySearchStatus={memorySearchStatus}
+        middleMode={middleMode}
+        selectedAgentId={selectedAgentId}
+        selectedMemoryHealth={selectedMemoryHealth}
+        selectedThreadId={selectedThreadId}
+        t={t}
+        uiAgentId={uiAgentId}
+        visibleThreads={visibleThreads}
+        onMemorySearchQueryChange={onMemorySearchQueryChange}
+        onMemorySearchSubmit={onMemorySearchSubmit}
+        onMiddleModeChange={onMiddleModeChange}
+        onSelectAgent={onSelectAgent}
+        onSelectMemorySearchHit={onSelectMemorySearchHit}
+        onSelectThread={onSelectThread}
+      />
     </>
   );
 }

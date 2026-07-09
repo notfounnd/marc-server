@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "builtAt": "2026-07-07T22:22:11.015Z",
+  "builtAt": "2026-07-09T05:07:01.771Z",
   "embeddingProvider": {
     "id": "transformers-js-local",
     "name": "Transformers.js local multilingual embeddings",
@@ -276,6 +276,24 @@
         "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb:section:validation",
         "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb:section:notes",
         "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb:section:follow-up"
+      ]
+    },
+    {
+      "threadId": "oportunidade-mecanismo-de-busca-sobre-o-conhecimento-do-projeto-b64903bd",
+      "title": "Oportunidade - Mecanismo de busca sobre o conhecimento do projeto",
+      "closedAt": "2026-07-09T04:44:18Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-mecanismo-de-busca-sobre-o-conhecimento-do-projeto-b64903bd\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-mecanismo-de-busca-sobre-o-conhecimento-do-projeto-b64903bd/SUMMARY.md",
+      "reference": "marc://$oportunidade-mecanismo-de-busca-sobre-o-conhecimento-do-projeto-b64903bd",
+      "sha256": "4d00bcd5db17aa5ee3e2a73309a812736c57a3a72a1c9fc73a57293b42133c46",
+      "mtimeMs": 1783572281971.7397,
+      "recordIds": [
+        "oportunidade-mecanismo-de-busca-sobre-o-conhecimento-do-projeto-b64903bd:summary",
+        "oportunidade-mecanismo-de-busca-sobre-o-conhecimento-do-projeto-b64903bd:section:executive-summary",
+        "oportunidade-mecanismo-de-busca-sobre-o-conhecimento-do-projeto-b64903bd:section:decisions",
+        "oportunidade-mecanismo-de-busca-sobre-o-conhecimento-do-projeto-b64903bd:section:implementation",
+        "oportunidade-mecanismo-de-busca-sobre-o-conhecimento-do-projeto-b64903bd:section:validation",
+        "oportunidade-mecanismo-de-busca-sobre-o-conhecimento-do-projeto-b64903bd:section:follow-ups"
       ]
     },
     {

@@ -64,6 +64,26 @@ export type MemoryIndexHealth = {
   message: string;
 };
 
+export type MemoryRecallHit = {
+  threadId: string;
+  title: string;
+  closedAt?: string;
+  summaryPath: string;
+  reference: string;
+  matchedText: string;
+  score: number;
+  reason: string;
+};
+
+export type MemoryRecallResult = {
+  query: string;
+  indexStatus: MemoryIndexHealth;
+  results: MemoryRecallHit[];
+  nextActions: string[];
+};
+
+export type MemorySearchStatus = "idle" | "searching" | "error";
+
 export type DaemonStatus = {
   ok: boolean;
   modules?: {
@@ -78,7 +98,7 @@ export type DaemonStatus = {
 
 export type StatusKind = "idle" | "ok" | "warn" | "error";
 
-export type MiddleMode = "threads" | "marckers" | "archive";
+export type MiddleMode = "threads" | "marckers" | "archive" | "search";
 
 export type MarkdownLinkHandler = (href: string) => void | Promise<void>;
 
