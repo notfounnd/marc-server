@@ -73,6 +73,7 @@ export function EmptyState({
 }
 
 export function NavItem({
+  children,
   icon,
   title,
   detail,
@@ -80,8 +81,11 @@ export function NavItem({
   trailing,
   active,
   closed,
+  disabled,
+  tooltip,
   onClick
 }: {
+  children?: React.ReactNode;
   icon: React.ReactNode;
   title: string;
   detail?: string;
@@ -89,6 +93,8 @@ export function NavItem({
   trailing?: React.ReactNode;
   active?: boolean;
   closed?: boolean;
+  disabled?: boolean;
+  tooltip?: string;
   onClick: () => void;
 }) {
   return (
@@ -99,7 +105,9 @@ export function NavItem({
         active && "active",
         closed && "nav-item-closed"
       )}
+      disabled={disabled}
       onClick={onClick}
+      title={tooltip}
     >
       <span className="nav-icon">{icon}</span>
       <span className="nav-copy">
@@ -108,6 +116,7 @@ export function NavItem({
           {detail ? <small>{detail}</small> : null}
           {tag ? <em>{tag}</em> : null}
         </span>
+        {children}
       </span>
       {trailing ? <span className="nav-trailing">{trailing}</span> : null}
     </NeoButton>

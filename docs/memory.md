@@ -78,6 +78,16 @@ The UI renders that state on each workspace card:
 
 This indicator is separate from `Connected`, which is daemon/token health, and `Synced`, which is the browser's last successful UI refresh.
 
+## UI search
+
+The UI can search the same summary-memory index used by `memory_recall`. This is not a separate text search index.
+
+The search panel is available only when workspace memory is `ready` or `stale`. A stale index can still be queried, but the UI warns that recent summaries may be missing. `missing`, `model_missing`, `incompatible`, `rebuilding`, and `degraded` states block the search action.
+
+Search runs only when the user presses Enter or the search button. It does not run on every keystroke because recall must generate an embedding for the query with the local provider. The current provider lifecycle still loads the local pipeline for recall and disposes it after the call.
+
+The UI stores only the latest search snapshot in local browser storage and overwrites that slot after each completed search. It does not maintain a search history.
+
 ## Recall flow
 
 Agents should call `memory_recall` before proposing or developing behavior that may overlap historical decisions:

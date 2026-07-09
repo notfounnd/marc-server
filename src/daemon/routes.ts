@@ -2,15 +2,13 @@ import type http from "node:http";
 import type { URL } from "node:url";
 import type { WorkspaceInfo } from "../core/types.js";
 import {
-  appendMessage,
   attachArtifactToMessage,
   listAgentProfiles,
   listThreadsCached,
   readMessageArtifact,
   readRules,
   readThread,
-  rebuildThreadIndexInBackground,
-  registerAgent
+  rebuildThreadIndexInBackground
 } from "../core/workspace.js";
 import {
   isWorkspaceInfo,
@@ -20,6 +18,8 @@ import {
   threadListStatus
 } from "./http.js";
 import type { UiEventBus } from "./events.js";
+import { postWorkspaceThreadMessage } from "./message-routes.js";
+import { postWorkspaceMemoryRecall } from "./memory-routes.js";
 import type { DaemonStore } from "./store.js";
 
 type RouteContext = {
@@ -37,13 +37,6 @@ type Route = {
   pattern: RegExp;
   handle: RouteHandler;
 };
-
-type PostThreadBody = Partial<{
-  agentId: string;
-  displayName: string;
-  role: string;
-  message: string;
-}>;
 
 type ArtifactBody = Partial<{
   content: string;
@@ -149,43 +142,6 @@ async function readWorkspaceThread(
   );
 }
 
-async function postThreadMessage(
-  context: RouteContext,
-  match: RouteMatch
-): Promise<void> {
-  const workspace = await workspaceOr404(context, match[1]);
-  if (!workspace) return;
-
-  const body = (await readBody(context.request)) as PostThreadBody;
-  if (!body.agentId || !body.message) {
-    text(context.response, 400, "agentId and message are required");
-    return;
-  }
-
-  await registerAgent(workspace.rootPath, {
-    id: body.agentId,
-    displayName: body.displayName,
-    role: body.role ?? "user",
-    model: "human",
-    description: "Posted from the mARC web UI."
-  });
-  const message = await appendMessage(
-    workspace.rootPath,
-    decodeURIComponent(match[2]),
-    {
-      agentId: body.agentId,
-      role: body.role ?? "user",
-      body: body.message
-    }
-  );
-  context.events.send("workspace-changed", {
-    workspaceId: workspace.id,
-    threadId: decodeURIComponent(match[2]),
-    at: new Date().toISOString()
-  });
-  json(context.response, 200, message);
-}
-
 async function readArtifact(
   context: RouteContext,
   match: RouteMatch
@@ -273,6 +229,11 @@ const routes: Route[] = [
     handle: listWorkspaceAgents
   },
   {
+    method: "POST",
+    pattern: /^\/api\/workspaces\/([^/]+)\/memory\/recall$/,
+    handle: (context, match) => postWorkspaceMemoryRecall(context, match[1])
+  },
+  {
     method: "GET",
     pattern: /^\/api\/workspaces\/([^/]+)\/threads\/([^/]+)$/,
     handle: readWorkspaceThread
@@ -280,7 +241,8 @@ const routes: Route[] = [
   {
     method: "POST",
     pattern: /^\/api\/workspaces\/([^/]+)\/threads\/([^/]+)$/,
-    handle: postThreadMessage
+    handle: (context, match) =>
+      postWorkspaceThreadMessage(context, match[1], match[2])
   },
   {
     method: "GET",

@@ -140,6 +140,7 @@ The daemon API is local infrastructure for the UI and nearby tooling. MCP client
 | `GET` | `/api/workspaces/:workspaceId/threads` | List workspace threads. |
 | `GET` | `/api/workspaces/:workspaceId/rules` | Read workspace rules. |
 | `GET` | `/api/workspaces/:workspaceId/agents` | List registered agents. |
+| `POST` | `/api/workspaces/:workspaceId/memory/recall` | Search the workspace summary-memory index for the UI. |
 | `GET` | `/api/workspaces/:workspaceId/threads/:threadId` | Read one thread. |
 | `POST` | `/api/workspaces/:workspaceId/threads/:threadId` | Post a UI message to a thread. |
 | `GET` | `/api/workspaces/:workspaceId/threads/:threadId/messages/:messageId/artifacts/:fileName` | Read a message artifact. |
@@ -150,6 +151,8 @@ The API uses the daemon bearer token. It is not a public remote API surface.
 `/api/status` keeps the compatibility field `ok: boolean` and includes module health under `modules`. The thread index module reports each registered workspace as `ready`, `rebuilding`, `degraded`, or `unavailable`; the UI uses this to keep the last known thread list visible while a background rebuild finishes.
 
 The memory module reports each registered workspace under `modules.memory.workspaces`. Its status values mirror the summary-memory snapshot state: `ready`, `stale`, `missing`, `model_missing`, or `incompatible`. The UI renders this as a compact database icon on each workspace card. Missing or stale memory does not make the daemon disconnected; it only indicates that agents may need `memory_prepare` or `memory_rebuild` before relying on semantic recall.
+
+The UI memory search uses `POST /api/workspaces/:workspaceId/memory/recall`, which delegates to the same core recall flow as the MCP tool. It is enabled only for `ready` and `stale` memory. The route requires the daemon bearer token, validates a non-empty `query`, and returns the recall result with `indexStatus`, `results`, and `nextActions`.
 
 ## Troubleshooting
 
