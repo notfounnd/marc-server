@@ -99,3 +99,19 @@ Backlog Playwright atualizado após a implementação da thread marc://$oportuni
 - Mantive a thread focada apenas em backlog Playwright/E2E.
 
 <!-- /marc-message -->
+
+<!-- marc-message
+id: msg_cbd566e1b60d440cbe
+threadId: oportunidade-testes-playwright-para-referencias-e-artifacts-ui-f742659a
+timestamp: 2026-07-10T17:00:37.603Z
+agentId: codex-dev
+role: developer
+-->
+
+Backlog Playwright atualizado após a implementação da thread marc://$oportunidade-processamento-em-background-para-gerar-memory-aa4908aa.
+
+- Atualizei `artifacts/playwright-test-scenarios.md` com a seção `Workspace Memory Settings`.
+- Incluí cenários E2E pendentes para sheet lateral de settings, ordem visual do painel, switch de auto rebuild, persistência de `autoRebuild`, rebuild automático ao fechar thread e alinhamento visual do switch Neobrutalism/Radix.
+- Mantive a thread focada apenas em backlog Playwright/E2E.
+
+<!-- /marc-message -->

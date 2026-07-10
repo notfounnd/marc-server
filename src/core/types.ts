@@ -196,13 +196,39 @@ export type ThreadIndexHealth = {
 };
 
 export type MemoryIndexHealth = {
-  status: "ready" | "missing" | "stale" | "model_missing" | "incompatible";
+  status:
+    | "ready"
+    | "missing"
+    | "stale"
+    | "model_missing"
+    | "incompatible"
+    | "preparing"
+    | "rebuilding"
+    | "degraded";
   ready: boolean;
   stale: boolean;
   modelPrepared: boolean;
   summaryCount: number;
   indexedSummaryCount: number;
+  preparing: boolean;
+  rebuilding: boolean;
+  lastPreparedAt?: string;
+  lastRebuildAt?: string;
+  lastError: string | null;
+  autoRebuild: boolean;
   message: string;
+};
+
+export type WorkspaceSettings = {
+  memory: {
+    autoRebuild: boolean;
+  };
+};
+
+export type WorkspaceSettingsInput = {
+  memory?: {
+    autoRebuild?: boolean;
+  };
 };
 
 export type WorkspaceStatus = {

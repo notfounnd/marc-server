@@ -8,6 +8,12 @@ export {
   rebuildMemoryInWorkspace,
   recallMemoryInWorkspace
 } from "./operations.js";
+export { BackgroundMemoryReconciler } from "./background.js";
+export {
+  readWorkspaceSettingsInWorkspace,
+  updateWorkspaceSettingsInWorkspace,
+  workspaceSettingsPath
+} from "./settings.js";
 export {
   InMemoryMemoryVectorStore,
   LanceDbMemoryVectorStore,

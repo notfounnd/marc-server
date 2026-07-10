@@ -54,6 +54,7 @@ export type MemoryIndexHealth = {
     | "stale"
     | "model_missing"
     | "incompatible"
+    | "preparing"
     | "rebuilding"
     | "degraded";
   ready: boolean;
@@ -61,6 +62,12 @@ export type MemoryIndexHealth = {
   modelPrepared: boolean;
   summaryCount: number;
   indexedSummaryCount: number;
+  preparing: boolean;
+  rebuilding: boolean;
+  lastPreparedAt?: string;
+  lastRebuildAt?: string;
+  lastError: string | null;
+  autoRebuild: boolean;
   message: string;
 };
 

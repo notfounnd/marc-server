@@ -19,7 +19,16 @@ type DaemonStatusInput = {
 
 const MEMORY_STATUS_PRIORITY: Array<
   WorkspaceStatus["modules"]["memory"]["status"]
-> = ["incompatible", "model_missing", "missing", "stale", "ready"];
+> = [
+  "degraded",
+  "rebuilding",
+  "preparing",
+  "incompatible",
+  "model_missing",
+  "missing",
+  "stale",
+  "ready"
+];
 
 export async function daemonStatus(input: DaemonStatusInput): Promise<unknown> {
   const workspaces = await input.store.listWorkspaces();

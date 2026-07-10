@@ -138,6 +138,18 @@ Priority: medium
 - [ ] Simulate a future rebuilding status when available and verify the workspace card shows the `database-zap` busy state without shifting the card layout.
 - [ ] Verify the indicator remains aligned inside selected and unselected workspace cards across desktop and narrow viewports.
 
+## Workspace Memory Settings
+
+Source thread: `oportunidade-processamento-em-background-para-gerar-memory-aa4908aa`  
+Priority: high
+
+- [ ] Load the UI with a valid daemon token and a selected workspace; click the workspace settings button in the third-column header and verify a right-side sheet opens instead of a dropdown.
+- [ ] Verify the workspace settings sheet shows the memory status first, the `Automatic memory rebuild` switch second, and the `Prepare model` / `Rebuild memory` actions below without horizontal overflow.
+- [ ] Toggle `Automatic memory rebuild` off and on; verify the switch state persists after refresh and the workspace status API reports the same `autoRebuild` value.
+- [ ] With `autoRebuild` enabled, close a thread by creating `SUMMARY.md`; verify memory status transitions through rebuild when needed and returns to `ready` with the new summary indexed.
+- [ ] Verify the Neobrutalism/Radix switch thumb is visually aligned in both checked and unchecked states, matching the documented switch spacing.
+- [ ] Verify workspace, thread, and agent headers keep the same eyebrow/title/reference structure, including copyable `marc://$threadId`, `marc://@agentId`, and workspace path rows.
+
 ## Maintenance Notes
 
 - This backlog should grow as UI features are added.

@@ -34,4 +34,9 @@ test("maps memory states to workspace-card indicator variants", () => {
     tone: "busy",
     label: "Memory rebuilding"
   });
+  assert.deepEqual(memoryIndicatorForStatus({ status: "preparing" }), {
+    icon: "DatabaseZap",
+    tone: "busy",
+    label: "Memory preparing"
+  });
 });

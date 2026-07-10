@@ -4,6 +4,7 @@ export type MemoryIndicatorStatus =
   | "stale"
   | "model_missing"
   | "incompatible"
+  | "preparing"
   | "rebuilding"
   | "degraded";
 
@@ -50,6 +51,11 @@ const INDICATORS: Record<MemoryIndicatorStatus, MemoryIndicator> = {
     icon: "DatabaseCheck",
     label: "Memory ready",
     tone: "ready"
+  },
+  preparing: {
+    icon: "DatabaseZap",
+    label: "Memory preparing",
+    tone: "busy"
   },
   rebuilding: {
     icon: "DatabaseZap",

@@ -3,32 +3,49 @@ import {
   ArtifactViewerModal,
   KeyboardShortcutsModal
 } from "./modals.js";
+import { WorkspaceSettingsModal } from "./workspace-settings-modal.js";
 import type {
   ArtifactDraft,
   ArtifactView,
-  MarkdownLinkHandler
+  MarkdownLinkHandler,
+  MemoryIndexHealth,
+  Workspace
 } from "./types.js";
 
 export function AppModals({
   artifactDraft,
   artifactView,
   savingArtifact,
+  selectedMemoryHealth,
+  selectedWorkspace,
   showShortcuts,
+  showWorkspaceSettings,
   onArtifactDraftChange,
   onArtifactSave,
   onArtifactViewClose,
   onLink,
-  onShortcutsClose
+  onPrepareMemoryModel,
+  onRebuildMemory,
+  onShowWorkspaceSettingsChange,
+  onShortcutsClose,
+  onWorkspaceAutoRebuildChange
 }: {
   artifactDraft?: ArtifactDraft;
   artifactView?: ArtifactView;
   savingArtifact: boolean;
+  selectedMemoryHealth?: MemoryIndexHealth;
+  selectedWorkspace?: Workspace;
   showShortcuts: boolean;
+  showWorkspaceSettings: boolean;
   onArtifactDraftChange: (draft: ArtifactDraft | undefined) => void;
   onArtifactSave: () => void;
   onArtifactViewClose: () => void;
   onLink: MarkdownLinkHandler;
+  onPrepareMemoryModel: () => void;
+  onRebuildMemory: () => void;
+  onShowWorkspaceSettingsChange: (show: boolean) => void;
   onShortcutsClose: () => void;
+  onWorkspaceAutoRebuildChange: (autoRebuild: boolean) => void;
 }) {
   return (
     <>
@@ -46,6 +63,16 @@ export function AppModals({
           artifact={artifactView}
           onClose={onArtifactViewClose}
           onLink={onLink}
+        />
+      ) : null}
+      {showWorkspaceSettings && selectedWorkspace ? (
+        <WorkspaceSettingsModal
+          health={selectedMemoryHealth}
+          workspace={selectedWorkspace}
+          onAutoRebuildChange={onWorkspaceAutoRebuildChange}
+          onClose={() => onShowWorkspaceSettingsChange(false)}
+          onPrepareModel={onPrepareMemoryModel}
+          onRebuildMemory={onRebuildMemory}
         />
       ) : null}
       {showShortcuts ? (

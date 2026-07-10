@@ -13,7 +13,7 @@ import {
   readMemoryStatus,
   rebuildMemory,
   recallMemory
-} from "./core/workspace.js";
+} from "./core/workspace-memory.js";
 import type { DaemonConfig } from "./core/types.js";
 
 type ParsedArgs = {

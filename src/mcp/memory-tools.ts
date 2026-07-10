@@ -5,7 +5,7 @@ import {
   readMemoryStatus,
   rebuildMemory,
   recallMemory
-} from "../core/workspace.js";
+} from "../core/workspace-memory.js";
 import { gatedShape, withBootstrap } from "./responses.js";
 
 export function registerMemoryTools(
