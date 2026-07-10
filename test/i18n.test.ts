@@ -36,13 +36,17 @@ test("keeps i18n usage scoped to the web UI", () => {
   const root = process.cwd();
   const allowed = [
     path.join("src", "i18n", "index.ts"),
+    path.join("src", "ui", "app.tsx"),
     path.join("src", "ui", "app-content.tsx"),
     path.join("src", "ui", "app-sidebar.tsx"),
     path.join("src", "ui", "composer.tsx"),
+    path.join("src", "ui", "content-header.tsx"),
+    path.join("src", "ui", "content-header-actions.tsx"),
     path.join("src", "ui", "i18n.ts"),
     path.join("src", "ui", "main.tsx"),
     path.join("src", "ui", "modals.tsx"),
     path.join("src", "ui", "thread-view.tsx"),
+    path.join("src", "ui", "workspace-settings-modal.tsx"),
     path.join("src", "ui", "workspace-overview.tsx"),
     path.join("test", "i18n.test.ts")
   ];

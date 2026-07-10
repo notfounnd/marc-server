@@ -29,9 +29,13 @@ class FakeStorage {
 const recallResult: MemoryRecallResult = {
   indexStatus: {
     indexedSummaryCount: 1,
+    autoRebuild: true,
+    lastError: null,
     message: "Memory index is current.",
     modelPrepared: true,
+    preparing: false,
     ready: true,
+    rebuilding: false,
     stale: false,
     status: "ready",
     summaryCount: 1

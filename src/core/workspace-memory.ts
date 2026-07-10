@@ -1,0 +1,80 @@
+import {
+  LocalEmbeddingProvider,
+  prepareMemoryInWorkspace,
+  readMemoryStatusInWorkspace,
+  readWorkspaceSettingsInWorkspace,
+  rebuildMemoryInWorkspace,
+  recallMemoryInWorkspace,
+  updateWorkspaceSettingsInWorkspace
+} from "./memory/index.js";
+import type { MemoryRecallResult, MemoryStatus } from "./memory/index.js";
+import {
+  prepareMemoryInBackgroundInWorkspace,
+  rebuildMemoryInBackgroundInWorkspace
+} from "./workspace-status.js";
+import type { WorkspaceSettingsInput } from "./types.js";
+import { initWorkspace } from "./workspace.js";
+
+export async function readWorkspaceSettings(workspaceRoot: string) {
+  const info = await initWorkspace(workspaceRoot);
+  return readWorkspaceSettingsInWorkspace(info);
+}
+
+export async function updateWorkspaceSettings(
+  workspaceRoot: string,
+  input: WorkspaceSettingsInput
+) {
+  const info = await initWorkspace(workspaceRoot);
+  return updateWorkspaceSettingsInWorkspace(info, input);
+}
+
+export async function prepareMemoryInBackground(workspaceRoot: string) {
+  const info = await initWorkspace(workspaceRoot);
+  return prepareMemoryInBackgroundInWorkspace(info);
+}
+
+export async function rebuildMemoryInBackground(workspaceRoot: string) {
+  const info = await initWorkspace(workspaceRoot);
+  return rebuildMemoryInBackgroundInWorkspace(info);
+}
+
+export async function prepareMemory(workspaceRoot: string): Promise<{
+  prepared: true;
+  provider: ReturnType<LocalEmbeddingProvider["describe"]>;
+}> {
+  const info = await initWorkspace(workspaceRoot);
+  return prepareMemoryInWorkspace(new LocalEmbeddingProvider(info));
+}
+
+export async function readMemoryStatus(
+  workspaceRoot: string
+): Promise<MemoryStatus> {
+  const info = await initWorkspace(workspaceRoot);
+  return readMemoryStatusInWorkspace(info, {
+    provider: new LocalEmbeddingProvider(info)
+  });
+}
+
+export async function rebuildMemory(
+  workspaceRoot: string
+): Promise<MemoryStatus> {
+  const info = await initWorkspace(workspaceRoot);
+  const provider = new LocalEmbeddingProvider(info);
+  const status = await readMemoryStatusInWorkspace(info, { provider });
+  if (status.status === "model_missing") return status;
+  await rebuildMemoryInWorkspace(info, { provider });
+  return readMemoryStatusInWorkspace(info, { provider });
+}
+
+export async function recallMemory(
+  workspaceRoot: string,
+  input: { query: string; limit?: number; minScore?: number }
+): Promise<MemoryRecallResult> {
+  const info = await initWorkspace(workspaceRoot);
+  return recallMemoryInWorkspace(info, {
+    provider: new LocalEmbeddingProvider(info),
+    query: input.query,
+    limit: input.limit,
+    minScore: input.minScore
+  });
+}

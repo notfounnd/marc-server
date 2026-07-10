@@ -23,13 +23,6 @@ import {
   rebuildThreadIndexInWorkspace
 } from "./workspace-status.js";
 import {
-  LocalEmbeddingProvider,
-  prepareMemoryInWorkspace,
-  readMemoryStatusInWorkspace,
-  rebuildMemoryInWorkspace,
-  recallMemoryInWorkspace
-} from "./memory/index.js";
-import {
   appendMessageInWorkspace,
   createThreadInWorkspace,
   listThreadsInWorkspace,
@@ -61,7 +54,6 @@ import type {
   WorkspaceRecommendationsUpdate,
   WorkspaceStatus
 } from "./types.js";
-import type { MemoryRecallResult, MemoryStatus } from "./memory/index.js";
 
 async function exists(filePath: string): Promise<boolean> {
   try {
@@ -170,47 +162,6 @@ export async function readWorkspaceStatus(
 ): Promise<WorkspaceStatus> {
   const info = await initWorkspace(workspaceRoot);
   return readWorkspaceStatusInWorkspace(info);
-}
-
-export async function prepareMemory(workspaceRoot: string): Promise<{
-  prepared: true;
-  provider: ReturnType<LocalEmbeddingProvider["describe"]>;
-}> {
-  const info = await initWorkspace(workspaceRoot);
-  return prepareMemoryInWorkspace(new LocalEmbeddingProvider(info));
-}
-
-export async function readMemoryStatus(
-  workspaceRoot: string
-): Promise<MemoryStatus> {
-  const info = await initWorkspace(workspaceRoot);
-  return readMemoryStatusInWorkspace(info, {
-    provider: new LocalEmbeddingProvider(info)
-  });
-}
-
-export async function rebuildMemory(
-  workspaceRoot: string
-): Promise<MemoryStatus> {
-  const info = await initWorkspace(workspaceRoot);
-  const provider = new LocalEmbeddingProvider(info);
-  const status = await readMemoryStatusInWorkspace(info, { provider });
-  if (status.status === "model_missing") return status;
-  await rebuildMemoryInWorkspace(info, { provider });
-  return readMemoryStatusInWorkspace(info, { provider });
-}
-
-export async function recallMemory(
-  workspaceRoot: string,
-  input: { query: string; limit?: number; minScore?: number }
-): Promise<MemoryRecallResult> {
-  const info = await initWorkspace(workspaceRoot);
-  return recallMemoryInWorkspace(info, {
-    provider: new LocalEmbeddingProvider(info),
-    query: input.query,
-    limit: input.limit,
-    minScore: input.minScore
-  });
 }
 
 export async function appendMessage(

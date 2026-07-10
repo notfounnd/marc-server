@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "builtAt": "2026-07-09T05:07:01.771Z",
+  "builtAt": "2026-07-10T18:08:00.933Z",
   "embeddingProvider": {
     "id": "transformers-js-local",
     "name": "Transformers.js local multilingual embeddings",
@@ -404,6 +404,24 @@
         "oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd:section:melhorias-de-usabilidade",
         "oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd:section:validacao",
         "oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd:section:estado-final"
+      ]
+    },
+    {
+      "threadId": "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa",
+      "title": "Resumo executivo",
+      "closedAt": "2026-07-10T17:05:00.000Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-processamento-em-background-para-gerar-memory-aa4908aa\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-processamento-em-background-para-gerar-memory-aa4908aa/SUMMARY.md",
+      "reference": "marc://$oportunidade-processamento-em-background-para-gerar-memory-aa4908aa",
+      "sha256": "691850c24a10d40190978adc6f0eb7da69ee143e820296287d0263e3a8ed0669",
+      "mtimeMs": 1783706739654.8157,
+      "recordIds": [
+        "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa:summary",
+        "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa:section:resultado",
+        "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa:section:o-que-foi-tratado",
+        "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa:section:validacao",
+        "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa:section:continuidade",
+        "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa:section:referencias"
       ]
     },
     {

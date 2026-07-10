@@ -44,9 +44,11 @@ marc memory prepare
 
 `memory_status` does not load the model. It only checks whether the model cache and index manifest are usable.
 
+The UI can also prepare the model explicitly from the selected workspace settings panel through `POST /api/workspaces/:workspaceId/memory/prepare`. The daemon never prepares or downloads the model automatically.
+
 ## Rebuild flow
 
-Rebuild is explicit. It should run after a thread is closed or a `SUMMARY.md` changes:
+MCP and CLI rebuild is explicit and synchronous. It should run after a thread is closed or a `SUMMARY.md` changes:
 
 ```bash
 marc memory status
@@ -54,6 +56,17 @@ marc memory rebuild
 ```
 
 The rebuild scans `.marc/threads/*/SUMMARY.md`, embeds the whole summary and its second-level sections, writes LanceDB data under `.marc/memory/`, and writes `manifest.json`.
+
+The daemon and UI add background rebuild for interactive use:
+
+- workspace settings are stored per workspace in `.marc/SETTINGS.md`;
+- `memory.autoRebuild` defaults to `true`;
+- automatic rebuild only runs when the local model is already prepared;
+- automatic rebuild is considered only for `missing` or `stale` memory;
+- manual rebuild from the UI uses `POST /api/workspaces/:workspaceId/memory/rebuild`;
+- concurrent prepare/rebuild requests are deduplicated per workspace.
+
+If a background rebuild fails, `/api/status` reports memory as `degraded` with `lastError`. Existing snapshots remain derived state and are not treated as source of truth.
 
 The manifest records:
 
@@ -73,16 +86,18 @@ The UI renders that state on each workspace card:
 
 - `DatabaseCheck`: memory is ready and current.
 - `DatabaseBackup`: memory is stale, missing, or waiting for the local model cache.
-- `DatabaseZap`: memory rebuild is running, once background rebuild support exposes that state.
+- `DatabaseZap`: memory model preparation or rebuild is running.
 - `DatabaseX`: memory is incompatible or degraded.
 
 This indicator is separate from `Connected`, which is daemon/token health, and `Synced`, which is the browser's last successful UI refresh.
+
+The selected workspace detail view exposes workspace settings from the same header action area used by thread artifacts. Its memory controls are `Automatic memory rebuild`, `Prepare model`, `Rebuild memory`, current memory status, and the last error when present.
 
 ## UI search
 
 The UI can search the same summary-memory index used by `memory_recall`. This is not a separate text search index.
 
-The search panel is available only when workspace memory is `ready` or `stale`. A stale index can still be queried, but the UI warns that recent summaries may be missing. `missing`, `model_missing`, `incompatible`, `rebuilding`, and `degraded` states block the search action.
+The search panel is available only when workspace memory is `ready` or `stale`. A stale index can still be queried, but the UI warns that recent summaries may be missing. `missing`, `model_missing`, `incompatible`, `preparing`, `rebuilding`, and `degraded` states block the search action.
 
 Search runs only when the user presses Enter or the search button. It does not run on every keystroke because recall must generate an embedding for the query with the local provider. The current provider lifecycle still loads the local pipeline for recall and disposes it after the call.
 

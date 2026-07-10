@@ -19,7 +19,13 @@ import {
 } from "./http.js";
 import type { UiEventBus } from "./events.js";
 import { postWorkspaceThreadMessage } from "./message-routes.js";
-import { postWorkspaceMemoryRecall } from "./memory-routes.js";
+import {
+  getWorkspaceSettings,
+  postWorkspaceMemoryPrepare,
+  postWorkspaceMemoryRebuild,
+  postWorkspaceMemoryRecall,
+  postWorkspaceSettings
+} from "./memory-routes.js";
 import type { DaemonStore } from "./store.js";
 
 type RouteContext = {
@@ -227,6 +233,26 @@ const routes: Route[] = [
     method: "GET",
     pattern: /^\/api\/workspaces\/([^/]+)\/agents$/,
     handle: listWorkspaceAgents
+  },
+  {
+    method: "GET",
+    pattern: /^\/api\/workspaces\/([^/]+)\/settings$/,
+    handle: (context, match) => getWorkspaceSettings(context, match[1])
+  },
+  {
+    method: "POST",
+    pattern: /^\/api\/workspaces\/([^/]+)\/settings$/,
+    handle: (context, match) => postWorkspaceSettings(context, match[1])
+  },
+  {
+    method: "POST",
+    pattern: /^\/api\/workspaces\/([^/]+)\/memory\/prepare$/,
+    handle: (context, match) => postWorkspaceMemoryPrepare(context, match[1])
+  },
+  {
+    method: "POST",
+    pattern: /^\/api\/workspaces\/([^/]+)\/memory\/rebuild$/,
+    handle: (context, match) => postWorkspaceMemoryRebuild(context, match[1])
   },
   {
     method: "POST",
