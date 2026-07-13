@@ -10,14 +10,19 @@ import {
   writeFileAtomically
 } from "../write-coordination.js";
 
-const SETTINGS_FILE = "SETTINGS.md";
-const AUTO_REBUILD_PATTERN = /^memory\.autoRebuild:\s*(true|false)\s*$/m;
+const SETTINGS_FILE = "marc.config.json";
 
 const DEFAULT_SETTINGS: WorkspaceSettings = {
   memory: {
     autoRebuild: true
   }
 };
+
+type WorkspaceSettingsFile = Partial<{
+  memory: Partial<{
+    autoRebuild: boolean;
+  }>;
+}>;
 
 export function workspaceSettingsPath(info: WorkspaceInfo): string {
   return safeJoin(info.marcPath, SETTINGS_FILE);
@@ -26,14 +31,9 @@ export function workspaceSettingsPath(info: WorkspaceInfo): string {
 export async function readWorkspaceSettingsInWorkspace(
   info: WorkspaceInfo
 ): Promise<WorkspaceSettings> {
-  const content = await fs
-    .readFile(workspaceSettingsPath(info), "utf8")
-    .catch(() => "");
-  return {
-    memory: {
-      autoRebuild: readAutoRebuild(content)
-    }
-  };
+  const content = await readSettingsContent(info);
+  if (!content) return defaultSettings();
+  return normalizeWorkspaceSettings(JSON.parse(content));
 }
 
 export async function updateWorkspaceSettingsInWorkspace(
@@ -62,24 +62,47 @@ function mergeWorkspaceSettings(
   };
 }
 
-function readAutoRebuild(content: string): boolean {
-  const match = AUTO_REBUILD_PATTERN.exec(content);
-  if (!match) return DEFAULT_SETTINGS.memory.autoRebuild;
-  return match[1] === "true";
+async function readSettingsContent(
+  info: WorkspaceInfo
+): Promise<string | undefined> {
+  try {
+    return await fs.readFile(workspaceSettingsPath(info), "utf8");
+  } catch (error) {
+    if (isNotFoundError(error)) return undefined;
+    throw error;
+  }
 }
 
 function renderSettings(settings: WorkspaceSettings): string {
-  const state = settings.memory.autoRebuild ? "enabled" : "disabled";
-  return [
-    "# mARC Workspace Settings",
-    "",
-    "<!-- marc-settings",
-    `memory.autoRebuild: ${settings.memory.autoRebuild}`,
-    "-->",
-    "",
-    "## Memory",
-    "",
-    `- Automatic memory rebuild: ${state}`,
-    ""
-  ].join("\n");
+  return `${JSON.stringify(settings, null, 2)}\n`;
+}
+
+function normalizeWorkspaceSettings(value: unknown): WorkspaceSettings {
+  if (!isRecord(value)) return defaultSettings();
+  const input = value as WorkspaceSettingsFile;
+  const memory = isRecord(input.memory) ? input.memory : {};
+  return {
+    memory: {
+      autoRebuild:
+        typeof memory.autoRebuild === "boolean"
+          ? memory.autoRebuild
+          : DEFAULT_SETTINGS.memory.autoRebuild
+    }
+  };
+}
+
+function defaultSettings(): WorkspaceSettings {
+  return {
+    memory: {
+      autoRebuild: DEFAULT_SETTINGS.memory.autoRebuild
+    }
+  };
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function isNotFoundError(error: unknown): boolean {
+  return isRecord(error) && error.code === "ENOENT";
 }

@@ -156,7 +156,7 @@ The API uses the daemon bearer token. It is not a public remote API surface.
 
 The memory module reports each registered workspace under `modules.memory.workspaces`. Its status values are `ready`, `stale`, `missing`, `model_missing`, `incompatible`, `preparing`, `rebuilding`, or `degraded`. The health payload also includes `autoRebuild`, `preparing`, `rebuilding`, `lastPreparedAt`, `lastRebuildAt`, and `lastError`. The UI renders this as a compact database icon on each workspace card. Missing or stale memory does not make the daemon disconnected; it only indicates that agents may need model preparation or memory rebuild before relying on semantic recall.
 
-Workspace memory settings are stored per workspace in `.marc/SETTINGS.md`. `memory.autoRebuild` defaults to `true`, but automatic rebuild only runs when the local model is already prepared. The daemon never downloads or prepares the model automatically.
+Workspace memory settings are stored per workspace in `.marc/marc.config.json`. This JSON file is structured machine configuration; Markdown remains the source of truth for mARC knowledge, threads, summaries, rules, messages, and artifacts. `memory.autoRebuild` defaults to `true`, but automatic rebuild only runs when the local model is already prepared. The daemon never downloads or prepares the model automatically.
 
 The UI memory search uses `POST /api/workspaces/:workspaceId/memory/recall`, which delegates to the same core recall flow as the MCP tool. It is enabled only for `ready` and `stale` memory. The route requires the daemon bearer token, validates a non-empty `query`, and returns the recall result with `indexStatus`, `results`, and `nextActions`.
 

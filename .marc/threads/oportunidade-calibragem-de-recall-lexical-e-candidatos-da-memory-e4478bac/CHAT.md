@@ -58,3 +58,58 @@ Racional:
 - O ajuste deve ficar isolado no contrato da UI, sem alterar o default global do recall.
 
 <!-- /marc-message -->
+
+<!-- marc-message
+id: msg_2d4fa821fde146298f
+threadId: oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac
+timestamp: 2026-07-13T21:56:31.831Z
+agentId: ui-user
+role: user
+-->
+
+Sugestão para busca sem resultados:
+
+- Exibir botão para busca com minScore mais permissivo.
+
+Fluxo:
+
+- Usuário realiza busca.
+- Busca termina sem resultados.
+- Coluna do meio apresenta segundo botão (abaixo do Search original) com nome Deep retry.
+- Usuário clica (se quiser).
+- UI dispara busca com minScore reduzido.
+
+<!-- /marc-message -->
+
+<!-- marc-message
+id: msg_413e3152feb2465980
+threadId: oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac
+timestamp: 2026-07-13T22:21:15.608Z
+agentId: ui-user
+role: user
+-->
+
+Outra sugestão para busca sem resultados:
+
+- Sistema gera autoretry baixando minScore (para evitar recarregamento do modelo).
+
+Fluxo:
+
+- Usuário realiza busca.
+- Ação gera retorno sem resultados de busca.
+- Sistema internamento decrementa 0.1 e realiza retentativa de busca.
+- Ciclo se repete até encontrar resultado OU até chegar em ultima busca com minScore 0.
+
+Isso possibilita que o usuário configure quantidade de retries (slider em modo controlled) que o sistema irá realizar no painel de configuração.
+
+```
+edge                 deep
+ ()-----||-----||-----|| // apenas search original 0.15
+ ||-----()-----||-----|| // até 1 iteração adicional (search com 0.15 / 0.10)
+ ||-----||-----()-----|| // até 2 iteração adicional (search com 0.15 / 0.10 / 0.05)
+ ||-----||-----||-----() // até 3 iteração adicional (search com 0.15 / 0.10 / 0.05 / 0.00)
+```
+
+Nessa opção, também será necessário melhorar a mensagem de No results.
+
+<!-- /marc-message -->
