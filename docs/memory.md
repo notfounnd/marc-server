@@ -59,12 +59,16 @@ The rebuild scans `.marc/threads/*/SUMMARY.md`, embeds the whole summary and its
 
 The daemon and UI add background rebuild for interactive use:
 
-- workspace settings are stored per workspace in `.marc/SETTINGS.md`;
+- workspace settings are stored per workspace in `.marc/marc.config.json`;
 - `memory.autoRebuild` defaults to `true`;
 - automatic rebuild only runs when the local model is already prepared;
 - automatic rebuild is considered only for `missing` or `stale` memory;
 - manual rebuild from the UI uses `POST /api/workspaces/:workspaceId/memory/rebuild`;
 - concurrent prepare/rebuild requests are deduplicated per workspace.
+
+Workspace settings are structured machine configuration. Markdown remains the
+source of truth for mARC knowledge, threads, summaries, rules, messages, and
+artifacts.
 
 If a background rebuild fails, `/api/status` reports memory as `degraded` with `lastError`. Existing snapshots remain derived state and are not treated as source of truth.
 

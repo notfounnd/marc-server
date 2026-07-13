@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "builtAt": "2026-07-10T18:08:00.933Z",
+  "builtAt": "2026-07-13T23:33:05.291Z",
   "embeddingProvider": {
     "id": "transformers-js-local",
     "name": "Transformers.js local multilingual embeddings",
@@ -511,6 +511,26 @@
         "oportunidade-revisao-en-us-do-projeto-c14150b8:section:validacao",
         "oportunidade-revisao-en-us-do-projeto-c14150b8:section:documentacao-e-continuidade",
         "oportunidade-revisao-en-us-do-projeto-c14150b8:section:estado-final"
+      ]
+    },
+    {
+      "threadId": "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9",
+      "title": "Resumo executivo",
+      "closedAt": "2026-07-13T23:31:15.250Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9/SUMMARY.md",
+      "reference": "marc://$oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9",
+      "sha256": "a4b7cd15175b24a013ab9ae546eac65bbafcda3703397b179aa27ae103b1a018",
+      "mtimeMs": 1783985502465.1592,
+      "recordIds": [
+        "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9:summary",
+        "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9:section:resultado",
+        "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9:section:o-que-mudou",
+        "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9:section:decisoes",
+        "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9:section:validacao",
+        "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9:section:documentacao",
+        "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9:section:referencias",
+        "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9:section:continuidade"
       ]
     },
     {

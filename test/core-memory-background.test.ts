@@ -1,8 +1,11 @@
 import assert from "node:assert/strict";
+import fs from "node:fs/promises";
+import path from "node:path";
 import test from "node:test";
 import {
   BackgroundMemoryReconciler,
   readWorkspaceSettingsInWorkspace,
+  workspaceSettingsPath,
   updateWorkspaceSettingsInWorkspace
 } from "../src/core/memory/index.js";
 import { readWorkspaceStatus } from "../src/core/workspace.js";
@@ -86,6 +89,13 @@ async function waitFor(assertion: () => boolean): Promise<void> {
   }
 }
 
+async function fileExists(filePath: string): Promise<boolean> {
+  return fs
+    .access(filePath)
+    .then(() => true)
+    .catch(() => false);
+}
+
 test("workspace memory settings default to automatic rebuild and persist per workspace", async () => {
   const first = await tempWorkspace();
   const second = await tempWorkspace();
@@ -99,12 +109,37 @@ test("workspace memory settings default to automatic rebuild and persist per wor
     memory: { autoRebuild: false }
   });
 
+  const settingsPath = workspaceSettingsPath(first);
+  const settingsContent = JSON.parse(
+    await fs.readFile(settingsPath, "utf8")
+  ) as { memory?: { autoRebuild?: boolean } };
+
+  assert.equal(path.basename(settingsPath), "marc.config.json");
+  assert.equal(path.basename(path.dirname(settingsPath)), ".marc");
+  assert.equal(settingsContent.memory?.autoRebuild, false);
+  assert.equal(
+    await fileExists(path.join(first.marcPath, "SETTINGS.md")),
+    false
+  );
   assert.equal(
     (await readWorkspaceSettingsInWorkspace(first)).memory.autoRebuild,
     false
   );
   assert.equal(
     (await readWorkspaceSettingsInWorkspace(second)).memory.autoRebuild,
+    true
+  );
+});
+
+test("workspace memory settings ignore legacy Markdown settings", async () => {
+  const info = await tempWorkspace();
+  await fs.writeFile(
+    path.join(info.marcPath, "SETTINGS.md"),
+    ["<!-- marc-settings", "memory.autoRebuild: false", "-->", ""].join("\n")
+  );
+
+  assert.equal(
+    (await readWorkspaceSettingsInWorkspace(info)).memory.autoRebuild,
     true
   );
 });
