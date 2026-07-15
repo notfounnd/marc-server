@@ -12,6 +12,11 @@ export {
   rebuildMemoryInWorkspace,
   recallMemoryInWorkspace
 } from "./operations.js";
+export {
+  MEMORY_REBUILD_RESOURCE,
+  memoryRebuildingStatus,
+  memoryRebuildActiveInWorkspace
+} from "./rebuild-coordination.js";
 export { BackgroundMemoryReconciler } from "./background.js";
 export {
   readWorkspaceSettingsInWorkspace,

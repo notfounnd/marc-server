@@ -78,6 +78,7 @@ export type MemoryManifest = {
 
 export type MemoryStatusState =
   | "ready"
+  | "rebuilding"
   | "missing"
   | "stale"
   | "model_missing"

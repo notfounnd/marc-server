@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "builtAt": "2026-07-14T17:03:08.987Z",
+  "builtAt": "2026-07-15T03:43:29.285Z",
   "embeddingProvider": {
     "id": "transformers-js-local",
     "name": "Transformers.js local multilingual embeddings",
@@ -136,6 +136,26 @@
         "oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686:section:resultado",
         "oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686:section:validacao",
         "oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686:section:estado-final"
+      ]
+    },
+    {
+      "threadId": "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99",
+      "title": "Resumo executivo",
+      "closedAt": "2026-07-15T03:41:13.693Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99/SUMMARY.md",
+      "reference": "marc://$oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99",
+      "sha256": "c0aaffb22499bd584fa5cc48394297e061950eef79d8320b63aa0ff69a5d6767",
+      "mtimeMs": 1784086922659.807,
+      "recordIds": [
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99:summary",
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99:section:objetivo",
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99:section:diagnostico",
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99:section:implementacao",
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99:section:decisoes",
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99:section:validacao",
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99:section:observacoes",
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99:section:referencias"
       ]
     },
     {

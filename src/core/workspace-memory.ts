@@ -1,6 +1,8 @@
 import {
   LocalEmbeddingProvider,
   MemoryProviderManager,
+  memoryRebuildActiveInWorkspace,
+  memoryRebuildingStatus,
   prepareMemoryInWorkspace,
   readMemoryStatusInWorkspace,
   readWorkspaceSettingsInWorkspace,
@@ -55,9 +57,13 @@ export async function readMemoryStatus(
   workspaceRoot: string
 ): Promise<MemoryStatus> {
   const info = await initWorkspace(workspaceRoot);
-  return readMemoryStatusInWorkspace(info, {
+  const status = await readMemoryStatusInWorkspace(info, {
     provider: new LocalEmbeddingProvider(info)
   });
+  const rebuilding = await memoryRebuildActiveInWorkspace(info);
+  if (!rebuilding) return status;
+
+  return memoryRebuildingStatus(status);
 }
 
 export async function rebuildMemory(
@@ -66,9 +72,14 @@ export async function rebuildMemory(
   const info = await initWorkspace(workspaceRoot);
   const provider = new LocalEmbeddingProvider(info);
   const status = await readMemoryStatusInWorkspace(info, { provider });
+  const rebuilding = await memoryRebuildActiveInWorkspace(info);
+  if (rebuilding) return memoryRebuildingStatus(status);
   if (status.status === "model_missing") return status;
-  await rebuildMemoryInWorkspace(info, { provider });
-  return readMemoryStatusInWorkspace(info, { provider });
+  const rebuild = await rebuildMemoryInWorkspace(info, { provider });
+  const nextStatus = await readMemoryStatusInWorkspace(info, { provider });
+  if (!rebuild.acquired) return memoryRebuildingStatus(nextStatus);
+
+  return nextStatus;
 }
 
 export async function recallMemory(

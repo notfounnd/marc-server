@@ -4,11 +4,13 @@ import path from "node:path";
 import test from "node:test";
 import {
   BackgroundMemoryReconciler,
+  MEMORY_REBUILD_RESOURCE,
   readWorkspaceSettingsInWorkspace,
   workspaceSettingsPath,
   updateWorkspaceSettingsInWorkspace
 } from "../src/core/memory/index.js";
 import { readWorkspaceStatus } from "../src/core/workspace.js";
+import { withWorkspaceWriteLock } from "../src/core/write-coordination.js";
 import {
   FakeEmbeddingProvider,
   tempWorkspace,
@@ -209,6 +211,61 @@ test("background memory rebuild deduplicates concurrent requests", async () => {
   assert.equal(store.rebuildCalls, 1);
   assert.equal(ready.status, "ready");
   assert.ok(ready.lastRebuildAt);
+});
+
+test("background memory does not rebuild again while another reconciler holds the lock", async () => {
+  const info = await tempWorkspace();
+  const gate = new Deferred();
+  const store = new GatedStore(gate);
+  const first = new BackgroundMemoryReconciler(
+    info,
+    () => new PreparedProvider(true),
+    store
+  );
+  const second = new BackgroundMemoryReconciler(
+    info,
+    () => new PreparedProvider(true),
+    store
+  );
+  await writeSummary(
+    info,
+    "thread-memory",
+    "# Summary\n\nThread: `thread-memory`"
+  );
+
+  const firstRebuild = first.rebuild();
+  await waitFor(() => store.rebuildCalls === 1);
+
+  const secondRebuild = second.rebuild();
+
+  try {
+    await new Promise((resolve) => setTimeout(resolve, 25));
+    assert.equal(store.rebuildCalls, 1);
+    const health = await second.health({ memory: { autoRebuild: true } });
+    assert.equal(health.status, "rebuilding");
+  } finally {
+    gate.resolve();
+    await Promise.all([firstRebuild, secondRebuild]);
+  }
+});
+
+test("background memory reports a rebuild held by another process", async () => {
+  const info = await tempWorkspace();
+  const provider = new PreparedProvider(true);
+  const store = new GatedStore();
+  const memory = new BackgroundMemoryReconciler(info, () => provider, store);
+
+  await withWorkspaceWriteLock(
+    info.marcPath,
+    MEMORY_REBUILD_RESOURCE,
+    async () => {
+      const health = await memory.health({ memory: { autoRebuild: true } });
+
+      assert.equal(health.status, "rebuilding");
+      assert.equal(health.rebuilding, true);
+      assert.equal(store.rebuildCalls, 0);
+    }
+  );
 });
 
 test("background memory does not start rebuild while model prepare is running", async () => {

@@ -130,12 +130,14 @@ Priority: medium
 ## Workspace Memory Indicator
 
 Source thread: `oportunidade-indicador-visual-de-memory-na-interface-174c48b6`  
+Additional source thread: `oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99`  
 Priority: medium
 
 - [ ] Load the UI with a valid daemon token and a workspace whose memory status is `ready`; verify the workspace card shows a `Memory ready` accessible indicator with the `database-check` icon.
 - [ ] Simulate or prepare stale/missing memory status and verify the workspace card shows the `database-backup` action state without affecting the daemon `Connected` status.
 - [ ] Simulate a memory error or incompatible index status and verify the workspace card shows the `database-x` error state with an accessible label.
-- [ ] Simulate a future rebuilding status when available and verify the workspace card shows the `database-zap` busy state without shifting the card layout.
+- [ ] Trigger a memory rebuild from the UI and verify the workspace card shows the `database-zap` busy state while `/api/status` reports `modules.memory.rebuilding=true`.
+- [ ] Start a memory rebuild from MCP or CLI while the UI is connected and verify the workspace card switches to the `database-zap` busy state through the daemon `workspace-changed` event, then returns to `database-check` after the shared lock is released.
 - [ ] Verify the indicator remains aligned inside selected and unselected workspace cards across desktop and narrow viewports.
 
 ## Workspace Memory Settings

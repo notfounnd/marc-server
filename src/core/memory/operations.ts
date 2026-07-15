@@ -10,6 +10,15 @@ import {
   type RankedMemoryHit
 } from "./ranking.js";
 import { nextActionsForRecallResults } from "./recall-actions.js";
+import {
+  tryWithMemoryRebuildLock,
+  type MemoryRebuildAttempt
+} from "./rebuild-coordination.js";
+import {
+  buildMemoryStatus,
+  compareMemoryManifestSources,
+  memoryProvidersMatch
+} from "./status.js";
 import { scanThreadSummarySources } from "./summaries.js";
 import type {
   EmbeddingProvider,
@@ -20,7 +29,6 @@ import type {
   MemoryRecallOptions,
   MemoryRecallResult,
   MemoryStatus,
-  MemoryStatusState,
   MemoryVectorRecord,
   MemoryVectorStore,
   ThreadSummarySource
@@ -51,41 +59,51 @@ export async function readMemoryStatusInWorkspace(
     provider.isPrepared(),
     store.exists(info)
   ]);
-  if (!modelPrepared) return memoryStatus("model_missing", sources, manifest);
+  if (!modelPrepared)
+    return buildMemoryStatus("model_missing", sources, manifest);
   if (!manifest || !storeExists)
-    return memoryStatus("missing", sources, manifest);
-  if (!providersMatch(manifest, provider)) {
-    return memoryStatus("incompatible", sources, manifest);
+    return buildMemoryStatus("missing", sources, manifest);
+  if (!memoryProvidersMatch(manifest, provider)) {
+    return buildMemoryStatus("incompatible", sources, manifest);
   }
 
-  const stale = compareManifestSources(manifest, sources);
+  const stale = compareMemoryManifestSources(manifest, sources);
   if (stale.stale) {
     return {
-      ...memoryStatus("stale", sources, manifest),
+      ...buildMemoryStatus("stale", sources, manifest),
       missingSummaryIds: stale.missingSummaryIds,
       staleSummaryIds: stale.staleSummaryIds,
       extraSummaryIds: stale.extraSummaryIds
     };
   }
 
-  return memoryStatus("ready", sources, manifest);
+  return buildMemoryStatus("ready", sources, manifest);
 }
 
 export async function rebuildMemoryInWorkspace(
   info: WorkspaceInfo,
   options: MemoryOperationOptions
-): Promise<MemoryManifest> {
+): Promise<MemoryRebuildAttempt> {
   const provider = options.provider;
-  const sources = await scanThreadSummarySources(info);
-  const records = flattenSources(sources);
-  const vectors = await provider.embedDocuments(
-    records.map((record) => record.text)
-  );
-  const manifest = buildManifest(provider, sources);
-  await memoryStore(options.store).rebuild(info, records, vectors);
-  await writeMemoryManifest(info, manifest);
-  await provider.dispose();
-  return manifest;
+  const attempt = await tryWithMemoryRebuildLock(info, async () => {
+    const sources = await scanThreadSummarySources(info);
+    const records = flattenSources(sources);
+    const vectors = await provider.embedDocuments(
+      records.map((record) => record.text)
+    );
+    const manifest = buildManifest(provider, sources);
+    await memoryStore(options.store).rebuild(info, records, vectors);
+    await writeMemoryManifest(info, manifest);
+    await provider.dispose();
+    return manifest;
+  });
+
+  if (!attempt.acquired) {
+    await provider.dispose();
+    return attempt;
+  }
+
+  return { acquired: true, manifest: attempt.value };
 }
 
 export async function recallMemoryInWorkspace(
@@ -132,86 +150,6 @@ export async function recallMemoryInWorkspace(
 
 function memoryStore(store?: MemoryVectorStore): MemoryVectorStore {
   return store ?? new LanceDbMemoryVectorStore();
-}
-
-function memoryStatus(
-  status: MemoryStatusState,
-  sources: ThreadSummarySource[],
-  manifest?: MemoryManifest
-): MemoryStatus {
-  return {
-    status,
-    ready: status === "ready",
-    stale: status === "stale",
-    modelPrepared: status !== "model_missing",
-    summaryCount: sources.length,
-    indexedSummaryCount: manifest?.records.length ?? 0,
-    missingSummaryIds: [],
-    staleSummaryIds: [],
-    extraSummaryIds: [],
-    message: memoryStatusMessage(status)
-  };
-}
-
-function memoryStatusMessage(status: MemoryStatusState): string {
-  const messages: Record<MemoryStatusState, string> = {
-    ready: "Memory index is current.",
-    missing: "Memory index has not been built.",
-    stale: "Memory index is stale.",
-    model_missing: "Local memory embedding model is not prepared.",
-    incompatible: "Memory index was built with a different provider contract."
-  };
-  return messages[status];
-}
-
-function providersMatch(
-  manifest: MemoryManifest,
-  provider: EmbeddingProvider
-): boolean {
-  const current = provider.describe();
-  const stored = manifest.embeddingProvider;
-  return (
-    stored.id === current.id &&
-    stored.model === current.model &&
-    stored.version === current.version &&
-    stored.dimensions === current.dimensions &&
-    stored.distance === current.distance
-  );
-}
-
-function compareManifestSources(
-  manifest: MemoryManifest,
-  sources: ThreadSummarySource[]
-): {
-  stale: boolean;
-  missingSummaryIds: string[];
-  staleSummaryIds: string[];
-  extraSummaryIds: string[];
-} {
-  const sourceMap = new Map(sources.map((source) => [source.threadId, source]));
-  const manifestMap = new Map(
-    manifest.records.map((record) => [record.threadId, record])
-  );
-  const missingSummaryIds = sources
-    .filter((source) => !manifestMap.has(source.threadId))
-    .map((source) => source.threadId);
-  const staleSummaryIds = sources
-    .filter(
-      (source) => manifestMap.get(source.threadId)?.sha256 !== source.sha256
-    )
-    .map((source) => source.threadId);
-  const extraSummaryIds = manifest.records
-    .filter((record) => !sourceMap.has(record.threadId))
-    .map((record) => record.threadId);
-  return {
-    stale:
-      missingSummaryIds.length > 0 ||
-      staleSummaryIds.length > 0 ||
-      extraSummaryIds.length > 0,
-    missingSummaryIds,
-    staleSummaryIds,
-    extraSummaryIds
-  };
 }
 
 function flattenSources(sources: ThreadSummarySource[]): MemoryVectorRecord[] {

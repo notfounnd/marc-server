@@ -77,13 +77,20 @@ The daemon and UI add background rebuild for interactive use:
 - automatic rebuild only runs when the local model is already prepared;
 - automatic rebuild is considered only for `missing` or `stale` memory;
 - manual rebuild from the UI uses `POST /api/workspaces/:workspaceId/memory/rebuild`;
-- concurrent prepare/rebuild requests are deduplicated per workspace.
+- background prepare and rebuild requests are deduplicated per workspace inside the daemon;
+- memory rebuild execution is guarded by a cache-backed workspace lock shared by daemon, MCP, and CLI;
+- a concurrent memory rebuild request does not queue another run; it reports `rebuilding` while the active owner continues;
+- stale rebuild lock metadata is recovered before status checks or new rebuild attempts.
 
 Workspace settings are structured machine configuration. Markdown remains the
 source of truth for mARC knowledge, threads, summaries, rules, messages, and
 artifacts.
 
 If a background rebuild fails, `/api/status` reports memory as `degraded` with `lastError`. Existing snapshots remain derived state and are not treated as source of truth.
+
+`memory_status` also checks the shared rebuild lock. It can report `rebuilding`
+while another process owns the rebuild, without loading the model or touching
+the embedding provider.
 
 The manifest records:
 
@@ -109,6 +116,12 @@ The UI renders that state on each workspace card:
 This indicator is separate from `Connected`, which is daemon/token health, and `Synced`, which is the browser's last successful UI refresh.
 
 The selected workspace detail view exposes workspace settings from the same header action area used by thread artifacts. Its memory controls are `Automatic memory rebuild`, `Prepare model`, `Rebuild memory`, current memory status, and the last error when present.
+
+When a browser is connected through the daemon event stream, the daemon watches
+only memory rebuild lock transitions for registered workspaces. It emits
+`workspace-changed` when the lock becomes active or inactive, so the existing
+status refresh can show `DatabaseZap` during rebuilds started from UI, MCP, or
+CLI. The monitor stops when no UI client is connected.
 
 ## UI search
 

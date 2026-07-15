@@ -12,6 +12,10 @@ export type WorkspaceWriteLockOptions = {
   timeoutMs?: number;
 };
 
+export type WorkspaceWriteLockAttempt<T> =
+  | { acquired: false }
+  | { acquired: true; value: T };
+
 export function threadWriteResource(threadId: string): string {
   return `thread:${threadId}`;
 }
@@ -52,6 +56,34 @@ export async function withWorkspaceWriteLock<T>(
   } finally {
     await lock.release();
   }
+}
+
+export async function tryWithWorkspaceWriteLock<T>(
+  marcPath: string,
+  resource: string,
+  writer: () => Promise<T>,
+  options: WorkspaceWriteLockOptions = {}
+): Promise<WorkspaceWriteLockAttempt<T>> {
+  const lock = await tryAcquireWorkspaceWriteLock(marcPath, resource, options);
+  if (!lock) return { acquired: false };
+
+  try {
+    return { acquired: true, value: await writer() };
+  } finally {
+    await lock.release();
+  }
+}
+
+export async function workspaceWriteLockActive(
+  marcPath: string,
+  resource: string,
+  options: WorkspaceWriteLockOptions = {}
+): Promise<boolean> {
+  const lockPath = workspaceWriteLockPath(marcPath, resource);
+  const staleAfterMs = options.staleAfterMs ?? DEFAULT_STALE_AFTER_MS;
+  await removeStaleLock(lockPath, staleAfterMs);
+  const stats = await fs.stat(lockPath).catch(() => undefined);
+  return Boolean(stats);
 }
 
 export async function writeFileAtomically(
@@ -101,6 +133,30 @@ async function acquireWorkspaceWriteLock(
   }
 
   throw new Error(`Timed out acquiring write lock for ${resource}.`);
+}
+
+async function tryAcquireWorkspaceWriteLock(
+  marcPath: string,
+  resource: string,
+  options: WorkspaceWriteLockOptions
+): Promise<HeldLock | undefined> {
+  const staleAfterMs = options.staleAfterMs ?? DEFAULT_STALE_AFTER_MS;
+  const lockPath = workspaceWriteLockPath(marcPath, resource);
+  const owner: LockOwner = {
+    pid: process.pid,
+    resource,
+    token: randomUUID()
+  };
+  await fs.mkdir(path.dirname(lockPath), { recursive: true });
+
+  const acquired = await tryAcquireLock(lockPath, owner);
+  if (acquired) return heldLock(lockPath, owner, staleAfterMs);
+
+  await removeStaleLock(lockPath, staleAfterMs);
+  const recovered = await tryAcquireLock(lockPath, owner);
+  if (!recovered) return undefined;
+
+  return heldLock(lockPath, owner, staleAfterMs);
 }
 
 async function tryAcquireLock(
