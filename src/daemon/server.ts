@@ -1,6 +1,7 @@
 import http from "node:http";
 import { URL } from "node:url";
 import type { DaemonConfig, DaemonLease } from "../core/types.js";
+import { disposeMemoryProviders } from "../core/workspace-memory.js";
 import { UiEventBus } from "./events.js";
 import { authorized, json, serveStatic, text } from "./http.js";
 import {
@@ -160,6 +161,7 @@ export async function createDaemonServer(
 
   server.on("close", () => {
     events.close();
+    void disposeMemoryProviders().catch(() => undefined);
   });
   return server;
 }

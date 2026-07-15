@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "builtAt": "2026-07-13T23:33:05.291Z",
+  "builtAt": "2026-07-14T17:03:08.987Z",
   "embeddingProvider": {
     "id": "transformers-js-local",
     "name": "Transformers.js local multilingual embeddings",
@@ -422,6 +422,25 @@
         "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa:section:validacao",
         "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa:section:continuidade",
         "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa:section:referencias"
+      ]
+    },
+    {
+      "threadId": "oportunidade-provider-de-memory-aquecido-com-ttl-curto-d540c6b4",
+      "title": "Resumo executivo",
+      "closedAt": "2026-07-14T16:52:00.000Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-provider-de-memory-aquecido-com-ttl-curto-d540c6b4\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-provider-de-memory-aquecido-com-ttl-curto-d540c6b4/SUMMARY.md",
+      "reference": "marc://$oportunidade-provider-de-memory-aquecido-com-ttl-curto-d540c6b4",
+      "sha256": "a7a77fa9ab08979bb71f17b32de21dc06d433396ff51a97c012eac4540bc73c7",
+      "mtimeMs": 1784048396286.7234,
+      "recordIds": [
+        "oportunidade-provider-de-memory-aquecido-com-ttl-curto-d540c6b4:summary",
+        "oportunidade-provider-de-memory-aquecido-com-ttl-curto-d540c6b4:section:objetivo",
+        "oportunidade-provider-de-memory-aquecido-com-ttl-curto-d540c6b4:section:implementacao",
+        "oportunidade-provider-de-memory-aquecido-com-ttl-curto-d540c6b4:section:decisoes",
+        "oportunidade-provider-de-memory-aquecido-com-ttl-curto-d540c6b4:section:validacao",
+        "oportunidade-provider-de-memory-aquecido-com-ttl-curto-d540c6b4:section:limite-observado",
+        "oportunidade-provider-de-memory-aquecido-com-ttl-curto-d540c6b4:section:estado-final"
       ]
     },
     {

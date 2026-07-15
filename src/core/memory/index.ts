@@ -3,6 +3,10 @@ export {
   localModelCachePath
 } from "./local-provider.js";
 export {
+  MemoryProviderManager,
+  MEMORY_PROVIDER_IDLE_TIMEOUT_MS
+} from "./provider-manager.js";
+export {
   prepareMemoryInWorkspace,
   readMemoryStatusInWorkspace,
   rebuildMemoryInWorkspace,

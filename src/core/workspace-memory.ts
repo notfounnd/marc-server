@@ -1,5 +1,6 @@
 import {
   LocalEmbeddingProvider,
+  MemoryProviderManager,
   prepareMemoryInWorkspace,
   readMemoryStatusInWorkspace,
   readWorkspaceSettingsInWorkspace,
@@ -14,6 +15,10 @@ import {
 } from "./workspace-status.js";
 import type { WorkspaceSettingsInput } from "./types.js";
 import { initWorkspace } from "./workspace.js";
+
+const memoryProviderManager = new MemoryProviderManager(
+  (info) => new LocalEmbeddingProvider(info)
+);
 
 export async function readWorkspaceSettings(workspaceRoot: string) {
   const info = await initWorkspace(workspaceRoot);
@@ -71,10 +76,16 @@ export async function recallMemory(
   input: { query: string; limit?: number; minScore?: number }
 ): Promise<MemoryRecallResult> {
   const info = await initWorkspace(workspaceRoot);
-  return recallMemoryInWorkspace(info, {
-    provider: new LocalEmbeddingProvider(info),
-    query: input.query,
-    limit: input.limit,
-    minScore: input.minScore
-  });
+  return memoryProviderManager.run(info, (provider) =>
+    recallMemoryInWorkspace(info, {
+      provider,
+      query: input.query,
+      limit: input.limit,
+      minScore: input.minScore
+    })
+  );
+}
+
+export async function disposeMemoryProviders(): Promise<void> {
+  await memoryProviderManager.disposeAll();
 }

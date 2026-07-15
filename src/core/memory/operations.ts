@@ -117,7 +117,6 @@ export async function recallMemoryInWorkspace(
     vector,
     memoryRecallCandidateOptions(limit, minScore)
   );
-  await options.provider.dispose();
   const results = dedupeRecallHits(
     hitsToRecallResults(
       rankMemoryHits(options.query, hits).filter((hit) => hit.score >= minScore)
