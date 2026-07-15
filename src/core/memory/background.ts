@@ -8,6 +8,7 @@ import {
   readMemoryStatusInWorkspace,
   rebuildMemoryInWorkspace
 } from "./operations.js";
+import { memoryRebuildActiveInWorkspace } from "./rebuild-coordination.js";
 import type { EmbeddingProvider, MemoryVectorStore } from "./types.js";
 
 type ProviderFactory = () => EmbeddingProvider;
@@ -46,6 +47,9 @@ export class BackgroundMemoryReconciler {
       provider: this.createProvider(),
       store: this.store
     });
+    const rebuilding =
+      Boolean(this.rebuildPromise) ||
+      (await memoryRebuildActiveInWorkspace(this.info));
     const health = {
       status: base.status,
       ready: base.ready,
@@ -54,7 +58,7 @@ export class BackgroundMemoryReconciler {
       summaryCount: base.summaryCount,
       indexedSummaryCount: base.indexedSummaryCount,
       preparing: Boolean(this.preparePromise),
-      rebuilding: Boolean(this.rebuildPromise),
+      rebuilding,
       lastPreparedAt: this.lastPreparedAt,
       lastRebuildAt: this.lastRebuildAt,
       lastError: this.lastError,
@@ -69,7 +73,7 @@ export class BackgroundMemoryReconciler {
         message: "Memory model is preparing."
       };
     }
-    if (this.rebuildPromise) {
+    if (rebuilding) {
       return {
         ...health,
         status: "rebuilding",
@@ -115,10 +119,11 @@ export class BackgroundMemoryReconciler {
       if (status.status === "model_missing") {
         throw new Error("Memory model is not prepared.");
       }
-      await rebuildMemoryInWorkspace(this.info, {
+      const rebuild = await rebuildMemoryInWorkspace(this.info, {
         provider,
         store: this.store
       });
+      if (!rebuild.acquired) return;
       this.lastRebuildAt = new Date().toISOString();
       this.lastError = null;
       this.lastFailure = undefined;

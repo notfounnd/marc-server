@@ -115,3 +115,20 @@ Backlog Playwright atualizado após a implementação da thread marc://$oportuni
 - Mantive a thread focada apenas em backlog Playwright/E2E.
 
 <!-- /marc-message -->
+
+<!-- marc-message
+id: msg_4615acccfe9641d2b2
+threadId: oportunidade-testes-playwright-para-referencias-e-artifacts-ui-f742659a
+timestamp: 2026-07-15T03:39:46.911Z
+agentId: codex-dev
+role: developer
+artifacts: artifacts/playwright-test-scenarios.md
+-->
+
+Backlog Playwright atualizado apos a implementacao da thread marc://$oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99.
+
+- Atualizei `artifacts/playwright-test-scenarios.md` na secao `Workspace Memory Indicator`.
+- Inclui cenarios E2E pendentes para `database-zap` durante rebuild iniciado pela UI e durante rebuild iniciado por MCP/CLI observado via `workspace-changed`.
+- Mantive a thread focada apenas em backlog Playwright/E2E.
+
+<!-- /marc-message -->

@@ -4,7 +4,9 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import {
+  tryWithWorkspaceWriteLock,
   withWorkspaceWriteLock,
+  workspaceWriteLockActive,
   workspaceWriteLockPath,
   writeFileAtomically
 } from "../src/core/write-coordination.js";
@@ -87,6 +89,63 @@ test("times out without entering a resource held by another writer", async () =>
 
   releaseFirst.resolve();
   await first;
+});
+
+test("does not queue a writer when the workspace resource is already held", async () => {
+  const marcPath = await tempMarcPath();
+  const releaseFirst = deferred();
+  const firstStarted = deferred();
+  let secondEntered = false;
+
+  const first = withWorkspaceWriteLock(marcPath, "memory-rebuild", async () => {
+    firstStarted.resolve();
+    await releaseFirst.promise;
+  });
+  await firstStarted.promise;
+
+  const attempt = await tryWithWorkspaceWriteLock(
+    marcPath,
+    "memory-rebuild",
+    async () => {
+      secondEntered = true;
+    }
+  );
+
+  assert.deepEqual(attempt, { acquired: false });
+  assert.equal(secondEntered, false);
+  assert.equal(
+    await workspaceWriteLockActive(marcPath, "memory-rebuild"),
+    true
+  );
+
+  releaseFirst.resolve();
+  await first;
+
+  assert.equal(
+    await workspaceWriteLockActive(marcPath, "memory-rebuild"),
+    false
+  );
+});
+
+test("clears a stale lock before reporting a workspace resource as active", async () => {
+  const marcPath = await tempMarcPath();
+  const lockPath = workspaceWriteLockPath(marcPath, "memory-rebuild");
+  const oldTime = new Date(Date.now() - 5_000);
+  await fs.mkdir(lockPath, { recursive: true });
+  await fs.utimes(lockPath, oldTime, oldTime);
+
+  const active = await workspaceWriteLockActive(marcPath, "memory-rebuild", {
+    staleAfterMs: 10
+  });
+
+  assert.equal(active, false);
+  assert.equal(
+    await fs
+      .stat(lockPath)
+      .then(() => true)
+      .catch(() => false),
+    false
+  );
 });
 
 test("recovers a stale write lock before executing the writer", async () => {

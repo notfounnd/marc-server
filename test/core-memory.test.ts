@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   InMemoryMemoryVectorStore,
+  memoryRebuildingStatus,
   readMemoryStatusInWorkspace,
   rebuildMemoryInWorkspace,
   recallMemoryInWorkspace,
@@ -15,6 +16,34 @@ import {
   tempWorkspace,
   writeSummary
 } from "./memory-test-helpers.js";
+
+test("maps an existing memory snapshot to the rebuilding status", () => {
+  const rebuilding = memoryRebuildingStatus({
+    status: "stale",
+    ready: false,
+    stale: true,
+    modelPrepared: true,
+    summaryCount: 2,
+    indexedSummaryCount: 1,
+    missingSummaryIds: ["thread-current"],
+    staleSummaryIds: [],
+    extraSummaryIds: [],
+    message: "Memory index is stale."
+  });
+
+  assert.deepEqual(rebuilding, {
+    status: "rebuilding",
+    ready: false,
+    stale: true,
+    modelPrepared: true,
+    summaryCount: 2,
+    indexedSummaryCount: 1,
+    missingSummaryIds: ["thread-current"],
+    staleSummaryIds: [],
+    extraSummaryIds: [],
+    message: "Memory rebuild is running."
+  });
+});
 
 test("scans only thread summaries and extracts structured metadata", async () => {
   const info = await tempWorkspace();
