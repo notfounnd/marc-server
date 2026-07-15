@@ -25,6 +25,7 @@ export class FakeEmbeddingProvider implements EmbeddingProvider {
   prepareCalls = 0;
   documentCalls = 0;
   queryCalls = 0;
+  disposeCalls = 0;
 
   constructor(
     private readonly metadata: EmbeddingProviderMetadata = providerMetadata,
@@ -53,7 +54,9 @@ export class FakeEmbeddingProvider implements EmbeddingProvider {
     return vectorForText(text);
   }
 
-  async dispose(): Promise<void> {}
+  async dispose(): Promise<void> {
+    this.disposeCalls += 1;
+  }
 }
 
 export class ScoreOverrideStore implements MemoryVectorStore {

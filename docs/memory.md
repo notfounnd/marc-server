@@ -44,6 +44,19 @@ marc memory prepare
 
 `memory_status` does not load the model. It only checks whether the model cache and index manifest are usable.
 
+## Provider lifecycle
+
+`memory_recall` keeps one local embedding provider per workspace process for a
+short idle window. Consecutive recalls in a persistent daemon or MCP process
+reuse that provider instead of loading a new feature-extraction pipeline for
+every request. The default idle timeout is 30 seconds.
+
+The provider is discarded after the workspace becomes idle and when the daemon
+closes. The timer is unreferenced, so a one-shot CLI recall does not remain
+alive only because of the idle window. This lifecycle does not change the
+committed LanceDB snapshot, the summary corpus, ranking, or public recall
+inputs and outputs.
+
 The UI can also prepare the model explicitly from the selected workspace settings panel through `POST /api/workspaces/:workspaceId/memory/prepare`. The daemon never prepares or downloads the model automatically.
 
 ## Rebuild flow
@@ -103,7 +116,7 @@ The UI can search the same summary-memory index used by `memory_recall`. This is
 
 The search panel is available only when workspace memory is `ready` or `stale`. A stale index can still be queried, but the UI warns that recent summaries may be missing. `missing`, `model_missing`, `incompatible`, `preparing`, `rebuilding`, and `degraded` states block the search action.
 
-Search runs only when the user presses Enter or the search button. It does not run on every keystroke because recall must generate an embedding for the query with the local provider. The current provider lifecycle still loads the local pipeline for recall and disposes it after the call.
+Search runs only when the user presses Enter or the search button. It does not run on every keystroke because recall must generate an embedding for the query with the local provider. A persistent daemon can reuse the provider during the short idle window described above.
 
 The UI stores only the latest search snapshot in local browser storage and overwrites that slot after each completed search. It does not maintain a search history.
 

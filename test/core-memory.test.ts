@@ -140,6 +140,7 @@ test("recall returns the summary thread that matches the development intent", as
     ].join("\n")
   );
   await rebuildMemoryInWorkspace(info, { provider, store });
+  const disposeCallsBeforeRecall = provider.disposeCalls;
 
   const recall = await recallMemoryInWorkspace(info, {
     provider,
@@ -155,6 +156,7 @@ test("recall returns the summary thread that matches the development intent", as
     recall.nextActions.some((action) => action.includes("thread_read"))
   );
   assert.equal(provider.queryCalls, 1);
+  assert.equal(provider.disposeCalls, disposeCallsBeforeRecall);
 });
 
 test("recall reranks decision matches above generic vector neighbors", async () => {
