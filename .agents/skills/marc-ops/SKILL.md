@@ -1,13 +1,7 @@
 ---
 name: marc-ops
-description: |
-  Operate inside a mARC-enabled repository. Activates EVERY session in this workspace.
-  Establish bootstrap context, read RULES.md, and apply Custom Rules,
-  artifact metadata, marc:// references, and workspace_audit checkpoints.
-when_to_use: |
-  Use at the start of every session in a mARC workspace, after reconnecting or context loss,
-  and before proposing, planning, editing, posting messages, attaching artifacts, validating,
-  concluding, or closing mARC work.
+description: "Operate inside a mARC-enabled repository. Activates EVERY session in this workspace. Always active when a session starts, after every compaction, and whenever development is requested only if the skill has not already been loaded in the active session. Establish bootstrap context, read RULES.md, and apply Custom Rules, artifact metadata, marc:// references, and workspace_audit checkpoints. This process must not be ignored."
+when_to_use: "Use this always-active skill at the start of every session in a mARC workspace, after every compaction, reconnecting, or context loss, and whenever development is requested only if it has not already been loaded in the active session. Use it before proposing, planning, editing, posting messages, attaching artifacts, validating, concluding, or closing mARC work."
 ---
 
 # mARC Ops

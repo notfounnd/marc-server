@@ -50,6 +50,10 @@ test("updates workspace recommendations idempotently", async () => {
   const second = await updateWorkspaceRecommendations(workspace);
   const rules = await readRules(workspace);
   const instructions = await readInstructions(workspace);
+  const skill = await fs.readFile(
+    path.join(workspace, ".agents", "skills", "marc-ops", "SKILL.md"),
+    "utf8"
+  );
 
   assert.deepEqual(first.updated.sort(), [".agents/skills/marc-ops/SKILL.md"]);
   assert.ok(first.alreadyCurrent.includes("INSTRUCTIONS.md"));
@@ -62,6 +66,23 @@ test("updates workspace recommendations idempotently", async () => {
   assert.doesNotMatch(instructions, /## Message Style/);
   assert.match(instructions, /## Bootstrap Protocol/);
   assert.match(instructions, /workspace_bootstrap/);
+  assert.ok(
+    skill.includes(
+      'description: "Operate inside a mARC-enabled repository. Activates EVERY session in this workspace. Always active when a session starts, after every compaction, and whenever development is requested only if the skill has not already been loaded in the active session. Establish bootstrap context, read RULES.md, and apply Custom Rules, artifact metadata, marc:// references, and workspace_audit checkpoints. This process must not be ignored."'
+    )
+  );
+  assert.ok(
+    skill.includes(
+      'when_to_use: "Use this always-active skill at the start of every session in a mARC workspace, after every compaction, reconnecting, or context loss, and whenever development is requested only if it has not already been loaded in the active session. Use it before proposing, planning, editing, posting messages, attaching artifacts, validating, concluding, or closing mARC work."'
+    )
+  );
+  assert.doesNotMatch(skill, /^description: \|$/m);
+  assert.doesNotMatch(skill, /^when_to_use: \|$/m);
+  assert.match(skill, /## Always Active/);
+  assert.match(
+    skill,
+    /\*\*This skill is active for every session in this mARC workspace\.\*\*/
+  );
   assert.match(rules, /## Message Style/);
   assert.match(
     rules,
