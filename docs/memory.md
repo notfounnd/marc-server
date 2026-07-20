@@ -46,51 +46,48 @@ marc memory prepare
 
 ## Provider lifecycle
 
-`memory_recall` keeps one local embedding provider per workspace process for a
-short idle window. Consecutive recalls in a persistent daemon or MCP process
-reuse that provider instead of loading a new feature-extraction pipeline for
-every request. The default idle timeout is 30 seconds.
+`memory_recall` keeps one local embedding provider per workspace process for a short idle window. Consecutive recalls in a persistent daemon or MCP process reuse that provider instead of loading a new feature-extraction pipeline for every request. The default idle timeout is 30 seconds.
 
-The provider is discarded after the workspace becomes idle and when the daemon
-closes. The timer is unreferenced, so a one-shot CLI recall does not remain
-alive only because of the idle window. This lifecycle does not change the
-committed LanceDB snapshot, the summary corpus, ranking, or public recall
-inputs and outputs.
+The provider is discarded after the workspace becomes idle and when the daemon closes. The timer is unreferenced, so a one-shot CLI recall does not remain alive only because of the idle window. This lifecycle does not change the committed LanceDB snapshot, the summary corpus, ranking, or public recall inputs and outputs.
 
 The UI can also prepare the model explicitly from the selected workspace settings panel through `POST /api/workspaces/:workspaceId/memory/prepare`. The daemon never prepares or downloads the model automatically.
 
 ## Rebuild flow
 
-MCP and CLI rebuild is explicit and synchronous. It should run after a thread is closed or a `SUMMARY.md` changes:
+Memory rebuilds operate on closed-thread `SUMMARY.md` files. The core exposes two modes:
+
+- `incremental` is the normal reconciliation path. It embeds only new or changed summary records and removes records whose source summary disappeared.
+- `full` rebuilds the entire derived snapshot. It remains an explicit manual operation for recovery or provider-contract changes.
+
+CLI rebuild remains explicit and synchronous. It should run after a thread is closed or a `SUMMARY.md` changes:
 
 ```bash
 marc memory status
 marc memory rebuild
 ```
 
-The rebuild scans `.marc/threads/*/SUMMARY.md`, embeds the whole summary and its second-level sections, writes LanceDB data under `.marc/memory/`, and writes `manifest.json`.
+Both modes scan `.marc/threads/*/SUMMARY.md`, use the manifest hashes to determine their work, write LanceDB data under `.marc/memory/`, and publish a new `manifest.json` only after the derived index operation succeeds. Embedding uses sequential bounded batches. `memory.embeddingBatchSize` defaults to `4` records and accepts even values from `2` through `16`. The provider is disposed when the rebuild finishes or fails, so a rebuild does not retain the local model after its operation.
 
 The daemon and UI add background rebuild for interactive use:
 
 - workspace settings are stored per workspace in `.marc/marc.config.json`;
 - `memory.autoRebuild` defaults to `true`;
 - automatic rebuild only runs when the local model is already prepared;
-- automatic rebuild is considered only for `missing` or `stale` memory;
-- manual rebuild from the UI uses `POST /api/workspaces/:workspaceId/memory/rebuild`;
+- automatic rebuild is considered only for `missing` or `stale` memory and always uses `incremental` mode;
+- `degraded` memory waits for manual action and never enters an automatic retry loop;
+- manual rebuild from the UI and MCP defaults to `incremental`, while `full` requires an explicit mode selection;
+- the UI uses the existing `POST /api/workspaces/:workspaceId/memory/rebuild` route with an optional `mode` body field;
+- the workspace settings panel exposes the shared batch-size setting as a slider from `2` to `16` records;
 - background prepare and rebuild requests are deduplicated per workspace inside the daemon;
 - memory rebuild execution is guarded by a cache-backed workspace lock shared by daemon, MCP, and CLI;
 - a concurrent memory rebuild request does not queue another run; it reports `rebuilding` while the active owner continues;
 - stale rebuild lock metadata is recovered before status checks or new rebuild attempts.
 
-Workspace settings are structured machine configuration. Markdown remains the
-source of truth for mARC knowledge, threads, summaries, rules, messages, and
-artifacts.
+Workspace settings are structured machine configuration. Markdown remains the source of truth for mARC knowledge, threads, summaries, rules, messages, and artifacts.
 
 If a background rebuild fails, `/api/status` reports memory as `degraded` with `lastError`. Existing snapshots remain derived state and are not treated as source of truth.
 
-`memory_status` also checks the shared rebuild lock. It can report `rebuilding`
-while another process owns the rebuild, without loading the model or touching
-the embedding provider.
+`memory_status` also checks the shared rebuild lock. It can report `rebuilding` while another process owns the rebuild, without loading the model or touching the embedding provider.
 
 The manifest records:
 
@@ -117,11 +114,7 @@ This indicator is separate from `Connected`, which is daemon/token health, and `
 
 The selected workspace detail view exposes workspace settings from the same header action area used by thread artifacts. Its memory controls are `Automatic memory rebuild`, `Prepare model`, `Rebuild memory`, current memory status, and the last error when present.
 
-When a browser is connected through the daemon event stream, the daemon watches
-only memory rebuild lock transitions for registered workspaces. It emits
-`workspace-changed` when the lock becomes active or inactive, so the existing
-status refresh can show `DatabaseZap` during rebuilds started from UI, MCP, or
-CLI. The monitor stops when no UI client is connected.
+When a browser is connected through the daemon event stream, the daemon watches only memory rebuild lock transitions for registered workspaces. It emits `workspace-changed` when the lock becomes active or inactive, so the existing status refresh can show `DatabaseZap` during rebuilds started from UI, MCP, or CLI. The monitor stops when no UI client is connected.
 
 ## UI search
 

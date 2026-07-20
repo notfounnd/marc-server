@@ -68,6 +68,7 @@ export type MemoryIndexHealth = {
   lastRebuildAt?: string;
   lastError: string | null;
   autoRebuild: boolean;
+  embeddingBatchSize: number;
   message: string;
 };
 

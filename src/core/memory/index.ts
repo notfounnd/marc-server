@@ -10,6 +10,7 @@ export {
   prepareMemoryInWorkspace,
   readMemoryStatusInWorkspace,
   rebuildMemoryInWorkspace,
+  reconcileMemoryInWorkspace,
   recallMemoryInWorkspace
 } from "./operations.js";
 export {
@@ -21,7 +22,11 @@ export { BackgroundMemoryReconciler } from "./background.js";
 export {
   readWorkspaceSettingsInWorkspace,
   updateWorkspaceSettingsInWorkspace,
-  workspaceSettingsPath
+  workspaceSettingsPath,
+  DEFAULT_MEMORY_EMBEDDING_BATCH_SIZE,
+  MAX_MEMORY_EMBEDDING_BATCH_SIZE,
+  MIN_MEMORY_EMBEDDING_BATCH_SIZE,
+  isMemoryEmbeddingBatchSize
 } from "./settings.js";
 export {
   InMemoryMemoryVectorStore,
@@ -35,9 +40,11 @@ export type {
   EmbeddingProvider,
   EmbeddingProviderMetadata,
   MemoryManifest,
+  MemoryRebuildMode,
   MemoryRecallResult,
   MemoryStatus,
   MemoryVectorRecord,
+  MemoryVectorRow,
   MemoryVectorStore,
   ThreadSummarySource
 } from "./types.js";

@@ -132,3 +132,21 @@ Backlog Playwright atualizado apos a implementacao da thread marc://$oportunidad
 - Mantive a thread focada apenas em backlog Playwright/E2E.
 
 <!-- /marc-message -->
+
+<!-- marc-message
+id: msg_9805a9c1472842ed98
+threadId: oportunidade-testes-playwright-para-referencias-e-artifacts-ui-f742659a
+timestamp: 2026-07-20T22:53:14.624Z
+agentId: codex-dev
+role: developer
+-->
+
+Backlog Playwright atualizado após a implementação de marc://$oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682.
+
+A seção `Workspace Memory Settings` agora cobre:
+- slider de batch size, valores permitidos e persistência;
+- request `mode: "incremental"` para o fluxo padrão;
+- request `mode: "full"` para o rebuild explícito;
+- estado `database-zap` e bloqueio das ações enquanto o lock global estiver ativo.
+
+<!-- /marc-message -->

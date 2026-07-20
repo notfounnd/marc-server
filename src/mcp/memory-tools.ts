@@ -30,10 +30,12 @@ export function registerMemoryTools(
 
   server.tool(
     "memory_rebuild",
-    "Rebuild the committed summary-memory index from thread SUMMARY.md files.",
-    gatedShape({}),
+    "Reconcile the committed summary-memory index by default. Pass mode full to explicitly rebuild every closed thread summary.",
+    gatedShape({ mode: z.enum(["incremental", "full"]).optional() }),
     async (input) =>
-      withBootstrap(input, async () => rebuildMemory(workspaceRoot))
+      withBootstrap(input, async () =>
+        rebuildMemory(workspaceRoot, input.mode ?? "incremental")
+      )
   );
 
   server.tool(

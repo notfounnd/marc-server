@@ -32,18 +32,20 @@ test("daemon exposes workspace memory settings and status health", async () => {
     await registerWorkspace(baseUrl, workspace);
     const encodedWorkspace = encodeURIComponent(workspace.id);
     const initialSettings = await fetchJson<{
-      memory: { autoRebuild: boolean };
+      memory: { autoRebuild: boolean; embeddingBatchSize: number };
     }>(`${baseUrl}/api/workspaces/${encodedWorkspace}/settings`);
 
     assert.equal(initialSettings.memory.autoRebuild, true);
+    assert.equal(initialSettings.memory.embeddingBatchSize, 4);
 
     const updatedSettings = await postJson<{
-      memory: { autoRebuild: boolean };
+      memory: { autoRebuild: boolean; embeddingBatchSize: number };
     }>(`${baseUrl}/api/workspaces/${encodedWorkspace}/settings`, {
-      memory: { autoRebuild: false }
+      memory: { autoRebuild: false, embeddingBatchSize: 8 }
     });
 
     assert.equal(updatedSettings.memory.autoRebuild, false);
+    assert.equal(updatedSettings.memory.embeddingBatchSize, 8);
 
     const status = await fetchJson<{
       modules: {
@@ -52,6 +54,7 @@ test("daemon exposes workspace memory settings and status health", async () => {
             string,
             {
               autoRebuild: boolean;
+              embeddingBatchSize: number;
               lastError: string | null;
               preparing: boolean;
               rebuilding: boolean;
@@ -64,6 +67,10 @@ test("daemon exposes workspace memory settings and status health", async () => {
     assert.equal(
       status.modules.memory.workspaces[workspace.id].autoRebuild,
       false
+    );
+    assert.equal(
+      status.modules.memory.workspaces[workspace.id].embeddingBatchSize,
+      8
     );
     assert.equal(
       status.modules.memory.workspaces[workspace.id].preparing,

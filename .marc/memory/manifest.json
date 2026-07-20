@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "builtAt": "2026-07-15T03:43:29.285Z",
+  "builtAt": "2026-07-20T22:55:23.345Z",
   "embeddingProvider": {
     "id": "transformers-js-local",
     "name": "Transformers.js local multilingual embeddings",
@@ -464,6 +464,24 @@
       ]
     },
     {
+      "threadId": "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682",
+      "title": "Sumario executivo",
+      "closedAt": "2026-07-20T22:54:00.000Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682/SUMMARY.md",
+      "reference": "marc://$oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682",
+      "sha256": "7f3e995983003f5934eb9af33d170d86a0e0bf21787029711596d4319e7ce8f4",
+      "mtimeMs": 1784588082170.566,
+      "recordIds": [
+        "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682:summary",
+        "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682:section:resultado",
+        "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682:section:contexto",
+        "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682:section:tratativa",
+        "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682:section:validacao",
+        "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682:section:referencias"
+      ]
+    },
+    {
       "threadId": "oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486",
       "title": "Resumo executivo",
       "closedAt": "2026-05-06T05:54:55.283Z",
@@ -499,6 +517,22 @@
         "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4:section:testes-e-validacao",
         "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4:section:continuidade",
         "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4:section:estado-final"
+      ]
+    },
+    {
+      "threadId": "oportunidade-reforcar-gatilhos-de-ativacao-da-skill-marc-ops-934c4896",
+      "title": "Resumo Executivo",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-reforcar-gatilhos-de-ativacao-da-skill-marc-ops-934c4896\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-reforcar-gatilhos-de-ativacao-da-skill-marc-ops-934c4896/SUMMARY.md",
+      "reference": "marc://$oportunidade-reforcar-gatilhos-de-ativacao-da-skill-marc-ops-934c4896",
+      "sha256": "f4e4c4f7054bf049abd1581da7b5389feb943cf723d7d65317b2bee24d909566",
+      "mtimeMs": 1784228263514.1167,
+      "recordIds": [
+        "oportunidade-reforcar-gatilhos-de-ativacao-da-skill-marc-ops-934c4896:summary",
+        "oportunidade-reforcar-gatilhos-de-ativacao-da-skill-marc-ops-934c4896:section:resultado",
+        "oportunidade-reforcar-gatilhos-de-ativacao-da-skill-marc-ops-934c4896:section:o-que-foi-tratado",
+        "oportunidade-reforcar-gatilhos-de-ativacao-da-skill-marc-ops-934c4896:section:validacao",
+        "oportunidade-reforcar-gatilhos-de-ativacao-da-skill-marc-ops-934c4896:section:continuidade"
       ]
     },
     {

@@ -13,6 +13,7 @@ import type {
   ThreadInfo,
   ThreadListOptions,
   WorkspaceInfo,
+  WorkspaceSettings,
   WorkspaceStatus
 } from "./types.js";
 
@@ -49,7 +50,7 @@ export async function readWorkspaceStatusInWorkspace(
 
   let memory = await memoryIndex.health(settings);
   if (shouldAutoRebuildMemory(memory)) {
-    void memoryIndex.rebuild().catch(() => undefined);
+    void memoryIndex.rebuild(settings).catch(() => undefined);
     memory = await memoryIndex.health(settings);
   }
 
@@ -104,13 +105,24 @@ export async function prepareMemoryInBackgroundInWorkspace(
 }
 
 export async function rebuildMemoryInBackgroundInWorkspace(
-  info: WorkspaceInfo
+  info: WorkspaceInfo,
+  mode: "incremental" | "full" = "incremental"
 ) {
   const memory = await backgroundMemory(info);
   const settings = await readWorkspaceSettingsInWorkspace(info);
-  void memory.rebuild().catch(() => undefined);
+  const rebuild = backgroundMemoryRebuilds[mode];
+  void rebuild(memory, settings).catch(() => undefined);
   return memory.health(settings);
 }
+
+const backgroundMemoryRebuilds = {
+  incremental: (
+    memory: BackgroundMemoryReconciler,
+    settings: WorkspaceSettings
+  ) => memory.rebuild(settings),
+  full: (memory: BackgroundMemoryReconciler, settings: WorkspaceSettings) =>
+    memory.rebuildFull(settings)
+};
 
 async function scheduleAutoRebuildAfterPrepare(
   info: WorkspaceInfo,

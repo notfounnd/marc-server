@@ -4,6 +4,8 @@ export type MemoryDistance = "cosine";
 export type MemoryRuntime = "local" | "external";
 export type MemoryRecordKind = "summary" | "section";
 
+export type MemoryRebuildMode = "incremental" | "full";
+
 export type EmbeddingProviderMetadata = {
   id: string;
   name: string;
@@ -55,6 +57,10 @@ export type MemoryVectorRecord = {
   kind: MemoryRecordKind;
   sectionTitle?: string;
   text: string;
+};
+
+export type MemoryVectorRow = MemoryVectorRecord & {
+  vector: number[];
 };
 
 export type MemoryManifestRecord = {
@@ -122,10 +128,16 @@ export type MemoryRecallHit = {
 
 export type MemoryVectorStore = {
   exists(info: WorkspaceInfo): Promise<boolean>;
+  listRecordIds(info: WorkspaceInfo): Promise<string[]>;
   rebuild(
     info: WorkspaceInfo,
     records: MemoryVectorRecord[],
     vectors: number[][]
+  ): Promise<void>;
+  reconcile(
+    info: WorkspaceInfo,
+    rows: MemoryVectorRow[],
+    removeRecordIds: string[]
   ): Promise<void>;
   search(
     info: WorkspaceInfo,
@@ -137,6 +149,7 @@ export type MemoryVectorStore = {
 export type MemoryOperationOptions = {
   provider: EmbeddingProvider;
   store?: MemoryVectorStore;
+  batchSize?: number;
 };
 
 export type MemoryRecallOptions = MemoryOperationOptions & {

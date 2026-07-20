@@ -7,10 +7,15 @@ import {
   readMemoryStatusInWorkspace,
   readWorkspaceSettingsInWorkspace,
   rebuildMemoryInWorkspace,
+  reconcileMemoryInWorkspace,
   recallMemoryInWorkspace,
   updateWorkspaceSettingsInWorkspace
 } from "./memory/index.js";
-import type { MemoryRecallResult, MemoryStatus } from "./memory/index.js";
+import type {
+  MemoryRecallResult,
+  MemoryRebuildMode,
+  MemoryStatus
+} from "./memory/index.js";
 import {
   prepareMemoryInBackgroundInWorkspace,
   rebuildMemoryInBackgroundInWorkspace
@@ -40,9 +45,12 @@ export async function prepareMemoryInBackground(workspaceRoot: string) {
   return prepareMemoryInBackgroundInWorkspace(info);
 }
 
-export async function rebuildMemoryInBackground(workspaceRoot: string) {
+export async function rebuildMemoryInBackground(
+  workspaceRoot: string,
+  mode: MemoryRebuildMode = "incremental"
+) {
   const info = await initWorkspace(workspaceRoot);
-  return rebuildMemoryInBackgroundInWorkspace(info);
+  return rebuildMemoryInBackgroundInWorkspace(info, mode);
 }
 
 export async function prepareMemory(workspaceRoot: string): Promise<{
@@ -67,20 +75,31 @@ export async function readMemoryStatus(
 }
 
 export async function rebuildMemory(
-  workspaceRoot: string
+  workspaceRoot: string,
+  mode: MemoryRebuildMode = "incremental"
 ): Promise<MemoryStatus> {
   const info = await initWorkspace(workspaceRoot);
   const provider = new LocalEmbeddingProvider(info);
   const status = await readMemoryStatusInWorkspace(info, { provider });
+  const settings = await readWorkspaceSettingsInWorkspace(info);
   const rebuilding = await memoryRebuildActiveInWorkspace(info);
   if (rebuilding) return memoryRebuildingStatus(status);
   if (status.status === "model_missing") return status;
-  const rebuild = await rebuildMemoryInWorkspace(info, { provider });
+  if (mode === "incremental" && status.status === "incompatible") return status;
+  const rebuild = await memoryRebuildOperations[mode](info, {
+    provider,
+    batchSize: settings.memory.embeddingBatchSize
+  });
   const nextStatus = await readMemoryStatusInWorkspace(info, { provider });
   if (!rebuild.acquired) return memoryRebuildingStatus(nextStatus);
 
   return nextStatus;
 }
+
+const memoryRebuildOperations = {
+  incremental: reconcileMemoryInWorkspace,
+  full: rebuildMemoryInWorkspace
+} satisfies Record<MemoryRebuildMode, typeof rebuildMemoryInWorkspace>;
 
 export async function recallMemory(
   workspaceRoot: string,

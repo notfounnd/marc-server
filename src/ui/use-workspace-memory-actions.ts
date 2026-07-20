@@ -57,8 +57,11 @@ export function useWorkspaceMemoryActions({
 
   return {
     prepareMemoryModel: () => postWorkspace("/memory/prepare", {}),
-    rebuildMemoryIndex: () => postWorkspace("/memory/rebuild", {}),
+    rebuildMemoryIndex: (mode: "incremental" | "full") =>
+      postWorkspace("/memory/rebuild", { mode }),
     updateWorkspaceAutoRebuild: (autoRebuild: boolean) =>
-      postWorkspace("/settings", { memory: { autoRebuild } })
+      postWorkspace("/settings", { memory: { autoRebuild } }),
+    updateWorkspaceEmbeddingBatchSize: (embeddingBatchSize: number) =>
+      postWorkspace("/settings", { memory: { embeddingBatchSize } })
   };
 }

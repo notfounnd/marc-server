@@ -7,6 +7,7 @@ import type {
   MemoryManifest,
   MemorySearchHit,
   MemoryVectorRecord,
+  MemoryVectorRow,
   MemoryVectorStore
 } from "./types.js";
 
@@ -42,10 +43,14 @@ export async function writeMemoryManifest(
 }
 
 export class InMemoryMemoryVectorStore implements MemoryVectorStore {
-  private records: Array<MemoryVectorRecord & { vector: number[] }> = [];
+  private records: MemoryVectorRow[] = [];
 
   async exists(): Promise<boolean> {
     return this.records.length > 0;
+  }
+
+  async listRecordIds(): Promise<string[]> {
+    return this.records.map((record) => record.recordId);
   }
 
   async rebuild(
@@ -57,6 +62,19 @@ export class InMemoryMemoryVectorStore implements MemoryVectorStore {
       ...record,
       vector: vectors[index] ?? []
     }));
+  }
+
+  async reconcile(
+    _info: WorkspaceInfo,
+    rows: MemoryVectorRow[],
+    removeRecordIds: string[]
+  ): Promise<void> {
+    const recordsById = new Map(
+      this.records.map((record) => [record.recordId, record])
+    );
+    for (const row of rows) recordsById.set(row.recordId, row);
+    for (const recordId of removeRecordIds) recordsById.delete(recordId);
+    this.records = [...recordsById.values()];
   }
 
   async search(
@@ -82,6 +100,14 @@ export class LanceDbMemoryVectorStore implements MemoryVectorStore {
     return entries.some((entry) => entry !== MANIFEST_FILE);
   }
 
+  async listRecordIds(info: WorkspaceInfo): Promise<string[]> {
+    if (!(await this.exists(info))) return [];
+    const db = await connectLanceDb(info);
+    const table = await db.openTable(TABLE_NAME);
+    const rows = await table.query().toArray();
+    return rows.flatMap(recordIdFromRow);
+  }
+
   async rebuild(
     info: WorkspaceInfo,
     records: MemoryVectorRecord[],
@@ -93,6 +119,26 @@ export class LanceDbMemoryVectorStore implements MemoryVectorStore {
       vector: vectors[index] ?? []
     }));
     await db.createTable(TABLE_NAME, rows, { mode: "overwrite" });
+  }
+
+  async reconcile(
+    info: WorkspaceInfo,
+    rows: MemoryVectorRow[],
+    removeRecordIds: string[]
+  ): Promise<void> {
+    const exists = await this.exists(info);
+    if (!exists) return this.createInitialTable(info, rows);
+
+    const db = await connectLanceDb(info);
+    const table = await db.openTable(TABLE_NAME);
+    if (rows.length)
+      await table
+        .mergeInsert("recordId")
+        .whenMatchedUpdateAll()
+        .whenNotMatchedInsertAll()
+        .execute(rows);
+    if (!removeRecordIds.length) return;
+    await table.delete(recordIdPredicate(removeRecordIds));
   }
 
   async search(
@@ -114,46 +160,75 @@ export class LanceDbMemoryVectorStore implements MemoryVectorStore {
       }))
       .filter((hit) => hit.score >= options.minScore);
   }
+
+  private async createInitialTable(
+    info: WorkspaceInfo,
+    rows: MemoryVectorRow[]
+  ): Promise<void> {
+    if (!rows.length) return;
+    const db = await connectLanceDb(info);
+    await db.createTable(TABLE_NAME, rows);
+  }
 }
 
 async function connectLanceDb(info: WorkspaceInfo): Promise<{
   createTable(
     name: string,
     data: unknown[],
-    options: { mode: "overwrite" }
+    options?: { mode: "overwrite" }
   ): Promise<unknown>;
-  openTable(name: string): Promise<{
-    vectorSearch(vector: number[]): {
-      distanceType(distanceType: "cosine"): {
-        limit(limit: number): { toArray(): Promise<unknown[]> };
-      };
-    };
-    search?(vector: number[]): {
-      limit(limit: number): { toArray(): Promise<unknown[]> };
-    };
-  }>;
+  openTable(name: string): Promise<LanceDbTable>;
 }> {
   const lancedb = (await import("@lancedb/lancedb")) as {
     connect(uri: string): Promise<{
       createTable(
         name: string,
         data: unknown[],
-        options: { mode: "overwrite" }
+        options?: { mode: "overwrite" }
       ): Promise<unknown>;
-      openTable(name: string): Promise<{
-        vectorSearch(vector: number[]): {
-          distanceType(distanceType: "cosine"): {
-            limit(limit: number): { toArray(): Promise<unknown[]> };
-          };
-        };
-        search?(vector: number[]): {
-          limit(limit: number): { toArray(): Promise<unknown[]> };
-        };
-      }>;
+      openTable(name: string): Promise<LanceDbTable>;
     }>;
   };
   await fs.mkdir(memoryRootPath(info), { recursive: true });
   return lancedb.connect(memoryRootPath(info));
+}
+
+type LanceDbTable = {
+  delete(predicate: string): Promise<unknown>;
+  mergeInsert(on: string): {
+    whenMatchedUpdateAll(): {
+      whenNotMatchedInsertAll(): {
+        execute(rows: MemoryVectorRow[]): Promise<unknown>;
+      };
+    };
+  };
+  query(): { toArray(): Promise<unknown[]> };
+  vectorSearch(vector: number[]): {
+    distanceType(distanceType: "cosine"): {
+      limit(limit: number): { toArray(): Promise<unknown[]> };
+    };
+  };
+  search?(vector: number[]): {
+    limit(limit: number): { toArray(): Promise<unknown[]> };
+  };
+};
+
+function recordIdPredicate(recordIds: string[]): string {
+  return `recordId IN (${recordIds.map(sqlString).join(", ")})`;
+}
+
+function sqlString(value: string): string {
+  return `'${value.replaceAll("'", "''")}'`;
+}
+
+function recordIdFromRow(row: unknown): string[] {
+  if (!isRecord(row)) return [];
+  if (typeof row.recordId !== "string") return [];
+  return [row.recordId];
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 function cosineSimilarity(left: number[], right: number[]): number {

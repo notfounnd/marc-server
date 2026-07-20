@@ -142,12 +142,15 @@ Priority: medium
 
 ## Workspace Memory Settings
 
-Source thread: `oportunidade-processamento-em-background-para-gerar-memory-aa4908aa`  
+Source threads: `oportunidade-processamento-em-background-para-gerar-memory-aa4908aa`, `oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682`  
 Priority: high
 
 - [ ] Load the UI with a valid daemon token and a selected workspace; click the workspace settings button in the third-column header and verify a right-side sheet opens instead of a dropdown.
-- [ ] Verify the workspace settings sheet shows the memory status first, the `Automatic memory rebuild` switch second, and the `Prepare model` / `Rebuild memory` actions below without horizontal overflow.
+- [ ] Verify the workspace settings sheet shows the memory status first, the `Automatic memory rebuild` switch second, the embedding batch-size slider third, and the `Prepare model` / `Rebuild incremental` / `Rebuild full` actions below without horizontal overflow.
 - [ ] Toggle `Automatic memory rebuild` off and on; verify the switch state persists after refresh and the workspace status API reports the same `autoRebuild` value.
+- [ ] Verify the embedding batch-size slider defaults to `4`, exposes only even values from `2` through `16`, updates its record-count label while dragged, persists on commit, and restores the saved value after refresh.
+- [ ] Trigger `Rebuild incremental` with unchanged summaries and verify the request body sends `mode: "incremental"`, the UI returns to `ready`, and no second rebuild can be started while the shared lock is active.
+- [ ] Trigger `Rebuild full` and verify the request body sends `mode: "full"`, the workspace card shows `database-zap` while rebuilding, and both rebuild buttons are disabled until the shared lock is released.
 - [ ] With `autoRebuild` enabled, close a thread by creating `SUMMARY.md`; verify memory status transitions through rebuild when needed and returns to `ready` with the new summary indexed.
 - [ ] Verify the Neobrutalism/Radix switch thumb is visually aligned in both checked and unchecked states, matching the documented switch spacing.
 - [ ] Verify workspace, thread, and agent headers keep the same eyebrow/title/reference structure, including copyable `marc://$threadId`, `marc://@agentId`, and workspace path rows.

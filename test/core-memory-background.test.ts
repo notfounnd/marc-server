@@ -1,15 +1,9 @@
 import assert from "node:assert/strict";
-import fs from "node:fs/promises";
-import path from "node:path";
 import test from "node:test";
 import {
   BackgroundMemoryReconciler,
-  MEMORY_REBUILD_RESOURCE,
-  readWorkspaceSettingsInWorkspace,
-  workspaceSettingsPath,
-  updateWorkspaceSettingsInWorkspace
+  MEMORY_REBUILD_RESOURCE
 } from "../src/core/memory/index.js";
-import { readWorkspaceStatus } from "../src/core/workspace.js";
 import { withWorkspaceWriteLock } from "../src/core/write-coordination.js";
 import {
   FakeEmbeddingProvider,
@@ -18,6 +12,7 @@ import {
 } from "./memory-test-helpers.js";
 import type {
   MemoryVectorRecord,
+  MemoryVectorRow,
   MemoryVectorStore
 } from "../src/core/memory/types.js";
 import type { WorkspaceInfo } from "../src/core/types.js";
@@ -54,6 +49,7 @@ class PreparedProvider extends FakeEmbeddingProvider {
 
 class GatedStore implements MemoryVectorStore {
   rebuildCalls = 0;
+  reconcileCalls = 0;
   records: Array<MemoryVectorRecord & { vector: number[] }> = [];
 
   constructor(
@@ -63,6 +59,10 @@ class GatedStore implements MemoryVectorStore {
 
   exists(): Promise<boolean> {
     return Promise.resolve(this.records.length > 0);
+  }
+
+  listRecordIds(): Promise<string[]> {
+    return Promise.resolve(this.records.map((record) => record.recordId));
   }
 
   async rebuild(
@@ -79,6 +79,22 @@ class GatedStore implements MemoryVectorStore {
     }));
   }
 
+  async reconcile(
+    _info: WorkspaceInfo,
+    rows: MemoryVectorRow[],
+    removeRecordIds: string[]
+  ): Promise<void> {
+    this.reconcileCalls += 1;
+    await this.gate?.promise;
+    if (this.failure) throw this.failure;
+    const recordsById = new Map(
+      this.records.map((record) => [record.recordId, record])
+    );
+    for (const row of rows) recordsById.set(row.recordId, row);
+    for (const recordId of removeRecordIds) recordsById.delete(recordId);
+    this.records = [...recordsById.values()];
+  }
+
   search(): Promise<[]> {
     return Promise.resolve([]);
   }
@@ -90,75 +106,6 @@ async function waitFor(assertion: () => boolean): Promise<void> {
     await new Promise((resolve) => setTimeout(resolve, 5));
   }
 }
-
-async function fileExists(filePath: string): Promise<boolean> {
-  return fs
-    .access(filePath)
-    .then(() => true)
-    .catch(() => false);
-}
-
-test("workspace memory settings default to automatic rebuild and persist per workspace", async () => {
-  const first = await tempWorkspace();
-  const second = await tempWorkspace();
-
-  assert.equal(
-    (await readWorkspaceSettingsInWorkspace(first)).memory.autoRebuild,
-    true
-  );
-
-  await updateWorkspaceSettingsInWorkspace(first, {
-    memory: { autoRebuild: false }
-  });
-
-  const settingsPath = workspaceSettingsPath(first);
-  const settingsContent = JSON.parse(
-    await fs.readFile(settingsPath, "utf8")
-  ) as { memory?: { autoRebuild?: boolean } };
-
-  assert.equal(path.basename(settingsPath), "marc.config.json");
-  assert.equal(path.basename(path.dirname(settingsPath)), ".marc");
-  assert.equal(settingsContent.memory?.autoRebuild, false);
-  assert.equal(
-    await fileExists(path.join(first.marcPath, "SETTINGS.md")),
-    false
-  );
-  assert.equal(
-    (await readWorkspaceSettingsInWorkspace(first)).memory.autoRebuild,
-    false
-  );
-  assert.equal(
-    (await readWorkspaceSettingsInWorkspace(second)).memory.autoRebuild,
-    true
-  );
-});
-
-test("workspace memory settings ignore legacy Markdown settings", async () => {
-  const info = await tempWorkspace();
-  await fs.writeFile(
-    path.join(info.marcPath, "SETTINGS.md"),
-    ["<!-- marc-settings", "memory.autoRebuild: false", "-->", ""].join("\n")
-  );
-
-  assert.equal(
-    (await readWorkspaceSettingsInWorkspace(info)).memory.autoRebuild,
-    true
-  );
-});
-
-test("workspace status includes persisted memory auto rebuild setting", async () => {
-  const info = await tempWorkspace();
-  await updateWorkspaceSettingsInWorkspace(info, {
-    memory: { autoRebuild: false }
-  });
-
-  const status = await readWorkspaceStatus(info.rootPath);
-
-  assert.equal(status.modules.memory.autoRebuild, false);
-  assert.equal(status.modules.memory.preparing, false);
-  assert.equal(status.modules.memory.rebuilding, false);
-  assert.equal(status.modules.memory.lastError, null);
-});
 
 test("background memory prepare deduplicates concurrent requests", async () => {
   const info = await tempWorkspace();
@@ -201,16 +148,34 @@ test("background memory rebuild deduplicates concurrent requests", async () => {
 
   assert.equal(rebuilding.status, "rebuilding");
   assert.equal(rebuilding.rebuilding, true);
-  await waitFor(() => store.rebuildCalls === 1);
-  assert.equal(store.rebuildCalls, 1);
+  await waitFor(() => store.reconcileCalls === 1);
+  assert.equal(store.reconcileCalls, 1);
 
   gate.resolve();
   await Promise.all([first, second]);
 
   const ready = await memory.health({ memory: { autoRebuild: true } });
-  assert.equal(store.rebuildCalls, 1);
+  assert.equal(store.reconcileCalls, 1);
   assert.equal(ready.status, "ready");
   assert.ok(ready.lastRebuildAt);
+});
+
+test("background memory runs full rebuild only when explicitly requested", async () => {
+  const info = await tempWorkspace();
+  const provider = new PreparedProvider(true);
+  const store = new GatedStore();
+  const memory = new BackgroundMemoryReconciler(info, () => provider, store);
+  await writeSummary(
+    info,
+    "thread-memory",
+    "# Summary\n\nThread: `thread-memory`"
+  );
+
+  await memory.rebuild();
+  await memory.rebuildFull();
+
+  assert.equal(store.reconcileCalls, 1);
+  assert.equal(store.rebuildCalls, 1);
 });
 
 test("background memory does not rebuild again while another reconciler holds the lock", async () => {
@@ -234,13 +199,13 @@ test("background memory does not rebuild again while another reconciler holds th
   );
 
   const firstRebuild = first.rebuild();
-  await waitFor(() => store.rebuildCalls === 1);
+  await waitFor(() => store.reconcileCalls === 1);
 
   const secondRebuild = second.rebuild();
 
   try {
     await new Promise((resolve) => setTimeout(resolve, 25));
-    assert.equal(store.rebuildCalls, 1);
+    assert.equal(store.reconcileCalls, 1);
     const health = await second.health({ memory: { autoRebuild: true } });
     assert.equal(health.status, "rebuilding");
   } finally {

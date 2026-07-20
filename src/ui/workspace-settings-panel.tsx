@@ -1,5 +1,7 @@
 import { Database, RefreshCw } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Button, classNames } from "./common.js";
 import type { MemoryIndexHealth } from "./types.js";
@@ -8,14 +10,16 @@ export function WorkspaceSettingsPanel({
   health,
   t,
   onAutoRebuildChange,
+  onEmbeddingBatchSizeChange,
   onPrepareModel,
-  onRebuildMemory
+  onRebuild
 }: {
   health?: MemoryIndexHealth;
-  t: (key: string) => string;
+  t: (key: string, options?: { count: number }) => string;
   onAutoRebuildChange: (autoRebuild: boolean) => void;
+  onEmbeddingBatchSizeChange: (embeddingBatchSize: number) => void;
   onPrepareModel: () => void;
-  onRebuildMemory: () => void;
+  onRebuild: (mode: "incremental" | "full") => void;
 }) {
   const modelPrepared = health?.modelPrepared === true;
   const preparing = health?.preparing === true;
@@ -24,6 +28,26 @@ export function WorkspaceSettingsPanel({
   const canPrepare = !modelPrepared && !busy;
   const canRebuild = modelPrepared && !busy;
   const autoRebuild = health?.autoRebuild ?? true;
+  const configuredBatchSize = health?.embeddingBatchSize ?? 4;
+  const [batchSize, setBatchSize] = useState(configuredBatchSize);
+
+  useEffect(() => {
+    setBatchSize(configuredBatchSize);
+  }, [configuredBatchSize]);
+
+  function updateBatchSize(value: number[]) {
+    const next = value[0];
+    if (next === undefined) return;
+    setBatchSize(next);
+  }
+
+  function commitBatchSize(value: number[]) {
+    const next = value[0];
+    if (next === undefined) return;
+    setBatchSize(next);
+    if (next === configuredBatchSize) return;
+    onEmbeddingBatchSizeChange(next);
+  }
 
   return (
     <div className="workspace-settings-panel">
@@ -46,6 +70,23 @@ export function WorkspaceSettingsPanel({
           {t("Automatic memory rebuild")}
         </Label>
       </div>
+      <div className="workspace-settings-batch-row">
+        <Label htmlFor="workspace-memory-embedding-batch-size">
+          {t("Embedding batch size")}
+          <span>{t("{{count}} records", { count: batchSize })}</span>
+        </Label>
+        <Slider
+          id="workspace-memory-embedding-batch-size"
+          aria-label={t("Embedding batch size")}
+          disabled={busy}
+          max={16}
+          min={2}
+          step={2}
+          value={[batchSize]}
+          onValueChange={updateBatchSize}
+          onValueCommit={commitBatchSize}
+        />
+      </div>
       <div className="workspace-settings-actions">
         <Button
           className="workspace-settings-action"
@@ -58,10 +99,18 @@ export function WorkspaceSettingsPanel({
         <Button
           className="workspace-settings-action"
           disabled={!canRebuild}
-          onClick={onRebuildMemory}
+          onClick={() => onRebuild("incremental")}
         >
           <RefreshCw size={14} className={classNames(rebuilding && "spin")} />
-          {t("Rebuild memory")}
+          {t("Rebuild incremental")}
+        </Button>
+        <Button
+          className="workspace-settings-action"
+          disabled={!canRebuild}
+          onClick={() => onRebuild("full")}
+        >
+          <RefreshCw size={14} className={classNames(rebuilding && "spin")} />
+          {t("Rebuild full")}
         </Button>
       </div>
     </div>

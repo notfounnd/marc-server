@@ -17,16 +17,18 @@ export function WorkspaceSettingsModal({
   health,
   workspace,
   onAutoRebuildChange,
+  onEmbeddingBatchSizeChange,
   onClose,
   onPrepareModel,
-  onRebuildMemory
+  onRebuild
 }: {
   health?: MemoryIndexHealth;
   workspace: Workspace;
   onAutoRebuildChange: (autoRebuild: boolean) => void;
+  onEmbeddingBatchSizeChange: (embeddingBatchSize: number) => void;
   onClose: () => void;
   onPrepareModel: () => void;
-  onRebuildMemory: () => void;
+  onRebuild: (mode: "incremental" | "full") => void;
 }) {
   const { t } = useTranslation();
   const { open, setOpen, handleAnimationEnd } = useAnimatedSheetClose(onClose);
@@ -62,8 +64,9 @@ export function WorkspaceSettingsModal({
             health={health}
             t={t}
             onAutoRebuildChange={onAutoRebuildChange}
+            onEmbeddingBatchSizeChange={onEmbeddingBatchSizeChange}
             onPrepareModel={onPrepareModel}
-            onRebuildMemory={onRebuildMemory}
+            onRebuild={onRebuild}
           />
         </div>
       </SheetContent>

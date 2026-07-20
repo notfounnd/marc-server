@@ -30,6 +30,7 @@ const recallResult: MemoryRecallResult = {
   indexStatus: {
     indexedSummaryCount: 1,
     autoRebuild: true,
+    embeddingBatchSize: 4,
     lastError: null,
     message: "Memory index is current.",
     modelPrepared: true,

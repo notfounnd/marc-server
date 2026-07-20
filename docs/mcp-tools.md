@@ -83,10 +83,12 @@ The audit reports objective issues such as missing artifact files, artifact refe
 |---|---|
 | `memory_prepare` | Prepare the local embedding model cache used by summary memory. |
 | `memory_status` | Check whether `.marc/memory/` is ready, stale, missing, incompatible, or waiting for the local model. |
-| `memory_rebuild` | Rebuild the committed LanceDB summary-memory index from `.marc/threads/*/SUMMARY.md`. |
+| `memory_rebuild` | Reconcile the committed LanceDB summary-memory index by default. Pass `mode: "full"` only for an explicit full rebuild. |
 | `memory_recall` | Search historical thread summaries for a development intent and return relevant `marc://` references. |
 
 Summary memory is derived from `SUMMARY.md` only. Agents should use `memory_recall` before proposing or developing behavior that may overlap prior decisions, then read any strongly matched thread before reopening or contradicting the historical decision.
+
+`memory_rebuild` accepts an optional `mode` input. Omitted or `"incremental"` reconciles only added, changed, or removed summary records. `"full"` rebuilds the complete derived snapshot. Both modes use the workspace batch-size setting and the same per-workspace rebuild lock.
 
 ## Agent tools
 

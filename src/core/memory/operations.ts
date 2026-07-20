@@ -1,9 +1,6 @@
 import type { WorkspaceInfo } from "../types.js";
-import {
-  LanceDbMemoryVectorStore,
-  readMemoryManifest,
-  writeMemoryManifest
-} from "./store.js";
+import { LanceDbMemoryVectorStore, readMemoryManifest } from "./store.js";
+import { rebuildAllMemory, reconcileMemory } from "./rebuild-operations.js";
 import {
   memoryRecallCandidateOptions,
   rankMemoryHits,
@@ -23,15 +20,13 @@ import { scanThreadSummarySources } from "./summaries.js";
 import type {
   EmbeddingProvider,
   MemoryManifest,
-  MemoryManifestRecord,
   MemoryOperationOptions,
+  MemoryRebuildMode,
   MemoryRecallHit,
   MemoryRecallOptions,
   MemoryRecallResult,
   MemoryStatus,
-  MemoryVectorRecord,
-  MemoryVectorStore,
-  ThreadSummarySource
+  MemoryVectorStore
 } from "./types.js";
 
 const DEFAULT_LIMIT = 5;
@@ -84,26 +79,14 @@ export async function rebuildMemoryInWorkspace(
   info: WorkspaceInfo,
   options: MemoryOperationOptions
 ): Promise<MemoryRebuildAttempt> {
-  const provider = options.provider;
-  const attempt = await tryWithMemoryRebuildLock(info, async () => {
-    const sources = await scanThreadSummarySources(info);
-    const records = flattenSources(sources);
-    const vectors = await provider.embedDocuments(
-      records.map((record) => record.text)
-    );
-    const manifest = buildManifest(provider, sources);
-    await memoryStore(options.store).rebuild(info, records, vectors);
-    await writeMemoryManifest(info, manifest);
-    await provider.dispose();
-    return manifest;
-  });
+  return runMemoryRebuild(info, options, "full");
+}
 
-  if (!attempt.acquired) {
-    await provider.dispose();
-    return attempt;
-  }
-
-  return { acquired: true, manifest: attempt.value };
+export async function reconcileMemoryInWorkspace(
+  info: WorkspaceInfo,
+  options: MemoryOperationOptions
+): Promise<MemoryRebuildAttempt> {
+  return runMemoryRebuild(info, options, "incremental");
 }
 
 export async function recallMemoryInWorkspace(
@@ -152,50 +135,33 @@ function memoryStore(store?: MemoryVectorStore): MemoryVectorStore {
   return store ?? new LanceDbMemoryVectorStore();
 }
 
-function flattenSources(sources: ThreadSummarySource[]): MemoryVectorRecord[] {
-  return sources.flatMap((source) =>
-    source.chunks.map((chunk) => ({
-      recordId: chunk.recordId,
-      threadId: source.threadId,
-      title: source.title,
-      closedAt: source.closedAt,
-      summaryPath: source.summaryPath,
-      relativeSummaryPath: source.relativeSummaryPath,
-      reference: source.reference,
-      kind: chunk.kind,
-      sectionTitle: chunk.sectionTitle,
-      text: chunk.text
-    }))
-  );
+async function runMemoryRebuild(
+  info: WorkspaceInfo,
+  options: MemoryOperationOptions,
+  mode: MemoryRebuildMode
+): Promise<MemoryRebuildAttempt> {
+  const operation = memoryRebuildOperations[mode];
+  try {
+    const attempt = await tryWithMemoryRebuildLock(info, () =>
+      operation(info, options)
+    );
+    if (!attempt.acquired) return attempt;
+    return { acquired: true, manifest: attempt.value };
+  } finally {
+    await options.provider.dispose();
+  }
 }
 
-function buildManifest(
-  provider: EmbeddingProvider,
-  sources: ThreadSummarySource[]
-): MemoryManifest {
-  return {
-    schemaVersion: 1,
-    builtAt: new Date().toISOString(),
-    embeddingProvider: provider.describe(),
-    records: sources.map(sourceToManifestRecord)
-  };
-}
-
-function sourceToManifestRecord(
-  source: ThreadSummarySource
-): MemoryManifestRecord {
-  return {
-    threadId: source.threadId,
-    title: source.title,
-    closedAt: source.closedAt,
-    summaryPath: source.summaryPath,
-    relativeSummaryPath: source.relativeSummaryPath,
-    reference: source.reference,
-    sha256: source.sha256,
-    mtimeMs: source.mtimeMs,
-    recordIds: source.chunks.map((chunk) => chunk.recordId)
-  };
-}
+const memoryRebuildOperations: Record<
+  MemoryRebuildMode,
+  (
+    info: WorkspaceInfo,
+    options: MemoryOperationOptions
+  ) => Promise<MemoryManifest>
+> = {
+  full: rebuildAllMemory,
+  incremental: reconcileMemory
+};
 
 function recallWithoutResults(
   query: string,
