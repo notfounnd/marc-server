@@ -44,13 +44,22 @@ test("workspace settings panel exposes memory controls", () => {
     "src/components/ui/switch.tsx",
     "utf8"
   );
+  const sliderComponent = fs.readFileSync(
+    "src/components/ui/slider.tsx",
+    "utf8"
+  );
 
   assert.match(panel, /Automatic memory rebuild/);
+  assert.match(panel, /Embedding batch size/);
   assert.match(panel, /Prepare model/);
-  assert.match(panel, /Rebuild memory/);
+  assert.match(panel, /Rebuild incremental/);
+  assert.match(panel, /Rebuild full/);
   assert.match(panel, /modelPrepared/);
   assert.match(panel, /autoRebuild/);
+  assert.match(panel, /embeddingBatchSize/);
   assert.match(panel, /<Switch/);
+  assert.match(panel, /<Slider/);
+  assert.match(panel, /onValueCommit/);
   assert.match(panel, /<Label/);
   assert.doesNotMatch(panel, /type="checkbox"/);
   assert.match(css, /\.workspace-settings-panel/);
@@ -61,6 +70,8 @@ test("workspace settings panel exposes memory controls", () => {
   assert.match(switchComponent, /SwitchPrimitive\.Root/);
   assert.match(switchComponent, /appearance-none/);
   assert.match(switchComponent, /p-0/);
+  assert.match(sliderComponent, /@radix-ui\/react-slider/);
+  assert.match(sliderComponent, /SliderPrimitive\.Root/);
 });
 
 test("refreshes while memory prepare or rebuild is running", () => {
@@ -72,4 +83,6 @@ test("refreshes while memory prepare or rebuild is running", () => {
   assert.match(hook, /selectedMemoryHealth\?\.preparing/);
   assert.match(hook, /selectedMemoryHealth\?\.rebuilding/);
   assert.match(hook, /window\.setTimeout/);
+  assert.match(hook, /rebuildMemoryIndex: \(mode: "incremental" \| "full"\)/);
+  assert.match(hook, /embeddingBatchSize/);
 });

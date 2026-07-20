@@ -1,12 +1,16 @@
 import type http from "node:http";
 import {
   prepareMemoryInBackground,
+  readMemoryStatus,
   readWorkspaceSettings,
   rebuildMemoryInBackground,
   recallMemory,
   updateWorkspaceSettings
 } from "../core/workspace-memory.js";
-import { readWorkspaceStatus } from "../core/workspace.js";
+import {
+  isMemoryEmbeddingBatchSize,
+  type MemoryRebuildMode
+} from "../core/memory/index.js";
 import type { WorkspaceInfo, WorkspaceSettingsInput } from "../core/types.js";
 import { json, readBody, text } from "./http.js";
 import type { DaemonStore } from "./store.js";
@@ -29,7 +33,12 @@ type MemoryRecallBody = Partial<{
 type WorkspaceSettingsBody = Partial<{
   memory: Partial<{
     autoRebuild: boolean;
+    embeddingBatchSize: number;
   }>;
+}>;
+
+type MemoryRebuildBody = Partial<{
+  mode: MemoryRebuildMode;
 }>;
 
 export async function postWorkspaceMemoryRecall(
@@ -101,13 +110,19 @@ export async function postWorkspaceMemoryRebuild(
   const workspace = await workspaceOr404(context, workspaceId);
   if (!workspace) return;
 
-  const status = await readWorkspaceStatus(workspace.rootPath);
-  if (!status.modules.memory.modelPrepared) {
+  const mode = memoryRebuildMode(await readBody(context.request));
+  if (!mode) {
+    text(context.response, 400, "Invalid memory rebuild mode");
+    return;
+  }
+
+  const status = await readMemoryStatus(workspace.rootPath);
+  if (!status.modelPrepared) {
     text(context.response, 409, "Memory model is not prepared");
     return;
   }
 
-  const health = await rebuildMemoryInBackground(workspace.rootPath);
+  const health = await rebuildMemoryInBackground(workspace.rootPath, mode);
   context.events.send("workspace-changed", {
     workspaceId: workspace.id,
     at: new Date().toISOString()
@@ -159,7 +174,22 @@ function workspaceSettingsInput(
   const input = body as WorkspaceSettingsBody;
   const memory = isRecord(input.memory) ? input.memory : undefined;
   const autoRebuild = memory?.autoRebuild;
-  if (autoRebuild === undefined) return { memory: {} };
-  if (typeof autoRebuild !== "boolean") return undefined;
-  return { memory: { autoRebuild } };
+  const embeddingBatchSize = memory?.embeddingBatchSize;
+  if (autoRebuild !== undefined && typeof autoRebuild !== "boolean")
+    return undefined;
+  if (
+    embeddingBatchSize !== undefined &&
+    !isMemoryEmbeddingBatchSize(embeddingBatchSize)
+  )
+    return undefined;
+  return { memory: { autoRebuild, embeddingBatchSize } };
+}
+
+function memoryRebuildMode(body: unknown): MemoryRebuildMode | undefined {
+  if (body === undefined) return "incremental";
+  if (!isRecord(body)) return undefined;
+  const mode = (body as MemoryRebuildBody).mode;
+  if (mode === undefined) return "incremental";
+  if (mode === "incremental" || mode === "full") return mode;
+  return undefined;
 }

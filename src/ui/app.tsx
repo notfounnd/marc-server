@@ -283,14 +283,15 @@ export function App() {
         onArtifactSave={() => void appActions.saveArtifact()}
         onArtifactViewClose={() => setArtifactView(undefined)}
         onLink={appActions.handleMarkdownLink}
-        onPrepareMemoryModel={() =>
-          void workspaceMemoryActions.prepareMemoryModel()
-        }
-        onRebuildMemory={() => void workspaceMemoryActions.rebuildMemoryIndex()}
+        onPrepareMemoryModel={workspaceMemoryActions.prepareMemoryModel}
+        onRebuildMemory={workspaceMemoryActions.rebuildMemoryIndex}
         onShowWorkspaceSettingsChange={setShowWorkspaceSettings}
         onShortcutsClose={() => setShowShortcuts(false)}
-        onWorkspaceAutoRebuildChange={(autoRebuild) =>
-          void workspaceMemoryActions.updateWorkspaceAutoRebuild(autoRebuild)
+        onWorkspaceAutoRebuildChange={
+          workspaceMemoryActions.updateWorkspaceAutoRebuild
+        }
+        onWorkspaceEmbeddingBatchSizeChange={
+          workspaceMemoryActions.updateWorkspaceEmbeddingBatchSize
         }
       />
       <Toaster position="bottom-right" />

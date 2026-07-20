@@ -12,17 +12,31 @@ import {
 
 const SETTINGS_FILE = "marc.config.json";
 
+export const DEFAULT_MEMORY_EMBEDDING_BATCH_SIZE = 4;
+export const MIN_MEMORY_EMBEDDING_BATCH_SIZE = 2;
+export const MAX_MEMORY_EMBEDDING_BATCH_SIZE = 16;
+
 const DEFAULT_SETTINGS: WorkspaceSettings = {
   memory: {
-    autoRebuild: true
+    autoRebuild: true,
+    embeddingBatchSize: DEFAULT_MEMORY_EMBEDDING_BATCH_SIZE
   }
 };
 
 type WorkspaceSettingsFile = Partial<{
   memory: Partial<{
     autoRebuild: boolean;
+    embeddingBatchSize: number;
   }>;
 }>;
+
+export function isMemoryEmbeddingBatchSize(value: unknown): value is number {
+  if (typeof value !== "number") return false;
+  if (!Number.isInteger(value)) return false;
+  if (value < MIN_MEMORY_EMBEDDING_BATCH_SIZE) return false;
+  if (value > MAX_MEMORY_EMBEDDING_BATCH_SIZE) return false;
+  return value % 2 === 0;
+}
 
 export function workspaceSettingsPath(info: WorkspaceInfo): string {
   return safeJoin(info.marcPath, SETTINGS_FILE);
@@ -57,9 +71,22 @@ function mergeWorkspaceSettings(
       autoRebuild:
         typeof input.memory?.autoRebuild === "boolean"
           ? input.memory.autoRebuild
-          : current.memory.autoRebuild
+          : current.memory.autoRebuild,
+      embeddingBatchSize: nextEmbeddingBatchSize(current, input)
     }
   };
+}
+
+function nextEmbeddingBatchSize(
+  current: WorkspaceSettings,
+  input: WorkspaceSettingsInput
+): number {
+  const next = input.memory?.embeddingBatchSize;
+  if (next === undefined) return current.memory.embeddingBatchSize;
+  if (isMemoryEmbeddingBatchSize(next)) return next;
+  throw new Error(
+    "Memory embedding batch size must be an even integer from 2 to 16."
+  );
 }
 
 async function readSettingsContent(
@@ -86,7 +113,10 @@ function normalizeWorkspaceSettings(value: unknown): WorkspaceSettings {
       autoRebuild:
         typeof memory.autoRebuild === "boolean"
           ? memory.autoRebuild
-          : DEFAULT_SETTINGS.memory.autoRebuild
+          : DEFAULT_SETTINGS.memory.autoRebuild,
+      embeddingBatchSize: isMemoryEmbeddingBatchSize(memory.embeddingBatchSize)
+        ? memory.embeddingBatchSize
+        : DEFAULT_SETTINGS.memory.embeddingBatchSize
     }
   };
 }
@@ -94,7 +124,8 @@ function normalizeWorkspaceSettings(value: unknown): WorkspaceSettings {
 function defaultSettings(): WorkspaceSettings {
   return {
     memory: {
-      autoRebuild: DEFAULT_SETTINGS.memory.autoRebuild
+      autoRebuild: DEFAULT_SETTINGS.memory.autoRebuild,
+      embeddingBatchSize: DEFAULT_SETTINGS.memory.embeddingBatchSize
     }
   };
 }

@@ -6,13 +6,25 @@ import type {
 import {
   prepareMemoryInWorkspace,
   readMemoryStatusInWorkspace,
+  reconcileMemoryInWorkspace,
   rebuildMemoryInWorkspace
 } from "./operations.js";
 import { memoryRebuildActiveInWorkspace } from "./rebuild-coordination.js";
-import type { EmbeddingProvider, MemoryVectorStore } from "./types.js";
+import { DEFAULT_MEMORY_EMBEDDING_BATCH_SIZE } from "./settings.js";
+import type {
+  EmbeddingProvider,
+  MemoryRebuildMode,
+  MemoryVectorStore
+} from "./types.js";
 
 type ProviderFactory = () => EmbeddingProvider;
 type MemoryFailureKind = "prepare" | "rebuild";
+type MemoryHealthSettings = {
+  memory: {
+    autoRebuild: boolean;
+    embeddingBatchSize?: number;
+  };
+};
 
 export class BackgroundMemoryReconciler {
   private preparePromise?: Promise<void>;
@@ -35,14 +47,25 @@ export class BackgroundMemoryReconciler {
     return this.preparePromise;
   }
 
-  async rebuild(): Promise<void> {
+  async rebuild(settings?: WorkspaceSettings): Promise<void> {
+    return this.startRebuild("incremental", settings);
+  }
+
+  async rebuildFull(settings?: WorkspaceSettings): Promise<void> {
+    return this.startRebuild("full", settings);
+  }
+
+  private async startRebuild(
+    mode: MemoryRebuildMode,
+    settings: WorkspaceSettings | undefined
+  ): Promise<void> {
     if (this.preparePromise) return this.preparePromise;
     if (this.rebuildPromise) return this.rebuildPromise;
-    this.rebuildPromise = this.performRebuild();
+    this.rebuildPromise = this.performRebuild(mode, settings);
     return this.rebuildPromise;
   }
 
-  async health(settings: WorkspaceSettings): Promise<MemoryIndexHealth> {
+  async health(settings: MemoryHealthSettings): Promise<MemoryIndexHealth> {
     const base = await readMemoryStatusInWorkspace(this.info, {
       provider: this.createProvider(),
       store: this.store
@@ -63,6 +86,9 @@ export class BackgroundMemoryReconciler {
       lastRebuildAt: this.lastRebuildAt,
       lastError: this.lastError,
       autoRebuild: settings.memory.autoRebuild,
+      embeddingBatchSize:
+        settings.memory.embeddingBatchSize ??
+        DEFAULT_MEMORY_EMBEDDING_BATCH_SIZE,
       message: base.message
     };
     if (this.preparePromise) {
@@ -109,8 +135,13 @@ export class BackgroundMemoryReconciler {
     }
   }
 
-  private async performRebuild(): Promise<void> {
+  private async performRebuild(
+    mode: MemoryRebuildMode,
+    settings: WorkspaceSettings | undefined
+  ): Promise<void> {
     const provider = this.createProvider();
+    const operation = memoryRebuildOperations[mode];
+    let operationStarted = false;
     try {
       const status = await readMemoryStatusInWorkspace(this.info, {
         provider,
@@ -119,9 +150,11 @@ export class BackgroundMemoryReconciler {
       if (status.status === "model_missing") {
         throw new Error("Memory model is not prepared.");
       }
-      const rebuild = await rebuildMemoryInWorkspace(this.info, {
+      operationStarted = true;
+      const rebuild = await operation(this.info, {
         provider,
-        store: this.store
+        store: this.store,
+        batchSize: settings?.memory.embeddingBatchSize
       });
       if (!rebuild.acquired) return;
       this.lastRebuildAt = new Date().toISOString();
@@ -132,11 +165,16 @@ export class BackgroundMemoryReconciler {
       this.lastFailure = "rebuild";
       throw error;
     } finally {
-      await provider.dispose().catch(() => undefined);
+      if (!operationStarted) await provider.dispose().catch(() => undefined);
       this.rebuildPromise = undefined;
     }
   }
 }
+
+const memoryRebuildOperations = {
+  incremental: reconcileMemoryInWorkspace,
+  full: rebuildMemoryInWorkspace
+} satisfies Record<MemoryRebuildMode, typeof rebuildMemoryInWorkspace>;
 
 function errorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;

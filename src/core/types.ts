@@ -216,18 +216,21 @@ export type MemoryIndexHealth = {
   lastRebuildAt?: string;
   lastError: string | null;
   autoRebuild: boolean;
+  embeddingBatchSize: number;
   message: string;
 };
 
 export type WorkspaceSettings = {
   memory: {
     autoRebuild: boolean;
+    embeddingBatchSize: number;
   };
 };
 
 export type WorkspaceSettingsInput = {
   memory?: {
     autoRebuild?: boolean;
+    embeddingBatchSize?: number;
   };
 };
 

@@ -141,9 +141,9 @@ The daemon API is local infrastructure for the UI and nearby tooling. MCP client
 | `GET` | `/api/workspaces/:workspaceId/rules` | Read workspace rules. |
 | `GET` | `/api/workspaces/:workspaceId/agents` | List registered agents. |
 | `GET` | `/api/workspaces/:workspaceId/settings` | Read workspace settings used by the UI. |
-| `POST` | `/api/workspaces/:workspaceId/settings` | Update workspace settings such as `memory.autoRebuild`. |
+| `POST` | `/api/workspaces/:workspaceId/settings` | Update workspace settings such as `memory.autoRebuild` and `memory.embeddingBatchSize`. |
 | `POST` | `/api/workspaces/:workspaceId/memory/prepare` | Explicitly prepare the local memory embedding model for a workspace. |
-| `POST` | `/api/workspaces/:workspaceId/memory/rebuild` | Start a background memory rebuild for a workspace. |
+| `POST` | `/api/workspaces/:workspaceId/memory/rebuild` | Start a background incremental rebuild by default. Pass `{ "mode": "full" }` for an explicit full rebuild. |
 | `POST` | `/api/workspaces/:workspaceId/memory/recall` | Search the workspace summary-memory index for the UI. |
 | `GET` | `/api/workspaces/:workspaceId/threads/:threadId` | Read one thread. |
 | `POST` | `/api/workspaces/:workspaceId/threads/:threadId` | Post a UI message to a thread. |
@@ -154,9 +154,9 @@ The API uses the daemon bearer token. It is not a public remote API surface.
 
 `/api/status` keeps the compatibility field `ok: boolean` and includes module health under `modules`. The thread index module reports each registered workspace as `ready`, `rebuilding`, `degraded`, or `unavailable`; the UI uses this to keep the last known thread list visible while a background rebuild finishes.
 
-The memory module reports each registered workspace under `modules.memory.workspaces`. Its status values are `ready`, `stale`, `missing`, `model_missing`, `incompatible`, `preparing`, `rebuilding`, or `degraded`. The health payload also includes `autoRebuild`, `preparing`, `rebuilding`, `lastPreparedAt`, `lastRebuildAt`, and `lastError`. The UI renders this as a compact database icon on each workspace card. Missing or stale memory does not make the daemon disconnected; it only indicates that agents may need model preparation or memory rebuild before relying on semantic recall.
+The memory module reports each registered workspace under `modules.memory.workspaces`. Its status values are `ready`, `stale`, `missing`, `model_missing`, `incompatible`, `preparing`, `rebuilding`, or `degraded`. The health payload also includes `autoRebuild`, `embeddingBatchSize`, `preparing`, `rebuilding`, `lastPreparedAt`, `lastRebuildAt`, and `lastError`. The UI renders this as a compact database icon on each workspace card. Missing or stale memory does not make the daemon disconnected; it only indicates that agents may need model preparation or memory rebuild before relying on semantic recall.
 
-Workspace memory settings are stored per workspace in `.marc/marc.config.json`. This JSON file is structured machine configuration; Markdown remains the source of truth for mARC knowledge, threads, summaries, rules, messages, and artifacts. `memory.autoRebuild` defaults to `true`, but automatic rebuild only runs when the local model is already prepared. The daemon never downloads or prepares the model automatically.
+Workspace memory settings are stored per workspace in `.marc/marc.config.json`. This JSON file is structured machine configuration; Markdown remains the source of truth for mARC knowledge, threads, summaries, rules, messages, and artifacts. `memory.autoRebuild` defaults to `true`, but automatic rebuild only runs when the local model is already prepared. Automatic rebuild always reconciles incrementally and does not retry `degraded` memory. `memory.embeddingBatchSize` defaults to `4` and accepts even values from `2` through `16`. The settings panel exposes that value with a slider and offers separate incremental and explicit full rebuild actions. The daemon never downloads or prepares the model automatically.
 
 The UI memory search uses `POST /api/workspaces/:workspaceId/memory/recall`, which delegates to the same core recall flow as the MCP tool. It is enabled only for `ready` and `stale` memory. The route requires the daemon bearer token, validates a non-empty `query`, and returns the recall result with `indexStatus`, `results`, and `nextActions`.
 

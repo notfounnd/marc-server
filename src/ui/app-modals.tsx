@@ -28,7 +28,8 @@ export function AppModals({
   onRebuildMemory,
   onShowWorkspaceSettingsChange,
   onShortcutsClose,
-  onWorkspaceAutoRebuildChange
+  onWorkspaceAutoRebuildChange,
+  onWorkspaceEmbeddingBatchSizeChange
 }: {
   artifactDraft?: ArtifactDraft;
   artifactView?: ArtifactView;
@@ -42,10 +43,11 @@ export function AppModals({
   onArtifactViewClose: () => void;
   onLink: MarkdownLinkHandler;
   onPrepareMemoryModel: () => void;
-  onRebuildMemory: () => void;
+  onRebuildMemory: (mode: "incremental" | "full") => void;
   onShowWorkspaceSettingsChange: (show: boolean) => void;
   onShortcutsClose: () => void;
   onWorkspaceAutoRebuildChange: (autoRebuild: boolean) => void;
+  onWorkspaceEmbeddingBatchSizeChange: (embeddingBatchSize: number) => void;
 }) {
   return (
     <>
@@ -70,9 +72,10 @@ export function AppModals({
           health={selectedMemoryHealth}
           workspace={selectedWorkspace}
           onAutoRebuildChange={onWorkspaceAutoRebuildChange}
+          onEmbeddingBatchSizeChange={onWorkspaceEmbeddingBatchSizeChange}
           onClose={() => onShowWorkspaceSettingsChange(false)}
           onPrepareModel={onPrepareMemoryModel}
-          onRebuildMemory={onRebuildMemory}
+          onRebuild={onRebuildMemory}
         />
       ) : null}
       {showShortcuts ? (

@@ -6,6 +6,7 @@ import type {
   EmbeddingProviderMetadata,
   MemorySearchHit,
   MemoryVectorRecord,
+  MemoryVectorRow,
   MemoryVectorStore
 } from "../src/core/memory/types.js";
 import type { WorkspaceInfo } from "../src/core/types.js";
@@ -68,12 +69,30 @@ export class ScoreOverrideStore implements MemoryVectorStore {
     return Promise.resolve(this.records.length > 0);
   }
 
+  listRecordIds(): Promise<string[]> {
+    return Promise.resolve(this.records.map((record) => record.recordId));
+  }
+
   async rebuild(
     _info: WorkspaceInfo,
     records: MemoryVectorRecord[],
     _vectors: number[][]
   ): Promise<void> {
     this.records = records;
+  }
+
+  reconcile(
+    _info: WorkspaceInfo,
+    rows: MemoryVectorRow[],
+    removeRecordIds: string[]
+  ): Promise<void> {
+    const recordsById = new Map(
+      this.records.map((record) => [record.recordId, record])
+    );
+    for (const row of rows) recordsById.set(row.recordId, row);
+    for (const recordId of removeRecordIds) recordsById.delete(recordId);
+    this.records = [...recordsById.values()];
+    return Promise.resolve();
   }
 
   search(

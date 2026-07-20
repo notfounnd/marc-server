@@ -41,6 +41,7 @@ test("memory tools expose schemas and require bootstrap", async () => {
   assert.ok(tools.memory_recall.inputSchema.shape.query);
   assert.ok(tools.memory_recall.inputSchema.shape.limit);
   assert.ok(tools.memory_recall.inputSchema.shape.minScore);
+  assert.ok(tools.memory_rebuild.inputSchema.shape.mode);
 
   const blocked = await callTool<{ error: { code: string; nextTool: string } }>(
     tools.memory_status
