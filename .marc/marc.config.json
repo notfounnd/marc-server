@@ -1,6 +1,7 @@
 {
   "memory": {
     "autoRebuild": false,
-    "embeddingBatchSize": 4
+    "embeddingBatchSize": 4,
+    "searchRetryDepth": 0
   }
 }

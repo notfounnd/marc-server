@@ -217,6 +217,7 @@ export type MemoryIndexHealth = {
   lastError: string | null;
   autoRebuild: boolean;
   embeddingBatchSize: number;
+  searchRetryDepth: number;
   message: string;
 };
 
@@ -224,6 +225,7 @@ export type WorkspaceSettings = {
   memory: {
     autoRebuild: boolean;
     embeddingBatchSize: number;
+    searchRetryDepth: number;
   };
 };
 
@@ -231,6 +233,7 @@ export type WorkspaceSettingsInput = {
   memory?: {
     autoRebuild?: boolean;
     embeddingBatchSize?: number;
+    searchRetryDepth?: number;
   };
 };
 

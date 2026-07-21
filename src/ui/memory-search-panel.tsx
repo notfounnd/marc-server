@@ -19,6 +19,7 @@ type Translation = (key: string) => string;
 
 export function MemorySearchPanel({
   allThreads,
+  deepRetryAvailable,
   error,
   health,
   query,
@@ -26,11 +27,13 @@ export function MemorySearchPanel({
   selectedThreadId,
   status,
   t,
+  onDeepRetry,
   onQueryChange,
   onSelectHit,
   onSubmit
 }: {
   allThreads: Thread[];
+  deepRetryAvailable: boolean;
   error?: string;
   health?: MemoryIndexHealth;
   query: string;
@@ -38,6 +41,7 @@ export function MemorySearchPanel({
   selectedThreadId?: string;
   status: MemorySearchStatus;
   t: Translation;
+  onDeepRetry: () => void;
   onQueryChange: (query: string) => void;
   onSelectHit: (hit: MemoryRecallHit) => void;
   onSubmit: () => void;
@@ -87,6 +91,11 @@ export function MemorySearchPanel({
         t,
         onSelectHit
       })}
+      {deepRetryAvailable ? (
+        <Button className="memory-search-deep-retry" onClick={onDeepRetry}>
+          {t("Deep retry")}
+        </Button>
+      ) : null}
     </div>
   );
 }

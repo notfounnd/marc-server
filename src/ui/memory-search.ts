@@ -4,11 +4,17 @@ import type {
   MemoryRecallResult,
   Thread
 } from "./types.js";
+import {
+  isMemorySearchRetryDepth,
+  MAX_MEMORY_SEARCH_RETRY_DEPTH,
+  MEMORY_SEARCH_UI_LIMIT,
+  type MemorySearchRetryDepth
+} from "./memory-search-depth.js";
 
 export const MEMORY_SEARCH_STORAGE_KEY = "marcMemorySearchState";
 
-const MEMORY_SEARCH_SCHEMA_VERSION = 1;
-const MAX_STORED_RESULTS = 5;
+const MEMORY_SEARCH_SCHEMA_VERSION = 2;
+const MAX_STORED_NEXT_ACTIONS = 5;
 const MAX_STORED_TEXT_LENGTH = 360;
 
 export type MemorySearchStorage = {
@@ -18,6 +24,8 @@ export type MemorySearchStorage = {
 };
 
 export type MemorySearchSnapshot = {
+  configuredDepth: MemorySearchRetryDepth;
+  manualDeepRetries: number;
   workspaceId: string;
   query: string;
   result: MemoryRecallResult;
@@ -68,6 +76,8 @@ export function readStoredMemorySearchState(
   if (!parsed) return undefined;
   if (parsed.workspaceId !== workspaceId) return undefined;
   return {
+    configuredDepth: parsed.configuredDepth,
+    manualDeepRetries: parsed.manualDeepRetries,
     query: parsed.query,
     result: parsed.result,
     workspaceId: parsed.workspaceId
@@ -99,8 +109,14 @@ function parseStoredMemorySearchState(
   if (typeof parsed.workspaceId !== "string") return undefined;
   if (typeof parsed.query !== "string") return undefined;
   if (typeof parsed.savedAt !== "string") return undefined;
+  if (!isMemorySearchRetryDepth(parsed.configuredDepth)) return undefined;
+  if (!isManualDeepRetries(parsed.manualDeepRetries, parsed.configuredDepth)) {
+    return undefined;
+  }
   if (!isMemoryRecallResult(parsed.result)) return undefined;
   return {
+    configuredDepth: parsed.configuredDepth,
+    manualDeepRetries: parsed.manualDeepRetries,
     query: parsed.query,
     result: compactMemoryRecallResult(parsed.result),
     savedAt: parsed.savedAt,
@@ -122,9 +138,19 @@ function compactMemoryRecallResult(
 ): MemoryRecallResult {
   return {
     ...result,
-    nextActions: result.nextActions.slice(0, MAX_STORED_RESULTS),
-    results: result.results.slice(0, MAX_STORED_RESULTS).map(compactHit)
+    nextActions: result.nextActions.slice(0, MAX_STORED_NEXT_ACTIONS),
+    results: result.results.slice(0, MEMORY_SEARCH_UI_LIMIT).map(compactHit)
   };
+}
+
+function isManualDeepRetries(
+  value: unknown,
+  configuredDepth: MemorySearchRetryDepth
+): value is number {
+  if (typeof value !== "number") return false;
+  if (!Number.isInteger(value)) return false;
+  if (value < 0) return false;
+  return configuredDepth + value <= MAX_MEMORY_SEARCH_RETRY_DEPTH;
 }
 
 function compactHit(hit: MemoryRecallHit): MemoryRecallHit {

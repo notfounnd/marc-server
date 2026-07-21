@@ -9,6 +9,7 @@ import {
 } from "../core/workspace-memory.js";
 import {
   isMemoryEmbeddingBatchSize,
+  isMemorySearchRetryDepth,
   type MemoryRebuildMode
 } from "../core/memory/index.js";
 import type { WorkspaceInfo, WorkspaceSettingsInput } from "../core/types.js";
@@ -34,6 +35,7 @@ type WorkspaceSettingsBody = Partial<{
   memory: Partial<{
     autoRebuild: boolean;
     embeddingBatchSize: number;
+    searchRetryDepth: number;
   }>;
 }>;
 
@@ -175,6 +177,7 @@ function workspaceSettingsInput(
   const memory = isRecord(input.memory) ? input.memory : undefined;
   const autoRebuild = memory?.autoRebuild;
   const embeddingBatchSize = memory?.embeddingBatchSize;
+  const searchRetryDepth = memory?.searchRetryDepth;
   if (autoRebuild !== undefined && typeof autoRebuild !== "boolean")
     return undefined;
   if (
@@ -182,7 +185,12 @@ function workspaceSettingsInput(
     !isMemoryEmbeddingBatchSize(embeddingBatchSize)
   )
     return undefined;
-  return { memory: { autoRebuild, embeddingBatchSize } };
+  if (
+    searchRetryDepth !== undefined &&
+    !isMemorySearchRetryDepth(searchRetryDepth)
+  )
+    return undefined;
+  return { memory: { autoRebuild, embeddingBatchSize, searchRetryDepth } };
 }
 
 function memoryRebuildMode(body: unknown): MemoryRebuildMode | undefined {

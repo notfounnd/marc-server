@@ -32,20 +32,34 @@ test("daemon exposes workspace memory settings and status health", async () => {
     await registerWorkspace(baseUrl, workspace);
     const encodedWorkspace = encodeURIComponent(workspace.id);
     const initialSettings = await fetchJson<{
-      memory: { autoRebuild: boolean; embeddingBatchSize: number };
+      memory: {
+        autoRebuild: boolean;
+        embeddingBatchSize: number;
+        searchRetryDepth: number;
+      };
     }>(`${baseUrl}/api/workspaces/${encodedWorkspace}/settings`);
 
     assert.equal(initialSettings.memory.autoRebuild, true);
     assert.equal(initialSettings.memory.embeddingBatchSize, 4);
+    assert.equal(initialSettings.memory.searchRetryDepth, 0);
 
     const updatedSettings = await postJson<{
-      memory: { autoRebuild: boolean; embeddingBatchSize: number };
+      memory: {
+        autoRebuild: boolean;
+        embeddingBatchSize: number;
+        searchRetryDepth: number;
+      };
     }>(`${baseUrl}/api/workspaces/${encodedWorkspace}/settings`, {
-      memory: { autoRebuild: false, embeddingBatchSize: 8 }
+      memory: {
+        autoRebuild: false,
+        embeddingBatchSize: 8,
+        searchRetryDepth: 2
+      }
     });
 
     assert.equal(updatedSettings.memory.autoRebuild, false);
     assert.equal(updatedSettings.memory.embeddingBatchSize, 8);
+    assert.equal(updatedSettings.memory.searchRetryDepth, 2);
 
     const status = await fetchJson<{
       modules: {

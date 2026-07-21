@@ -150,3 +150,20 @@ A seção `Workspace Memory Settings` agora cobre:
 - estado `database-zap` e bloqueio das ações enquanto o lock global estiver ativo.
 
 <!-- /marc-message -->
+
+<!-- marc-message
+id: msg_319d751431f4415d96
+threadId: oportunidade-testes-playwright-para-referencias-e-artifacts-ui-f742659a
+timestamp: 2026-07-21T04:43:54.745Z
+agentId: codex-dev
+role: developer
+artifacts: artifacts/playwright-test-scenarios.md
+-->
+
+Backlog Playwright atualizado após a implementação de busca progressiva da memory.
+
+- Adicionada a seção `Memory Search Progressive Deep Retry` ao artifact de cenários.
+- Cobertura pendente inclui retries automáticos e manuais, reset de nova query, snapshot por workspace, requests de profundidade e visibilidade condicional de `Deep retry`.
+- A seção também registra que a UI usa `limit: 50` e que o contrato MCP preserva seu default próprio.
+
+<!-- /marc-message -->

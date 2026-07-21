@@ -22,20 +22,31 @@ test("workspace memory settings persist automatic rebuild and embedding batch si
     (await readWorkspaceSettingsInWorkspace(first)).memory.embeddingBatchSize,
     4
   );
+  assert.equal(
+    (await readWorkspaceSettingsInWorkspace(first)).memory.searchRetryDepth,
+    0
+  );
 
   await updateWorkspaceSettingsInWorkspace(first, {
-    memory: { autoRebuild: false, embeddingBatchSize: 8 }
+    memory: { autoRebuild: false, embeddingBatchSize: 8, searchRetryDepth: 2 }
   });
 
   const settingsPath = workspaceSettingsPath(first);
   const settingsContent = JSON.parse(
     await fs.readFile(settingsPath, "utf8")
-  ) as { memory?: { autoRebuild?: boolean; embeddingBatchSize?: number } };
+  ) as {
+    memory?: {
+      autoRebuild?: boolean;
+      embeddingBatchSize?: number;
+      searchRetryDepth?: number;
+    };
+  };
 
   assert.equal(path.basename(settingsPath), "marc.config.json");
   assert.equal(path.basename(path.dirname(settingsPath)), ".marc");
   assert.equal(settingsContent.memory?.autoRebuild, false);
   assert.equal(settingsContent.memory?.embeddingBatchSize, 8);
+  assert.equal(settingsContent.memory?.searchRetryDepth, 2);
   assert.equal(
     await fileExists(path.join(first.marcPath, "SETTINGS.md")),
     false

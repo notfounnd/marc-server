@@ -226,6 +226,7 @@ export function App() {
         memorySearchResult={memorySearch.result}
         memorySearchStatus={memorySearch.status}
         memorySearchError={memorySearch.error}
+        memorySearchDeepRetryAvailable={memorySearch.deepRetryAvailable}
         onTokenChange={setToken}
         onLockToken={appActions.lockToken}
         onUnlockToken={appActions.unlockToken}
@@ -238,6 +239,7 @@ export function App() {
         onSelectAgent={appActions.selectAgent}
         onMemorySearchQueryChange={memorySearch.setQuery}
         onMemorySearchSubmit={() => void memorySearch.runSearch()}
+        onMemorySearchDeepRetry={() => void memorySearch.runDeepRetry()}
         onSelectMemorySearchHit={memorySearch.selectHit}
         onGoHome={appActions.goHome}
       />
@@ -292,6 +294,9 @@ export function App() {
         }
         onWorkspaceEmbeddingBatchSizeChange={
           workspaceMemoryActions.updateWorkspaceEmbeddingBatchSize
+        }
+        onWorkspaceSearchRetryDepthChange={
+          workspaceMemoryActions.updateWorkspaceSearchRetryDepth
         }
       />
       <Toaster position="bottom-right" />
