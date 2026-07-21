@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "builtAt": "2026-07-20T22:55:23.345Z",
+  "builtAt": "2026-07-21T05:12:55.938Z",
   "embeddingProvider": {
     "id": "transformers-js-local",
     "name": "Transformers.js local multilingual embeddings",
@@ -136,6 +136,25 @@
         "oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686:section:resultado",
         "oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686:section:validacao",
         "oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686:section:estado-final"
+      ]
+    },
+    {
+      "threadId": "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac",
+      "title": "Resumo executivo",
+      "closedAt": "2026-07-21T04:41:33Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac/SUMMARY.md",
+      "reference": "marc://$oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac",
+      "sha256": "31f49569918c7a5f750296ea5486d5b31bdf7758706ad67c434bf63efe6776db",
+      "mtimeMs": 1784608973667.4172,
+      "recordIds": [
+        "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac:summary",
+        "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac:section:objetivo",
+        "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac:section:resultado",
+        "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac:section:validacao",
+        "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac:section:descoberta-posterior",
+        "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac:section:continuidade",
+        "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac:section:estado-final"
       ]
     },
     {

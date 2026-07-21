@@ -155,6 +155,19 @@ Priority: high
 - [ ] Verify the Neobrutalism/Radix switch thumb is visually aligned in both checked and unchecked states, matching the documented switch spacing.
 - [ ] Verify workspace, thread, and agent headers keep the same eyebrow/title/reference structure, including copyable `marc://$threadId`, `marc://@agentId`, and workspace path rows.
 
+## Memory Search Progressive Deep Retry
+
+Source thread: `oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac`  
+Priority: high
+
+- [ ] With memory `ready`, open Search and submit a query that has no result at `minScore: 0.15`; verify the UI shows the empty state and a `Deep retry` action when a deeper level remains.
+- [ ] Configure Search depth in workspace settings, submit a query with no initial result, and verify automatic requests advance only through the configured sequence `0.15`, `0.10`, `0.05`, and `0.00`.
+- [ ] Submit a query that returns results before the final level and verify `Deep retry` remains visible below the results while another level is available.
+- [ ] Click `Deep retry` repeatedly and verify each request advances exactly one level, the returned results replace the prior result set, and the action disappears only after the last level.
+- [ ] Run one or more manual deep retries, submit a new query, and verify the new request restarts at `minScore: 0.15` without inheriting prior retry depth.
+- [ ] Refresh after a completed search and verify the workspace restores only the latest saved search snapshot, not an active retry state.
+- [ ] Verify the UI sends `limit: 50` for human search requests while the MCP default remains `limit: 5` in its own contract tests.
+
 ## Maintenance Notes
 
 - This backlog should grow as UI features are added.

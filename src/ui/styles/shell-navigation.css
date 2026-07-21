@@ -266,6 +266,10 @@ h3 {
   min-height: 40px;
 }
 
+.memory-search-deep-retry {
+  width: 100%;
+}
+
 .memory-search-note {
   color: var(--amber);
   font-size: 12px;

@@ -38,6 +38,7 @@ export function AppSidebar({
   memorySearchResult,
   memorySearchStatus,
   memorySearchError,
+  memorySearchDeepRetryAvailable,
   onTokenChange,
   onLockToken,
   onUnlockToken,
@@ -48,6 +49,7 @@ export function AppSidebar({
   onSelectAgent,
   onMemorySearchQueryChange,
   onMemorySearchSubmit,
+  onMemorySearchDeepRetry,
   onSelectMemorySearchHit,
   onGoHome
 }: {
@@ -71,6 +73,7 @@ export function AppSidebar({
   memorySearchResult?: MemoryRecallResult;
   memorySearchStatus: MemorySearchStatus;
   memorySearchError?: string;
+  memorySearchDeepRetryAvailable: boolean;
   onTokenChange: (token: string) => void;
   onLockToken: () => void;
   onUnlockToken: () => void;
@@ -81,6 +84,7 @@ export function AppSidebar({
   onSelectAgent: (agent: Agent) => void;
   onMemorySearchQueryChange: (query: string) => void;
   onMemorySearchSubmit: () => void;
+  onMemorySearchDeepRetry: () => void;
   onSelectMemorySearchHit: (hit: MemoryRecallHit) => void;
   onGoHome: () => void;
 }) {
@@ -153,6 +157,7 @@ export function AppSidebar({
       <AppSidebarMiddle
         agents={agents}
         allWorkspaceThreads={allWorkspaceThreads}
+        memorySearchDeepRetryAvailable={memorySearchDeepRetryAvailable}
         memorySearchError={memorySearchError}
         memorySearchQuery={memorySearchQuery}
         memorySearchResult={memorySearchResult}
@@ -165,6 +170,7 @@ export function AppSidebar({
         uiAgentId={uiAgentId}
         visibleThreads={visibleThreads}
         onMemorySearchQueryChange={onMemorySearchQueryChange}
+        onMemorySearchDeepRetry={onMemorySearchDeepRetry}
         onMemorySearchSubmit={onMemorySearchSubmit}
         onMiddleModeChange={onMiddleModeChange}
         onSelectAgent={onSelectAgent}

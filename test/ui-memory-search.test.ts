@@ -31,6 +31,7 @@ const recallResult: MemoryRecallResult = {
     indexedSummaryCount: 1,
     autoRebuild: true,
     embeddingBatchSize: 4,
+    searchRetryDepth: 0,
     lastError: null,
     message: "Memory index is current.",
     modelPrepared: true,
@@ -74,10 +75,12 @@ test("enables memory search only for ready or stale memory", () => {
 test("stores one compact memory search result per workspace", () => {
   const storage = new FakeStorage();
   writeStoredMemorySearchState(storage, {
+    configuredDepth: 1,
+    manualDeepRetries: 1,
     query: "token rotation",
     result: {
       ...recallResult,
-      results: Array.from({ length: 6 }, (_, index) => ({
+      results: Array.from({ length: 51 }, (_, index) => ({
         ...recallResult.results[0],
         matchedText: "x".repeat(600),
         score: 0.9 - index / 10,
@@ -88,18 +91,22 @@ test("stores one compact memory search result per workspace", () => {
   });
 
   const saved = readStoredMemorySearchState(storage, "workspace-1");
+  assert.equal(saved?.configuredDepth, 1);
+  assert.equal(saved?.manualDeepRetries, 1);
   assert.equal(saved?.query, "token rotation");
-  assert.equal(saved?.result.results.length, 5);
+  assert.equal(saved?.result.results.length, 50);
   assert.equal(saved?.result.results[0].matchedText.length, 360);
   assert.deepEqual(
     saved?.result.results.map((hit) => hit.threadId),
-    ["thread-0", "thread-1", "thread-2", "thread-3", "thread-4"]
+    Array.from({ length: 50 }, (_, index) => `thread-${index}`)
   );
 });
 
 test("ignores stored memory search from another workspace", () => {
   const storage = new FakeStorage();
   writeStoredMemorySearchState(storage, {
+    configuredDepth: 0,
+    manualDeepRetries: 0,
     query: "token rotation",
     result: recallResult,
     workspaceId: "workspace-1"

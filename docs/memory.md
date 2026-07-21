@@ -52,6 +52,21 @@ The provider is discarded after the workspace becomes idle and when the daemon c
 
 The UI can also prepare the model explicitly from the selected workspace settings panel through `POST /api/workspaces/:workspaceId/memory/prepare`. The daemon never prepares or downloads the model automatically.
 
+## UI search depth
+
+The UI uses the existing workspace memory recall route and does not change the memory corpus, candidate selection, ranking, or MCP recall defaults. MCP keeps its default `limit` of `5`. The UI requests up to `50` results because its purpose is to give a human a broader view of relevant closed-thread history.
+
+Workspace settings persist `memory.searchRetryDepth` as an integer from `0` through `3`, with `0` as the default. Every newly submitted UI query always starts at `minScore: 0.15`. When that request returns no results, the UI can automatically retry at the configured depth through these exact levels:
+
+```text
+0: 0.15
+1: 0.15, 0.10
+2: 0.15, 0.10, 0.05
+3: 0.15, 0.10, 0.05, 0.00
+```
+
+When a result or empty result remains below the configured depth, the UI exposes `Deep retry` below the search content. Each click issues exactly one next score level. The active result state stores the configured depth and the number of manual retries in the single per-workspace localStorage snapshot. A new query resets manual retries and never inherits the previous query's depth.
+
 ## Rebuild flow
 
 Memory rebuilds operate on closed-thread `SUMMARY.md` files. The core exposes two modes:

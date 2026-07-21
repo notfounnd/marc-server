@@ -2,12 +2,14 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import test from "node:test";
 
-test("renders memory search as full-width textual submit", () => {
+test("renders full-width memory search and deep retry actions", () => {
   const panel = fs.readFileSync("src/ui/memory-search-panel.tsx", "utf8");
   const css = fs.readFileSync("src/ui/styles/shell-navigation.css", "utf8");
 
   assert.match(panel, /className="memory-search-submit"/);
   assert.match(panel, /\{t\("Search"\)\}/);
+  assert.match(panel, /className="memory-search-deep-retry"/);
+  assert.match(panel, /\{t\("Deep retry"\)\}/);
   assert.doesNotMatch(panel, /className="button-icon"/);
   assert.match(
     css,
@@ -17,4 +19,5 @@ test("renders memory search as full-width textual submit", () => {
     css,
     /\.memory-search-submit\s*{[\s\S]*width: 100%;[\s\S]*min-height: 40px;/
   );
+  assert.match(css, /\.memory-search-deep-retry\s*{[\s\S]*width: 100%;/);
 });

@@ -173,8 +173,8 @@
 }
 
 .workspace-settings-toggle-row [data-slot="label"] {
-  margin-left: auto;
-  text-align: right;
+  margin-right: auto;
+  text-align: left;
 }
 
 .workspace-settings-batch-row {
@@ -193,6 +193,13 @@
 
 .workspace-settings-batch-row [data-slot="label"] span {
   color: var(--ink-muted);
+}
+
+.workspace-settings-slider-legend {
+  display: flex;
+  justify-content: space-between;
+  color: var(--ink-muted);
+  font-size: 11px;
 }
 
 .workspace-settings-status {

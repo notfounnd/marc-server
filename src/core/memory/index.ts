@@ -26,7 +26,10 @@ export {
   DEFAULT_MEMORY_EMBEDDING_BATCH_SIZE,
   MAX_MEMORY_EMBEDDING_BATCH_SIZE,
   MIN_MEMORY_EMBEDDING_BATCH_SIZE,
-  isMemoryEmbeddingBatchSize
+  isMemoryEmbeddingBatchSize,
+  DEFAULT_MEMORY_SEARCH_RETRY_DEPTH,
+  MAX_MEMORY_SEARCH_RETRY_DEPTH,
+  isMemorySearchRetryDepth
 } from "./settings.js";
 export {
   InMemoryMemoryVectorStore,

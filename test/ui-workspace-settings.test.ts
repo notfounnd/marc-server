@@ -50,10 +50,15 @@ test("workspace settings panel exposes memory controls", () => {
   );
 
   assert.match(panel, /Automatic memory rebuild/);
+  assert.match(panel, /<Label>\s*\{t\("Memory status"\)\}/);
   assert.match(panel, /Embedding batch size/);
+  assert.match(panel, /\{t\("Search"\)\}/);
+  assert.match(panel, /Search depth/);
+  assert.match(panel, /\{t\("Edge"\)\}/);
+  assert.match(panel, /\{t\("Deep"\)\}/);
   assert.match(panel, /Prepare model/);
-  assert.match(panel, /Rebuild incremental/);
-  assert.match(panel, /Rebuild full/);
+  assert.match(panel, /Incremental rebuild/);
+  assert.match(panel, /Full rebuild/);
   assert.match(panel, /modelPrepared/);
   assert.match(panel, /autoRebuild/);
   assert.match(panel, /embeddingBatchSize/);
@@ -64,6 +69,7 @@ test("workspace settings panel exposes memory controls", () => {
   assert.doesNotMatch(panel, /type="checkbox"/);
   assert.match(css, /\.workspace-settings-panel/);
   assert.match(css, /\.workspace-settings-toggle-row/);
+  assert.match(css, /\.workspace-settings-slider-legend/);
   assert.match(overlayCss, /scrollbar-gutter: stable/);
   assert.doesNotMatch(css, /--shadow-offset/);
   assert.match(switchComponent, /@radix-ui\/react-switch/);
@@ -72,6 +78,10 @@ test("workspace settings panel exposes memory controls", () => {
   assert.match(switchComponent, /p-0/);
   assert.match(sliderComponent, /@radix-ui\/react-slider/);
   assert.match(sliderComponent, /SliderPrimitive\.Root/);
+  assert.ok(panel.indexOf('{t("Search")}') < panel.indexOf('{t("Memory")}'));
+  assert.ok(
+    panel.indexOf("Automatic memory rebuild") < panel.indexOf("<Switch")
+  );
 });
 
 test("refreshes while memory prepare or rebuild is running", () => {

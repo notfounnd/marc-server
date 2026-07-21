@@ -10,6 +10,8 @@ test("uses en_US as the default active locale", () => {
 
 test("resolves product text from the flat en_US catalog", () => {
   assert.equal(t("Cancel"), "Cancel");
+  assert.equal(t("Incremental rebuild"), "Incremental rebuild");
+  assert.equal(t("Full rebuild"), "Full rebuild");
 });
 
 test("interpolates i18next-style variables", () => {
@@ -30,6 +32,18 @@ test("keeps translation catalog flat and free of array values", () => {
       `${key} must not map to an array`
     );
   }
+});
+
+test("keeps literal UI translation keys in the en_US catalog", () => {
+  const translations = loadTranslations();
+  const uiSources = walk(path.join(process.cwd(), "src", "ui")).filter((file) =>
+    /\.(ts|tsx)$/.test(file)
+  );
+  const missing = uiSources
+    .flatMap((file) => literalTranslationKeys(fs.readFileSync(file, "utf8")))
+    .filter((key) => translations[key] === undefined);
+
+  assert.deepEqual([...new Set(missing)].sort(), []);
 });
 
 test("keeps i18n usage scoped to the web UI", () => {
@@ -104,4 +118,8 @@ function walk(root: string): string[] {
     }
   }
   return files;
+}
+
+function literalTranslationKeys(source: string): string[] {
+  return [...source.matchAll(/\bt\(\s*"([^"]+)"/g)].map((match) => match[1]);
 }
