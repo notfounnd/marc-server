@@ -37,6 +37,7 @@ export function AppSidebarMiddle({
   visibleThreads,
   onMemorySearchQueryChange,
   onMemorySearchDeepRetry,
+  onMemorySearchAlternate,
   onMemorySearchSubmit,
   onMiddleModeChange,
   onSelectAgent,
@@ -59,6 +60,7 @@ export function AppSidebarMiddle({
   visibleThreads: Thread[];
   onMemorySearchQueryChange: (query: string) => void;
   onMemorySearchDeepRetry: () => void;
+  onMemorySearchAlternate: () => void;
   onMemorySearchSubmit: () => void;
   onMiddleModeChange: (mode: MiddleMode) => void;
   onSelectAgent: (agent: Agent) => void;
@@ -97,6 +99,7 @@ export function AppSidebarMiddle({
     t,
     onMemorySearchQueryChange,
     onMemorySearchDeepRetry,
+    onMemorySearchAlternate,
     onMemorySearchSubmit,
     onSelectAgent,
     onSelectMemorySearchHit,
@@ -221,6 +224,7 @@ function middleContent(props: {
   t: Translation;
   onMemorySearchQueryChange: (query: string) => void;
   onMemorySearchDeepRetry: () => void;
+  onMemorySearchAlternate: () => void;
   onMemorySearchSubmit: () => void;
   onSelectAgent: (agent: Agent) => void;
   onSelectMemorySearchHit: (hit: MemoryRecallHit) => void;
@@ -241,6 +245,7 @@ function middleContent(props: {
         status={props.memorySearchStatus}
         t={props.t}
         onDeepRetry={props.onMemorySearchDeepRetry}
+        onAlternateSearch={props.onMemorySearchAlternate}
         onQueryChange={props.onMemorySearchQueryChange}
         onSelectHit={props.onSelectMemorySearchHit}
         onSubmit={props.onMemorySearchSubmit}

@@ -1,19 +1,19 @@
 import type {
   MemoryIndexHealth,
+  MemoryQueryInterpretation,
   MemoryRecallHit,
   MemoryRecallResult,
   Thread
 } from "./types.js";
 import {
   isMemorySearchRetryDepth,
-  MAX_MEMORY_SEARCH_RETRY_DEPTH,
   MEMORY_SEARCH_UI_LIMIT,
   type MemorySearchRetryDepth
 } from "./memory-search-depth.js";
 
 export const MEMORY_SEARCH_STORAGE_KEY = "marcMemorySearchState";
 
-const MEMORY_SEARCH_SCHEMA_VERSION = 2;
+const MEMORY_SEARCH_SCHEMA_VERSION = 5;
 const MAX_STORED_NEXT_ACTIONS = 5;
 const MAX_STORED_TEXT_LENGTH = 360;
 
@@ -23,9 +23,11 @@ export type MemorySearchStorage = {
   setItem(key: string, value: string): void;
 };
 
+type MemorySearchApiPost = <T>(path: string, body: unknown) => Promise<T>;
+
 export type MemorySearchSnapshot = {
   configuredDepth: MemorySearchRetryDepth;
-  manualDeepRetries: number;
+  lastExecutedDepth: MemorySearchRetryDepth;
   workspaceId: string;
   query: string;
   result: MemoryRecallResult;
@@ -36,11 +38,27 @@ type StoredMemorySearchState = MemorySearchSnapshot & {
   schemaVersion: number;
 };
 
+type MemorySearchDepthRun = {
+  lastExecutedDepth: MemorySearchRetryDepth;
+  result: MemoryRecallResult;
+};
+
+export function isCurrentMemorySearchRequest(
+  requestId: number,
+  currentRequestId: number,
+  requestWorkspaceId: string,
+  currentWorkspaceId: string | undefined
+): boolean {
+  return (
+    requestId === currentRequestId && requestWorkspaceId === currentWorkspaceId
+  );
+}
+
 export function isMemorySearchAvailable(
-  health: Pick<MemoryIndexHealth, "status"> | undefined
+  health: Pick<MemoryIndexHealth, "searchReady"> | undefined
 ): boolean {
   if (!health) return false;
-  return health.status === "ready" || health.status === "stale";
+  return health.searchReady;
 }
 
 export function findMemorySearchThread(
@@ -65,19 +83,105 @@ export function memorySearchTooltip(
   return title;
 }
 
+export function memorySearchRecallInput(
+  originalQuery: string,
+  depth: MemorySearchRetryDepth,
+  interpretation?: MemoryQueryInterpretation,
+  initialMode: "auto" | "literal" = "auto"
+): {
+  depth: MemorySearchRetryDepth;
+  limit: number;
+  query: string;
+  queryMode: "auto" | "literal";
+} {
+  if (!interpretation) {
+    return {
+      depth,
+      limit: MEMORY_SEARCH_UI_LIMIT,
+      query: originalQuery,
+      queryMode: initialMode
+    };
+  }
+  return {
+    depth,
+    limit: MEMORY_SEARCH_UI_LIMIT,
+    query: interpretation.effectiveQuery,
+    queryMode: "literal"
+  };
+}
+
+export async function recallMemorySearchDepths({
+  apiPost,
+  depths,
+  initialMode = "auto",
+  interpretation,
+  query,
+  workspaceId
+}: {
+  apiPost: MemorySearchApiPost;
+  depths: MemorySearchRetryDepth[];
+  initialMode?: "auto" | "literal";
+  interpretation?: MemoryQueryInterpretation;
+  query: string;
+  workspaceId: string;
+}): Promise<MemorySearchDepthRun> {
+  let latestResult: MemoryRecallResult | undefined;
+  let lastExecutedDepth: MemorySearchRetryDepth | undefined;
+  let stableInterpretation = interpretation;
+  for (const depth of depths) {
+    const recalled = await apiPost<MemoryRecallResult>(
+      `/api/workspaces/${encodeURIComponent(workspaceId)}/memory/recall`,
+      memorySearchRecallInput(query, depth, stableInterpretation, initialMode)
+    );
+    lastExecutedDepth = depth;
+    if (!stableInterpretation) stableInterpretation = recalled.interpretation;
+    latestResult = {
+      ...recalled,
+      interpretation: stableInterpretation,
+      query
+    };
+    if (latestResult.results.length) {
+      return { lastExecutedDepth, result: latestResult };
+    }
+  }
+  if (!latestResult || lastExecutedDepth === undefined) {
+    throw new Error("Memory search requires at least one depth.");
+  }
+  return { lastExecutedDepth, result: latestResult };
+}
+
+export function alternateMemorySearchQuery(
+  interpretation: MemoryQueryInterpretation
+): string | undefined {
+  const alternate = interpretation.correctionApplied
+    ? interpretation.originalQuery
+    : interpretation.suggestedQuery;
+  if (!alternate) return undefined;
+  if (alternate === interpretation.effectiveQuery) return undefined;
+  return alternate;
+}
+
 export function readStoredMemorySearchState(
   storage: MemorySearchStorage,
   workspaceId: string | undefined
 ): MemorySearchSnapshot | undefined {
   if (!workspaceId) return undefined;
-  const parsed = parseStoredMemorySearchState(
-    storage.getItem(MEMORY_SEARCH_STORAGE_KEY)
-  );
+  const raw = storage.getItem(MEMORY_SEARCH_STORAGE_KEY);
+  const parsed = parseStoredMemorySearchState(raw);
+  const legacy = parsed ? undefined : parseJson(raw ?? "");
+  if (
+    !parsed &&
+    isRecord(legacy) &&
+    typeof legacy.schemaVersion === "number" &&
+    legacy.schemaVersion < MEMORY_SEARCH_SCHEMA_VERSION
+  ) {
+    storage.removeItem(MEMORY_SEARCH_STORAGE_KEY);
+  }
   if (!parsed) return undefined;
   if (parsed.workspaceId !== workspaceId) return undefined;
   return {
     configuredDepth: parsed.configuredDepth,
-    manualDeepRetries: parsed.manualDeepRetries,
+    lastExecutedDepth: parsed.lastExecutedDepth,
     query: parsed.query,
     result: parsed.result,
     workspaceId: parsed.workspaceId
@@ -110,13 +214,11 @@ function parseStoredMemorySearchState(
   if (typeof parsed.query !== "string") return undefined;
   if (typeof parsed.savedAt !== "string") return undefined;
   if (!isMemorySearchRetryDepth(parsed.configuredDepth)) return undefined;
-  if (!isManualDeepRetries(parsed.manualDeepRetries, parsed.configuredDepth)) {
-    return undefined;
-  }
+  if (!isMemorySearchRetryDepth(parsed.lastExecutedDepth)) return undefined;
   if (!isMemoryRecallResult(parsed.result)) return undefined;
   return {
     configuredDepth: parsed.configuredDepth,
-    manualDeepRetries: parsed.manualDeepRetries,
+    lastExecutedDepth: parsed.lastExecutedDepth,
     query: parsed.query,
     result: compactMemoryRecallResult(parsed.result),
     savedAt: parsed.savedAt,
@@ -143,16 +245,6 @@ function compactMemoryRecallResult(
   };
 }
 
-function isManualDeepRetries(
-  value: unknown,
-  configuredDepth: MemorySearchRetryDepth
-): value is number {
-  if (typeof value !== "number") return false;
-  if (!Number.isInteger(value)) return false;
-  if (value < 0) return false;
-  return configuredDepth + value <= MAX_MEMORY_SEARCH_RETRY_DEPTH;
-}
-
 function compactHit(hit: MemoryRecallHit): MemoryRecallHit {
   return {
     ...hit,
@@ -169,10 +261,27 @@ function truncateText(text: string): string {
 function isMemoryRecallResult(value: unknown): value is MemoryRecallResult {
   if (!isRecord(value)) return false;
   if (typeof value.query !== "string") return false;
+  if (!isMemoryQueryInterpretation(value.interpretation)) return false;
   if (!isRecord(value.indexStatus)) return false;
   if (!Array.isArray(value.results)) return false;
   if (!Array.isArray(value.nextActions)) return false;
   return value.results.every(isMemoryRecallHit);
+}
+
+function isMemoryQueryInterpretation(
+  value: unknown
+): value is MemoryQueryInterpretation {
+  if (!isRecord(value)) return false;
+  if (typeof value.originalQuery !== "string") return false;
+  if (typeof value.effectiveQuery !== "string") return false;
+  if (typeof value.correctionApplied !== "boolean") return false;
+  if (value.mode !== "auto" && value.mode !== "literal") return false;
+  if (
+    value.suggestedQuery !== undefined &&
+    typeof value.suggestedQuery !== "string"
+  )
+    return false;
+  return true;
 }
 
 function isMemoryRecallHit(value: unknown): value is MemoryRecallHit {

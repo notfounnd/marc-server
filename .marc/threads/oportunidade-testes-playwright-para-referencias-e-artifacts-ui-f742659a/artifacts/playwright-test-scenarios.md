@@ -146,27 +146,56 @@ Source threads: `oportunidade-processamento-em-background-para-gerar-memory-aa49
 Priority: high
 
 - [ ] Load the UI with a valid daemon token and a selected workspace; click the workspace settings button in the third-column header and verify a right-side sheet opens instead of a dropdown.
-- [ ] Verify the workspace settings sheet shows the memory status first, the `Automatic memory rebuild` switch second, the embedding batch-size slider third, and the `Prepare model` / `Rebuild incremental` / `Rebuild full` actions below without horizontal overflow.
+- [ ] Verify the workspace settings sheet shows a Search section above the Memory section, followed by memory status, the right-aligned `Automatic memory rebuild` switch, the embedding batch-size slider, and the `Prepare models` / `Incremental rebuild` / `Full rebuild` / `Purge unused` actions below without horizontal overflow.
 - [ ] Toggle `Automatic memory rebuild` off and on; verify the switch state persists after refresh and the workspace status API reports the same `autoRebuild` value.
 - [ ] Verify the embedding batch-size slider defaults to `4`, exposes only even values from `2` through `16`, updates its record-count label while dragged, persists on commit, and restores the saved value after refresh.
-- [ ] Trigger `Rebuild incremental` with unchanged summaries and verify the request body sends `mode: "incremental"`, the UI returns to `ready`, and no second rebuild can be started while the shared lock is active.
-- [ ] Trigger `Rebuild full` and verify the request body sends `mode: "full"`, the workspace card shows `database-zap` while rebuilding, and both rebuild buttons are disabled until the shared lock is released.
+- [ ] Trigger `Incremental rebuild` with unchanged summaries and verify the request body sends `mode: "incremental"`, the UI returns to `ready`, and no second rebuild can be started while the shared lock is active.
+- [ ] Trigger `Full rebuild` and verify the request body sends `mode: "full"`, the workspace card shows `database-zap` while rebuilding, and both rebuild buttons are disabled until the shared lock is released.
 - [ ] With `autoRebuild` enabled, close a thread by creating `SUMMARY.md`; verify memory status transitions through rebuild when needed and returns to `ready` with the new summary indexed.
 - [ ] Verify the Neobrutalism/Radix switch thumb is visually aligned in both checked and unchecked states, matching the documented switch spacing.
 - [ ] Verify workspace, thread, and agent headers keep the same eyebrow/title/reference structure, including copyable `marc://$threadId`, `marc://@agentId`, and workspace path rows.
 
 ## Memory Search Progressive Deep Retry
 
-Source thread: `oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac`  
+Source threads: marc://$oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac, marc://$oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba  
 Priority: high
 
-- [ ] With memory `ready`, open Search and submit a query that has no result at `minScore: 0.15`; verify the UI shows the empty state and a `Deep retry` action when a deeper level remains.
-- [ ] Configure Search depth in workspace settings, submit a query with no initial result, and verify automatic requests advance only through the configured sequence `0.15`, `0.10`, `0.05`, and `0.00`.
-- [ ] Submit a query that returns results before the final level and verify `Deep retry` remains visible below the results while another level is available.
-- [ ] Click `Deep retry` repeatedly and verify each request advances exactly one level, the returned results replace the prior result set, and the action disappears only after the last level.
-- [ ] Run one or more manual deep retries, submit a new query, and verify the new request restarts at `minScore: 0.15` without inheriting prior retry depth.
-- [ ] Refresh after a completed search and verify the workspace restores only the latest saved search snapshot, not an active retry state.
-- [ ] Verify the UI sends `limit: 50` for human search requests while the MCP default remains `limit: 5` in its own contract tests.
+Coverage note: the scenarios below remain pending as durable automated E2E tests. Ad hoc Playwright CLI checks on desktop/mobile and user checks after restart validated early-success visibility, sequential retries, reload persistence, exhaustion, and new-query reset for thread 834716ba. They do not replace this regression backlog.
+
+Current contract: depth 0, 1, 2, and 3 request candidate pools of 100, 200, 300, and 400 per retrieval channel. Depth does not lower semantic eligibility. The former minScore ladder is no longer part of the recall contract.
+
+- [ ] With memory ready, submit a query with no result at depth 0 and verify the empty state retains Deep retry while another depth remains.
+- [ ] Configure automatic depth 0 through 3; verify every new query starts at 0, advances sequentially only after empty responses, and stops at the first result or configured limit.
+- [ ] Configure automatic depth 3 and return results at depth 0; verify Deep retry remains available and its next request uses depth 1 rather than skipping levels or disappearing.
+- [ ] Configure automatic depth 1 and return results at depth 0; verify the first manual retry uses depth 1.
+- [ ] Click Deep retry through remaining depths; verify each action requests exactly the next completed depth, replaces the result set, and disappears only when depth 3 completed.
+- [ ] Submit a new query after manual retries or exhaustion; verify its first request uses depth 0 and does not inherit prior progress.
+- [ ] Refresh after success or exhaustion; verify the latest per-workspace snapshot restores its last completed depth, without replaying a request automatically.
+- [ ] Restore a legacy localStorage snapshot without reliable completed-depth metadata; verify it is discarded rather than inventing progress.
+- [ ] Switch workspace or submit a new query while a response is pending; verify stale responses cannot replace the active workspace/query result or persisted snapshot.
+- [ ] Verify interpretation runs only on the first automatic request; automatic and manual retries use the same effective query with queryMode literal.
+- [ ] Verify the UI requests limit 50; do not infer the separate MCP default of 5 from browser behavior.
+
+## Memory Query Interpretation Links
+
+Source thread: marc://$oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba  
+Priority: high
+
+- [ ] Return an automatically corrected query; verify the effective-query notice and original-term alternative are shown, with only the alternative query underlined as a link and no boxed button.
+- [ ] Return a corpus-backed suggestion without correction; verify the literal search stays effective and the suggested term alone is presented as the alternative link.
+- [ ] Activate either alternative after deep retries; verify a new literal search starts at depth 0 and does not inherit prior progress or reinterpret the explicitly selected term.
+- [ ] Verify link typography matches adjacent interpretation text and supports keyboard activation/focus without shifting the result layout.
+
+## Memory Model Maintenance
+
+Source thread: marc://$oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba  
+Priority: high
+
+- [ ] Open workspace settings with missing interpretation/retrieval/reranking caches; verify Prepare models reflects availability and preparation progress, then enables eligible rebuild/search actions when preparation succeeds.
+- [ ] Use a disposable workspace with obsolete managed generations/model variants; activate Purge unused and verify its authenticated maintenance request, released-space notification, and refreshed inventory.
+- [ ] Verify purge preserves the committed active generation, selected model variants, and source Markdown files; do not run destructive fixture scenarios against the user's real workspace.
+- [ ] Mock a busy shared maintenance operation; verify conflicting actions remain unavailable or surface the busy response without queuing a duplicate operation.
+- [ ] Verify preparation/purge errors clear progress states and show localized error feedback rather than leaving actions indefinitely disabled.
 
 ## Maintenance Notes
 

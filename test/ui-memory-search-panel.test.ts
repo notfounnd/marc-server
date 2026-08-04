@@ -10,6 +10,13 @@ test("renders full-width memory search and deep retry actions", () => {
   assert.match(panel, /\{t\("Search"\)\}/);
   assert.match(panel, /className="memory-search-deep-retry"/);
   assert.match(panel, /\{t\("Deep retry"\)\}/);
+  assert.match(panel, /className="memory-search-interpretation"/);
+  assert.match(panel, /t\("Searching for \{\{query\}\}"/);
+  assert.match(panel, /t\("Search instead for"\)/);
+  assert.match(panel, /t\("Did you mean \{\{query\}\}\?"/);
+  assert.match(panel, /t\("Search for"\)/);
+  assert.match(panel, />\s*\{result\.interpretation\.originalQuery\}\s*<\/a>/);
+  assert.match(panel, />\s*\{result\.interpretation\.suggestedQuery\}\s*<\/a>/);
   assert.doesNotMatch(panel, /className="button-icon"/);
   assert.match(
     css,

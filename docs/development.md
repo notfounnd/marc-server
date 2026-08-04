@@ -56,6 +56,19 @@ pnpm test:benchmark ./performance/<file>.benchmark.mjs
 
 `performance/thread-index.benchmark.mjs` reports direct scans, JSON rebuilds, warm JSON reads, and stale reads while a background rebuild is running.
 
+Summary-memory quality and model-matrix experiments use separate opt-in commands:
+
+```bash
+pnpm run memory:quality -- --workspace <path>
+pnpm run memory:benchmark -- --workspace <path>
+```
+
+`memory:quality` maps to the current `scripts/memory-quality-v4.ts` entrypoint, which validates schema version `6` and retrieval contract `field-aware-hybrid-v2`. Its accepted flags are `--workspace <path>`, `--family <name>`, `--query <exact-query>`, `--depth 0|1|2|3`, `--strategy baseline|hybrid-exact|hybrid-prefix`, and `--interpret-only`. The default strategy is `hybrid-prefix`; the default run evaluates all cases across depths `0` through `3`. The quality suite requires a compatible memory generation and prepared local model caches.
+
+`--family` and `--query` use exact matches and can be combined. If the selected filters match no cases, the command exits with an error before workspace access, including in `--interpret-only` mode.
+
+`memory:benchmark` runs isolated model profiles and accepts `--workspace <path>`, `--output <path>`, `--resume`, and `--detach`. Its profiles use an in-memory vector store and the baseline quality strategy, so the matrix does not exercise production LanceDB FTS or hybrid-prefix ranking. These local experiments are separate from the normal test suite and are not accuracy guarantees.
+
 ## Build
 
 ```bash

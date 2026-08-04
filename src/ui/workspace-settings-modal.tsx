@@ -21,6 +21,7 @@ export function WorkspaceSettingsModal({
   onSearchRetryDepthChange,
   onClose,
   onPrepareModel,
+  onPurge,
   onRebuild
 }: {
   health?: MemoryIndexHealth;
@@ -30,6 +31,7 @@ export function WorkspaceSettingsModal({
   onSearchRetryDepthChange: (searchRetryDepth: number) => void;
   onClose: () => void;
   onPrepareModel: () => void;
+  onPurge: () => void;
   onRebuild: (mode: "incremental" | "full") => void;
 }) {
   const { t } = useTranslation();
@@ -69,6 +71,7 @@ export function WorkspaceSettingsModal({
             onEmbeddingBatchSizeChange={onEmbeddingBatchSizeChange}
             onSearchRetryDepthChange={onSearchRetryDepthChange}
             onPrepareModel={onPrepareModel}
+            onPurge={onPurge}
             onRebuild={onRebuild}
           />
         </div>

@@ -22,6 +22,7 @@ import { postWorkspaceThreadMessage } from "./message-routes.js";
 import {
   getWorkspaceSettings,
   postWorkspaceMemoryPrepare,
+  postWorkspaceMemoryPurge,
   postWorkspaceMemoryRebuild,
   postWorkspaceMemoryRecall,
   postWorkspaceSettings
@@ -253,6 +254,11 @@ const routes: Route[] = [
     method: "POST",
     pattern: /^\/api\/workspaces\/([^/]+)\/memory\/rebuild$/,
     handle: (context, match) => postWorkspaceMemoryRebuild(context, match[1])
+  },
+  {
+    method: "POST",
+    pattern: /^\/api\/workspaces\/([^/]+)\/memory\/purge$/,
+    handle: (context, match) => postWorkspaceMemoryPurge(context, match[1])
   },
   {
     method: "POST",

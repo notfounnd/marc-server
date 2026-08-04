@@ -14,7 +14,7 @@ export function registerMemoryTools(
 ): void {
   server.tool(
     "memory_prepare",
-    "Prepare the local summary-memory embedding model cache without rebuilding the committed memory index.",
+    "Prepare the local summary-memory query interpretation, retrieval, and reranking model caches without rebuilding the committed memory index.",
     gatedShape({}),
     async (input) =>
       withBootstrap(input, async () => prepareMemory(workspaceRoot))
@@ -22,7 +22,7 @@ export function registerMemoryTools(
 
   server.tool(
     "memory_status",
-    "Read summary-memory index health without loading the embedding model.",
+    "Read summary-memory index health without loading local interpretation, retrieval, or reranking models.",
     gatedShape({}),
     async (input) =>
       withBootstrap(input, async () => readMemoryStatus(workspaceRoot))
@@ -40,18 +40,21 @@ export function registerMemoryTools(
 
   server.tool(
     "memory_recall",
-    "Recall relevant historical thread summaries for a development intent before proposing or changing behavior.",
+    "Interpret a development intent when requested and recall relevant historical thread summaries before proposing or changing behavior.",
     gatedShape({
       query: z.string().min(1),
+      queryMode: z.enum(["auto", "literal"]).optional(),
       limit: z.number().int().positive().optional(),
-      minScore: z.number().min(0).max(1).optional()
+      depth: z.number().int().min(0).max(3).optional(),
+      minScore: z.never().optional().describe("Removed. Use depth from 0 to 3.")
     }),
     async (input) =>
       withBootstrap(input, async () =>
         recallMemory(workspaceRoot, {
           query: input.query,
+          queryMode: input.queryMode,
           limit: input.limit,
-          minScore: input.minScore
+          depth: input.depth
         })
       )
   );

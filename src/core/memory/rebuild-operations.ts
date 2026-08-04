@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import type { WorkspaceInfo } from "../types.js";
 import {
   LanceDbMemoryVectorStore,
@@ -8,7 +9,10 @@ import {
   DEFAULT_MEMORY_EMBEDDING_BATCH_SIZE,
   isMemoryEmbeddingBatchSize
 } from "./settings.js";
-import { scanThreadSummarySources } from "./summaries.js";
+import {
+  materializeThreadSummarySources,
+  scanThreadSummarySources
+} from "./summaries.js";
 import type {
   EmbeddingProvider,
   MemoryManifest,
@@ -24,13 +28,15 @@ export async function rebuildAllMemory(
   info: WorkspaceInfo,
   options: MemoryOperationOptions
 ): Promise<MemoryManifest> {
-  const sources = await scanThreadSummarySources(info);
+  const sources = await materializedSources(info, options);
   const records = flattenSources(sources);
   const vectors = await embedRecords(records, options);
-  const manifest = buildManifest(options.provider, sources);
-  await memoryStore(options.store).rebuild(info, records, vectors);
-  await writeMemoryManifest(info, manifest);
-  return manifest;
+  return publishGeneration(
+    info,
+    options,
+    sources,
+    vectorRows(records, vectors)
+  );
 }
 
 export async function reconcileMemory(
@@ -38,123 +44,95 @@ export async function reconcileMemory(
   options: MemoryOperationOptions
 ): Promise<MemoryManifest> {
   const store = memoryStore(options.store);
-  const [manifest, sources, storeExists] = await Promise.all([
-    readMemoryManifest(info),
-    scanThreadSummarySources(info),
-    store.exists(info)
-  ]);
-  const existingRecordIds = await existingMemoryRecordIds(
-    store,
-    info,
-    manifest,
-    storeExists
-  );
-  const reconciliation = planMemoryReconciliation(
-    sources,
-    manifest,
-    existingRecordIds
-  );
-  if (!reconciliationHasChanges(reconciliation))
-    return manifest ?? buildManifest(options.provider, sources);
+  const manifest = await readMemoryManifest(info);
+  if (
+    !manifest ||
+    manifest.schemaVersion !== 6 ||
+    manifest.retrievalContract !== "field-aware-hybrid-v2"
+  )
+    throw new Error("Memory schema changed. Run a full rebuild.");
 
-  const vectors = await embedRecords(reconciliation.rowsToEmbed, options);
-  const rows = vectorRows(reconciliation.rowsToEmbed, vectors);
-  await store.reconcile(info, rows, reconciliation.removeRecordIds);
-  const nextManifest = buildManifest(options.provider, sources);
-  await writeMemoryManifest(info, nextManifest);
-  return nextManifest;
+  const sources = await materializedSources(info, options);
+  const changedThreadIds = changedSourceIds(sources, manifest);
+  const removedThreadIds = removedSourceIds(sources, manifest);
+  if (!changedThreadIds.size && !removedThreadIds.size) return manifest;
+
+  if (!store.readRows)
+    throw new Error(
+      "Memory store does not support generational reconciliation."
+    );
+  const currentRows = await store.readRows(info, manifest.generation);
+  const preservedRows = currentRows.filter(
+    (row) =>
+      !changedThreadIds.has(row.threadId) && !removedThreadIds.has(row.threadId)
+  );
+  const changedRecords = flattenSources(
+    sources.filter((source) => changedThreadIds.has(source.threadId))
+  );
+  const changedVectors = await embedRecords(changedRecords, options);
+  const rows = [
+    ...preservedRows,
+    ...vectorRows(changedRecords, changedVectors)
+  ];
+  return publishGeneration(info, options, sources, rows);
+}
+
+async function materializedSources(
+  info: WorkspaceInfo,
+  options: MemoryOperationOptions
+): Promise<ThreadSummarySource[]> {
+  const sources = await scanThreadSummarySources(info);
+  return materializeThreadSummarySources(sources, options.reranker);
+}
+
+async function publishGeneration(
+  info: WorkspaceInfo,
+  options: MemoryOperationOptions,
+  sources: ThreadSummarySource[],
+  rows: MemoryVectorRow[]
+): Promise<MemoryManifest> {
+  const store = memoryStore(options.store);
+  const generation = generationId();
+  validateRows(rows, options.provider);
+  await store.rebuild(
+    info,
+    rows.map(recordWithoutVector),
+    rows.map((row) => row.vector),
+    generation
+  );
+  await validateStoredGeneration(store, info, generation, rows);
+  const manifest = buildManifest(options.provider, sources, generation);
+  await writeMemoryManifest(info, manifest);
+  return manifest;
 }
 
 function memoryStore(store?: MemoryVectorStore): MemoryVectorStore {
   return store ?? new LanceDbMemoryVectorStore();
 }
 
-async function existingMemoryRecordIds(
-  store: MemoryVectorStore,
-  info: WorkspaceInfo,
-  manifest: MemoryManifest | undefined,
-  storeExists: boolean
-): Promise<string[]> {
-  if (manifest) return [];
-  if (!storeExists) return [];
-  return store.listRecordIds(info);
-}
-
-function reconciliationHasChanges(
-  reconciliation: MemoryReconciliation
-): boolean {
-  return Boolean(
-    reconciliation.rowsToEmbed.length || reconciliation.removeRecordIds.length
-  );
-}
-
-function planMemoryReconciliation(
+function changedSourceIds(
   sources: ThreadSummarySource[],
-  manifest: MemoryManifest | undefined,
-  existingRecordIds: string[]
-): MemoryReconciliation {
-  if (!manifest)
-    return planMissingMemoryReconciliation(sources, existingRecordIds);
-
-  const sourcesByThreadId = new Map(
-    sources.map((source) => [source.threadId, source])
-  );
-  const changedSources = sources.filter((source) =>
-    sourceNeedsEmbedding(source, manifest)
-  );
-  const rowsToEmbed = flattenSources(changedSources);
-  const currentRecordIds = new Set(
-    rowsToEmbed.map((record) => record.recordId)
-  );
-  const previousRecordIds = manifest.records
-    .filter((record) => manifestRecordNeedsRemoval(record, sourcesByThreadId))
-    .flatMap((record) => record.recordIds);
-  return {
-    rowsToEmbed,
-    removeRecordIds: removedRecordIds(previousRecordIds, currentRecordIds)
-  };
-}
-
-function planMissingMemoryReconciliation(
-  sources: ThreadSummarySource[],
-  existingRecordIds: string[]
-): MemoryReconciliation {
-  const rowsToEmbed = flattenSources(sources);
-  const currentRecordIds = new Set(
-    rowsToEmbed.map((record) => record.recordId)
-  );
-  return {
-    rowsToEmbed,
-    removeRecordIds: removedRecordIds(existingRecordIds, currentRecordIds)
-  };
-}
-
-function sourceNeedsEmbedding(
-  source: ThreadSummarySource,
   manifest: MemoryManifest
-): boolean {
-  const previous = manifest.records.find(
-    (record) => record.threadId === source.threadId
+): Set<string> {
+  const previousHashes = new Map(
+    manifest.records.map((record) => [record.threadId, record.sha256])
   );
-  if (!previous) return true;
-  return previous.sha256 !== source.sha256;
+  return new Set(
+    sources
+      .filter((source) => previousHashes.get(source.threadId) !== source.sha256)
+      .map((source) => source.threadId)
+  );
 }
 
-function manifestRecordNeedsRemoval(
-  record: MemoryManifestRecord,
-  sourcesByThreadId: Map<string, ThreadSummarySource>
-): boolean {
-  const source = sourcesByThreadId.get(record.threadId);
-  if (!source) return true;
-  return source.sha256 !== record.sha256;
-}
-
-function removedRecordIds(
-  recordIds: string[],
-  currentRecordIds: Set<string>
-): string[] {
-  return [...new Set(recordIds)].filter(
-    (recordId) => !currentRecordIds.has(recordId)
+function removedSourceIds(
+  sources: ThreadSummarySource[],
+  manifest: MemoryManifest
+): Set<string> {
+  const currentIds = new Set(sources.map((source) => source.threadId));
+  return new Set(
+    manifest.records
+      .filter((record) => !currentIds.has(record.threadId))
+      .map((record) => record.threadId)
   );
 }
 
@@ -167,7 +145,7 @@ async function embedRecords(
   for (let index = 0; index < records.length; index += batchSize) {
     const batch = records.slice(index, index + batchSize);
     const batchVectors = await options.provider.embedDocuments(
-      batch.map((record) => record.text)
+      batch.map((record) => record.embeddingText)
     );
     if (batchVectors.length !== batch.length)
       throw new Error(
@@ -193,10 +171,37 @@ function vectorRows(
   }));
 }
 
-type MemoryReconciliation = {
-  rowsToEmbed: MemoryVectorRecord[];
-  removeRecordIds: string[];
-};
+function recordWithoutVector(row: MemoryVectorRow): MemoryVectorRecord {
+  const { vector: _vector, ...record } = row;
+  return record;
+}
+
+function validateRows(
+  rows: MemoryVectorRow[],
+  provider: EmbeddingProvider
+): void {
+  const dimensions = provider.describe().dimensions;
+  const invalid = rows.find((row) => row.vector.length !== dimensions);
+  if (!invalid) return;
+  throw new Error(
+    `Memory record ${invalid.recordId} has an invalid vector dimension.`
+  );
+}
+
+async function validateStoredGeneration(
+  store: MemoryVectorStore,
+  info: WorkspaceInfo,
+  generation: string,
+  rows: MemoryVectorRow[]
+): Promise<void> {
+  if (!rows.length) return;
+  const exists = await store.exists(info, generation);
+  if (!exists) throw new Error("Memory generation was not persisted.");
+  const recordIds = await store.listRecordIds(info, generation);
+  if (recordIds.length !== rows.length)
+    throw new Error("Memory generation record count is inconsistent.");
+  await store.validateGeneration(info, generation);
+}
 
 function flattenSources(sources: ThreadSummarySource[]): MemoryVectorRecord[] {
   return sources.flatMap((source) =>
@@ -210,19 +215,23 @@ function flattenSources(sources: ThreadSummarySource[]): MemoryVectorRecord[] {
       reference: source.reference,
       kind: chunk.kind,
       sectionTitle: chunk.sectionTitle,
-      text: chunk.text
+      text: chunk.text,
+      embeddingText: chunk.embeddingText
     }))
   );
 }
 
 function buildManifest(
   provider: EmbeddingProvider,
-  sources: ThreadSummarySource[]
+  sources: ThreadSummarySource[],
+  generation: string
 ): MemoryManifest {
   return {
-    schemaVersion: 1,
+    schemaVersion: 6,
     builtAt: new Date().toISOString(),
+    generation,
     embeddingProvider: provider.describe(),
+    retrievalContract: "field-aware-hybrid-v2",
     records: sources.map(sourceToManifestRecord)
   };
 }
@@ -241,4 +250,9 @@ function sourceToManifestRecord(
     mtimeMs: source.mtimeMs,
     recordIds: source.chunks.map((chunk) => chunk.recordId)
   };
+}
+
+function generationId(): string {
+  const timestamp = new Date().toISOString().replaceAll(/[-:.TZ]/g, "");
+  return `${timestamp}_${randomUUID().slice(0, 8)}`;
 }

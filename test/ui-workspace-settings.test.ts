@@ -51,12 +51,12 @@ test("workspace settings panel exposes memory controls", () => {
 
   assert.match(panel, /Automatic memory rebuild/);
   assert.match(panel, /<Label>\s*\{t\("Memory status"\)\}/);
-  assert.match(panel, /Embedding batch size/);
+  assert.match(panel, /Inference batch size/);
   assert.match(panel, /\{t\("Search"\)\}/);
   assert.match(panel, /Search depth/);
   assert.match(panel, /\{t\("Edge"\)\}/);
   assert.match(panel, /\{t\("Deep"\)\}/);
-  assert.match(panel, /Prepare model/);
+  assert.match(panel, /Prepare models/);
   assert.match(panel, /Incremental rebuild/);
   assert.match(panel, /Full rebuild/);
   assert.match(panel, /modelPrepared/);

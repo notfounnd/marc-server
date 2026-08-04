@@ -215,6 +215,37 @@
   font-size: 13px;
 }
 
+.workspace-settings-models {
+  display: grid;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.workspace-settings-model {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.workspace-settings-model span,
+.workspace-settings-model small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace-settings-model small,
+.workspace-settings-models > small {
+  color: var(--ink-muted);
+  font-size: 12px;
+}
+
+.workspace-settings-purge-action {
+  width: 100%;
+}
+
 .workspace-settings-actions {
   align-items: stretch;
   flex-wrap: wrap;

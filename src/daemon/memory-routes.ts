@@ -1,6 +1,7 @@
 import type http from "node:http";
 import {
   prepareMemoryInBackground,
+  purgeMemory,
   readMemoryStatus,
   readWorkspaceSettings,
   rebuildMemoryInBackground,
@@ -9,6 +10,7 @@ import {
 } from "../core/workspace-memory.js";
 import {
   isMemoryEmbeddingBatchSize,
+  isMemorySearchDepth,
   isMemorySearchRetryDepth,
   type MemoryRebuildMode
 } from "../core/memory/index.js";
@@ -26,9 +28,11 @@ type MemoryRouteContext = {
 };
 
 type MemoryRecallBody = Partial<{
+  depth: number;
   limit: number;
   minScore: number;
   query: string;
+  queryMode: "auto" | "literal";
 }>;
 
 type WorkspaceSettingsBody = Partial<{
@@ -53,6 +57,10 @@ export async function postWorkspaceMemoryRecall(
   const input = memoryRecallInput(await readBody(context.request));
   if (!input) {
     text(context.response, 400, "Search query is required");
+    return;
+  }
+  if ("error" in input) {
+    text(context.response, 400, input.error);
     return;
   }
 
@@ -119,8 +127,8 @@ export async function postWorkspaceMemoryRebuild(
   }
 
   const status = await readMemoryStatus(workspace.rootPath);
-  if (!status.modelPrepared) {
-    text(context.response, 409, "Memory model is not prepared");
+  if (!status.rebuildReady) {
+    text(context.response, 409, "Memory retrieval model is not prepared");
     return;
   }
 
@@ -132,19 +140,53 @@ export async function postWorkspaceMemoryRebuild(
   json(context.response, 202, health);
 }
 
-function memoryRecallInput(
-  body: unknown
-): { limit?: number; minScore?: number; query: string } | undefined {
+export async function postWorkspaceMemoryPurge(
+  context: MemoryRouteContext,
+  workspaceId: string
+): Promise<void> {
+  const workspace = await workspaceOr404(context, workspaceId);
+  if (!workspace) return;
+  try {
+    json(context.response, 200, await purgeMemory(workspace.rootPath));
+  } catch (error) {
+    text(
+      context.response,
+      409,
+      error instanceof Error ? error.message : String(error)
+    );
+  }
+}
+
+function memoryRecallInput(body: unknown):
+  | {
+      depth?: number;
+      limit?: number;
+      query: string;
+      queryMode?: "auto" | "literal";
+    }
+  | { error: string }
+  | undefined {
   if (!isRecord(body)) return undefined;
+  if ("minScore" in body)
+    return { error: "minScore was removed. Use depth from 0 to 3." };
   const input = body as MemoryRecallBody;
   if (typeof input.query !== "string") return undefined;
   const query = input.query.trim();
   if (!query) return undefined;
+  if (input.depth !== undefined && !isMemorySearchDepth(input.depth))
+    return undefined;
+  if (input.queryMode !== undefined && !isMemoryQueryMode(input.queryMode))
+    return { error: "Memory query mode must be auto or literal" };
   return {
+    depth: input.depth,
     limit: optionalFiniteNumber(input.limit),
-    minScore: optionalFiniteNumber(input.minScore),
-    query
+    query,
+    queryMode: input.queryMode
   };
+}
+
+function isMemoryQueryMode(value: unknown): value is "auto" | "literal" {
+  return value === "auto" || value === "literal";
 }
 
 function optionalFiniteNumber(value: unknown): number | undefined {

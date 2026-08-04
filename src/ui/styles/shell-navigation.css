@@ -270,6 +270,42 @@ h3 {
   width: 100%;
 }
 
+.memory-search-interpretation {
+  align-items: flex-start;
+  border: 1px solid var(--border-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+}
+
+.memory-search-interpretation span {
+  color: var(--ink-muted);
+  font-size: 12px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.memory-search-alternate-link {
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.memory-search-alternate-link:hover,
+.memory-search-alternate-link:focus-visible {
+  color: var(--teal);
+}
+
+.memory-search-alternate-link:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+}
+
 .memory-search-note {
   color: var(--amber);
   font-size: 12px;

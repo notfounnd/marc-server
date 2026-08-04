@@ -25,6 +25,7 @@ export function AppModals({
   onArtifactViewClose,
   onLink,
   onPrepareMemoryModel,
+  onPurgeUnusedMemory,
   onRebuildMemory,
   onShowWorkspaceSettingsChange,
   onShortcutsClose,
@@ -44,6 +45,7 @@ export function AppModals({
   onArtifactViewClose: () => void;
   onLink: MarkdownLinkHandler;
   onPrepareMemoryModel: () => void;
+  onPurgeUnusedMemory: () => void;
   onRebuildMemory: (mode: "incremental" | "full") => void;
   onShowWorkspaceSettingsChange: (show: boolean) => void;
   onShortcutsClose: () => void;
@@ -78,6 +80,7 @@ export function AppModals({
           onSearchRetryDepthChange={onWorkspaceSearchRetryDepthChange}
           onClose={() => onShowWorkspaceSettingsChange(false)}
           onPrepareModel={onPrepareMemoryModel}
+          onPurge={onPurgeUnusedMemory}
           onRebuild={onRebuildMemory}
         />
       ) : null}

@@ -7,6 +7,7 @@ import {
 import type { MemoryManifest, MemoryStatus } from "./types.js";
 
 export const MEMORY_REBUILD_RESOURCE = "memory-rebuild";
+export const MEMORY_OPERATION_RESOURCE = "memory-operation";
 
 export type MemoryRebuildAttempt =
   | { acquired: false }
@@ -16,9 +17,21 @@ export async function tryWithMemoryRebuildLock(
   info: WorkspaceInfo,
   callback: () => Promise<MemoryManifest>
 ): Promise<WorkspaceWriteLockAttempt<MemoryManifest>> {
+  const operation = await tryWithMemoryOperationLock(info, () =>
+    tryWithWorkspaceWriteLock(info.marcPath, MEMORY_REBUILD_RESOURCE, callback)
+  );
+  if (!operation.acquired) return operation;
+  if (!operation.value.acquired) return { acquired: false };
+  return { acquired: true, value: operation.value.value };
+}
+
+export async function tryWithMemoryOperationLock<T>(
+  info: WorkspaceInfo,
+  callback: () => Promise<T>
+): Promise<WorkspaceWriteLockAttempt<T>> {
   return tryWithWorkspaceWriteLock(
     info.marcPath,
-    MEMORY_REBUILD_RESOURCE,
+    MEMORY_OPERATION_RESOURCE,
     callback
   );
 }

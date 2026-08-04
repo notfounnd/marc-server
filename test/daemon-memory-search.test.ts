@@ -43,6 +43,23 @@ test("daemon validates memory recall queries", async () => {
     );
     assert.equal(recall.status, 400);
     assert.equal(await recall.text(), "Search query is required");
+
+    const invalidMode = await fetch(
+      `${baseUrl}/api/workspaces/${encodeURIComponent(workspace.id)}/memory/recall`,
+      {
+        body: JSON.stringify({ query: "toggle", queryMode: "deep" }),
+        headers: {
+          authorization: "Bearer secret",
+          "content-type": "application/json"
+        },
+        method: "POST"
+      }
+    );
+    assert.equal(invalidMode.status, 400);
+    assert.equal(
+      await invalidMode.text(),
+      "Memory query mode must be auto or literal"
+    );
   } finally {
     server.close();
   }

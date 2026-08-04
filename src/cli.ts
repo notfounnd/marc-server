@@ -10,10 +10,15 @@ import { runDaemon } from "./daemon/server.js";
 import { runMcpServer } from "./mcp/server.js";
 import {
   prepareMemory,
+  purgeMemory,
   readMemoryStatus,
   rebuildMemory,
   recallMemory
 } from "./core/workspace-memory.js";
+import type {
+  MemoryQueryMode,
+  MemoryRebuildMode
+} from "./core/memory/types.js";
 import type { DaemonConfig } from "./core/types.js";
 
 type ParsedArgs = {
@@ -66,7 +71,7 @@ function usage(): never {
   console.error(`Usage:
   marc daemon [--host 127.0.0.1] [--port 4187] [--data-dir .marc-daemon] [--token <token>]
   marc daemon start|stop|restart|status [--host 127.0.0.1] [--port 4187] [--data-dir .marc-daemon]
-  marc memory status|prepare|rebuild|recall [--workspace <path>] [--query <text>] [--limit <n>] [--min-score <n>]
+  marc memory status|prepare|rebuild|recall|purge [--workspace <path>] [--mode incremental|full] [--query <text>] [--query-mode auto|literal] [--limit <n>] [--depth 0|1|2|3]
   marc mcp [--workspace <path>] [--daemon-url http://127.0.0.1:4187] [--token <token>]`);
   process.exit(1);
 }
@@ -114,12 +119,15 @@ const memoryCommandHandlers: Record<
 > = {
   status: (_parsed, workspaceRoot) => readMemoryStatus(workspaceRoot),
   prepare: (_parsed, workspaceRoot) => prepareMemory(workspaceRoot),
-  rebuild: (_parsed, workspaceRoot) => rebuildMemory(workspaceRoot),
+  purge: (_parsed, workspaceRoot) => purgeMemory(workspaceRoot),
+  rebuild: (parsed, workspaceRoot) =>
+    rebuildMemory(workspaceRoot, memoryRebuildMode(parsed)),
   recall: (parsed, workspaceRoot) =>
     recallMemory(workspaceRoot, {
       query: stringValue(parsed.values, "query") ?? "",
+      queryMode: memoryQueryMode(parsed),
       limit: numberValue(parsed.values, "limit"),
-      minScore: numberValue(parsed.values, "min-score")
+      depth: numberValue(parsed.values, "depth")
     })
 };
 
@@ -132,10 +140,26 @@ async function handleMemoryCommand(parsed: ParsedArgs): Promise<void> {
   if (action === "recall" && !stringValue(parsed.values, "query")) {
     usage();
   }
+  if (action === "recall" && stringValue(parsed.values, "min-score"))
+    throw new Error("--min-score was removed. Use --depth from 0 to 3.");
 
   const workspaceRoot =
     stringValue(parsed.values, "workspace") ?? process.cwd();
   printResult(await handler(parsed, workspaceRoot));
+}
+
+function memoryRebuildMode(parsed: ParsedArgs): MemoryRebuildMode {
+  const mode = stringValue(parsed.values, "mode");
+  if (mode === undefined || mode === "incremental") return "incremental";
+  if (mode === "full") return mode;
+  throw new Error("Memory rebuild mode must be incremental or full.");
+}
+
+function memoryQueryMode(parsed: ParsedArgs): MemoryQueryMode | undefined {
+  const mode = stringValue(parsed.values, "query-mode");
+  if (mode === undefined || mode === "auto") return mode;
+  if (mode === "literal") return mode;
+  throw new Error("Memory query mode must be auto or literal.");
 }
 
 async function main(): Promise<void> {

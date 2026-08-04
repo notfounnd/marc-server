@@ -167,3 +167,23 @@ Backlog Playwright atualizado após a implementação de busca progressiva da me
 - A seção também registra que a UI usa `limit: 50` e que o contrato MCP preserva seu default próprio.
 
 <!-- /marc-message -->
+
+<!-- marc-message
+id: msg_715134be83ac4f1abb
+threadId: oportunidade-testes-playwright-para-referencias-e-artifacts-ui-f742659a
+timestamp: 2026-10-08T22:39:53.084Z
+agentId: codex-dev
+role: architect
+artifacts: artifacts/playwright-test-scenarios.md
+-->
+
+Backlog revisado antes do fechamento de marc://$oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba.
+
+- Atualizado o contrato de Deep: depth 0 a 3 amplia pools de candidatos, sem reduzir elegibilidade ou usar minScore.
+- Acrescentados cenarios de sucesso precoce, progresso apos reload, reset, cache legado, isolamento de respostas obsoletas e reutilizacao literal da interpretacao.
+- Incluidos links de alternativas de query e manutencao de modelos/purge. Layout e labels de settings alinhados ao produto atual.
+- Registradas as verificacoes ad hoc do Playwright CLI e do usuario, sem marcar como pronta a suite E2E automatizada duravel. Os cenarios seguem pendentes.
+
+Registro limitado ao backlog de browser/E2E; validacoes unitarias e build permanecem na thread da implementacao.
+
+<!-- /marc-message -->

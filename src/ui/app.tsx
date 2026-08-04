@@ -240,6 +240,7 @@ export function App() {
         onMemorySearchQueryChange={memorySearch.setQuery}
         onMemorySearchSubmit={() => void memorySearch.runSearch()}
         onMemorySearchDeepRetry={() => void memorySearch.runDeepRetry()}
+        onMemorySearchAlternate={() => void memorySearch.runAlternateSearch()}
         onSelectMemorySearchHit={memorySearch.selectHit}
         onGoHome={appActions.goHome}
       />
@@ -286,6 +287,7 @@ export function App() {
         onArtifactViewClose={() => setArtifactView(undefined)}
         onLink={appActions.handleMarkdownLink}
         onPrepareMemoryModel={workspaceMemoryActions.prepareMemoryModel}
+        onPurgeUnusedMemory={workspaceMemoryActions.purgeUnusedMemory}
         onRebuildMemory={workspaceMemoryActions.rebuildMemoryIndex}
         onShowWorkspaceSettingsChange={setShowWorkspaceSettings}
         onShortcutsClose={() => setShowShortcuts(false)}

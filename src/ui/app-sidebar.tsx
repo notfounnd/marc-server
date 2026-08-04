@@ -50,6 +50,7 @@ export function AppSidebar({
   onMemorySearchQueryChange,
   onMemorySearchSubmit,
   onMemorySearchDeepRetry,
+  onMemorySearchAlternate,
   onSelectMemorySearchHit,
   onGoHome
 }: {
@@ -85,6 +86,7 @@ export function AppSidebar({
   onMemorySearchQueryChange: (query: string) => void;
   onMemorySearchSubmit: () => void;
   onMemorySearchDeepRetry: () => void;
+  onMemorySearchAlternate: () => void;
   onSelectMemorySearchHit: (hit: MemoryRecallHit) => void;
   onGoHome: () => void;
 }) {
@@ -171,6 +173,7 @@ export function AppSidebar({
         visibleThreads={visibleThreads}
         onMemorySearchQueryChange={onMemorySearchQueryChange}
         onMemorySearchDeepRetry={onMemorySearchDeepRetry}
+        onMemorySearchAlternate={onMemorySearchAlternate}
         onMemorySearchSubmit={onMemorySearchSubmit}
         onMiddleModeChange={onMiddleModeChange}
         onSelectAgent={onSelectAgent}

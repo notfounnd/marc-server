@@ -122,7 +122,10 @@ test("daemon rejects manual memory rebuild while the model is missing", async ()
     );
 
     assert.equal(response.status, 409);
-    assert.equal(await response.text(), "Memory model is not prepared");
+    assert.equal(
+      await response.text(),
+      "Memory retrieval model is not prepared"
+    );
   } finally {
     server.close();
   }

@@ -114,6 +114,8 @@ The UI renders these as compact labels. Agents can use the raw links to understa
 
 The project treats cache files as rebuildable controls. If the thread index is missing or stale, mARC can rebuild it from `.marc/threads`, `CHAT.md`, and `SUMMARY.md`. The `write-locks/` directory contains disposable cooperative coordination state for mARC writers.
 
+Summary memory is a derived LanceDB index built from closed-thread `SUMMARY.md` files. Its manifest uses schema version `6` and retrieval contract `field-aware-hybrid-v2`. The index keeps thread identity and content passages as separate dense-retrieval records, alongside full-text indexes for title, summary text, and title prefixes. Recall is a read-time projection over this snapshot; it does not change the Markdown source of truth. See [Thread Summary Memory](memory.md) for the retrieval and lifecycle details.
+
 SQLite may be used as an optional local registry/index when available in the Node runtime. It is not required for correctness and does not replace the Markdown source of truth.
 
 ## Format evolution

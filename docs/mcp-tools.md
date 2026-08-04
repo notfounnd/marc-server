@@ -81,14 +81,20 @@ The audit reports objective issues such as missing artifact files, artifact refe
 
 | Tool | Use |
 |---|---|
-| `memory_prepare` | Prepare the local embedding model cache used by summary memory. |
-| `memory_status` | Check whether `.marc/memory/` is ready, stale, missing, incompatible, or waiting for the local model. |
+| `memory_prepare` | Prepare and validate all three local retrieval, reranking, and query-interpretation model caches without rebuilding the index. |
+| `memory_status` | Check index health and model-file readiness without loading model weights. |
 | `memory_rebuild` | Reconcile the committed LanceDB summary-memory index by default. Pass `mode: "full"` only for an explicit full rebuild. |
-| `memory_recall` | Search historical thread summaries for a development intent and return relevant `marc://` references. |
+| `memory_recall` | Interpret a query, search historical thread summaries, and return relevant `marc://` references. Pass `queryMode: "literal"` to bypass correction. |
 
 Summary memory is derived from `SUMMARY.md` only. Agents should use `memory_recall` before proposing or developing behavior that may overlap prior decisions, then read any strongly matched thread before reopening or contradicting the historical decision.
 
+`memory_recall` defaults to `queryMode: "auto"`. The response reports the original and effective queries. Automatic interpretation selects only from corpus-derived typo candidates and falls back to the original query on any model or protocol failure. Use `queryMode: "literal"` when the original spelling must be preserved.
+
+Recall defaults to `limit: 5` and `depth: 0`. Depth accepts `0` through `3` and expands the candidate limit for each dense and lexical retrieval channel to `100`, `200`, `300`, or `400`; it does not relax semantic eligibility. Lexical matches cannot qualify a thread by themselves, but can reinforce ordering after semantic eligibility is established. `minScore` is not a supported recall input.
+
 `memory_rebuild` accepts an optional `mode` input. Omitted or `"incremental"` reconciles only added, changed, or removed summary records. `"full"` rebuilds the complete derived snapshot. Both modes use the workspace batch-size setting and the same per-workspace rebuild lock.
+
+Summary memory uses schema version `6` and retrieval contract `field-aware-hybrid-v2`. Incremental rebuild requires a compatible generation; an absent or incompatible generation needs an explicit full rebuild. Rebuild readiness requires the retriever and reranker, while recall additionally requires the interpreter and an index in `ready` or `stale` state. Model preparation does not rebuild the index. Purge is available through the CLI and HTTP API, not as an MCP tool; it preserves the active memory generation and configured production models while removing unused data.
 
 ## Agent tools
 

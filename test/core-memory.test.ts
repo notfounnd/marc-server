@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   InMemoryMemoryVectorStore,
-  memoryRebuildingStatus,
+  readMemoryManifest,
   readMemoryStatusInWorkspace,
   rebuildMemoryInWorkspace,
   recallMemoryInWorkspace,
@@ -10,40 +10,13 @@ import {
 } from "../src/core/memory/index.js";
 import {
   FakeEmbeddingProvider,
+  FakeRerankingProvider,
   ScoreOverrideStore,
   createThreadFolder,
-  providerMetadata,
   tempWorkspace,
+  writeThreadChat,
   writeSummary
 } from "./memory-test-helpers.js";
-
-test("maps an existing memory snapshot to the rebuilding status", () => {
-  const rebuilding = memoryRebuildingStatus({
-    status: "stale",
-    ready: false,
-    stale: true,
-    modelPrepared: true,
-    summaryCount: 2,
-    indexedSummaryCount: 1,
-    missingSummaryIds: ["thread-current"],
-    staleSummaryIds: [],
-    extraSummaryIds: [],
-    message: "Memory index is stale."
-  });
-
-  assert.deepEqual(rebuilding, {
-    status: "rebuilding",
-    ready: false,
-    stale: true,
-    modelPrepared: true,
-    summaryCount: 2,
-    indexedSummaryCount: 1,
-    missingSummaryIds: ["thread-current"],
-    staleSummaryIds: [],
-    extraSummaryIds: [],
-    message: "Memory rebuild is running."
-  });
-});
 
 test("scans only thread summaries and extracts structured metadata", async () => {
   const info = await tempWorkspace();
@@ -85,9 +58,41 @@ test("scans only thread summaries and extracts structured metadata", async () =>
   );
 });
 
+test("uses the canonical thread title as summary embedding context", async () => {
+  const info = await tempWorkspace();
+  const threadId = "thread-canonical-title";
+  await writeSummary(
+    info,
+    threadId,
+    [
+      "# Resumo executivo",
+      "",
+      `Thread: marc://$${threadId}`,
+      "",
+      "## Resultado",
+      "",
+      "- Decisao visual consolidada."
+    ].join("\n")
+  );
+  await writeThreadChat(
+    info,
+    threadId,
+    "Oportunidade - Estilo neo-brutalism para a UI"
+  );
+
+  const [summary] = await scanThreadSummarySources(info);
+
+  assert.equal(summary?.title, "Oportunidade - Estilo neo-brutalism para a UI");
+  assert.match(
+    summary?.chunks[0]?.embeddingText ?? "",
+    /Thread: Oportunidade - Estilo neo-brutalism para a UI\./
+  );
+});
+
 test("rebuild creates a current manifest and status detects stale summaries", async () => {
   const info = await tempWorkspace();
   const provider = new FakeEmbeddingProvider();
+  const reranker = new FakeRerankingProvider();
   const store = new InMemoryMemoryVectorStore();
   await writeSummary(
     info,
@@ -104,8 +109,13 @@ test("rebuild creates a current manifest and status detects stale summaries", as
     ].join("\n")
   );
 
-  await rebuildMemoryInWorkspace(info, { provider, store });
-  const current = await readMemoryStatusInWorkspace(info, { provider, store });
+  await rebuildMemoryInWorkspace(info, { provider, reranker, store });
+  const manifest = await readMemoryManifest(info);
+  const current = await readMemoryStatusInWorkspace(info, {
+    provider,
+    reranker,
+    store
+  });
   await writeSummary(
     info,
     "thread-token",
@@ -121,9 +131,15 @@ test("rebuild creates a current manifest and status detects stale summaries", as
       "- Mudanca nova que deixa o indice stale."
     ].join("\n")
   );
-  const stale = await readMemoryStatusInWorkspace(info, { provider, store });
+  const stale = await readMemoryStatusInWorkspace(info, {
+    provider,
+    reranker,
+    store
+  });
 
   assert.equal(current.status, "ready");
+  assert.equal(manifest?.schemaVersion, 6);
+  assert.equal(manifest?.retrievalContract, "field-aware-hybrid-v2");
   assert.equal(current.stale, false);
   assert.equal(current.summaryCount, 1);
   assert.equal(stale.status, "stale");
@@ -135,6 +151,7 @@ test("rebuild creates a current manifest and status detects stale summaries", as
 test("recall returns the summary thread that matches the development intent", async () => {
   const info = await tempWorkspace();
   const provider = new FakeEmbeddingProvider();
+  const reranker = new FakeRerankingProvider();
   const store = new InMemoryMemoryVectorStore();
   await writeSummary(
     info,
@@ -168,11 +185,12 @@ test("recall returns the summary thread that matches the development intent", as
       "- Implementar autocomplete de referencias na UI."
     ].join("\n")
   );
-  await rebuildMemoryInWorkspace(info, { provider, store });
+  await rebuildMemoryInWorkspace(info, { provider, reranker, store });
   const disposeCallsBeforeRecall = provider.disposeCalls;
 
   const recall = await recallMemoryInWorkspace(info, {
     provider,
+    reranker,
     store,
     query: "criar rotacao para o token da interface",
     limit: 2
@@ -191,6 +209,9 @@ test("recall returns the summary thread that matches the development intent", as
 test("recall reranks decision matches above generic vector neighbors", async () => {
   const info = await tempWorkspace();
   const provider = new FakeEmbeddingProvider();
+  const reranker = new FakeRerankingProvider((_query, documents) =>
+    documents.map((document) => (document.includes("rotacao") ? 0.9 : 0.6))
+  );
   const store = new ScoreOverrideStore({
     "thread-token": 0.6,
     "thread-ui": 0.72
@@ -228,36 +249,56 @@ test("recall reranks decision matches above generic vector neighbors", async () 
       "- Implementar melhoria visual de interface para as colunas da UI."
     ].join("\n")
   );
-  await rebuildMemoryInWorkspace(info, { provider, store });
+  await rebuildMemoryInWorkspace(info, { provider, reranker, store });
 
   const recall = await recallMemoryInWorkspace(info, {
     provider,
+    reranker,
     store,
     query: "implementar rotacao de token da interface",
     limit: 2
   });
 
   assert.equal(recall.results[0]?.threadId, "thread-token");
-  assert.match(recall.results[0]?.matchedText ?? "", /rotacao/i);
-  assert.match(recall.results[0]?.reason ?? "", /exact terms/i);
-  assert.match(recall.results[0]?.reason ?? "", /Decisao/i);
+  assert.match(recall.results[0]?.matchedText ?? "", /token/i);
+  assert.match(recall.results[0]?.reason ?? "", /^Matched /);
 });
 
-test("recall does not load embeddings when the local provider is not prepared", async () => {
+test("recall uses title prefixes only for single-term queries", async () => {
   const info = await tempWorkspace();
-  const provider = new FakeEmbeddingProvider(providerMetadata, false);
-  const store = new InMemoryMemoryVectorStore();
-
-  const recall = await recallMemoryInWorkspace(info, {
-    provider,
-    store,
-    query: "verificar historico de token"
-  });
-
-  assert.equal(recall.indexStatus.status, "model_missing");
-  assert.deepEqual(recall.results, []);
-  assert.equal(provider.queryCalls, 0);
-  assert.ok(
-    recall.nextActions.some((action) => action.includes("memory_prepare"))
+  const provider = new FakeEmbeddingProvider();
+  const reranker = new FakeRerankingProvider();
+  const store = new ScoreOverrideStore({ "thread-ui": 0.8 });
+  await writeSummary(
+    info,
+    "thread-ui",
+    [
+      "# Resumo - Estilo neo-brutalism para a UI",
+      "",
+      "Thread: `thread-ui`",
+      "Closed: `2026-05-22T02:20:47.643Z`",
+      "",
+      "## Resultado",
+      "",
+      "- Aplicar o estilo visual na interface."
+    ].join("\n")
   );
+  await rebuildMemoryInWorkspace(info, { provider, reranker, store });
+
+  await recallMemoryInWorkspace(info, {
+    provider,
+    reranker,
+    store,
+    query: "brutalism"
+  });
+  assert.deepEqual(store.lexicalFields, ["title", "summary", "titlePrefix"]);
+
+  store.lexicalFields.length = 0;
+  await recallMemoryInWorkspace(info, {
+    provider,
+    reranker,
+    store,
+    query: "interface brutalism"
+  });
+  assert.deepEqual(store.lexicalFields, ["title", "summary"]);
 });

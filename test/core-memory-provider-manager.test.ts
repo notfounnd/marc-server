@@ -1,97 +1,137 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { MemoryProviderManager } from "../src/core/memory/index.js";
-import { FakeEmbeddingProvider, tempWorkspace } from "./memory-test-helpers.js";
+import {
+  MemoryInferenceManager,
+  type MemoryInferenceClient
+} from "../src/core/memory/index.js";
+import type { MemoryInferenceRequest } from "../src/core/memory/inference-protocol.js";
+import { tempWorkspace } from "./memory-test-helpers.js";
 
-class Deferred {
-  promise: Promise<void>;
-  resolve!: () => void;
+class FakeInferenceClient implements MemoryInferenceClient {
+  disposeCalls = 0;
+  requests: MemoryInferenceRequest[] = [];
 
-  constructor() {
-    this.promise = new Promise((resolve) => {
-      this.resolve = resolve;
-    });
+  async request(request: MemoryInferenceRequest) {
+    this.requests.push(request);
+    if (request.action === "prepare") return { prepared: true } as const;
+    if (request.action === "memoryUsage")
+      return {
+        memoryUsage: {
+          arrayBuffers: 1,
+          external: 2,
+          heapTotal: 3,
+          heapUsed: 4,
+          rss: 5
+        }
+      } as const;
+    if (request.action === "rerank")
+      return { scores: request.documents.map(() => 1) } as const;
+    if (request.action === "interpret") return { text: "0" } as const;
+    return {
+      vectors: request.action === "embedQuery" ? [[1]] : [[1]]
+    } as const;
+  }
+
+  async dispose(): Promise<void> {
+    this.disposeCalls += 1;
   }
 }
 
-async function waitFor(
-  predicate: () => boolean,
-  timeoutMs = 100
-): Promise<void> {
-  const deadline = Date.now() + timeoutMs;
-  while (!predicate()) {
-    if (Date.now() >= deadline) {
-      throw new Error("Timed out while waiting for provider lifecycle state.");
-    }
-    await new Promise((resolve) => setTimeout(resolve, 1));
-  }
-}
-
-test("reuses a provider within the idle TTL and disposes it afterward", async () => {
+test("reuses an inference worker within the idle TTL and terminates it afterward", async () => {
   const info = await tempWorkspace();
-  const providers: FakeEmbeddingProvider[] = [];
-  const manager = new MemoryProviderManager(() => {
-    const provider = new FakeEmbeddingProvider();
-    providers.push(provider);
-    return provider;
+  const clients: FakeInferenceClient[] = [];
+  const manager = new MemoryInferenceManager(() => {
+    const client = new FakeInferenceClient();
+    clients.push(client);
+    return client;
   }, 10);
 
-  await manager.run(info, (provider) => provider.embedQuery("first query"));
-  await manager.run(info, (provider) => provider.embedQuery("second query"));
+  await manager.run(info, "embedding", { action: "embedQuery", text: "first" });
+  await manager.run(info, "embedding", {
+    action: "embedQuery",
+    text: "second"
+  });
 
-  assert.equal(providers.length, 1);
-  assert.equal(providers[0]?.queryCalls, 2);
-  await waitFor(() => providers[0]?.disposeCalls === 1);
+  assert.equal(clients.length, 1);
+  assert.equal(clients[0]?.requests.length, 2);
+  await waitFor(() => clients[0]?.disposeCalls === 1);
 
   await manager.disposeAll();
-  assert.equal(providers[0]?.disposeCalls, 1);
+  assert.equal(clients[0]?.disposeCalls, 1);
 });
 
-test("keeps providers isolated by workspace", async () => {
-  const firstWorkspace = await tempWorkspace();
-  const secondWorkspace = await tempWorkspace();
-  const providers: FakeEmbeddingProvider[] = [];
-  const manager = new MemoryProviderManager(() => {
-    const provider = new FakeEmbeddingProvider();
-    providers.push(provider);
-    return provider;
+test("keeps inference workers isolated by workspace and role", async () => {
+  const first = await tempWorkspace();
+  const second = await tempWorkspace();
+  const clients: FakeInferenceClient[] = [];
+  const manager = new MemoryInferenceManager(() => {
+    const client = new FakeInferenceClient();
+    clients.push(client);
+    return client;
   }, 1_000);
 
-  await manager.run(firstWorkspace, (provider) => provider.embedQuery("first"));
-  await manager.run(secondWorkspace, (provider) =>
-    provider.embedQuery("second")
+  await manager.run(first, "embedding", {
+    action: "embedQuery",
+    text: "first"
+  });
+  await manager.run(first, "reranking", {
+    action: "rerank",
+    batchSize: 2,
+    documents: ["first"],
+    query: "first"
+  });
+  await manager.run(second, "embedding", {
+    action: "embedQuery",
+    text: "second"
+  });
+  await manager.run(first, "interpretation", {
+    action: "interpret",
+    originalQuery: "toogle",
+    variants: ["toogle", "toggle"]
+  });
+
+  assert.equal(clients.length, 4);
+  assert.deepEqual(
+    manager.activeWorkers(first).map(({ role }) => role),
+    ["embedding", "interpretation", "reranking"]
+  );
+  await manager.disposeAll();
+});
+
+test("applies idle TTL independently for each inference role", async () => {
+  const info = await tempWorkspace();
+  const clients = new Map<string, FakeInferenceClient>();
+  const manager = new MemoryInferenceManager(
+    (_info, role) => {
+      const client = new FakeInferenceClient();
+      clients.set(role, client);
+      return client;
+    },
+    (role) => (role === "interpretation" ? 80 : 10)
   );
 
-  assert.equal(providers.length, 2);
+  await manager.run(info, "embedding", {
+    action: "embedQuery",
+    text: "first"
+  });
+  await manager.run(info, "interpretation", {
+    action: "interpret",
+    originalQuery: "toogle",
+    variants: ["toogle", "toggle"]
+  });
+
+  await waitFor(() => clients.get("embedding")?.disposeCalls === 1);
+  assert.equal(clients.get("interpretation")?.disposeCalls, 0);
+  await waitFor(() => clients.get("interpretation")?.disposeCalls === 1);
+
   await manager.disposeAll();
-  assert.equal(providers[0]?.disposeCalls, 1);
-  assert.equal(providers[1]?.disposeCalls, 1);
 });
 
-test("serializes operations for one workspace and disposes only after both finish", async () => {
-  const info = await tempWorkspace();
-  const provider = new FakeEmbeddingProvider();
-  const manager = new MemoryProviderManager(() => provider, 10);
-  const firstStarted = new Deferred();
-  const releaseFirst = new Deferred();
-  let secondStarted = false;
-
-  const first = manager.run(info, async () => {
-    firstStarted.resolve();
-    await releaseFirst.promise;
-  });
-  await firstStarted.promise;
-
-  const second = manager.run(info, async () => {
-    secondStarted = true;
-  });
-
-  await new Promise((resolve) => setTimeout(resolve, 5));
-  assert.equal(secondStarted, false);
-  assert.equal(provider.disposeCalls, 0);
-
-  releaseFirst.resolve();
-  await Promise.all([first, second]);
-  assert.equal(secondStarted, true);
-  await waitFor(() => provider.disposeCalls === 1);
-});
+async function waitFor(predicate: () => boolean): Promise<void> {
+  const deadline = Date.now() + 1_000;
+  while (Date.now() < deadline) {
+    if (predicate()) return;
+    await new Promise((resolve) => setTimeout(resolve, 5));
+  }
+  throw new Error("Timed out waiting for inference worker disposal.");
+}

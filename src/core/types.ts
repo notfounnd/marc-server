@@ -208,6 +208,11 @@ export type MemoryIndexHealth = {
   ready: boolean;
   stale: boolean;
   modelPrepared: boolean;
+  retrieverPrepared: boolean;
+  rerankerPrepared: boolean;
+  interpreterPrepared: boolean;
+  rebuildReady: boolean;
+  searchReady: boolean;
   summaryCount: number;
   indexedSummaryCount: number;
   preparing: boolean;
@@ -218,6 +223,18 @@ export type MemoryIndexHealth = {
   autoRebuild: boolean;
   embeddingBatchSize: number;
   searchRetryDepth: number;
+  maintenance?: {
+    models: Array<{
+      active: boolean;
+      bytes: number;
+      model: string;
+      prepared: boolean;
+      role: "interpreter" | "retriever" | "reranker" | "unused";
+      variant: string;
+    }>;
+    recoverableBytes: number;
+    usedBytes: number;
+  };
   message: string;
 };
 

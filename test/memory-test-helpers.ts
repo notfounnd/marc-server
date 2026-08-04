@@ -4,10 +4,16 @@ import path from "node:path";
 import type {
   EmbeddingProvider,
   EmbeddingProviderMetadata,
+  MemoryLexicalField,
+  MemoryLexicalSearchHit,
   MemorySearchHit,
   MemoryVectorRecord,
   MemoryVectorRow,
-  MemoryVectorStore
+  MemoryVectorStore,
+  QueryInterpretationProvider,
+  QueryInterpretationProviderMetadata,
+  RerankingProvider,
+  RerankingProviderMetadata
 } from "../src/core/memory/types.js";
 import type { WorkspaceInfo } from "../src/core/types.js";
 
@@ -22,11 +28,21 @@ export const providerMetadata: EmbeddingProviderMetadata = {
   runtime: "local"
 };
 
+export const rerankerMetadata: RerankingProviderMetadata = {
+  id: "fake-reranker",
+  name: "Fake reranker",
+  model: "fake-reranker-model",
+  version: "1.0.0",
+  quantized: true,
+  runtime: "local"
+};
+
 export class FakeEmbeddingProvider implements EmbeddingProvider {
   prepareCalls = 0;
   documentCalls = 0;
   queryCalls = 0;
   disposeCalls = 0;
+  readonly queryTexts: string[] = [];
 
   constructor(
     private readonly metadata: EmbeddingProviderMetadata = providerMetadata,
@@ -52,7 +68,104 @@ export class FakeEmbeddingProvider implements EmbeddingProvider {
 
   async embedQuery(text: string): Promise<number[]> {
     this.queryCalls += 1;
+    this.queryTexts.push(text);
     return vectorForText(text);
+  }
+
+  async dispose(): Promise<void> {
+    this.disposeCalls += 1;
+  }
+}
+
+export class FakeRerankingProvider implements RerankingProvider {
+  prepareCalls = 0;
+  rerankCalls = 0;
+  readonly rerankBatchSizes: number[] = [];
+  readonly rerankedDocuments: string[][] = [];
+  readonly rerankedQueries: string[] = [];
+  disposeCalls = 0;
+
+  constructor(
+    private readonly scores: (
+      query: string,
+      documents: string[]
+    ) => number[] = (_query, documents) => documents.map(() => 1),
+    private readonly prepared = true
+  ) {}
+
+  describe(): RerankingProviderMetadata {
+    return rerankerMetadata;
+  }
+
+  async isPrepared(): Promise<boolean> {
+    return this.prepared;
+  }
+
+  async prepare(): Promise<void> {
+    this.prepareCalls += 1;
+  }
+
+  async rerank(
+    query: string,
+    documents: string[],
+    _batchSize: number
+  ): Promise<number[]> {
+    this.rerankCalls += 1;
+    this.rerankBatchSizes.push(_batchSize);
+    this.rerankedQueries.push(query);
+    this.rerankedDocuments.push([...documents]);
+    return this.scores(query, documents);
+  }
+
+  async splitPassages(texts: string[]): Promise<string[][]> {
+    return texts.map((text) => [text]);
+  }
+
+  async dispose(): Promise<void> {
+    this.disposeCalls += 1;
+  }
+}
+
+export class FakeQueryInterpretationProvider implements QueryInterpretationProvider {
+  prepareCalls = 0;
+  disposeCalls = 0;
+  readonly calls: Array<{
+    feedback?: string;
+    originalQuery: string;
+    variants: string[];
+  }> = [];
+
+  constructor(
+    private readonly outputs: string[] = ["0"],
+    private readonly prepared = true
+  ) {}
+
+  describe(): QueryInterpretationProviderMetadata {
+    return {
+      id: "fake-interpreter",
+      model: "fake-query-model",
+      name: "Fake query interpreter",
+      quantized: true,
+      runtime: "local",
+      version: "1"
+    };
+  }
+
+  isPrepared(): Promise<boolean> {
+    return Promise.resolve(this.prepared);
+  }
+
+  async prepare(): Promise<void> {
+    this.prepareCalls += 1;
+  }
+
+  selectVariant(input: {
+    feedback?: string;
+    originalQuery: string;
+    variants: string[];
+  }): Promise<string> {
+    this.calls.push(input);
+    return Promise.resolve(this.outputs.shift() ?? "0");
   }
 
   async dispose(): Promise<void> {
@@ -62,8 +175,13 @@ export class FakeEmbeddingProvider implements EmbeddingProvider {
 
 export class ScoreOverrideStore implements MemoryVectorStore {
   private records: MemoryVectorRecord[] = [];
+  readonly lexicalFields: MemoryLexicalField[] = [];
+  readonly searchOptions: Array<{ limit: number }> = [];
 
-  constructor(private readonly scoresByThread: Record<string, number>) {}
+  constructor(
+    private readonly scoresByThread: Record<string, number>,
+    private readonly excludedVectorThreadIds = new Set<string>()
+  ) {}
 
   exists(): Promise<boolean> {
     return Promise.resolve(this.records.length > 0);
@@ -71,6 +189,12 @@ export class ScoreOverrideStore implements MemoryVectorStore {
 
   listRecordIds(): Promise<string[]> {
     return Promise.resolve(this.records.map((record) => record.recordId));
+  }
+
+  readRows(): Promise<MemoryVectorRow[]> {
+    return Promise.resolve(
+      this.records.map((record) => ({ ...record, vector: [] }))
+    );
   }
 
   async rebuild(
@@ -95,21 +219,41 @@ export class ScoreOverrideStore implements MemoryVectorStore {
     return Promise.resolve();
   }
 
-  search(
+  validateGeneration(): Promise<void> {
+    return Promise.resolve();
+  }
+
+  searchVector(
     _info: WorkspaceInfo,
     _vector: number[],
-    options: { limit: number; minScore: number }
+    options: {
+      generation?: string;
+      kind?: "identity" | "passage";
+      limit: number;
+    }
   ): Promise<MemorySearchHit[]> {
+    this.searchOptions.push(options);
     const hits = this.records
+      .filter((record) => !this.excludedVectorThreadIds.has(record.threadId))
+      .filter((record) => !options.kind || record.kind === options.kind)
       .map((record) => ({
         record,
         score: this.scoresByThread[record.threadId] ?? 0
       }))
-      .filter((hit) => hit.score >= options.minScore)
       .sort((left, right) => right.score - left.score)
       .slice(0, options.limit);
 
     return Promise.resolve(hits);
+  }
+
+  searchLexical(
+    _info: WorkspaceInfo,
+    _query: string,
+    _vector: number[],
+    options: { field: MemoryLexicalField }
+  ): Promise<MemoryLexicalSearchHit[]> {
+    this.lexicalFields.push(options.field);
+    return Promise.resolve([]);
   }
 }
 
@@ -133,6 +277,19 @@ export async function writeSummary(
   const threadPath = path.join(info.marcPath, "threads", threadId);
   await fs.mkdir(threadPath, { recursive: true });
   await fs.writeFile(path.join(threadPath, "SUMMARY.md"), content);
+}
+
+export async function writeThreadChat(
+  info: WorkspaceInfo,
+  threadId: string,
+  title: string
+): Promise<void> {
+  const threadPath = path.join(info.marcPath, "threads", threadId);
+  await fs.mkdir(threadPath, { recursive: true });
+  await fs.writeFile(
+    path.join(threadPath, "CHAT.md"),
+    [`# ${title}`, "", `Thread: \`${threadId}\``].join("\n")
+  );
 }
 
 export async function createThreadFolder(

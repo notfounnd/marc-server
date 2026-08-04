@@ -60,6 +60,11 @@ export type MemoryIndexHealth = {
   ready: boolean;
   stale: boolean;
   modelPrepared: boolean;
+  retrieverPrepared: boolean;
+  rerankerPrepared: boolean;
+  interpreterPrepared: boolean;
+  rebuildReady: boolean;
+  searchReady: boolean;
   summaryCount: number;
   indexedSummaryCount: number;
   preparing: boolean;
@@ -70,6 +75,18 @@ export type MemoryIndexHealth = {
   autoRebuild: boolean;
   embeddingBatchSize: number;
   searchRetryDepth: number;
+  maintenance?: {
+    models: Array<{
+      active: boolean;
+      bytes: number;
+      model: string;
+      prepared: boolean;
+      role: "interpreter" | "retriever" | "reranker" | "unused";
+      variant: string;
+    }>;
+    recoverableBytes: number;
+    usedBytes: number;
+  };
   message: string;
 };
 
@@ -86,9 +103,18 @@ export type MemoryRecallHit = {
 
 export type MemoryRecallResult = {
   query: string;
+  interpretation: MemoryQueryInterpretation;
   indexStatus: MemoryIndexHealth;
   results: MemoryRecallHit[];
   nextActions: string[];
+};
+
+export type MemoryQueryInterpretation = {
+  originalQuery: string;
+  effectiveQuery: string;
+  suggestedQuery?: string;
+  mode: "auto" | "literal";
+  correctionApplied: boolean;
 };
 
 export type MemorySearchStatus = "idle" | "searching" | "error";

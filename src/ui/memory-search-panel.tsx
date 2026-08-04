@@ -15,7 +15,7 @@ import type {
   Thread
 } from "./types.js";
 
-type Translation = (key: string) => string;
+type Translation = (key: string, options?: Record<string, unknown>) => string;
 
 export function MemorySearchPanel({
   allThreads,
@@ -28,6 +28,7 @@ export function MemorySearchPanel({
   status,
   t,
   onDeepRetry,
+  onAlternateSearch,
   onQueryChange,
   onSelectHit,
   onSubmit
@@ -42,6 +43,7 @@ export function MemorySearchPanel({
   status: MemorySearchStatus;
   t: Translation;
   onDeepRetry: () => void;
+  onAlternateSearch: () => void;
   onQueryChange: (query: string) => void;
   onSelectHit: (hit: MemoryRecallHit) => void;
   onSubmit: () => void;
@@ -79,6 +81,51 @@ export function MemorySearchPanel({
         <p className="memory-search-note">
           {t("Memory index is stale. Results may miss recent summaries.")}
         </p>
+      ) : null}
+      {result?.interpretation.correctionApplied ? (
+        <div className="memory-search-interpretation">
+          <span>
+            {t("Searching for {{query}}", {
+              query: result.interpretation.effectiveQuery
+            })}
+          </span>
+          <span>
+            {t("Search instead for")}{" "}
+            <a
+              className="memory-search-alternate-link"
+              href="#"
+              onClick={(event) => {
+                event.preventDefault();
+                onAlternateSearch();
+              }}
+            >
+              {result.interpretation.originalQuery}
+            </a>
+          </span>
+        </div>
+      ) : null}
+      {!result?.interpretation.correctionApplied &&
+      result?.interpretation.suggestedQuery ? (
+        <div className="memory-search-interpretation">
+          <span>
+            {t("Did you mean {{query}}?", {
+              query: result.interpretation.suggestedQuery
+            })}
+          </span>
+          <span>
+            {t("Search for")}{" "}
+            <a
+              className="memory-search-alternate-link"
+              href="#"
+              onClick={(event) => {
+                event.preventDefault();
+                onAlternateSearch();
+              }}
+            >
+              {result.interpretation.suggestedQuery}
+            </a>
+          </span>
+        </div>
       ) : null}
       {memorySearchBody({
         allThreads,

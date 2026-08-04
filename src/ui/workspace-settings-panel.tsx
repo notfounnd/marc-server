@@ -1,4 +1,4 @@
-import { Database, RefreshCw, Search } from "lucide-react";
+import { Database, RefreshCw, Search, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
@@ -13,22 +13,25 @@ export function WorkspaceSettingsPanel({
   onEmbeddingBatchSizeChange,
   onSearchRetryDepthChange,
   onPrepareModel,
+  onPurge,
   onRebuild
 }: {
   health?: MemoryIndexHealth;
-  t: (key: string, options?: { count: number }) => string;
+  t: (key: string, options?: Record<string, string | number>) => string;
   onAutoRebuildChange: (autoRebuild: boolean) => void;
   onEmbeddingBatchSizeChange: (embeddingBatchSize: number) => void;
   onSearchRetryDepthChange: (searchRetryDepth: number) => void;
   onPrepareModel: () => void;
+  onPurge: () => void;
   onRebuild: (mode: "incremental" | "full") => void;
 }) {
-  const modelPrepared = health?.modelPrepared === true;
+  const modelsPrepared = health?.modelPrepared === true;
   const preparing = health?.preparing === true;
   const rebuilding = health?.rebuilding === true;
   const busy = preparing || rebuilding;
-  const canPrepare = !modelPrepared && !busy;
-  const canRebuild = modelPrepared && !busy;
+  const canPrepare = !modelsPrepared && !busy;
+  const canRebuild = health?.rebuildReady === true && !busy;
+  const canPurge = (health?.maintenance?.recoverableBytes ?? 0) > 0 && !busy;
   const autoRebuild = health?.autoRebuild ?? true;
   const configuredBatchSize = health?.embeddingBatchSize ?? 4;
   const configuredSearchRetryDepth = health?.searchRetryDepth ?? 0;
@@ -108,6 +111,32 @@ export function WorkspaceSettingsPanel({
         <span>{health?.message ?? t("Memory status unavailable.")}</span>
         {health?.lastError ? <small>{health.lastError}</small> : null}
       </div>
+      <div className="workspace-settings-models">
+        <Label>{t("Active models")}</Label>
+        {(health?.maintenance?.models ?? [])
+          .filter((model) => model.active)
+          .map((model) => (
+            <div className="workspace-settings-model" key={model.role}>
+              <span>{model.model}</span>
+              <small>
+                {model.role} · {model.variant} · {formatBytes(model.bytes)}
+              </small>
+            </div>
+          ))}
+        <small>
+          {t("{{size}} can be released.", {
+            size: formatBytes(health?.maintenance?.recoverableBytes ?? 0)
+          })}
+        </small>
+        <Button
+          className="workspace-settings-action workspace-settings-purge-action"
+          disabled={!canPurge}
+          onClick={onPurge}
+        >
+          <Trash2 size={14} />
+          {t("Purge unused")}
+        </Button>
+      </div>
       <div className="workspace-settings-toggle-row">
         <Label htmlFor="workspace-memory-auto-rebuild">
           {t("Automatic memory rebuild")}
@@ -120,12 +149,12 @@ export function WorkspaceSettingsPanel({
       </div>
       <div className="workspace-settings-batch-row">
         <Label htmlFor="workspace-memory-embedding-batch-size">
-          {t("Embedding batch size")}
-          <span>{t("{{count}} records", { count: batchSize })}</span>
+          {t("Inference batch size")}
+          <span>{t("{{count}} items", { count: batchSize })}</span>
         </Label>
         <Slider
           id="workspace-memory-embedding-batch-size"
-          aria-label={t("Embedding batch size")}
+          aria-label={t("Inference batch size")}
           disabled={busy}
           max={16}
           min={2}
@@ -142,7 +171,7 @@ export function WorkspaceSettingsPanel({
           onClick={onPrepareModel}
         >
           <RefreshCw size={14} className={classNames(preparing && "spin")} />
-          {t("Prepare model")}
+          {t("Prepare models")}
         </Button>
         <Button
           className="workspace-settings-action"
@@ -163,4 +192,17 @@ export function WorkspaceSettingsPanel({
       </div>
     </div>
   );
+}
+
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  const units = ["KB", "MB", "GB", "TB"];
+  let value = bytes;
+  let unit = "B";
+  for (const nextUnit of units) {
+    value /= 1024;
+    unit = nextUnit;
+    if (value < 1024) break;
+  }
+  return `${value.toFixed(value >= 10 ? 1 : 2)} ${unit}`;
 }

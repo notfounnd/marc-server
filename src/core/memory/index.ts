@@ -1,13 +1,30 @@
 export {
   LocalEmbeddingProvider,
-  localModelCachePath
+  localEmbeddingModelCachePath
 } from "./local-provider.js";
 export {
-  MemoryProviderManager,
-  MEMORY_PROVIDER_IDLE_TIMEOUT_MS
-} from "./provider-manager.js";
+  activeMemoryModelSelection,
+  MEMORY_MODEL_BENCHMARK_PROFILES,
+  MEMORY_MODEL_BENCHMARK_PROFILE_ENV,
+  memoryModelSelection
+} from "./model-config.js";
+export {
+  LocalRerankingProvider,
+  localRerankingModelCachePath
+} from "./local-reranker.js";
+export {
+  LocalQueryInterpretationProvider,
+  localQueryInterpretationModelCachePath
+} from "./local-query-interpreter.js";
+export {
+  defaultMemoryInferenceManager,
+  MemoryInferenceManager,
+  MEMORY_INFERENCE_IDLE_TIMEOUT_MS
+} from "./inference-manager.js";
+export type { MemoryInferenceClient } from "./inference-manager.js";
 export {
   prepareMemoryInWorkspace,
+  purgeMemoryInWorkspace,
   readMemoryStatusInWorkspace,
   rebuildMemoryInWorkspace,
   reconcileMemoryInWorkspace,
@@ -32,6 +49,13 @@ export {
   isMemorySearchRetryDepth
 } from "./settings.js";
 export {
+  candidateLimitForMemorySearchDepth,
+  DEFAULT_MEMORY_SEARCH_DEPTH,
+  isMemorySearchDepth,
+  MEMORY_SEARCH_CANDIDATE_LIMITS
+} from "./search-depth.js";
+export { semanticRerankingDocument } from "./semantic-ranking.js";
+export {
   InMemoryMemoryVectorStore,
   LanceDbMemoryVectorStore,
   memoryManifestPath,
@@ -43,9 +67,22 @@ export type {
   EmbeddingProvider,
   EmbeddingProviderMetadata,
   MemoryManifest,
+  MemoryMaintenance,
+  MemoryLexicalField,
+  MemoryLexicalSearchHit,
+  MemoryModelInventoryItem,
+  MemoryPurgeResult,
   MemoryRebuildMode,
   MemoryRecallResult,
+  MemorySearchDepth,
+  MemorySearchChannels,
   MemoryStatus,
+  RerankingProvider,
+  RerankingProviderMetadata,
+  QueryInterpretationProvider,
+  QueryInterpretationProviderMetadata,
+  MemoryQueryInterpretation,
+  MemoryQueryMode,
   MemoryVectorRecord,
   MemoryVectorRow,
   MemoryVectorStore,

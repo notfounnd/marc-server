@@ -2,6 +2,8 @@ import { safeJoin } from "./paths.js";
 import {
   BackgroundMemoryReconciler,
   LocalEmbeddingProvider,
+  LocalQueryInterpretationProvider,
+  LocalRerankingProvider,
   readWorkspaceSettingsInWorkspace
 } from "./memory/index.js";
 import {
@@ -86,7 +88,10 @@ async function backgroundMemory(
 
   const reconciler = new BackgroundMemoryReconciler(
     info,
-    () => new LocalEmbeddingProvider(info)
+    () => new LocalEmbeddingProvider(info),
+    undefined,
+    () => new LocalRerankingProvider(info),
+    () => new LocalQueryInterpretationProvider(info)
   );
   backgroundMemories.set(info.marcPath, reconciler);
   return reconciler;
@@ -138,7 +143,7 @@ function shouldAutoRebuildMemory(
   memory: WorkspaceStatus["modules"]["memory"]
 ): boolean {
   if (!memory.autoRebuild) return false;
-  if (!memory.modelPrepared) return false;
+  if (!memory.rebuildReady) return false;
   if (memory.preparing) return false;
   if (memory.rebuilding) return false;
   return memory.status === "missing" || memory.status === "stale";

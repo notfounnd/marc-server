@@ -1,13 +1,17 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  alternateMemorySearchQuery,
   findMemorySearchThread,
   isMemorySearchAvailable,
   isMemorySearchClosedHit,
+  MEMORY_SEARCH_STORAGE_KEY,
+  memorySearchRecallInput,
   memorySearchTooltip,
   readStoredMemorySearchState,
   writeStoredMemorySearchState
 } from "../src/ui/memory-search.js";
+import { nextMemorySearchDepth } from "../src/ui/memory-search-depth.js";
 import type { MemoryRecallResult, Thread } from "../src/ui/types.js";
 
 class FakeStorage {
@@ -27,6 +31,12 @@ class FakeStorage {
 }
 
 const recallResult: MemoryRecallResult = {
+  interpretation: {
+    correctionApplied: false,
+    effectiveQuery: "token rotation",
+    mode: "auto",
+    originalQuery: "token rotation"
+  },
   indexStatus: {
     indexedSummaryCount: 1,
     autoRebuild: true,
@@ -35,6 +45,11 @@ const recallResult: MemoryRecallResult = {
     lastError: null,
     message: "Memory index is current.",
     modelPrepared: true,
+    retrieverPrepared: true,
+    rerankerPrepared: true,
+    interpreterPrepared: true,
+    rebuildReady: true,
+    searchReady: true,
     preparing: false,
     ready: true,
     rebuilding: false,
@@ -48,7 +63,7 @@ const recallResult: MemoryRecallResult = {
     {
       closedAt: "2026-05-24T23:15:59.807Z",
       matchedText: "Token rotation was already discussed in the daemon model.",
-      reason: "Exact terms: token.",
+      reason: "Matched summary in token rotation.",
       reference:
         "marc://$oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3",
       score: 0.82,
@@ -61,22 +76,64 @@ const recallResult: MemoryRecallResult = {
   ]
 };
 
-test("enables memory search only for ready or stale memory", () => {
-  assert.equal(isMemorySearchAvailable({ status: "ready" }), true);
-  assert.equal(isMemorySearchAvailable({ status: "stale" }), true);
-  assert.equal(isMemorySearchAvailable({ status: "missing" }), false);
-  assert.equal(isMemorySearchAvailable({ status: "model_missing" }), false);
-  assert.equal(isMemorySearchAvailable({ status: "incompatible" }), false);
-  assert.equal(isMemorySearchAvailable({ status: "rebuilding" }), false);
-  assert.equal(isMemorySearchAvailable({ status: "degraded" }), false);
+test("reuses the effective query literally after the first recall", () => {
+  assert.deepEqual(memorySearchRecallInput("toogle", 0), {
+    depth: 0,
+    limit: 50,
+    query: "toogle",
+    queryMode: "auto"
+  });
+  assert.deepEqual(
+    memorySearchRecallInput("toogle", 1, {
+      correctionApplied: true,
+      effectiveQuery: "toggle",
+      mode: "auto",
+      originalQuery: "toogle",
+      suggestedQuery: "toggle"
+    }),
+    {
+      depth: 1,
+      limit: 50,
+      query: "toggle",
+      queryMode: "literal"
+    }
+  );
+});
+
+test("selects the opposite query for correction and suggestion actions", () => {
+  assert.equal(
+    alternateMemorySearchQuery({
+      correctionApplied: true,
+      effectiveQuery: "toggle",
+      mode: "auto",
+      originalQuery: "toogle",
+      suggestedQuery: "toggle"
+    }),
+    "toogle"
+  );
+  assert.equal(
+    alternateMemorySearchQuery({
+      correctionApplied: false,
+      effectiveQuery: "toogle",
+      mode: "auto",
+      originalQuery: "toogle",
+      suggestedQuery: "toggle"
+    }),
+    "toggle"
+  );
+});
+
+test("enables memory search only when both models and the index are ready", () => {
+  assert.equal(isMemorySearchAvailable({ searchReady: true }), true);
+  assert.equal(isMemorySearchAvailable({ searchReady: false }), false);
   assert.equal(isMemorySearchAvailable(undefined), false);
 });
 
 test("stores one compact memory search result per workspace", () => {
   const storage = new FakeStorage();
   writeStoredMemorySearchState(storage, {
-    configuredDepth: 1,
-    manualDeepRetries: 1,
+    configuredDepth: 3,
+    lastExecutedDepth: 0,
     query: "token rotation",
     result: {
       ...recallResult,
@@ -91,9 +148,21 @@ test("stores one compact memory search result per workspace", () => {
   });
 
   const saved = readStoredMemorySearchState(storage, "workspace-1");
-  assert.equal(saved?.configuredDepth, 1);
-  assert.equal(saved?.manualDeepRetries, 1);
+  assert.equal(saved?.configuredDepth, 3);
+  assert.equal(saved?.lastExecutedDepth, 0);
+  assert.equal(
+    nextMemorySearchDepth({
+      configuredDepth: 3,
+      lastExecutedDepth: saved!.lastExecutedDepth
+    }),
+    1
+  );
   assert.equal(saved?.query, "token rotation");
+  assert.equal(
+    JSON.parse(storage.getItem(MEMORY_SEARCH_STORAGE_KEY) ?? "{}")
+      .schemaVersion,
+    5
+  );
   assert.equal(saved?.result.results.length, 50);
   assert.equal(saved?.result.results[0].matchedText.length, 360);
   assert.deepEqual(
@@ -102,11 +171,30 @@ test("stores one compact memory search result per workspace", () => {
   );
 });
 
+test("discards legacy search snapshots without an observed depth", () => {
+  const storage = new FakeStorage();
+  storage.setItem(
+    MEMORY_SEARCH_STORAGE_KEY,
+    JSON.stringify({
+      configuredDepth: 3,
+      manualDeepRetries: 0,
+      query: "token rotation",
+      result: recallResult,
+      savedAt: "2026-10-08T00:00:00.000Z",
+      schemaVersion: 4,
+      workspaceId: "workspace-1"
+    })
+  );
+
+  assert.equal(readStoredMemorySearchState(storage, "workspace-1"), undefined);
+  assert.equal(storage.getItem(MEMORY_SEARCH_STORAGE_KEY), null);
+});
+
 test("ignores stored memory search from another workspace", () => {
   const storage = new FakeStorage();
   writeStoredMemorySearchState(storage, {
     configuredDepth: 0,
-    manualDeepRetries: 0,
+    lastExecutedDepth: 0,
     query: "token rotation",
     result: recallResult,
     workspaceId: "workspace-1"

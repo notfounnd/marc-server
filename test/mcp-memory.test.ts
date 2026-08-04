@@ -39,6 +39,7 @@ test("memory tools expose schemas and require bootstrap", async () => {
   assert.ok(tools.memory_rebuild);
   assert.ok(tools.memory_recall);
   assert.ok(tools.memory_recall.inputSchema.shape.query);
+  assert.ok(tools.memory_recall.inputSchema.shape.queryMode);
   assert.ok(tools.memory_recall.inputSchema.shape.limit);
   assert.ok(tools.memory_recall.inputSchema.shape.minScore);
   assert.ok(tools.memory_rebuild.inputSchema.shape.mode);

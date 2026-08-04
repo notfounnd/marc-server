@@ -17,10 +17,14 @@ import {
 import type {
   EmbeddingProvider,
   MemoryRebuildMode,
-  MemoryVectorStore
+  MemoryVectorStore,
+  QueryInterpretationProvider,
+  RerankingProvider
 } from "./types.js";
 
 type ProviderFactory = () => EmbeddingProvider;
+type RerankerFactory = () => RerankingProvider;
+type InterpreterFactory = () => QueryInterpretationProvider;
 type MemoryFailureKind = "prepare" | "rebuild";
 type MemoryHealthSettings = {
   memory: {
@@ -41,7 +45,9 @@ export class BackgroundMemoryReconciler {
   constructor(
     private readonly info: WorkspaceInfo,
     private readonly createProvider: ProviderFactory,
-    private readonly store?: MemoryVectorStore
+    private readonly store?: MemoryVectorStore,
+    private readonly createReranker: RerankerFactory = unavailableRerankingProvider,
+    private readonly createInterpreter: InterpreterFactory = passThroughQueryInterpretationProvider
   ) {}
 
   async prepare(): Promise<void> {
@@ -72,6 +78,8 @@ export class BackgroundMemoryReconciler {
   async health(settings: MemoryHealthSettings): Promise<MemoryIndexHealth> {
     const base = await readMemoryStatusInWorkspace(this.info, {
       provider: this.createProvider(),
+      interpreter: this.createInterpreter(),
+      reranker: this.createReranker(),
       store: this.store
     });
     const rebuilding =
@@ -82,6 +90,11 @@ export class BackgroundMemoryReconciler {
       ready: base.ready,
       stale: base.stale,
       modelPrepared: base.modelPrepared,
+      rebuildReady: base.rebuildReady,
+      rerankerPrepared: base.rerankerPrepared,
+      interpreterPrepared: base.interpreterPrepared,
+      retrieverPrepared: base.retrieverPrepared,
+      searchReady: base.searchReady,
       summaryCount: base.summaryCount,
       indexedSummaryCount: base.indexedSummaryCount,
       preparing: Boolean(this.preparePromise),
@@ -95,6 +108,7 @@ export class BackgroundMemoryReconciler {
         DEFAULT_MEMORY_EMBEDDING_BATCH_SIZE,
       searchRetryDepth:
         settings.memory.searchRetryDepth ?? DEFAULT_MEMORY_SEARCH_RETRY_DEPTH,
+      maintenance: base.maintenance,
       message: base.message
     };
     if (this.preparePromise) {
@@ -126,8 +140,14 @@ export class BackgroundMemoryReconciler {
 
   private async performPrepare(): Promise<void> {
     const provider = this.createProvider();
+    const reranker = this.createReranker();
+    const interpreter = this.createInterpreter();
     try {
-      await prepareMemoryInWorkspace(provider);
+      await prepareMemoryInWorkspace(this.info, {
+        interpreter,
+        provider,
+        reranker
+      });
       this.lastPreparedAt = new Date().toISOString();
       this.lastError = null;
       this.lastFailure = undefined;
@@ -136,7 +156,6 @@ export class BackgroundMemoryReconciler {
       this.lastFailure = "prepare";
       throw error;
     } finally {
-      await provider.dispose().catch(() => undefined);
       this.preparePromise = undefined;
     }
   }
@@ -146,19 +165,21 @@ export class BackgroundMemoryReconciler {
     settings: WorkspaceSettings | undefined
   ): Promise<void> {
     const provider = this.createProvider();
+    const reranker = this.createReranker();
+    const interpreter = this.createInterpreter();
     const operation = memoryRebuildOperations[mode];
-    let operationStarted = false;
     try {
       const status = await readMemoryStatusInWorkspace(this.info, {
         provider,
+        interpreter,
+        reranker,
         store: this.store
       });
-      if (status.status === "model_missing") {
-        throw new Error("Memory model is not prepared.");
-      }
-      operationStarted = true;
+      if (!status.rebuildReady)
+        throw new Error("Memory retrieval model is not prepared.");
       const rebuild = await operation(this.info, {
         provider,
+        reranker,
         store: this.store,
         batchSize: settings?.memory.embeddingBatchSize
       });
@@ -171,10 +192,46 @@ export class BackgroundMemoryReconciler {
       this.lastFailure = "rebuild";
       throw error;
     } finally {
-      if (!operationStarted) await provider.dispose().catch(() => undefined);
       this.rebuildPromise = undefined;
     }
   }
+}
+
+function passThroughQueryInterpretationProvider(): QueryInterpretationProvider {
+  return {
+    describe: () => ({
+      id: "pass-through-interpreter",
+      model: "none",
+      name: "Pass-through query interpreter",
+      quantized: false,
+      runtime: "local",
+      version: "0"
+    }),
+    dispose: async () => undefined,
+    isPrepared: async () => true,
+    prepare: async () => undefined,
+    selectVariant: async () => "0"
+  };
+}
+
+function unavailableRerankingProvider(): RerankingProvider {
+  return {
+    describe: () => ({
+      id: "unavailable-reranker",
+      model: "unavailable",
+      name: "Unavailable reranker",
+      quantized: false,
+      runtime: "local",
+      version: "0"
+    }),
+    dispose: async () => undefined,
+    isPrepared: async () => false,
+    prepare: async () => undefined,
+    rerank: async () => [],
+    splitPassages: async () => {
+      throw new Error("Memory reranking model is not prepared.");
+    }
+  };
 }
 
 const memoryRebuildOperations = {

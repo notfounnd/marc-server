@@ -1,9 +1,13 @@
 import {
   LocalEmbeddingProvider,
-  MemoryProviderManager,
+  LocalQueryInterpretationProvider,
+  LocalRerankingProvider,
+  defaultMemoryInferenceManager,
+  isMemorySearchDepth,
   memoryRebuildActiveInWorkspace,
   memoryRebuildingStatus,
   prepareMemoryInWorkspace,
+  purgeMemoryInWorkspace,
   readMemoryStatusInWorkspace,
   readWorkspaceSettingsInWorkspace,
   rebuildMemoryInWorkspace,
@@ -12,6 +16,8 @@ import {
   updateWorkspaceSettingsInWorkspace
 } from "./memory/index.js";
 import type {
+  MemoryPurgeResult,
+  MemoryQueryMode,
   MemoryRecallResult,
   MemoryRebuildMode,
   MemoryStatus
@@ -22,10 +28,6 @@ import {
 } from "./workspace-status.js";
 import type { WorkspaceSettingsInput } from "./types.js";
 import { initWorkspace } from "./workspace.js";
-
-const memoryProviderManager = new MemoryProviderManager(
-  (info) => new LocalEmbeddingProvider(info)
-);
 
 export async function readWorkspaceSettings(workspaceRoot: string) {
   const info = await initWorkspace(workspaceRoot);
@@ -56,9 +58,25 @@ export async function rebuildMemoryInBackground(
 export async function prepareMemory(workspaceRoot: string): Promise<{
   prepared: true;
   provider: ReturnType<LocalEmbeddingProvider["describe"]>;
+  interpreter: ReturnType<LocalQueryInterpretationProvider["describe"]>;
+  reranker: ReturnType<LocalRerankingProvider["describe"]>;
 }> {
   const info = await initWorkspace(workspaceRoot);
-  return prepareMemoryInWorkspace(new LocalEmbeddingProvider(info));
+  const prepared = await prepareMemoryInWorkspace(info, {
+    interpreter: new LocalQueryInterpretationProvider(info),
+    provider: new LocalEmbeddingProvider(info),
+    reranker: new LocalRerankingProvider(info)
+  });
+  if (!prepared.interpreter)
+    throw new Error("Memory query interpretation model was not prepared.");
+  return { ...prepared, interpreter: prepared.interpreter };
+}
+
+export async function purgeMemory(
+  workspaceRoot: string
+): Promise<MemoryPurgeResult> {
+  const info = await initWorkspace(workspaceRoot);
+  return purgeMemoryInWorkspace(info, {});
 }
 
 export async function readMemoryStatus(
@@ -66,7 +84,9 @@ export async function readMemoryStatus(
 ): Promise<MemoryStatus> {
   const info = await initWorkspace(workspaceRoot);
   const status = await readMemoryStatusInWorkspace(info, {
-    provider: new LocalEmbeddingProvider(info)
+    interpreter: new LocalQueryInterpretationProvider(info),
+    provider: new LocalEmbeddingProvider(info),
+    reranker: new LocalRerankingProvider(info)
   });
   const rebuilding = await memoryRebuildActiveInWorkspace(info);
   if (!rebuilding) return status;
@@ -80,17 +100,29 @@ export async function rebuildMemory(
 ): Promise<MemoryStatus> {
   const info = await initWorkspace(workspaceRoot);
   const provider = new LocalEmbeddingProvider(info);
-  const status = await readMemoryStatusInWorkspace(info, { provider });
+  const reranker = new LocalRerankingProvider(info);
+  const interpreter = new LocalQueryInterpretationProvider(info);
+  const status = await readMemoryStatusInWorkspace(info, {
+    provider,
+    interpreter,
+    reranker
+  });
   const settings = await readWorkspaceSettingsInWorkspace(info);
   const rebuilding = await memoryRebuildActiveInWorkspace(info);
   if (rebuilding) return memoryRebuildingStatus(status);
-  if (status.status === "model_missing") return status;
+  if (!status.rebuildReady) return status;
   if (mode === "incremental" && status.status === "incompatible") return status;
   const rebuild = await memoryRebuildOperations[mode](info, {
     provider,
+    interpreter,
+    reranker,
     batchSize: settings.memory.embeddingBatchSize
   });
-  const nextStatus = await readMemoryStatusInWorkspace(info, { provider });
+  const nextStatus = await readMemoryStatusInWorkspace(info, {
+    provider,
+    interpreter,
+    reranker
+  });
   if (!rebuild.acquired) return memoryRebuildingStatus(nextStatus);
 
   return nextStatus;
@@ -103,19 +135,27 @@ const memoryRebuildOperations = {
 
 export async function recallMemory(
   workspaceRoot: string,
-  input: { query: string; limit?: number; minScore?: number }
+  input: {
+    depth?: number;
+    query: string;
+    queryMode?: MemoryQueryMode;
+    limit?: number;
+  }
 ): Promise<MemoryRecallResult> {
   const info = await initWorkspace(workspaceRoot);
-  return memoryProviderManager.run(info, (provider) =>
-    recallMemoryInWorkspace(info, {
-      provider,
-      query: input.query,
-      limit: input.limit,
-      minScore: input.minScore
-    })
-  );
+  if (input.depth !== undefined && !isMemorySearchDepth(input.depth))
+    throw new Error("Memory search depth must be an integer from 0 to 3.");
+  return recallMemoryInWorkspace(info, {
+    provider: new LocalEmbeddingProvider(info),
+    interpreter: new LocalQueryInterpretationProvider(info),
+    reranker: new LocalRerankingProvider(info),
+    query: input.query,
+    queryMode: input.queryMode,
+    limit: input.limit,
+    depth: input.depth
+  });
 }
 
 export async function disposeMemoryProviders(): Promise<void> {
-  await memoryProviderManager.disposeAll();
+  await defaultMemoryInferenceManager.disposeAll();
 }

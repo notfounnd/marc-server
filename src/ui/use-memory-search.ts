@@ -1,21 +1,23 @@
 import { useEffect, useRef, useState } from "react";
 import {
+  alternateMemorySearchQuery,
   findMemorySearchThread,
+  isCurrentMemorySearchRequest,
   isMemorySearchAvailable,
+  recallMemorySearchDepths,
   readStoredMemorySearchState,
   writeStoredMemorySearchState
 } from "./memory-search.js";
 import {
-  automaticMemorySearchScores,
+  automaticMemorySearchDepths,
   isMemorySearchRetryDepth,
-  MEMORY_SEARCH_UI_LIMIT,
-  minScoreForMemorySearchDepth,
   nextMemorySearchDepth,
   type MemorySearchDepthState,
   type MemorySearchRetryDepth
 } from "./memory-search-depth.js";
 import type {
   MemoryIndexHealth,
+  MemoryQueryInterpretation,
   MemoryRecallHit,
   MemoryRecallResult,
   MemorySearchStatus,
@@ -49,8 +51,10 @@ export function useMemorySearch({
   const [status, setStatus] = useState<MemorySearchStatus>("idle");
   const [error, setError] = useState<string>();
   const [activeSearch, setActiveSearch] = useState<MemorySearchDepthState>();
-  const requestId = useRef(0);
   const workspaceId = selectedWorkspace?.id;
+  const requestId = useRef(0);
+  const currentWorkspaceId = useRef(workspaceId);
+  currentWorkspaceId.current = workspaceId;
 
   useEffect(() => {
     requestId.current += 1;
@@ -63,7 +67,7 @@ export function useMemorySearch({
       saved
         ? {
             configuredDepth: saved.configuredDepth,
-            manualDeepRetries: saved.manualDeepRetries
+            lastExecutedDepth: saved.lastExecutedDepth
           }
         : undefined
     );
@@ -83,14 +87,11 @@ export function useMemorySearch({
       return;
     }
 
-    const active = {
-      configuredDepth: selectedSearchRetryDepth(selectedMemoryHealth),
-      manualDeepRetries: 0
-    };
+    const configuredDepth = selectedSearchRetryDepth(selectedMemoryHealth);
     await executeSearch({
-      active,
+      configuredDepth,
       query: trimmedQuery,
-      scores: automaticMemorySearchScores(active.configuredDepth)
+      depths: automaticMemorySearchDepths(configuredDepth)
     });
   }
 
@@ -102,39 +103,69 @@ export function useMemorySearch({
     const depth = nextMemorySearchDepth(activeSearch);
     if (depth === undefined) return;
 
-    const active = {
-      ...activeSearch,
-      manualDeepRetries: activeSearch.manualDeepRetries + 1
-    };
     await executeSearch({
-      active,
+      configuredDepth: activeSearch.configuredDepth,
       query: result.query,
-      scores: [minScoreForMemorySearchDepth(depth)]
+      depths: [depth],
+      interpretation: result.interpretation
+    });
+  }
+
+  async function runAlternateSearch(): Promise<void> {
+    if (!result) return;
+    const alternateQuery = alternateMemorySearchQuery(result.interpretation);
+    if (!alternateQuery) return;
+    const configuredDepth = selectedSearchRetryDepth(selectedMemoryHealth);
+    setQuery(alternateQuery);
+    await executeSearch({
+      configuredDepth,
+      depths: automaticMemorySearchDepths(configuredDepth),
+      initialMode: "literal",
+      query: alternateQuery
     });
   }
 
   async function executeSearch({
-    active,
+    configuredDepth,
     query: nextQuery,
-    scores
+    depths,
+    initialMode = "auto",
+    interpretation
   }: {
-    active: MemorySearchDepthState;
+    configuredDepth: MemorySearchRetryDepth;
     query: string;
-    scores: number[];
+    depths: MemorySearchRetryDepth[];
+    initialMode?: "auto" | "literal";
+    interpretation?: MemoryQueryInterpretation;
   }): Promise<void> {
     if (!selectedWorkspace) return;
+    const nextWorkspaceId = selectedWorkspace.id;
     const nextRequestId = requestId.current + 1;
     requestId.current = nextRequestId;
     setStatus("searching");
     setError(undefined);
 
     try {
-      const nextResult = await recallScores({
-        query: nextQuery,
-        scores,
-        workspaceId: selectedWorkspace.id
-      });
-      if (nextRequestId !== requestId.current) return;
+      const { lastExecutedDepth, result: nextResult } =
+        await recallMemorySearchDepths({
+          apiPost,
+          query: nextQuery,
+          depths,
+          initialMode,
+          interpretation,
+          workspaceId: nextWorkspaceId
+        });
+      if (
+        !isCurrentMemorySearchRequest(
+          nextRequestId,
+          requestId.current,
+          nextWorkspaceId,
+          currentWorkspaceId.current
+        )
+      ) {
+        return;
+      }
+      const active = { configuredDepth, lastExecutedDepth };
       setActiveSearch(active);
       setResult(nextResult);
       setStatus("idle");
@@ -142,34 +173,22 @@ export function useMemorySearch({
         ...active,
         query: nextQuery,
         result: nextResult,
-        workspaceId: selectedWorkspace.id
+        workspaceId: nextWorkspaceId
       });
     } catch (caught) {
-      if (nextRequestId !== requestId.current) return;
+      if (
+        !isCurrentMemorySearchRequest(
+          nextRequestId,
+          requestId.current,
+          nextWorkspaceId,
+          currentWorkspaceId.current
+        )
+      ) {
+        return;
+      }
       setStatus("error");
       setError(caught instanceof Error ? caught.message : String(caught));
     }
-  }
-
-  async function recallScores({
-    query: nextQuery,
-    scores,
-    workspaceId: nextWorkspaceId
-  }: {
-    query: string;
-    scores: number[];
-    workspaceId: string;
-  }): Promise<MemoryRecallResult> {
-    let latestResult: MemoryRecallResult | undefined;
-    for (const minScore of scores) {
-      latestResult = await apiPost<MemoryRecallResult>(
-        `/api/workspaces/${encodeURIComponent(nextWorkspaceId)}/memory/recall`,
-        { limit: MEMORY_SEARCH_UI_LIMIT, minScore, query: nextQuery }
-      );
-      if (latestResult.results.length) return latestResult;
-    }
-    if (latestResult) return latestResult;
-    throw new Error("Memory search requires at least one score.");
   }
 
   function selectHit(hit: MemoryRecallHit): void {
@@ -195,6 +214,7 @@ export function useMemorySearch({
     query,
     result,
     runDeepRetry,
+    runAlternateSearch,
     status,
     runSearch,
     selectHit,
