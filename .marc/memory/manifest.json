@@ -1,7 +1,7 @@
 {
   "schemaVersion": 6,
-  "builtAt": "2026-10-08T22:42:32.235Z",
-  "generation": "20261008224231840_e2d1a7be",
+  "builtAt": "2026-10-09T03:50:17.289Z",
+  "generation": "20261009035016639_519516a3",
   "embeddingProvider": {
     "id": "transformers-js-local-e5",
     "name": "Transformers.js local multilingual E5 retrieval",
@@ -82,6 +82,26 @@
         "bug-workspace-audit-ignora-referencias-marc-em-inline-code-72461180:source:o-que-foi-tratado:passage:001",
         "bug-workspace-audit-ignora-referencias-marc-em-inline-code-72461180:source:validacao:passage:001",
         "bug-workspace-audit-ignora-referencias-marc-em-inline-code-72461180:source:observacoes:passage:001"
+      ]
+    },
+    {
+      "threadId": "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81",
+      "title": "Documentar o fluxo de desenvolvimento em loop e a politica de modelos, reasoning e delegacao",
+      "closedAt": "2026-10-09T03:33:26Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81\\SUMMARY.md",
+      "relativeSummaryPath": "threads/documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81/SUMMARY.md",
+      "reference": "marc://$documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81",
+      "sha256": "f0b7334b50a9188f0853d091a86c27e3254828013b0573f2583b1936916a6be9",
+      "mtimeMs": 1791516851800.9382,
+      "recordIds": [
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81:identity",
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81:source:objetivo-e-aceite:passage:001",
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81:source:fluxo-consolidado:passage:001",
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81:source:fluxo-consolidado:passage:002",
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81:source:perfis-persistentes:passage:001",
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81:source:apresentacao-dos-agentes:passage:001",
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81:source:validacao:passage:001",
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81:source:limites-e-continuidade:passage:001"
       ]
     },
     {

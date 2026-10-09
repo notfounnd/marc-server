@@ -121,7 +121,7 @@
 
 3. **Run the project validation flow before completion**
    - Trigger: before reporting code, tooling, test, build, lint, formatting, or documentation changes as complete.
-   - Do instead: run `pnpm run validate`, `pnpm test`, and `pnpm build`, unless the user explicitly narrows the validation scope.
+   - Do instead: run `pnpm validate`, `pnpm build`, and `pnpm test`, unless the user explicitly narrows the validation scope.
    - Evidence: report which commands were executed and whether each passed.
    - Severity: critical
 
@@ -156,3 +156,49 @@
    - Do instead: keep the guard as an early return.
    - Evidence: avoid introducing Strategy pattern for a simple guard.
    - Severity: warning
+
+### Development Loop
+
+See [Development loop for delegated work](../docs/agent-workflows.md#development-loop-for-delegated-work) for the full procedure and templates.
+
+1. **Prepare complete bounded handoffs**
+   - Trigger: before dispatching a developer.
+   - Do instead: provide an atomic, self-contained brief with necessary context and sources, goal and non-goals, exact authorized paths and exclusions, expected output, acceptance criteria, required validation, dependencies, blocker conditions, and expected report. Resolve open decisions before dispatch.
+   - Evidence: include the complete brief in the task source before the developer starts.
+   - Severity: critical
+
+2. **Confirm model capability and reasoning separately**
+   - Trigger: selecting or confirming a principal or developer configuration before dispatch or implementation.
+   - Do instead: use a high-capability model for the principal with reasoning minimum medium and recommended high, and an economical model that fits the bounded task for the developer with reasoning minimum high and recommended xhigh. Treat names and effort labels as client-dependent examples. Record requested and effective settings separately with the confirmation source. Accept explicit human confirmation when client introspection is unavailable. Accept confirmed high as the developer minimum when xhigh is unavailable. Ask the human before implementation when model selection, role fit, effective reasoning, or an equivalent mapping cannot be established or is below minimum. Reconfiguring the principal may require human action.
+   - Evidence: record the selected model, role fit, requested and effective reasoning when established, confirmation source, and relevant client limits. Do not invent configuration fields, silently lower effort, or use vendor-specific scripts to configure the principal.
+   - Severity: critical
+
+3. **Respect concurrency limits and overrides**
+   - Trigger: planning or dispatching one or more developers.
+   - Do instead: set a default ceiling of two active developers only when no explicit human-confirmed override exists. Treat the ceiling as a maximum, not a target or minimum, and use fewer developers or sequential work when dependencies or scope call for it. Allow a recorded override to set another ceiling within client capacity, whether higher or lower than two. Respect client limits and ask the human before dispatch if an explicit override conflicts with a client limit or leaves the effective ceiling unclear. Do not silently change the agreed ceiling. Preserve this workspace's current sequential one-developer trial until the human changes it. Parallelize only independent tasks with separate write scopes. Count pending approvals as active and do not end an apparently idle developer without checking its state.
+   - Evidence: state the active limit and sequential or parallel mode in the handoff, including the source of any override.
+   - Severity: critical
+
+4. **Require independent bootstrap and explicit authorization**
+   - Trigger: before a delegated developer edits files.
+   - Do instead: have the developer bootstrap the intended workspace independently and return `OK_BOOTSTRAP` with workspace identity, sources, critical rules, model and reasoning configuration with confirmation source, write scope, and existing target status. Verify the acknowledgement and explicitly authorize edits before implementation.
+   - Evidence: retain the verified acknowledgement and explicit authorization in the task record.
+   - Severity: critical
+
+5. **Review iteratively and require evidence**
+   - Trigger: when a developer reports implementation complete or a review finds deficiencies.
+   - Do instead: require changed paths and line references, summary, checks and results, documentation status, and risks or blockers. Independently review the entire thread and accumulated work for acceptance, behavior, architecture, maintainability, rules, validation, and documentation. Return concrete findings to the same developer until requirements are met.
+   - Evidence: record checks actually run and review findings or technical approval. Do not treat absence of critical findings as sufficient.
+   - Severity: critical
+
+6. **Separate technical approval from user acceptance and closure**
+   - Trigger: after technical review or before a completion or closure summary.
+   - Do instead: present the integrated result for human review and address requested changes. Keep the thread open until the human explicitly authorizes closure. Use `workspace_audit` as a structural check with the matching scope rather than as technical review. Use `scope: all` only for a human-requested broad audit or uncertain thread state.
+   - Evidence: state the human's closure authorization and the structural audit scope when closure is authorized.
+   - Severity: critical
+
+7. **Reuse persistent role profiles for runtime subagents**
+   - Trigger: before administering the workspace agent catalog or delegating Codex subagent work.
+   - Do instead: keep this workspace's persistent profiles limited to `codex-software-architect`, `codex-dev`, and `ui-user`. Only the principal administers the catalog. All Codex developer subagents reuse `codex-dev`. Spawned runtime workers are ephemeral and do not receive task-specific profiles or IDs. The principal records delegated outcomes in mARC as `codex-software-architect` and attributes execution to `codex-dev` in task evidence. Keep model selection and reasoning effort separate. Record task-specific variations and confirmation source in the handoff or evidence rather than creating profiles. This local rule does not constrain other mARC users' model or tool choices or change the managed product contract.
+   - Evidence: identify `codex-dev` in the handoff, record requested/effective model and reasoning plus confirmation source when established, and attribute delegated work in the principal's mARC delivery record without creating task-specific profiles.
+   - Severity: critical

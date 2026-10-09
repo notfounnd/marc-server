@@ -197,6 +197,18 @@ Priority: high
 - [ ] Mock a busy shared maintenance operation; verify conflicting actions remain unavailable or surface the busy response without queuing a duplicate operation.
 - [ ] Verify preparation/purge errors clear progress states and show localized error feedback rather than leaving actions indefinitely disabled.
 
+## Agent Profile Line Breaks
+
+Source thread: marc://$documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81
+Priority: medium
+
+- [ ] Open each registered agent and verify ID, Role, Model, and Description appear on separate lines without requiring Markdown hard-break spaces in the profile source.
+- [ ] Verify long descriptions wrap within the content area on desktop and narrow viewports without horizontal overflow.
+- [ ] Verify paragraph line breaks are preserved in agent profiles while headings, lists, inline code, and links remain usable.
+- [ ] Open thread messages, artifacts, and workspace rules containing soft line breaks and verify they retain the default Markdown rendering rather than inheriting the agent-only behavior.
+
+Coverage remains pending as durable browser tests. Implementation validation and human closure authorization are recorded in the source thread and are not substitutes for these E2E scenarios.
+
 ## Maintenance Notes
 
 - This backlog should grow as UI features are added.

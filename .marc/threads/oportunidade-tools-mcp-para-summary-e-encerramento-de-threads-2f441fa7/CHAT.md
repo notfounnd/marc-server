@@ -25,3 +25,51 @@ Decisao historica de fechamento a preservar: marc://$oportunidade-encerramento-d
 Apenas registro da oportunidade. Nenhuma implementacao iniciada; aguarda planejamento futuro.
 
 <!-- /marc-message -->
+
+<!-- marc-message
+id: msg_48b7e8af07234cd98c
+threadId: oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7
+timestamp: 2026-10-09T03:45:23.989Z
+agentId: ui-user
+role: user
+-->
+
+Eu reparei que cada summary tem sido criado com uma formatação distinta. Alguns blocos, por exemplo, como cabeçalhos do summary, deverão ser padronizados, para manter consistência no formato dos documentos.
+
+<!-- /marc-message -->
+
+<!-- marc-message
+id: msg_87561bbe7d35453bb5
+threadId: oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7
+timestamp: 2026-10-09T03:46:33.106Z
+agentId: ui-user
+role: user
+-->
+
+Talvez uma reformatação dos headers das summaries de threads já encerradas seja desejado aplicar.
+
+<!-- /marc-message -->
+
+<!-- marc-message
+id: msg_25554e843020416cbf
+threadId: oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7
+timestamp: 2026-10-09T03:47:10.427Z
+agentId: ui-user
+role: user
+-->
+
+Use a fase de planejamento para debater um formato de cabeçalho das threads.
+
+<!-- /marc-message -->
+
+<!-- marc-message
+id: msg_6827805437f147449c
+threadId: oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7
+timestamp: 2026-10-09T03:48:49.656Z
+agentId: ui-user
+role: user
+-->
+
+Complementando, ter um formato não significa que o conteúdo descritivo da summary deve ser rígido. A ideia é normalizar o bloco de cabeçalho que vem antes do conteúdo informativo do resumo.
+
+<!-- /marc-message -->

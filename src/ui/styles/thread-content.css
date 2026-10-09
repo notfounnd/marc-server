@@ -377,6 +377,10 @@
   background: transparent;
 }
 
+.markdown-panel-preserve-line-breaks p {
+  white-space: pre-line;
+}
+
 .markdown-panel > :first-child {
   margin-top: 0;
 }

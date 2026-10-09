@@ -81,6 +81,7 @@ export function AppContent({
         ) : selectedAgent ? (
           <MarkdownPanel
             markdown={selectedAgent.markdown}
+            preserveLineBreaks
             onLink={onOpenLink}
           />
         ) : selectedWorkspace ? (

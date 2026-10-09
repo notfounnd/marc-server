@@ -14,10 +14,12 @@ import type { MarkdownLinkHandler } from "./types.js";
 export function MarkdownPanel({
   markdown,
   compact = false,
+  preserveLineBreaks = false,
   onLink
 }: {
   markdown: string;
   compact?: boolean;
+  preserveLineBreaks?: boolean;
   onLink?: MarkdownLinkHandler;
 }) {
   const linkedMarkdown = useMemo(
@@ -30,7 +32,8 @@ export function MarkdownPanel({
     <Panel
       className={classNames(
         "markdown-panel",
-        compact && "markdown-panel-compact"
+        compact && "markdown-panel-compact",
+        preserveLineBreaks && "markdown-panel-preserve-line-breaks"
       )}
     >
       <ReactMarkdown

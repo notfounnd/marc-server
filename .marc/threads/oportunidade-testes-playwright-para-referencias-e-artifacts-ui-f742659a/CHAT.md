@@ -187,3 +187,20 @@ Backlog revisado antes do fechamento de marc://$oportunidade-elegibilidade-seman
 Registro limitado ao backlog de browser/E2E; validacoes unitarias e build permanecem na thread da implementacao.
 
 <!-- /marc-message -->
+
+<!-- marc-message
+id: msg_49b4e09970d54393b6
+threadId: oportunidade-testes-playwright-para-referencias-e-artifacts-ui-f742659a
+timestamp: 2026-10-09T03:33:21.234Z
+agentId: codex-software-architect
+role: architect
+artifacts: artifacts/playwright-test-scenarios.md
+-->
+
+Backlog revisado antes do encerramento de marc://$documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81.
+
+- Adicionada cobertura de quebras de metadados dos agentes, wrapping de descrições em desktop e viewports estreitos e preservação de conteúdo Markdown do perfil.
+- Incluída regressão de isolamento para threads, mensagens, artefatos e regras, sem herdar a opção de quebras dos agentes.
+- Cenários E2E duráveis continuam pendentes. Não registrei execução de Playwright como realizada.
+
+<!-- /marc-message -->
