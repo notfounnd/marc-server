@@ -47,7 +47,7 @@ Source thread: `oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd`
 Priority: high
 
 - [ ] Post a short UI message and verify `role=user` messages expose the attach artifact action.
-- [ ] Open the attach artifact modal and verify desktop layout is centered in the content area.
+- [ ] Open the attach artifact sheet and verify desktop layout is aligned to the right side of the content area.
 - [ ] Open the attach artifact modal on a narrow viewport and verify responsive layout does not overflow.
 - [ ] Save an artifact without an extension and verify `.md` is appended.
 - [ ] Save an artifact with an arbitrary extension and verify `.md` is appended, for example `notes.txt` becomes `notes.txt.md`.
@@ -76,16 +76,33 @@ Priority: high
 - [ ] Verify cross-thread autocomplete does not change the selected thread while suggesting remote messages or artifacts.
 - [ ] Press `Escape` while suggestions are open and verify the suggestion list closes.
 
-## Keyboard Shortcuts Modal
+## Keyboard Shortcuts Sheet
 
-Source thread: `oportunidade-autocomplete-de-referencias-no-composer-2341bc9f`  
+Source threads: `oportunidade-autocomplete-de-referencias-no-composer-2341bc9f`, `oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1`  
 Priority: medium
 
 - [ ] Verify the content column footer shows an icon-only keyboard shortcuts link on workspace, agent, rules/workspace overview, and thread views.
-- [ ] Click the keyboard shortcuts link and verify the modal opens centered in the full viewport.
-- [ ] Verify the modal title includes the keyboard icon and `Keyboard shortcuts` text.
-- [ ] Verify the modal does not show composer-specific eyebrow or explanatory text.
-- [ ] Press `Escape` and verify the keyboard shortcuts modal closes.
+- [ ] Activate the keyboard shortcuts link by click or `Enter` and verify a right-side sheet opens using the same content-column geometry as artifact and workspace settings sheets.
+- [ ] Verify the sheet title includes the keyboard icon and `Keyboard shortcuts` text, with an accessible title and hidden `Available keyboard shortcuts.` description.
+- [ ] Verify the sheet has no composer-specific eyebrow and preserves all four shortcut keys and descriptions.
+- [ ] Open the sheet, verify initial focus is inside it, and use `Tab` and `Shift+Tab` to confirm focus stays contained.
+- [ ] Close the sheet separately using Close, `Escape`, and a backdrop click; verify focus returns to the footer link, no hidden sheet or background lock remains, and reopening works.
+- [ ] At 1440×900, 390×844, and 320×240, verify the title and Close do not overlap, no horizontal overflow occurs, narrow shortcut rows stack, and the internal list scrolls when needed.
+
+Validation note: ad hoc Playwright CLI checks covered these behaviors during the source thread, including nine final viewport/close-path cases. Durable E2E test files have not been added; scenarios remain pending.
+
+## Shared Sheet Header
+
+Source thread: `oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1`  
+Priority: medium
+
+- [ ] Open keyboard shortcuts, artifact creation, artifact viewing, and workspace settings; verify each has one accessible title/description and one translated Close control, preserving its existing text and icons.
+- [ ] At desktop, narrow, and low-height viewports, verify all four headers leave Close usable without overlap, the document and panel have no horizontal overflow, and each body remains scrollable.
+- [ ] Exercise artifact filename/content input, Cancel, save, and viewer reopening with intercepted API fixtures; verify the shared header does not alter the form flow or viewer content.
+- [ ] Open workspace settings with synthetic memory status and verify the Search/Memory controls remain usable and callbacks still reach their existing actions.
+- [ ] Close and reopen each sheet through its existing controls, `Escape`, and backdrop; verify the header refactor preserves each consumer's focus handling and animation lifecycle.
+
+Validation note: final ad hoc Playwright CLI fixtures covered all four sheets at 1440×900, 390×844, and 320×240. Durable automated coverage remains pending; the refactor preserved the existing autofocus behavior of settings and artifact sheets.
 
 ## UI Localization
 
@@ -111,9 +128,9 @@ Priority: high
 - [ ] Open a long thread and verify only the third column content scrolls while the workspace and middle columns keep their own scroll positions.
 - [ ] Verify the third-column header scrolls with the content while the footer remains fixed.
 - [ ] Verify `Developed by Júnior Sbrissa` appears immediately to the left of the keyboard shortcuts button.
-- [ ] Open the centered keyboard shortcuts modal and verify wheel or touch input on the backdrop does not scroll the app behind it.
+- [ ] Open the right-side keyboard shortcuts sheet and verify wheel or touch input on the backdrop does not scroll the app behind it.
 - [ ] Open the right-side artifact modal and verify wheel or touch input on the backdrop does not scroll the app behind it.
-- [ ] Verify the centered keyboard shortcuts modal remains centered and right-side artifact modals remain aligned to the content column.
+- [ ] Verify keyboard shortcuts, artifact, and workspace settings sheets remain aligned to the content column across Threads, Marckers, archive, workspace, and agent views.
 
 ## Neo-Brutalism UI Migration
 
@@ -124,7 +141,7 @@ Priority: medium
 - [ ] Select a workspace and a thread, hover each selected card, and verify the teal left inset remains visible while the black hover shadow is removed.
 - [ ] Open a thread containing rendered Markdown and verify headings, lists, inline code, fenced code, links, bold text, and italic text remain visually distinguishable.
 - [ ] Open the artifact menu and autocomplete suggestions, move the active selection, and verify the selected row keeps the teal left indicator without rounded badges or rounded menu items.
-- [ ] Open the keyboard shortcuts dialog and an artifact sheet, and verify both use consistent close controls, borders, shadows, focus indication, and close animations.
+- [ ] Open the keyboard shortcuts sheet and an artifact sheet, and verify both use consistent close controls, borders, shadows, focus indication, and close animations.
 - [ ] Copy a thread reference by clicking its displayed reference text and verify the value is copied without rendering that reference as a button-like control.
 
 ## Workspace Memory Indicator

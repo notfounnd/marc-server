@@ -1,16 +1,9 @@
 import { type AnimationEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Database, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle
-} from "@/components/ui/sheet";
+import { Database } from "lucide-react";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { WorkspaceSettingsPanel } from "./workspace-settings-panel.js";
+import { ModalSheetHeader } from "./modal-sheet-header.js";
 import type { MemoryIndexHealth, Workspace } from "./types.js";
 
 export function WorkspaceSettingsModal({
@@ -46,23 +39,16 @@ export function WorkspaceSettingsModal({
         onOpenAutoFocus={(event) => event.preventDefault()}
         onAnimationEnd={handleAnimationEnd}
       >
-        <SheetHeader className="modal-head">
-          <div className="eyebrow">
-            <Database size={14} />
-            {t("Workspace settings")}
-          </div>
-          <SheetTitle>{workspace.name}</SheetTitle>
-          <SheetDescription>{workspace.rootPath}</SheetDescription>
-        </SheetHeader>
-        <SheetClose asChild>
-          <Button
-            className="button-icon modal-sheet-close"
-            title={t("Close")}
-            aria-label={t("Close")}
-          >
-            <X size={15} />
-          </Button>
-        </SheetClose>
+        <ModalSheetHeader
+          eyebrow={
+            <>
+              <Database size={14} />
+              {t("Workspace settings")}
+            </>
+          }
+          title={workspace.name}
+          description={workspace.rootPath}
+        />
         <div className="workspace-settings-body">
           <WorkspaceSettingsPanel
             health={health}

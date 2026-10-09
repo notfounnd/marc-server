@@ -58,6 +58,7 @@ test("keeps i18n usage scoped to the web UI", () => {
     path.join("src", "ui", "content-header-actions.tsx"),
     path.join("src", "ui", "i18n.ts"),
     path.join("src", "ui", "main.tsx"),
+    path.join("src", "ui", "modal-sheet-header.tsx"),
     path.join("src", "ui", "modals.tsx"),
     path.join("src", "ui", "thread-view.tsx"),
     path.join("src", "ui", "use-workspace-memory-actions.ts"),

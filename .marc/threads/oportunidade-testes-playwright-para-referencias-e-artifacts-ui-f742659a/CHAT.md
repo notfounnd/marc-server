@@ -204,3 +204,19 @@ Backlog revisado antes do encerramento de marc://$documentar-o-fluxo-de-desenvol
 - Cenários E2E duráveis continuam pendentes. Não registrei execução de Playwright como realizada.
 
 <!-- /marc-message -->
+
+<!-- marc-message
+id: msg_601069783c24469295
+threadId: oportunidade-testes-playwright-para-referencias-e-artifacts-ui-f742659a
+timestamp: 2026-10-09T13:04:37.998Z
+agentId: codex-software-architect
+artifacts: artifacts/playwright-test-scenarios.md
+-->
+
+Backlog revisado antes do encerramento autorizado de marc://$oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1.
+
+Atualizei os cenários de atalhos para Sheet lateral: acionamento, foco contido/retorno, Close/Escape/backdrop, reabertura, bloqueio do fundo e viewports estreitos/baixos. Acrescentei cobertura do header compartilhado nos quatro sheets e alinhei as expectativas de geometria existentes.
+
+As verificações ad hoc por Playwright CLI estão registradas como evidência; os cenários continuam pendentes de cobertura E2E durável. Este registro trata somente de backlog de navegador.
+
+<!-- /marc-message -->

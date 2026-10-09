@@ -1,7 +1,7 @@
 {
   "schemaVersion": 6,
-  "builtAt": "2026-10-09T05:13:04.680Z",
-  "generation": "20261009051304242_ef0d4103",
+  "builtAt": "2026-10-09T13:06:51.621Z",
+  "generation": "20261009130651043_c050a8d0",
   "embeddingProvider": {
     "id": "transformers-js-local-e5",
     "name": "Transformers.js local multilingual E5 retrieval",
@@ -91,8 +91,8 @@
       "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684\\SUMMARY.md",
       "relativeSummaryPath": "threads/correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684/SUMMARY.md",
       "reference": "marc://$correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684",
-      "sha256": "f294af105530906f7239b72eb7f857508aa2fc8150515a660aa64807b88bf027",
-      "mtimeMs": 1791522108489.11,
+      "sha256": "3f1b1224ae8ce3a67740e09b17aee1d7d387f8c3658088de533c47253892ea3c",
+      "mtimeMs": 1791523108140.3096,
       "recordIds": [
         "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684:identity",
         "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684:source:objetivo-e-aceite:passage:001",
@@ -110,8 +110,8 @@
       "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81\\SUMMARY.md",
       "relativeSummaryPath": "threads/documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81/SUMMARY.md",
       "reference": "marc://$documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81",
-      "sha256": "ee2ac90305647f2ea9e8cb334639b4cde12f4582375e8a7f3cfd3fe23003c802",
-      "mtimeMs": 1791522541378.037,
+      "sha256": "4d7826573aae6eddd49d744a45a87e40bf411ace529ab948c0eabfe851896a39",
+      "mtimeMs": 1791523108144.8882,
       "recordIds": [
         "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81:identity",
         "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81:source:objetivo-e-aceite:passage:001",
@@ -121,6 +121,24 @@
         "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81:source:apresentacao-dos-agentes:passage:001",
         "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81:source:validacao:passage:001",
         "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81:source:limites-e-continuidade:passage:001"
+      ]
+    },
+    {
+      "threadId": "oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1",
+      "title": "Oportunidade - Atalhos de teclado em sheet lateral",
+      "closedAt": "2026-10-09T13:05:00Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1/SUMMARY.md",
+      "reference": "marc://$oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1",
+      "sha256": "15c27856c52cca5fef8c1aae37b2e1ad6d7aa5ca34c5143cdce8f4df136e7719",
+      "mtimeMs": 1791551152539.2393,
+      "recordIds": [
+        "oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1:identity",
+        "oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1:source:objetivo-e-encerramento:passage:001",
+        "oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1:source:entrega-e-decisoes:passage:001",
+        "oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1:source:execucao-e-revisao-final:passage:001",
+        "oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1:source:validacao:passage:001",
+        "oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1:source:limites-e-continuidade:passage:001"
       ]
     },
     {
@@ -264,8 +282,8 @@
       "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba\\SUMMARY.md",
       "relativeSummaryPath": "threads/oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba/SUMMARY.md",
       "reference": "marc://$oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba",
-      "sha256": "31f0c2380d8afcc78cfc63675d0b464dd3c743ab5f465543c6d12756a6da1b60",
-      "mtimeMs": 1791522561215.3171,
+      "sha256": "80867014d294e854164bdbd5b89ec153010a291d715598bb3b035da8dbba8975",
+      "mtimeMs": 1791523108148.888,
       "recordIds": [
         "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba:identity",
         "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba:source:resultado:passage:001",

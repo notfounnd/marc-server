@@ -57,3 +57,10 @@
     max-width: none;
   }
 }
+
+@media (max-width: 480px) {
+  .artifact-sheet .shortcut-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+}

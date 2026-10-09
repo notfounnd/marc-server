@@ -22,11 +22,6 @@
   box-shadow: var(--shadow);
 }
 
-.modal-panel-global {
-  width: min(860px, calc(100vw - 64px));
-  max-width: min(860px, calc(100vw - 64px));
-}
-
 .modal-head {
   display: flex;
   align-items: flex-start;
@@ -37,6 +32,7 @@
 .modal-head-shortcuts {
   flex-direction: row;
   align-items: center;
+  padding-right: 48px;
 }
 
 .modal-sheet-close {
@@ -111,6 +107,14 @@
   flex: 1 1 auto;
   min-height: 0;
   overflow: auto;
+}
+
+.artifact-sheet .shortcut-list {
+  align-content: start;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
 }
 
 .workspace-settings-body {

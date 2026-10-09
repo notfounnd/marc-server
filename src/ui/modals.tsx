@@ -1,40 +1,23 @@
-import { type AnimationEvent, useState } from "react";
+import { type AnimationEvent, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Keyboard, Paperclip, X } from "lucide-react";
+import { Keyboard, Paperclip } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Sheet,
   SheetClose,
   SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle
+  SheetFooter
 } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { MarkdownPanel } from "./markdown-panel.js";
+import { ModalSheetHeader } from "./modal-sheet-header.js";
 import type {
   ArtifactDraft,
   ArtifactView,
   MarkdownLinkHandler
 } from "./types.js";
-
-function closeWhenHidden(onClose: () => void) {
-  return (open: boolean) => {
-    if (open) return;
-    onClose();
-  };
-}
 
 function useAnimatedSheetClose(onClose: () => void) {
   const [open, setOpen] = useState(true);
@@ -50,6 +33,8 @@ function useAnimatedSheetClose(onClose: () => void) {
 
 export function KeyboardShortcutsModal({ onClose }: { onClose: () => void }) {
   const { t } = useTranslation();
+  const { open, setOpen, handleAnimationEnd } = useAnimatedSheetClose(onClose);
+  const returnFocusRef = useRef<HTMLElement | null>(null);
   const shortcuts = [
     [
       "Ctrl+Space",
@@ -61,30 +46,35 @@ export function KeyboardShortcutsModal({ onClose }: { onClose: () => void }) {
   ];
 
   return (
-    <Dialog open onOpenChange={closeWhenHidden(onClose)}>
-      <DialogContent
-        className="modal-panel modal-panel-global"
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetContent
+        side="right"
+        className="modal-panel artifact-sheet"
         showCloseButton={false}
-        onOpenAutoFocus={(event) => event.preventDefault()}
+        onOpenAutoFocus={() => {
+          const activeElement = document.activeElement;
+          if (!(activeElement instanceof HTMLElement)) return;
+          if (activeElement === document.body) return;
+          returnFocusRef.current = activeElement;
+        }}
+        onCloseAutoFocus={(event) => {
+          event.preventDefault();
+          returnFocusRef.current?.focus();
+        }}
+        onAnimationEnd={handleAnimationEnd}
       >
-        <DialogHeader className="modal-head modal-head-shortcuts">
-          <DialogTitle className="modal-title-icon">
-            <Keyboard className="modal-title-icon-glyph" size={18} />
-            {t("Keyboard shortcuts")}
-          </DialogTitle>
-          <DialogDescription className="sr-only">
-            {t("Available keyboard shortcuts.")}
-          </DialogDescription>
-          <DialogClose asChild>
-            <Button
-              className="button-icon"
-              title={t("Close")}
-              aria-label={t("Close")}
-            >
-              <X size={15} />
-            </Button>
-          </DialogClose>
-        </DialogHeader>
+        <ModalSheetHeader
+          className="modal-head-shortcuts"
+          titleClassName="modal-title-icon"
+          descriptionClassName="sr-only"
+          title={
+            <>
+              <Keyboard className="modal-title-icon-glyph" size={18} />
+              {t("Keyboard shortcuts")}
+            </>
+          }
+          description={t("Available keyboard shortcuts.")}
+        />
         <dl className="shortcut-list">
           {shortcuts.map(([key, description]) => (
             <div className="shortcut-row" key={key}>
@@ -93,8 +83,8 @@ export function KeyboardShortcutsModal({ onClose }: { onClose: () => void }) {
             </div>
           ))}
         </dl>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 }
 
@@ -123,23 +113,16 @@ export function ArtifactModal({
         onOpenAutoFocus={(event) => event.preventDefault()}
         onAnimationEnd={handleAnimationEnd}
       >
-        <SheetHeader className="modal-head">
-          <div className="eyebrow">
-            <Paperclip size={14} />
-            {t("Markdown artifact")}
-          </div>
-          <SheetTitle>{t("Attach artifact")}</SheetTitle>
-          <SheetDescription>{draft.message.id}</SheetDescription>
-        </SheetHeader>
-        <SheetClose asChild>
-          <Button
-            className="button-icon modal-sheet-close"
-            title={t("Close")}
-            aria-label={t("Close")}
-          >
-            <X size={15} />
-          </Button>
-        </SheetClose>
+        <ModalSheetHeader
+          eyebrow={
+            <>
+              <Paperclip size={14} />
+              {t("Markdown artifact")}
+            </>
+          }
+          title={t("Attach artifact")}
+          description={draft.message.id}
+        />
 
         <Label className="modal-field">
           {t("File name")}
@@ -204,27 +187,20 @@ export function ArtifactViewerModal({
         onOpenAutoFocus={(event) => event.preventDefault()}
         onAnimationEnd={handleAnimationEnd}
       >
-        <SheetHeader className="modal-head">
-          <div className="eyebrow">
-            <Paperclip size={14} />
-            {t("Markdown artifact")}
-          </div>
-          <SheetTitle>
-            {artifact.artifact.replace(/^artifacts\//, "")}
-          </SheetTitle>
-          <SheetDescription>
-            {artifact.threadId} / #{artifact.messageId}
-          </SheetDescription>
-        </SheetHeader>
-        <SheetClose asChild>
-          <Button
-            className="button-icon modal-sheet-close"
-            title={t("Close")}
-            aria-label={t("Close")}
-          >
-            <X size={15} />
-          </Button>
-        </SheetClose>
+        <ModalSheetHeader
+          eyebrow={
+            <>
+              <Paperclip size={14} />
+              {t("Markdown artifact")}
+            </>
+          }
+          title={artifact.artifact.replace(/^artifacts\//, "")}
+          description={
+            <>
+              {artifact.threadId} / #{artifact.messageId}
+            </>
+          }
+        />
         <div className="artifact-viewer-body">
           <MarkdownPanel markdown={artifact.content} onLink={onLink} />
         </div>

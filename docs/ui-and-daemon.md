@@ -104,7 +104,7 @@ Keyboard behavior:
 - `Enter` and `Tab` insert the active suggestion.
 - `Escape` closes the suggestion list.
 
-The content column footer exposes a keyboard icon link that opens the global keyboard shortcuts modal.
+The content column footer exposes a keyboard icon link that opens the global keyboard shortcuts sheet.
 
 ## Artifacts
 
@@ -112,7 +112,7 @@ Artifacts are Markdown files attached to messages. The UI can open them in a mod
 
 Artifact filenames are normalized to Markdown. If a user enters a name that does not end in `.md`, mARC appends `.md`.
 
-Keyboard shortcuts open in a centered dialog. Artifact creation and artifact viewing open in a right-side sheet. Both overlay forms close from their close control, `Escape`, or a backdrop click, and block interaction and background scrolling while open.
+Keyboard shortcuts, artifact creation, and artifact viewing open in right-side sheets. Each sheet closes from its close control, `Escape`, or a backdrop click, and blocks interaction and background scrolling while open.
 
 ## Live updates
 
