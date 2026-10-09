@@ -2,9 +2,9 @@
 
 ## Situação e limite desta etapa
 
-Plano registrado a pedido do usuário. Esta etapa autoriza somente criar a thread e anexar o planejamento. Não autoriza implementar as alterações, delegar trabalho, modificar contratos em uso ou interferir na sessão de desenvolvimento que permanece ativa.
+O plano foi inicialmente registrado a pedido do usuário sem autorização de implementação. Posteriormente, o usuário autorizou executar a thread 004a9983 e confirmou que os caminhos estão livres. A execução agora segue o plano e o registro consolidado, sem interferir em outras atividades.
 
-A execução deverá começar apenas após nova autorização humana e verificação de que os arquivos do contrato não estão sendo editados por outra atividade.
+A autorização humana e a disponibilidade dos arquivos foram confirmadas antes de iniciar a execução. O histórico dessa verificação e do handoff está no artefato consolidado de execução e revisão.
 
 A correção da revisão final deve ocorrer nas regras, no procedimento documentado e nas instruções de entrada do harness. Não criar bloqueio por mensagem, aprovação dentro da thread, estado adicional no produto ou requisito de publicação para habilitar a revisão. A thread registra resultados relevantes; não executa nem controla essa etapa.
 
@@ -51,7 +51,7 @@ O principal deve avaliar e aprovar o resultado integrado por iniciativa própria
 
 RULES estabelece a obrigação, docs descrevem sua execução e AGENTS.md a reforça como instrução direta para o harness. A conclusão depende da avaliação efetiva do principal, não de uma mensagem, de um campo preenchido ou da existência de um artefato.
 
-## Escopo autorizado para uma execução futura
+## Escopo autorizado
 
 Uma tarefa documental atômica e integrada nos três arquivos de contrato:
 
@@ -296,7 +296,7 @@ Textos normativos dos três arquivos devem permanecer em en-US. Plano, comentár
 
 Não implementar classificação automática de mensagens, filtros por palavras ou bloqueios em ferramentas do produto. Os exemplos são critérios de revisão do contrato e do comportamento do agente.
 
-## Sequência de desenvolvimento futura
+## Sequência de desenvolvimento
 
 1. Revalidar autorização humana e ausência de conflito com a sessão ativa.
 2. Reler os três arquivos e o plano, identificando alterações concorrentes desde o planejamento.
@@ -311,7 +311,7 @@ Não implementar classificação automática de mensagens, filtros por palavras 
 11. Verificar que a aprovação corresponde ao estado efetivamente entregue e publicar a entrega relevante, com artefatos vinculados.
 12. Aguardar avaliação humana, tratar críticas e manter o fechamento dependente de autorização explícita.
 
-Uma única atividade delegada é suficiente: os arquivos compartilham o mesmo contrato e devem ser revisados juntos. Não iniciar delegação na etapa atual de registro.
+Uma única atividade delegada é suficiente: os arquivos compartilham o mesmo contrato e devem ser revisados juntos. Nesta execução, a delegação ocorreu somente após autorização humana, bootstrap independente e autorização explícita do principal.
 
 ## Validação e critérios de aceite
 
@@ -342,7 +342,7 @@ Uma única atividade delegada é suficiente: os arquivos compartilham o mesmo co
 
 ### Validação do projeto
 
-Após futuras alterações dos documentos técnicos, executar nesta ordem:
+Para validar esta alteração dos documentos técnicos, executar nesta ordem:
 
 1. `pnpm validate`.
 2. `pnpm build`.
@@ -376,14 +376,14 @@ Esta adequação orienta comportamento por contrato. Não garante obediência de
 - [x] Problema observado e fontes atuais analisadas.
 - [x] Histórico relevante consultado no mARC.
 - [x] Proposta detalhada estruturada.
-- [ ] Implementação autorizada pelo usuário.
-- [ ] Handoff e evidência de execução preparados.
-- [ ] Alterações dos três documentos desenvolvidas.
-- [ ] Responsabilidades dos perfis existentes alinhadas pelo principal, sem novos cadastros ou alteração de configuração.
-- [ ] Revisão integrada e validações concluídas.
-- [ ] Aprovação final do principal registrada para todo o desenvolvimento e para o estado efetivamente entregue.
-- [ ] Validação comportamental realizada ou limitações registradas.
-- [ ] Entrega avaliada pelo usuário.
-- [ ] Encerramento explicitamente autorizado.
+- [x] Implementação autorizada pelo usuário.
+- [x] Handoff e evidência de execução preparados.
+- [x] Alterações dos três documentos desenvolvidas.
+- [x] Responsabilidades dos perfis existentes alinhadas pelo principal, sem novos cadastros ou alteração de configuração.
+- [x] Revisão integrada e validações concluídas.
+- [x] Aprovação final do principal registrada para todo o desenvolvimento e para o estado efetivamente entregue.
+- [x] Validação comportamental realizada ou limitações registradas; observações desta execução e limite de sessão nova explicitados no artefato de revisão.
+- [x] Entrega avaliada pelo usuário, após confirmação do escopo documental.
+- [x] Encerramento explicitamente autorizado.
 
-A thread deve permanecer aberta. Este plano não autoriza iniciar o desenvolvimento.
+Após registrar este plano, o usuário autorizou executar a thread 004a9983. A execução, correções, validações e revisão final integrada foram concluídas e registradas no artefato consolidado. O usuário confirmou o escopo documental e autorizou o encerramento. A summary consolida o resultado e preserva os limites de validação comportamental, sem novas alterações de implementação.

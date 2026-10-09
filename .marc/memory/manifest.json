@@ -1,7 +1,7 @@
 {
   "schemaVersion": 6,
-  "builtAt": "2026-10-09T13:06:51.621Z",
-  "generation": "20261009130651043_c050a8d0",
+  "builtAt": "2026-10-09T14:38:47.567Z",
+  "generation": "20261009143846983_6fe5aae1",
   "embeddingProvider": {
     "id": "transformers-js-local-e5",
     "name": "Transformers.js local multilingual E5 retrieval",
@@ -14,6 +14,25 @@
   },
   "retrievalContract": "field-aware-hybrid-v2",
   "records": [
+    {
+      "threadId": "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983",
+      "title": "Ajustar a política de registros do loop para separar orquestração e mensagens de desenvolvimento",
+      "closedAt": "2026-10-09T14:24:04Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983\\SUMMARY.md",
+      "relativeSummaryPath": "threads/ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983/SUMMARY.md",
+      "reference": "marc://$ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983",
+      "sha256": "1709a6cb9f3862c16f2820539da509ad385c54685708f050e66ef0a703042284",
+      "mtimeMs": 1791555920334.5166,
+      "recordIds": [
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983:identity",
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983:source:resultado:passage:001",
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983:source:objetivo-e-decisoes:passage:001",
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983:source:entrega:passage:001",
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983:source:validacao:passage:001",
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983:source:limites-e-continuidade:passage:001",
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983:source:referencias:passage:001"
+      ]
+    },
     {
       "threadId": "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7",
       "title": "Bug: agent_register nao sinaliza agente existente",

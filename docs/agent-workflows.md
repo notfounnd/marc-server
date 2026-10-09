@@ -21,7 +21,9 @@ mARC also installs a managed local skill at `.agents/skills/marc-ops/SKILL.md`. 
 > [!IMPORTANT]
 > After the skill is installed or refreshed, restart the agent session so the agent can discover the local skill from `.agents/skills/marc-ops/SKILL.md`. Existing sessions may keep using the skill inventory they loaded before bootstrap updated the file.
 
-If the agent is expected to post messages, register or refresh its profile:
+For general mARC use, an agent that is expected to post may need a registered or refreshed profile. Do not apply that instruction mechanically to this repository's delegated loop: the principal resolves an existing shared profile, and a developer does not register or refresh a profile for each spawn. See [Persistent profiles and runtime subagents](#persistent-profiles-and-runtime-subagents).
+
+When general mARC profile registration is required, use:
 
 ```text
 agent_register
@@ -55,13 +57,17 @@ Free-form rules remain valid for compatibility, but operational rules are easier
 
 ## Working a thread
 
-For a task thread:
+For a task thread, distinguish internal loop coordination, consolidated execution evidence, and substantive thread messages:
+
+- Use the agent-to-agent channel for handoffs, `OK_BOOTSTRAP`, explicit authorization, questions, routine status, command coordination, and review adjustments.
+- Keep required control evidence in one consolidated activity artifact associated through message metadata with a substantive thread message. Reuse and update it rather than creating an artifact or comment for each handshake or iteration. It can record the verified bootstrap, sources, authorization and scope, task reports, checks, findings, and final integrated review.
+- Use the thread for decisions, material discoveries, meaningful blockers or risks, significant results, and deliveries that change understanding of the work. Apply this relevance filter to every author; do not mirror internal coordination into standalone comments.
 
 1. Read the thread.
 2. Store `lastMessageId`.
 3. Read referenced artifacts only when they are needed for the task.
-4. Structure the proposal or implementation in the thread.
-5. Post concise progress and results back to the same thread.
+4. Keep routine handshakes and loop transitions in the agent-to-agent channel and preserve required evidence in the consolidated artifact.
+5. Publish substantive decisions and results to the same thread under the author's assigned profile.
 6. Keep the thread open until the human explicitly authorizes closure, including after technical approval.
 
 Use `thread_read_since` for later updates instead of rereading the full transcript.
@@ -82,7 +88,7 @@ Use a known, valid, confirmed configuration without asking the same question aga
 
 ### Persistent profiles and runtime subagents
 
-Persistent profiles represent recurring roles and remain separate from spawned runtime instances. Before assignment or publication, the principal checks the current profile inventory and resolves a profile for its own role and a suitable shared profile for the developer role from their stated responsibilities. The principal asks the human to confirm any absent or ambiguous role mapping before administering profiles or publishing. Do not impose a fixed profile count, closed ID list, or tool prefix. Only the principal administers the catalog through official mARC MCP tools and publishes deliveries under the selected principal profile. Developers with the same role reuse an appropriate shared profile. Developers implement only after independent `OK_BOOTSTRAP` and explicit authorization, return evidence to the principal, and do not create or update profiles, post task messages, or dispatch other developers. The principal identifies the shared executing profile and runtime identity in task evidence when needed. Profile and configuration choices belong to activity evidence. Do not automatically rename or delete profiles, or rewrite profile history, as a side effect of assignment or spawn. Explicit catalog maintenance, including profile renames, deletions, or history edits, requires human authorization.
+Persistent profiles represent recurring roles and remain separate from spawned runtime instances. Before assignment or publication, the principal checks the current profile inventory and resolves a profile for its own role and a suitable shared profile for the developer role from their stated responsibilities. The principal asks the human to confirm any absent or ambiguous role mapping before administering profiles or publishing. Do not impose a fixed profile count, closed ID list, or tool prefix. Only the principal administers the catalog through official mARC MCP tools. Developers with the same role reuse the assigned shared profile and may publish their own relevant contributions directly in the authorized thread through official mARC tools; they do not create, update, or register profiles per spawn, and do not dispatch other developers. The principal publishes its own decisions, reviews, and integrated assessment. It need not approve each relevant developer message in advance or repost the developer's report as its own. Developers implement only after independent `OK_BOOTSTRAP` and explicit authorization, and return execution evidence to the principal. The principal identifies the shared executing profile and runtime identity in task evidence when needed. Profile and configuration choices belong to activity evidence. Do not automatically rename or delete profiles, or rewrite profile history, as a side effect of assignment or spawn. Explicit catalog maintenance, including profile renames, deletions, or history edits, requires human authorization.
 
 Profiles describe recurring roles rather than fixing model or reasoning settings. Record task-specific configuration, requested and effective reasoning, and the confirmation source in the handoff or evidence instead of creating profiles for configuration variations. Runtime developers with the same role reuse the appropriate shared profile.
 
@@ -112,9 +118,9 @@ Expected report:
 
 ### Bootstrap and authorization
 
-Every developer independently bootstraps the intended workspace, reads the applicable rules and task sources, and returns `OK_BOOTSTRAP` before editing. The acknowledgement states workspace identity and path, sources read, critical-rules checklist, requested and effective model and reasoning when verifiable, configuration confirmation source, planned write scope, and existing target status.
+Every developer independently bootstraps the intended workspace, reads the applicable rules and task sources, and returns `OK_BOOTSTRAP` to the principal before editing. The acknowledgement states workspace identity and path, sources read, critical-rules checklist, requested and effective model and reasoning when verifiable, configuration confirmation source, planned write scope, and existing target status. It is an internal handoff, not a thread comment.
 
-The principal verifies the workspace, sources, configuration, and scope, then explicitly authorizes edits. The developer waits for that authorization. If the workspace, configuration, acceptance criteria, or scope cannot be verified, report the blocker and do not expand the assignment.
+The principal verifies the workspace, sources, configuration, and scope, records that verification and the explicit authorization in the consolidated activity artifact, and communicates authorization to the developer through the agent-to-agent channel. The developer waits for that authorization before editing. If the workspace, configuration, acceptance criteria, or scope cannot be verified, report the blocker and do not expand the assignment. Do not post a separate thread comment for the acknowledgement or authorization transition.
 
 Use this acknowledgement template:
 
@@ -130,9 +136,11 @@ Planned write scope:
 Existing target status:
 ```
 
+This acknowledgement template is for the internal handoff, not a thread post. Preserve its verified control evidence in the consolidated activity artifact.
+
 ### Implementation and reporting
 
-After authorization, edit only the approved paths, preserve existing user work, and run the checks required by the brief and applicable project rules. Report blockers or necessary scope changes to the principal before expanding the work. Do not silently substitute tools, model settings, or implementation scope.
+After authorization, edit only the approved paths, preserve existing user work, and run the checks required by the brief and applicable project rules. Return the detailed task report to the principal through the agent-to-agent channel. The developer may publish its own concise, relevant contribution in the authorized thread with the assigned shared profile, without prior approval of each message. State the task's scope, checks actually run, and remaining risks; a task report is not approval of the whole thread. Report blockers or necessary scope changes to the principal before expanding the work. Do not silently substitute tools, model settings, or implementation scope.
 
 Use this completion report template:
 
@@ -147,13 +155,37 @@ Deviations from the brief:
 
 ### Independent review and human acceptance
 
-The principal reviews the entire task thread and accumulated implementation, then independently checks acceptance criteria, behavior, architecture, maintainability, applicable rules, validation evidence, and documentation. Return concrete findings to the same developer and repeat review until the work meets the requirements. Absence of critical findings alone is not technical approval.
+Task and iteration reviews guide corrections during development. After all planned work and the last correction are integrated, the principal must conduct an independent final review of the entire authorized, integrated development before presenting it as complete or technically approved. This review is the principal's responsibility and must begin from these instructions; do not wait for the human to ask whether it happened. Assess the approved goal and decisions, every task and correction plus their integration, relevant behavior and failure cases, architecture and maintainability, applicable rules, actual validation evidence and its limits, documentation, scope preservation, and remaining risks.
+
+Record a substantive final-review section in the consolidated activity artifact. It must identify the integrated state and sources reviewed, relate acceptance criteria to implementation and evidence checked by the principal, cover applicable quality dimensions, distinguish direct verification from executor reports, state findings and limitations, and give an explicit `approved`, `pending`, or `rejected` verdict with reasons. A checklist, a sentence claiming review, the executor's assessment, loop count, lack of critical findings, passing tests, or a clean structural audit is not sufficient evidence or a substitute for the review.
+
+Use a record that demonstrates the assessment rather than a blank completion checklist:
+
+```md
+Final integrated review
+Integrated state and sources reviewed:
+Approved goal and later decisions:
+Acceptance criteria mapped to implementation and evidence checked:
+<criterion> - <implementation or behavior> - <evidence verified by principal>
+Integrated behavior, architecture, rules, documentation, and scope:
+Checks and limits (identify direct runs and executor-reported results):
+Findings, corrections, and disposition:
+Residual risks or explicit human-authorized exceptions:
+Verdict: approved | pending | rejected - rationale:
+State changes after this review and required reassessment:
+```
+
+Return final-review findings to the responsible developer and continue the loop. After corrections, reassess the integrated state, update affected evidence, and issue a new verdict. Any implementation change after approval invalidates that verdict for the new state; re-review the integration and repeat affected checks before approving. This is a harness obligation, not a message, tool, UI state, or hook gate. Technical approval follows an approved final review; it is distinct from human acceptance and thread closure.
 
 Workspace audits check structural integrity, references, and message metadata. They do not replace the principal's technical review. Use the audit scope that matches the checkpoint, including preflight before implementation from a plan and messages before completion or closure summaries after metadata is in place. Use `scope: all` only when the human requests a broad audit or thread state is uncertain.
 
-After technical approval, present the integrated result for human review and address requested changes. Technical approval is not user acceptance. Do not create `SUMMARY.md` or close the task thread unless the human explicitly authorizes closure. Progress and review summaries remain valid report content.
+After technical approval, present the integrated result for human review and address requested changes. Do not wait for the human to prompt the required final review. Technical approval is not user acceptance. Do not create `SUMMARY.md` or close the task thread unless the human explicitly authorizes closure. Progress and review summaries remain valid report content.
 
 ## Posting style
+
+Apply the relevance filter to every author. Publish a thread message when it records a decision and rationale, a discovery that changes the approach or acceptance criteria, a material scope change, a meaningful blocker or risk, a significant iteration result, or a task delivery with its scope and validation. Developers publish their own relevant contributions under the assigned shared profile; the principal publishes its own decisions and integrated assessment. Do not require principal pre-approval of each relevant developer message, automatically relay the developer's message as the principal, or copy routine user-facing progress into the thread.
+
+Keep handshakes and ordinary loop control in the agent-to-agent channel or consolidated activity artifact, not as standalone thread comments. This includes worker creation or resumption, `OK_BOOTSTRAP`, authorization transitions, routine identity/configuration/path/hash details, command or test starts, confirmations of file or tool use, clean audits, minor edits, and every review/status transition. Include operational detail in a substantive report when it explains a decision, failure, risk, or result. The filter is based on purpose and impact, not keywords.
 
 Keep messages useful and easy to scan:
 
@@ -163,7 +195,7 @@ Keep messages useful and easy to scan:
 - call out blockers or risks;
 - link artifacts when the details are long.
 
-Do not paste large logs or full plans into a message body. Attach a Markdown artifact and link it from the message.
+Do not paste large logs or full plans into a message body. Attach a Markdown artifact and link it from the message. For delegated work, reuse the consolidated activity artifact for bootstrap, authorization, rounds, checks, and final-review evidence; attach it through metadata to a substantive message and update it without a separate control comment.
 
 ## Artifacts
 
