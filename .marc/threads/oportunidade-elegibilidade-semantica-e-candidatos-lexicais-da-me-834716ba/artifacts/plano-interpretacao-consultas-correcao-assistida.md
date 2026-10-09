@@ -1,51 +1,51 @@
-# Plano - Interpretacao de consultas com correcao assistida
+# Plano - Interpretação de consultas com correção assistida
 
 ## Objetivo
 
-Adicionar uma etapa de interpretacao antes da recuperacao da memory para corrigir erros provaveis de digitacao sem reduzir a busca a correspondencia literal. A consulta original sempre sera preservada, a consulta efetiva sera explicita e toda decisao ambigua retornara ao texto informado pelo usuario.
+Adicionar uma etapa de interpretação antes da recuperação da memory para corrigir erros prováveis de digitação sem reduzir a busca a correspondência literal. A consulta original sempre será preservada, a consulta efetiva será explícita e toda decisão ambígua retornará ao texto informado pelo usuário.
 
-Esta iteracao complementa a arquitetura de elegibilidade e ranking ja definida na thread. Ela nao cria boosts por palavra exata, listas de stopwords por idioma, regras para termos especificos nem altera o corpus de threads fechadas.
+Esta iteração complementa a arquitetura de elegibilidade e ranking já definida na thread. Ela não cria boosts por palavra exata, listas de stopwords por idioma, regras para termos específicos nem altera o corpus de threads fechadas.
 
-## Decisoes consolidadas
+## Decisões consolidadas
 
-1. Usar `onnx-community/LFM2.5-350M-ONNX`, em Q4, como modelo padrao de interpretacao.
-2. Baixar o modelo em runtime pelo fluxo Prepare models. Nenhum arquivo de modelo sera commitado.
-3. Nao adicionar aviso, consentimento ou ruido de licenca na interface nesta fase.
-4. Manter tres responsabilidades isoladas:
-   - E5 para embeddings e recuperacao;
+1. Usar `onnx-community/LFM2.5-350M-ONNX`, em Q4, como modelo padrão de interpretação.
+2. Baixar o modelo em runtime pelo fluxo Prepare models. Nenhum arquivo de modelo será commitado.
+3. Não adicionar aviso, consentimento ou ruído de licença na interface nesta fase.
+4. Manter três responsabilidades isoladas:
+   - E5 para embeddings e recuperação;
    - mMARCO para reranking;
-   - LFM para interpretacao da consulta.
-5. Tratar o interpretador como provider independente. Ele nao integra o manifesto de embeddings e nao exige mudanca do schema v4 nem rebuild completo da base.
-6. Gerar candidatos de correcao a partir do corpus ativo da propria memory, composto apenas por conteudo de threads fechadas.
+   - LFM para interpretação da consulta.
+5. Tratar o interpretador como provider independente. Ele não integra o manifesto de embeddings e não exige mudança do schema v4 nem rebuild completo da base.
+6. Gerar candidatos de correção a partir do corpus ativo da própria memory, composto apenas por conteúdo de threads fechadas.
 7. Preservar a consulta literal como fallback autoritativo.
 
 ## Fluxo da consulta
 
 1. Receber a consulta original e o modo solicitado.
-2. Em `literal`, pular integralmente a interpretacao.
+2. Em `literal`, pular integralmente a interpretação.
 3. Em `auto`, tokenizar a consulta com suporte Unicode.
-4. Identificar apenas tokens plausivelmente corrigiveis.
-5. Preservar sem alteracao IDs, referencias `marc://`, caminhos, URLs, hashes e identificadores de codigo.
-6. Gerar candidatos usando o vocabulario derivado da geracao ativa da memory.
-7. Calcular proximidade ortografica com Damerau-Levenshtein e sinais do corpus, sem listas fixas por idioma.
-8. Limitar o protocolo a no maximo oito variantes. O indice zero sempre representa a consulta original.
-9. Solicitar ao LFM somente a escolha de um indice permitido.
-10. Validar a saida com guard estrito.
-11. Em formato invalido, realizar um unico loopback corretivo.
-12. Se a segunda resposta continuar invalida, houver erro de worker ou indisponibilidade do modelo, usar a consulta original.
+4. Identificar apenas tokens plausivelmente corrigíveis.
+5. Preservar sem alteração IDs, referências `marc://`, caminhos, URLs, hashes e identificadores de código.
+6. Gerar candidatos usando o vocabulário derivado da geração ativa da memory.
+7. Calcular proximidade ortográfica com Damerau-Levenshtein e sinais do corpus, sem listas fixas por idioma.
+8. Limitar o protocolo a no máximo oito variantes. O índice zero sempre representa a consulta original.
+9. Solicitar ao LFM somente a escolha de um índice permitido.
+10. Validar a saída com guard estrito.
+11. Em formato inválido, realizar um único loopback corretivo.
+12. Se a segunda resposta continuar inválida, houver erro de worker ou indisponibilidade do modelo, usar a consulta original.
 13. Executar E5 e mMARCO sobre a consulta efetiva.
 14. Retornar metadados suficientes para a UI e os clientes explicarem o que ocorreu.
 
-A similaridade lexical participa apenas da geracao de candidatos de correcao. Ela nao qualifica threads, nao altera scores e nao interfere diretamente no ranking final.
+A similaridade lexical participa apenas da geração de candidatos de correção. Ela não qualifica threads, não altera scores e não interfere diretamente no ranking final.
 
-## Contrato publico
+## Contrato público
 
 Adicionar `queryMode` com os valores:
 
-- `auto`, padrao quando omitido;
+- `auto`, padrão quando omitido;
 - `literal`, que exige busca pela consulta original.
 
-A resposta passara a expor um bloco de interpretacao com:
+A resposta passará a expor um bloco de interpretação com:
 
 - `originalQuery`;
 - `effectiveQuery`;
@@ -53,134 +53,134 @@ A resposta passara a expor um bloco de interpretacao com:
 - `mode`;
 - `correctionApplied`.
 
-API, MCP e CLI devem aceitar o modo literal explicitamente. Clientes existentes permanecem compativeis quando o campo for omitido.
+API, MCP e CLI devem aceitar o modo literal explicitamente. Clientes existentes permanecem compatíveis quando o campo for omitido.
 
 ## Runtime e ciclo de vida
 
-1. Adicionar o papel de inferencia `interpretation`.
-2. Executar o LFM em worker proprio, isolado dos workers de embedding e reranking.
+1. Adicionar o papel de inferência `interpretation`.
+2. Executar o LFM em worker próprio, isolado dos workers de embedding e reranking.
 3. Aplicar o mesmo TTL de 30 segundos usado pelos demais modelos.
-4. Liberar a sessao ONNX ao expirar o TTL.
-5. Incorporar o terceiro modelo ao inventario de runtime.
-6. Fazer Prepare models baixar e validar os tres modelos.
+4. Liberar a sessão ONNX ao expirar o TTL.
+5. Incorporar o terceiro modelo ao inventário de runtime.
+6. Fazer Prepare models baixar e validar os três modelos.
 7. Considerar a busca pronta apenas quando embeddings, reranker e interpretador estiverem preparados.
-8. Incluir os arquivos do LFM no purge e na apuracao de espaco liberado.
+8. Incluir os arquivos do LFM no purge e na apuração de espaço liberado.
 9. Manter o cache sob `.marc/cache/memory-models`.
-10. Tratar o modelo principal e seus dados externos como uma unidade de instalacao.
+10. Tratar o modelo principal e seus dados externos como uma unidade de instalação.
 
-A adicao do interpretador nao deve invalidar embeddings existentes. Troca ou ausencia do modelo de interpretacao afeta a disponibilidade da busca em modo automatico, nao o formato da base vetorial.
+A adição do interpretador não deve invalidar embeddings existentes. Troca ou ausência do modelo de interpretação afeta a disponibilidade da busca em modo automático, não o formato da base vetorial.
 
 ## Estado entre buscas e deep retry
 
-1. Toda nova consulta inicia em depth 0 e modo `auto`, salvo escolha literal explicita.
-2. A interpretacao acontece uma vez por consulta.
-3. Deep retries reutilizam a mesma consulta original, consulta efetiva e decisao de correcao.
-4. Deep retry altera apenas a profundidade da recuperacao.
-5. Uma nova consulta limpa depth, correcao sugerida e escolha literal anterior.
-6. O estado persistido na UI tera versao atualizada para impedir restauracao de payload antigo incompatível.
+1. Toda nova consulta inicia em depth 0 e modo `auto`, salvo escolha literal explícita.
+2. A interpretação acontece uma vez por consulta.
+3. Deep retries reutilizam a mesma consulta original, consulta efetiva e decisão de correção.
+4. Deep retry altera apenas a profundidade da recuperação.
+5. Uma nova consulta limpa depth, correção sugerida e escolha literal anterior.
+6. O estado persistido na UI terá versão atualizada para impedir restauração de payload antigo incompatível.
 
 ## Interface
 
-Quando houver correcao aplicada, a coluna de busca exibira:
+Quando houver correção aplicada, a coluna de busca exibirá:
 
 - `Searching for {effectiveQuery}`;
-- uma acao `Search instead for {originalQuery}`.
+- uma ação `Search instead for {originalQuery}`.
 
-A acao refaz a consulta em modo `literal`. Quando nao houver correcao, nenhum aviso adicional sera exibido.
+A ação refaz a consulta em modo `literal`. Quando não houver correção, nenhum aviso adicional será exibido.
 
-O indicador de processamento existente cobre interpretacao, recuperacao e reranking como uma unica operacao. Cards, ordenacao, estados vazios e deep retry permanecem visualmente inalterados.
+O indicador de processamento existente cobre interpretação, recuperação e reranking como uma única operação. Cards, ordenação, estados vazios e deep retry permanecem visualmente inalterados.
 
-Todo texto novo sera adicionado ao arquivo de localizacao en-US, conforme a ADR 0008 e o guard de localizacao do projeto.
+Todo texto novo será adicionado ao arquivo de localização en-US, conforme a ADR 0008 e o guard de localização do projeto.
 
 ## Qualidade e testes
 
-### Interpretacao isolada
+### Interpretação isolada
 
 Cobrir:
 
 - typo simples, incluindo `toogle`;
 - typo com sufixo, incluindo `brutalismp`;
 - erro em frase, incluindo `interace com brutalism`;
-- erro em termo do dominio, incluindo `memria`;
-- palavra valida proxima de outra palavra;
+- erro em termo do domínio, incluindo `memria`;
+- palavra válida próxima de outra palavra;
 - consultas multilíngues;
-- nomes proprios;
+- nomes próprios;
 - IDs e hashes;
-- referencias `marc://`;
+- referências `marc://`;
 - caminhos e URLs;
-- identificadores de codigo;
+- identificadores de código;
 - mais de um erro na mesma consulta;
-- ausencia de candidato seguro;
-- saida invalida do modelo;
-- loopback valido e invalido;
+- ausência de candidato seguro;
+- saída inválida do modelo;
+- loopback válido e inválido;
 - timeout, falha e encerramento do worker;
 - fallback integral para a consulta original.
 
-### Integracao
+### Integração
 
 Cobrir:
 
-- Prepare models, status, inventario e purge com tres modelos;
+- Prepare models, status, inventário e purge com três modelos;
 - TTL e descarregamento independente;
-- busca automatica corrigida;
-- busca literal explicita;
-- omissao retrocompativel de `queryMode`;
+- busca automática corrigida;
+- busca literal explícita;
+- omissão retrocompatível de `queryMode`;
 - API, MCP e CLI;
 - nova consulta depois de deep retry;
-- deep retry sem nova interpretacao;
-- persistencia e migracao do estado da UI;
+- deep retry sem nova interpretação;
+- persistência e migração do estado da UI;
 - mensagens localizadas;
-- habilitacao e desabilitacao coerente dos controles.
+- habilitação e desabilitação coerente dos controles.
 
-### Avaliacao empirica
+### Avaliação empírica
 
-Expandir o harness de qualidade com familias variadas de consultas curtas, compostas, corretas, incorretas e multilíngues. Os termos discutidos na thread entram como regressao, nao como alvo de regras especiais.
+Expandir o harness de qualidade com famílias variadas de consultas curtas, compostas, corretas, incorretas e multilíngues. Os termos discutidos na thread entram como regressão, não como alvo de regras especiais.
 
-A aprovacao exige:
+A aprovação exige:
 
-1. melhorar consultas com typos sem promover correspondencia literal irrelevante;
+1. melhorar consultas com typos sem promover correspondência literal irrelevante;
 2. preservar consultas corretas;
 3. manter resultados contextualmente relevantes;
-4. apresentar comportamento deterministico em falhas do interpretador;
-5. nao introduzir vies para `brutalism`, `toggle` ou qualquer thread especifica.
+4. apresentar comportamento determinístico em falhas do interpretador;
+5. não introduzir viés para `brutalism`, `toggle` ou qualquer thread específica.
 
-## Documentacao
+## Documentação
 
-Atualizar a documentacao da memory para explicar:
+Atualizar a documentação da memory para explicar:
 
-- os tres papeis de modelo;
-- o fluxo de interpretacao;
+- os três papéis de modelo;
+- o fluxo de interpretação;
 - os modos `auto` e `literal`;
 - o fallback;
 - o TTL;
 - cache, Prepare models e purge;
-- a separacao entre correcao da consulta e elegibilidade de resultados.
+- a separação entre correção da consulta e elegibilidade de resultados.
 
-Nao adicionar aviso de licenca na experiencia do usuario nesta entrega.
+Não adicionar aviso de licença na experiência do usuário nesta entrega.
 
 ## Ordem de desenvolvimento
 
-1. Criar testes de contrato e o corpus de regressao.
-2. Implementar vocabulario derivado da geracao ativa e geracao de candidatos.
-3. Implementar provider e worker de interpretacao com guard e loopback.
-4. Integrar lifecycle, Prepare models, status, inventario, purge e TTL.
+1. Criar testes de contrato e o corpus de regressão.
+2. Implementar vocabulário derivado da geração ativa e geração de candidatos.
+3. Implementar provider e worker de interpretação com guard e loopback.
+4. Integrar lifecycle, Prepare models, status, inventário, purge e TTL.
 5. Integrar `queryMode` e metadados na camada de busca.
 6. Propagar o contrato por API, MCP e CLI.
-7. Integrar UI, persistencia e localizacao.
-8. Atualizar documentacao.
-9. Executar testes unitarios, integrados e o harness empirico.
+7. Integrar UI, persistência e localização.
+8. Atualizar documentação.
+9. Executar testes unitários, integrados e o harness empírico.
 10. Validar a interface com Playwright CLI.
-11. Registrar na thread evidencias, resultados e limitacoes observadas.
+11. Registrar na thread evidências, resultados e limitações observadas.
 
-## Limites desta iteracao
+## Limites desta iteração
 
-- Nao alterar o corpus para conteudo fora de threads fechadas.
-- Nao criar dicionarios ou stopwords por idioma.
-- Nao usar match exato como criterio de relevancia.
-- Nao adicionar seletor de modelos nesta entrega.
-- Nao otimizar latencia antes de comprovar qualidade funcional.
-- Nao iniciar rebuild completo apenas pela instalacao do interpretador.
+- Não alterar o corpus para conteúdo fora de threads fechadas.
+- Não criar dicionários ou stopwords por idioma.
+- Não usar match exato como critério de relevância.
+- Não adicionar seletor de modelos nesta entrega.
+- Não otimizar latência antes de comprovar qualidade funcional.
+- Não iniciar rebuild completo apenas pela instalação do interpretador.
 
-## Criterio de conclusao
+## Critério de conclusão
 
-A entrega estara pronta para avaliacao quando consultas com e sem typo produzirem resultados contextualmente coerentes, o usuario puder rejeitar uma correcao, todos os clientes compartilharem o mesmo contrato, os tres modelos tiverem ciclo de vida controlado e a bateria de regressao passar sem regras especificas para os exemplos usados durante a investigacao.
+A entrega estará pronta para avaliação quando consultas com e sem typo produzirem resultados contextualmente coerentes, o usuário puder rejeitar uma correção, todos os clientes compartilharem o mesmo contrato, os três modelos tiverem ciclo de vida controlado e a bateria de regressão passar sem regras específicas para os exemplos usados durante a investigação.

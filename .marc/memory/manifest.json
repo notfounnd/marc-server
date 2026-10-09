@@ -1,7 +1,7 @@
 {
   "schemaVersion": 6,
-  "builtAt": "2026-10-09T03:50:17.289Z",
-  "generation": "20261009035016639_519516a3",
+  "builtAt": "2026-10-09T05:13:04.680Z",
+  "generation": "20261009051304242_ef0d4103",
   "embeddingProvider": {
     "id": "transformers-js-local-e5",
     "name": "Transformers.js local multilingual E5 retrieval",
@@ -85,14 +85,33 @@
       ]
     },
     {
+      "threadId": "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684",
+      "title": "Correção do fluxo de agentes para independência de fornecedores e perfis",
+      "closedAt": "2026-10-09T04:36:05Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684\\SUMMARY.md",
+      "relativeSummaryPath": "threads/correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684/SUMMARY.md",
+      "reference": "marc://$correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684",
+      "sha256": "f294af105530906f7239b72eb7f857508aa2fc8150515a660aa64807b88bf027",
+      "mtimeMs": 1791522108489.11,
+      "recordIds": [
+        "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684:identity",
+        "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684:source:objetivo-e-aceite:passage:001",
+        "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684:source:implementacao:passage:001",
+        "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684:source:implementacao:passage:002",
+        "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684:source:desenvolvimento-e-revisao:passage:001",
+        "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684:source:validacao:passage:001",
+        "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684:source:limites-e-continuidade:passage:001"
+      ]
+    },
+    {
       "threadId": "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81",
-      "title": "Documentar o fluxo de desenvolvimento em loop e a politica de modelos, reasoning e delegacao",
+      "title": "Documentar o fluxo de desenvolvimento em loop e a política de modelos, reasoning e delegação",
       "closedAt": "2026-10-09T03:33:26Z",
       "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81\\SUMMARY.md",
       "relativeSummaryPath": "threads/documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81/SUMMARY.md",
       "reference": "marc://$documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81",
-      "sha256": "f0b7334b50a9188f0853d091a86c27e3254828013b0573f2583b1936916a6be9",
-      "mtimeMs": 1791516851800.9382,
+      "sha256": "ee2ac90305647f2ea9e8cb334639b4cde12f4582375e8a7f3cfd3fe23003c802",
+      "mtimeMs": 1791522541378.037,
       "recordIds": [
         "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81:identity",
         "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81:source:objetivo-e-aceite:passage:001",
@@ -245,8 +264,8 @@
       "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba\\SUMMARY.md",
       "relativeSummaryPath": "threads/oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba/SUMMARY.md",
       "reference": "marc://$oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba",
-      "sha256": "de4942ad9ca1843344003459c1ca40814f430909cb700db431a19769f74deb71",
-      "mtimeMs": 1791499257409.507,
+      "sha256": "31f0c2380d8afcc78cfc63675d0b464dd3c743ab5f465543c6d12756a6da1b60",
+      "mtimeMs": 1791522561215.3171,
       "recordIds": [
         "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba:identity",
         "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba:source:resultado:passage:001",

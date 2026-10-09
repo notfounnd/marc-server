@@ -1,4 +1,4 @@
-# Documentar o fluxo de desenvolvimento em loop e a politica de modelos, reasoning e delegacao
+# Documentar o fluxo de desenvolvimento em loop e a política de modelos, reasoning e delegação
 
 Thread: `documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81`
 Created: `2026-10-09T00:40:55.390Z`
@@ -34,10 +34,10 @@ role: architect
 Bootstrap independente do desenvolvedor conferido e escopo autorizado.
 
 - Desenvolvedor selecionado em gpt-6-luna com reasoning xhigh.
-- Edicoes limitadas ao procedimento, novas Custom Rules e resumo coerente no AGENTS.
-- Area gerenciada e regras preexistentes preservadas. A unica adequacao antiga em RULES e a ordem dos comandos de validacao.
+- Edições limitadas ao procedimento, novas Custom Rules e resumo coerente no AGENTS.
+- Área gerenciada e regras preexistentes preservadas. A única adequação antiga em RULES é a ordem dos comandos de validação.
 
-Execucao sequencial. A aprovacao tecnica incluira revisao independente dos 16 cenarios de operacao.
+Execução sequencial. A aprovação técnica incluirá revisão independente dos 16 cenários de operação.
 
 <!-- /marc-message -->
 
@@ -49,13 +49,13 @@ agentId: codex-dev
 role: architect
 -->
 
-Primeira implementacao revisada pelo principal.
+Primeira implementação revisada pelo principal.
 
-- Links, Markdown e preservacao do trecho gerenciado e das regras legadas passaram.
-- Devolvi ajustes ao desenvolvedor para explicitar o fallback de modelo/capacidade, separar requisitos de recomendacoes e permitir overrides humanos do teto padrao dentro dos limites do cliente.
+- Links, Markdown e preservação do trecho gerenciado e das regras legadas passaram.
+- Devolvi ajustes ao desenvolvedor para explicitar o fallback de modelo/capacidade, separar requisitos de recomendações e permitir overrides humanos do teto padrão dentro dos limites do cliente.
 - O ensaio sequencial atual permanece respeitado.
 
-Ainda sem aceite tecnico. A revisao integrada e a validacao final seguem pendentes.
+Ainda sem aceite técnico. A revisão integrada e a validação final seguem pendentes.
 
 <!-- /marc-message -->
 
@@ -70,14 +70,14 @@ artifacts: artifacts/plano-fluxo-loop-modelos-reasoning-delegacao.md, artifacts/
 
 Entrega aprovada tecnicamente pelo principal.
 
-- Docs descrevem o procedimento completo e Custom Rules registram seis controles obrigatorios. AGENTS permanece como entrada coerente.
-- Modelos e reasoning definidos por papel, com minimos, recomendacoes e confirmacao humana quando necessario.
-- Teto padrao de dois, overrides humanos e limites do cliente. Ensaio sequencial atual preservado.
-- Handoffs completos, bootstrap comprovado, revisao iterativa e aceite humano separados.
+- Docs descrevem o procedimento completo e Custom Rules registram seis controles obrigatórios. AGENTS permanece como entrada coerente.
+- Modelos e reasoning definidos por papel, com mínimos, recomendações e confirmação humana quando necessário.
+- Teto padrão de dois, overrides humanos e limites do cliente. Ensaio sequencial atual preservado.
+- Handoffs completos, bootstrap comprovado, revisão iterativa e aceite humano separados.
 
-Validacao passou na ordem acordada. Foram 198 testes aprovados. Os 16 cenarios do contrato foram revisados e a area gerenciada e as regras legadas foram preservadas.
+Validação passou na ordem acordada. Foram 198 testes aprovados. Os 16 cenários do contrato foram revisados e a área gerenciada e as regras legadas foram preservadas.
 
-Relatorio anexado. A thread fica aberta para sua avaliacao e orientacao de encerramento.
+Relatório anexado. A thread fica aberta para sua avaliação e orientação de encerramento.
 
 <!-- /marc-message -->
 

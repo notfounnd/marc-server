@@ -1,6 +1,6 @@
-# Evidencia da validacao integrada final
+# Evidência da validação integrada final
 
-Dados originais em JSON, preservados em um anexo Markdown compativel com a auditoria do mARC.
+Dados originais em JSON, preservados em um anexo Markdown compatível com a auditoria do mARC.
 
 ```json
 {

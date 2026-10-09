@@ -1,6 +1,6 @@
-# Evidencia dos 56 casos do motor preservado
+# Evidência dos 56 casos do motor preservado
 
-Dados originais em JSON, preservados em um anexo Markdown compativel com a auditoria do mARC. Os criterios e os resultados nao foram alterados.
+Dados originais em JSON, preservados em um anexo Markdown compatível com a auditoria do mARC. Os critérios e os resultados não foram alterados.
 
 ```json
 {

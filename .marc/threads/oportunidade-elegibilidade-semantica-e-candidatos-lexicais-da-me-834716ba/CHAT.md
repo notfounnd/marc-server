@@ -47,7 +47,7 @@ vector candidates + exact lexical candidates -> dedupe -> semantic eligibility -
 
 Plano: marc://$oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba
 
-Início agora a implementação e as validações previstas.
+Inicio agora a implementação e as validações previstas.
 
 <!-- /marc-message -->
 
@@ -144,15 +144,15 @@ role: developer
 artifacts: artifacts/investigacao-estabilidade-ranking-memory.md
 -->
 
-## Investigacao registrada
+## Investigação registrada
 
-A reproducao confirmou que a reordenacao no Deep nao veio de indice desatualizado.
+A reprodução confirmou que a reordenação no Deep não veio de índice desatualizado.
 
 - O retriever vetorial prioriza corretamente Estilo neo-brutalism para a UI.
-- O resumo global duplicado da thread de processamento so entra no Deep.
-- A variante quint8 muda os scores quando o lote muda, portanto nao pode ordenar resultados com confianca.
+- O resumo global duplicado da thread de processamento só entra no Deep.
+- A variante quint8 muda os scores quando o lote muda, portanto não pode ordenar resultados com confiança.
 
-O artefato anexado contem os ranks, os tempos e a matriz de estabilidade que orientam a correcao.
+O artefato anexado contém os ranks, os tempos e a matriz de estabilidade que orientam a correção.
 
 <!-- /marc-message -->
 
@@ -165,11 +165,11 @@ role: developer
 artifacts: artifacts/plano-iteracao-estabilidade-e-passagens.md
 -->
 
-## Proxima iteracao iniciada
+## Próxima iteração iniciada
 
-A proxima iteracao substitui a variante instavel por mMARCO O4, converte o corpus em passagens tokenizadas e consolida o ranking por thread antes do retorno a UI.
+A próxima iteração substitui a variante instável por mMARCO O4, converte o corpus em passagens tokenizadas e consolida o ranking por thread antes do retorno à UI.
 
-O plano anexado define os contratos de estabilidade, qualidade e rebuild full. Inicio agora a implementacao e os testes previstos.
+O plano anexado define os contratos de estabilidade, qualidade e rebuild full. Inicio agora a implementação e os testes previstos.
 
 <!-- /marc-message -->
 
@@ -184,11 +184,11 @@ artifacts: artifacts/plano-correcao-estrutural-busca-memory-schema-v4.md
 
 Plano aprovado registrado antes do desenvolvimento.
 
-- Corrigir a busca com schema v4, recuperacao por identidade e passagens, consolidacao por thread e elegibilidade separada do ranking.
-- Adotar rebuild geracional e purge seguro de modelos e indices nao utilizados.
+- Corrigir a busca com schema v4, recuperação por identidade e passagens, consolidação por thread e elegibilidade separada do ranking.
+- Adotar rebuild geracional e purge seguro de modelos e índices não utilizados.
 - Validar com julgamentos graduados, matriz completa de depths e consultas reais, sem usar tempo como gate.
 
-O desenvolvimento comeca agora. O artifact anexado contem o plano detalhado e os criterios de aceite.
+O desenvolvimento começa agora. O artifact anexado contém o plano detalhado e os critérios de aceite.
 
 <!-- /marc-message -->
 
@@ -203,9 +203,9 @@ artifacts: artifacts/plano-interpretacao-consultas-correcao-assistida.md
 
 Plano detalhado registrado antes do desenvolvimento.
 
-A proposta adiciona interpretacao de consultas com o LFM2.5 350M Q4, preserva a busca literal como fallback e mantem correcao, recuperacao e reranking como responsabilidades independentes.
+A proposta adiciona interpretação de consultas com o LFM2.5 350M Q4, preserva a busca literal como fallback e mantém correção, recuperação e reranking como responsabilidades independentes.
 
-O desenvolvimento ainda nao foi iniciado. Aguardando autorizacao para prosseguir.
+O desenvolvimento ainda não foi iniciado. Aguardando autorização para prosseguir.
 
 <!-- /marc-message -->
 
@@ -286,13 +286,13 @@ artifacts: artifacts/plano-recuperacao-hibrida-orientada-por-campos-lancedb.md
 
 Plano detalhado anexado antes do desenvolvimento.
 
-- Arquitetura aprovada: recuperacao hibrida orientada por campos.
+- Arquitetura aprovada: recuperação híbrida orientada por campos.
 - LanceDB fornecera os canais vetorial e BM25.
-- O mARC manterá consolidacao por thread, reranking e elegibilidade semantica.
-- Match lexical isolado nao podera tornar uma thread elegivel.
-- A implementacao incluira migracao de schema, rebuild geracional seguro e uma bateria de qualidade com casos positivos e negativos.
+- O mARC manterá consolidação por thread, reranking e elegibilidade semântica.
+- Match lexical isolado não poderá tornar uma thread elegível.
+- A implementação incluirá migração de schema, rebuild geracional seguro e uma bateria de qualidade com casos positivos e negativos.
 
-Inicio agora a implementacao orientada pelo artefato anexado.
+Inicio agora a implementação orientada pelo artefato anexado.
 
 <!-- /marc-message -->
 
@@ -375,28 +375,28 @@ role: architect
 artifacts: artifacts/relatorio-conclusao-documentacao-scripts-e-validacao.md
 -->
 
-## Entrega pronta para revisao
+## Entrega pronta para revisão
 
 ### Realizado
 
-- Revisados os documentos do projeto e atualizados cinco arquivos para refletir os contratos atuais de busca, modelos, preparo, rebuild, purge e avaliacao.
-- Removido somente o script legado memory-quality.ts. Os quatro scripts ativos e os comandos publicos foram preservados.
-- Executadas duas atividades sequenciais por subagentes gpt-6-luna com reasoning xhigh. Ambos confirmaram bootstrap antes das edicoes.
-- Revisao do arquiteto devolveu uma referencia residual ao schema 4. O mesmo subagente corrigiu para schema 6 antes da aprovacao.
+- Revisados os documentos do projeto e atualizados cinco arquivos para refletir os contratos atuais de busca, modelos, preparo, rebuild, purge e avaliação.
+- Removido somente o script legado memory-quality.ts. Os quatro scripts ativos e os comandos públicos foram preservados.
+- Executadas duas atividades sequenciais por subagentes gpt-6-luna com reasoning xhigh. Ambos confirmaram bootstrap antes das edições.
+- Revisão do arquiteto devolveu uma referência residual ao schema 4. O mesmo subagente corrigiu para schema 6 antes da aprovação.
 
-### Validacao
+### Validação
 
 - pnpm run validate aprovado.
 - pnpm test aprovado com 185/185 testes.
 - pnpm build aprovado, mantendo o aviso conhecido de bundle acima de 500 kB.
 - Conferidos 33 links locais, sem links quebrados.
-- Comparacao SHA-256 confirmou codigo da busca, testes, configuracoes e manifesto da memoria ativa inalterados.
+- Comparação SHA-256 confirmou código da busca, testes, configurações e manifesto da memória ativa inalterados.
 
-### Proximo passo
+### Próximo passo
 
-Relatorio detalhado anexado pelos metadados desta mensagem. A auditoria sera executada depois deste registro completo.
+Relatório detalhado anexado pelos metadados desta mensagem. A auditoria será executada depois deste registro completo.
 
-Nao e necessario restart ou rebuild para esta rodada. Aguardo seu feedback para orientar a finalizacao. A thread permanece aberta, sem SUMMARY.md.
+Não é necessário restart ou rebuild para esta rodada. Aguardo seu feedback para orientar a finalização. A thread permanece aberta, sem SUMMARY.md.
 
 <!-- /marc-message -->
 
@@ -409,25 +409,25 @@ role: architect
 artifacts: artifacts/revisao-integral-qualidade-e-pendencias.md
 -->
 
-## Revisao integral de qualidade
+## Revisão integral de qualidade
 
-A aprovacao anterior cobriu apenas scripts e documentacao. Ela nao representa aprovacao integral da funcionalidade. O crivo do loop foi ampliado para a entrega acumulada da thread.
+A aprovação anterior cobriu apenas scripts e documentação. Ela não representa aprovação integral da funcionalidade. O crivo do loop foi ampliado para a entrega acumulada da thread.
 
-### Decisao preservada
+### Decisão preservada
 
-Conforme complemento do usuario, manter a versao atual do motor. Esta revisao nao reabre calibragem, modelos ou arquitetura de busca.
+Conforme complemento do usuário, manter a versão atual do motor. Esta revisão não reabre calibragem, modelos ou arquitetura de busca.
 
 ### Achados que impedem o aceite integral
 
-- P1: purge captura a geracao antes do lock e pode remover uma geracao recem-publicada por rebuild concorrente. Reproduzido em memoria, sem apagar a base real.
+- P1: purge captura a geração antes do lock e pode remover uma geração recem-publicada por rebuild concorrente. Reproduzido em memória, sem apagar a base real.
 - P2: a UI pode ocultar Deep depois de obter resultados apenas em depth 0, pois confunde profundidade configurada com executada.
-- P2: o harness retorna sucesso com zero consultas quando um filtro nao encontra casos. Reproduzido com codigo de saida zero e caseCount zero.
+- P2: o harness retorna sucesso com zero consultas quando um filtro não encontra casos. Reproduzido com código de saída zero e caseCount zero.
 
-### Validacao
+### Validação
 
-A bateria completa com modelos reais ficou inconclusiva por timeout da ferramenta, nao por falha de relevancia. O processo residual exclusivo dessa validacao foi identificado e encerrado. Nao houve alteracao do motor nem rebuild.
+A bateria completa com modelos reais ficou inconclusiva por timeout da ferramenta, não por falha de relevância. O processo residual exclusivo dessa validação foi identificado e encerrado. Não houve alteração do motor nem rebuild.
 
-O relatorio anexado detalha fontes, reproducoes, impactos e tres correcoes atomicas. A entrega integral ainda nao esta aprovada. A thread permanece aberta.
+O relatório anexado detalha fontes, reproduções, impactos e três correções atômicas. A entrega integral ainda não está aprovada. A thread permanece aberta.
 
 <!-- /marc-message -->
 
@@ -440,19 +440,19 @@ role: architect
 artifacts: artifacts/plano-loop-correcao-purge-deep-e-harness.md, artifacts/revisao-integral-qualidade-e-pendencias.md
 -->
 
-## Loop de correcao iniciado
+## Loop de correção iniciado
 
-O plano desta iteracao foi registrado pelo MCP antes das edicoes. O relatorio da revisao tambem foi regravado pelo MCP, preservando seu conteudo.
+O plano desta iteração foi registrado pelo MCP antes das edições. O relatório da revisão também foi regravado pelo MCP, preservando seu conteúdo.
 
-### Execucao
+### Execução
 
 - Corrigir snapshot do purge sob lock.
-- Corrigir progressao Deep pela profundidade realmente executada.
-- Impedir aprovacao do harness sem consultas selecionadas.
+- Corrigir progressão Deep pela profundidade realmente executada.
+- Impedir aprovação do harness sem consultas selecionadas.
 
-Desenvolvimento sequencial por subagentes gpt-6-luna com reasoning xhigh. Cada agente confirma bootstrap antes de editar. O arquiteto revisa e devolve ajustes ate o aceite tecnico.
+Desenvolvimento sequencial por subagentes gpt-6-luna com reasoning xhigh. Cada agente confirma bootstrap antes de editar. O arquiteto revisa e devolve ajustes até o aceite técnico.
 
-A versao do motor da busca sera preservada. Nao havera parada entre tarefas para pedir nova autorizacao. A thread permanece aberta para sua revisao depois do meu aceite.
+A versão do motor da busca será preservada. Não havera parada entre tarefas para pedir nova autorização. A thread permanece aberta para sua revisão depois do meu aceite.
 
 <!-- /marc-message -->
 
@@ -466,13 +466,13 @@ role: architect
 
 ## Tarefa 1 aprovada no loop
 
-- Purge le o manifesto dentro de memory-operation.
-- Teste RED reproduziu a intercalacao A antes do lock e B publicado depois.
-- GREEN preserva B; busy nao le manifesto nem remove recursos; ausencia de manifesto preserva comportamento.
-- Revisao independente do arquiteto e 15/15 testes focados aprovados.
-- Alteracoes limitadas a operations.ts e core-memory-maintenance.test.ts.
+- Purge lê o manifesto dentro de memory-operation.
+- Teste RED reproduziu a intercalação A antes do lock e B publicado depois.
+- GREEN preserva B; busy não lê manifesto nem remove recursos; ausência de manifesto preserva comportamento.
+- Revisão independente do arquiteto e 15/15 testes focados aprovados.
+- Alterações limitadas a operations.ts e core-memory-maintenance.test.ts.
 
-Turing concluiu a tarefa. Inicio agora a tarefa da progressao Deep, sem parar o loop.
+Turing concluiu a tarefa. Início agora a tarefa da progressão Deep, sem parar o loop.
 
 <!-- /marc-message -->
 
@@ -516,14 +516,14 @@ agentId: codex-dev
 role: architect
 -->
 
-Tarefa 2 aprovada na revisao do arquiteto.
+Tarefa 2 aprovada na revisão do arquiteto.
 
-- Codigo e estado de cache revisados. Progresso usa o ultimo nivel efetivamente executado, nao o limite configurado.
-- Validacao independente via context-mode: 17 testes focados passaram e build passou.
-- Playwright CLI em desktop e mobile confirmou sucesso em 0 seguido de Deep em 1, restauracao em 2, esgotamento em 3 e reset em 0 para nova busca.
+- Código e estado de cache revisados. Progresso usa o último nível efetivamente executado, não o limite configurado.
+- Validação independente via context-mode: 17 testes focados passaram e build passou.
+- Playwright CLI em desktop e mobile confirmou sucesso em 0 seguido de Deep em 1, restauração em 2, esgotamento em 3 e reset em 0 para nova busca.
 - Nenhum ajuste de ranking, modelos, pesos ou base real.
 
-O loop segue para a tarefa 3. A thread permanece aberta para sua revisao apos o aceite tecnico final.
+O loop segue para a tarefa 3. A thread permanece aberta para sua revisão após o aceite técnico final.
 
 <!-- /marc-message -->
 
@@ -538,12 +538,12 @@ artifacts: artifacts/avaliacao-motor-preservado-56-casos.md
 
 Bateria completa do motor atual registrada no anexo.
 
-- Foram 56 casos, com 14 consultas em quatro profundidades. Todas as 32 execucoes por familia/profundidade terminaram.
-- 28 casos passaram e 28 falharam nos gates existentes. Nao considero memory:quality globalmente aprovado.
-- As falhas restantes sao de recall para toggle/toogle e candidatos adicionais classificados como incidentais pelos fixtures. A familia brutalism e os casos negativos passaram em todos os niveis.
-- Conforme sua orientacao, o motor permanece preservado. Nao vou alterar ranking ou julgamentos para ocultar esses resultados.
+- Foram 56 casos, com 14 consultas em quatro profundidades. Todas as 32 execuções por família/profundidade terminaram.
+- 28 casos passaram e 28 falharam nos gates existentes. Não considero memory:quality globalmente aprovado.
+- As falhas restantes são de recall para toggle/toogle e candidatos adicionais classificados como incidentais pelos fixtures. A família brutalism e os casos negativos passaram em todos os níveis.
+- Conforme sua orientação, o motor permanece preservado. Não vou alterar ranking ou julgamentos para ocultar esses resultados.
 
-O loop de correcao dos defeitos de implementacao continua, separado destas limitacoes conhecidas.
+O loop de correção dos defeitos de implementação continua, separado destas limitações conhecidas.
 
 <!-- /marc-message -->
 
@@ -606,17 +606,17 @@ role: architect
 artifacts: artifacts/revisao-final-e-aceite-tecnico-loop.md, artifacts/validacao-integrada-final-loop.md, artifacts/avaliacao-motor-preservado-56-casos.md, artifacts/evidencia-motor-preservado-56-casos.md
 -->
 
-## Aceite tecnico do loop
+## Aceite técnico do loop
 
-As tres correcoes foram aprovadas apos revisao independente do arquiteto.
+As três correções foram aprovadas após revisão independente do arquiteto.
 
-- Purge protege a geracao lida dentro do lock. Deep usa o ultimo nivel efetivamente executado. Harness rejeita filtros sem casos antes do acesso ao workspace ou modelos.
-- Validate, 198/198 testes e build passaram. Playwright CLI confirmou a progressao e o reset da busca em desktop e mobile.
-- Documentacao revisada, script obsoleto removido e ferramentas ativas preservadas. Registros e evidencias anexados pelo MCP.
-- Motor e manifesto preservados por hashes. A bateria real terminou com 28/56 casos aprovados nos gates existentes; as limitacoes estao documentadas e nao foram mascaradas por recalibragem.
-- Reinicie daemon/MCP e recarregue a UI para carregar as correcoes. Nao e necessario rebuild da memoria.
+- Purge protege a geração lida dentro do lock. Deep usa o último nível efetivamente executado. Harness rejeita filtros sem casos antes do acesso ao workspace ou modelos.
+- Validate, 198/198 testes e build passaram. Playwright CLI confirmou a progressão e o reset da busca em desktop e mobile.
+- Documentação revisada, script obsoleto removido e ferramentas ativas preservadas. Registros e evidências anexados pelo MCP.
+- Motor e manifesto preservados por hashes. A bateria real terminou com 28/56 casos aprovados nos gates existentes; as limitações estão documentadas e não foram mascaradas por recalibragem.
+- Reinicie daemon/MCP e recarregue a UI para carregar as correções. Não é necessário rebuild da memória.
 
-A thread permanece aberta. Aguardo sua revisao e orientacao para o fechamento efetivo.
+A thread permanece aberta. Aguardo sua revisão e orientação para o fechamento efetivo.
 
 <!-- /marc-message -->
 
@@ -629,15 +629,15 @@ role: architect
 artifacts: artifacts/validacao-integrada-final-loop.md, artifacts/evidencia-motor-preservado-56-casos.md
 -->
 
-## Ajuste dos anexos de evidencia
+## Ajuste dos anexos de evidência
 
-A auditoria de registros apontou duas referencias como ausentes. Os arquivos existiam, mas a auditoria atual so enumera anexos Markdown.
+A auditoria de registros apontou duas referências como ausentes. Os arquivos existiam, mas a auditoria atual só enumera anexos Markdown.
 
-- Evidencias reapresentadas pelo MCP em anexos .md, com o JSON original preservado dentro deles.
-- Metadados da mensagem de aceite corrigidos via apply_patch, pois nao existe ferramenta MCP de edicao de mensagem.
-- As duas copias .json criadas nesta rodada foram removidas. Nenhum codigo, criterio, resultado de teste ou dado do usuario foi alterado.
+- Evidências reapresentadas pelo MCP em anexos .md, com o JSON original preservado dentro deles.
+- Metadados da mensagem de aceite corrigidos via apply_patch, pois não existe ferramenta MCP de edição de mensagem.
+- As duas copias .json criadas nesta rodada foram removidas. Nenhum código, critério, resultado de teste ou dado do usuário foi alterado.
 
-A revalidacao da auditoria verifica especificamente a correcao desses achados. O aceite tecnico do codigo permanece baseado na revisao e na validacao independente.
+A revalidação da auditoria verifica especificamente a correção desses achados. O aceite técnico do código permanece baseado na revisão e na validação independente.
 
 <!-- /marc-message -->
 
@@ -649,14 +649,14 @@ agentId: codex-dev
 role: architect
 -->
 
-## Verificacao apos restart
+## Verificação após restart
 
-- Bootstrap refeito apos restart. MCP e HTTP respondem.
-- memory_status confirmou ready, 38 summaries indexados e tres modelos preparados. Sem erro de rebuild.
-- Verificacao via context-mode confirmou que JS e CSS servidos pela UI sao identicos ao build aprovado.
-- Configuracao atual: autoRebuild false, batch size 4, searchRetryDepth 0. Inventario com zero bytes recuperaveis.
+- Bootstrap refeito após restart. MCP e HTTP respondem.
+- memory_status confirmou ready, 38 summaries indexados e três modelos preparados. Sem erro de rebuild.
+- Verificação via context-mode confirmou que JS e CSS servidos pela UI são idênticos ao build aprovado.
+- Configuração atual: autoRebuild false, batch size 4, searchRetryDepth 0. Inventário com zero bytes recuperáveis.
 
-Resta apenas a revisao visivel do usuario: sucesso precoce com limite automatico 3 deve manter Deep disponivel, reload deve preservar o progresso e nova consulta deve reiniciar em 0. Depois do teste, restaurar a configuracao preferida. Nao e necessario purge ou rebuild adicional.
+Resta apenas a revisão visível do usuário: sucesso precoce com limite automático 3 deve manter Deep disponível, reload deve preservar o progresso e nova consulta deve reiniciar em 0. Depois do teste, restaurar a configuração preferida. Não é necessário purge ou rebuild adicional.
 
 Thread permanece aberta aguardando feedback.
 
@@ -670,17 +670,17 @@ agentId: codex-dev
 role: architect
 -->
 
-## Validacao visual do usuario apos restart
+## Validação visual do usuário após restart
 
-O usuario apresentou quatro capturas da mesma consulta brutalism: busca inicial e tres acoes Deep.
+O usuário apresentou quatro capturas da mesma consulta brutalism: busca inicial e três ações Deep.
 
-- Deep permanece visivel nas tres primeiras capturas.
-- Depois da terceira acao Deep, a quarta captura nao apresenta o botao.
-- O resultado permanece a thread de estilo neo-brutalism durante a sequencia.
+- Deep permanece visível nas três primeiras capturas.
+- Depois da terceira ação Deep, a quarta captura não apresenta o botão.
+- O resultado permanece a thread de estilo neo-brutalism durante a sequência.
 
-A visibilidade e o esgotamento apresentados correspondem ao comportamento esperado. As capturas nao incluem os payloads depth das requisicoes; nao sao evidencia adicional desses valores.
+A visibilidade e o esgotamento apresentados correspondem ao comportamento esperado. As capturas não incluem os payloads depth das requisições; não são evidência adicional desses valores.
 
-Para completar o smoke test visivel, recarregar no estado final deve manter Deep ausente; submeter uma nova busca deve iniciar novo ciclo e reapresentar Deep se houver sucesso antes do ultimo nivel. Thread permanece aberta aguardando feedback.
+Para completar o smoke test visível, recarregar no estado final deve manter Deep ausente; submeter uma nova busca deve iniciar novo ciclo e reapresentar Deep se houver sucesso antes do último nível. Thread permanece aberta aguardando feedback.
 
 <!-- /marc-message -->
 
@@ -692,16 +692,16 @@ agentId: codex-dev
 role: architect
 -->
 
-## Smoke test apos restart concluido
+## Smoke test após restart concluído
 
-O usuario confirmou as duas checagens restantes:
+O usuário confirmou as duas checagens restantes:
 
-- Recarregar a pagina depois de esgotar os retries manteve Deep ausente.
+- Recarregar a página depois de esgotar os retries manteve Deep ausente.
 - Submeter nova busca por brutalism reapresentou Deep, iniciando novo ciclo.
 
-A sequencia visual inicial mais tres Deep, a persistencia depois de reload e o reset para nova busca foram validados pelo usuario no sistema reiniciado.
+A sequência visual inicial mais três Deep, a persistência depois de reload e o reset para nova busca foram validados pelo usuário no sistema reiniciado.
 
-Sem pendencia de validacao das correcoes deste loop. Aceite tecnico mantido; o motor continua na versao preservada, com suas limitacoes registradas. A thread esta pronta para encerramento e permanece aberta ate a orientacao do usuario.
+Sem pendência de validação das correções deste loop. Aceite técnico mantido; o motor continua na versão preservada, com suas limitações registradas. A thread está pronta para encerramento e permanece aberta até a orientação do usuário.
 
 <!-- /marc-message -->
 
@@ -716,14 +716,14 @@ artifacts: artifacts/revisao-final-e-aceite-tecnico-loop.md, artifacts/validacao
 
 ## Thread encerrada
 
-Encerramento autorizado pelo usuario apos o smoke test no sistema reiniciado.
+Encerramento autorizado pelo usuário após o smoke test no sistema reiniciado.
 
-- SUMMARY.md criado com a entrega consolidada, as decisoes, a revisao integral e as limitacoes do motor preservado.
-- Aceite tecnico e validacao do usuario concluidos. Validate, 198/198 testes e build aprovados; sem nova alteracao de codigo neste fechamento.
-- Backlog de browser/E2E revisado e atualizado em marc://$oportunidade-testes-playwright-para-referencias-e-artifacts-ui-f742659a, sem confundir validacao ad hoc com suite E2E automatizada pronta.
-- O motor permanece na versao aceita. Os resultados 28/56 da bateria real continuam documentados.
-- Como autoRebuild esta desligado, o novo resumo pode tornar a memory stale ate um rebuild incremental explicito. Nao e necessario full rebuild.
+- SUMMARY.md criado com a entrega consolidada, as decisões, a revisão integral e as limitações do motor preservado.
+- Aceite técnico e validação do usuário concluídos. Validate, 198/198 testes e build aprovados; sem nova alteração de código neste fechamento.
+- Backlog de browser/E2E revisado e atualizado em marc://$oportunidade-testes-playwright-para-referencias-e-artifacts-ui-f742659a, sem confundir validação ad hoc com suite E2E automatizada pronta.
+- O motor permanece na versão aceita. Os resultados 28/56 da bateria real continuam documentados.
+- Como autoRebuild está desligado, o novo resumo pode tornar a memory stale até um rebuild incremental explícito. Não é necessário full rebuild.
 
-A classificacao closed sera confirmada pela leitura de metadados do MCP.
+A classificação closed será confirmada pela leitura de metadados do MCP.
 
 <!-- /marc-message -->
