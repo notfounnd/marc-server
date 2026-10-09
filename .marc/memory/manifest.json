@@ -1,7 +1,7 @@
 {
   "schemaVersion": 6,
-  "builtAt": "2026-10-09T14:38:47.567Z",
-  "generation": "20261009143846983_6fe5aae1",
+  "builtAt": "2026-10-09T18:43:42.453Z",
+  "generation": "20261009184341634_634813a2",
   "embeddingProvider": {
     "id": "transformers-js-local-e5",
     "name": "Transformers.js local multilingual E5 retrieval",
@@ -254,6 +254,22 @@
         "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99:source:validacao:passage:001",
         "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99:source:observacoes:passage:001",
         "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99:source:referencias:passage:001"
+      ]
+    },
+    {
+      "threadId": "oportunidade-criacao-de-threads-pela-ui-0845d0bb",
+      "title": "Oportunidade - Criacao de threads pela UI",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-criacao-de-threads-pela-ui-0845d0bb\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-criacao-de-threads-pela-ui-0845d0bb/SUMMARY.md",
+      "reference": "marc://$oportunidade-criacao-de-threads-pela-ui-0845d0bb",
+      "sha256": "796011ddb97677f2d1aeed39a0d97f2c2eb1e09cdc73853faf35ff1c8017497d",
+      "mtimeMs": 1791568827243.1045,
+      "recordIds": [
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb:identity",
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb:source:resultado-e-decisoes:passage:001",
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb:source:validacao-e-revisao:passage:001",
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb:source:limites-e-continuidade:passage:001",
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb:source:registros-detalhados:passage:001"
       ]
     },
     {

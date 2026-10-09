@@ -1,4 +1,5 @@
 import { useCallback, useEffect } from "react";
+import { reconcileCreatedThreads } from "./thread-creation.js";
 import type {
   Agent,
   DaemonStatus,
@@ -28,6 +29,7 @@ export function useAppSync({
   tokenLocked,
   busyRef,
   lastRefreshAtRef,
+  pendingCreatedThreadsByWorkspaceRef,
   selectedWorkspaceIdRef,
   selectedThreadIdRef,
   liveRefreshTimerRef,
@@ -53,6 +55,7 @@ export function useAppSync({
   tokenLocked: boolean;
   busyRef: Ref<boolean>;
   lastRefreshAtRef: Ref<number>;
+  pendingCreatedThreadsByWorkspaceRef: Ref<Map<string, Map<string, Thread>>>;
   selectedWorkspaceIdRef: Ref<string | undefined>;
   selectedThreadIdRef: Ref<string | undefined>;
   liveRefreshTimerRef: Ref<number | undefined>;
@@ -193,7 +196,14 @@ export function useAppSync({
             )
           ]);
 
-        setThreads(nextThreads);
+        setThreads(
+          reconcileCreatedThreads(
+            workspace.id,
+            nextThreads,
+            pendingCreatedThreadsByWorkspaceRef.current,
+            [...nextThreads, ...nextClosedThreads].map((thread) => thread.id)
+          )
+        );
         setClosedThreads(nextClosedThreads);
         setAgents(nextAgents);
         setRules(nextRules.markdown);

@@ -92,7 +92,7 @@ function threadEmpty(mode: MiddleMode, t: Translation) {
     };
   }
   return {
-    detail: t("Create a thread from an agent to start the room."),
+    detail: t("Create a thread to start the room."),
     title: t("No threads")
   };
 }

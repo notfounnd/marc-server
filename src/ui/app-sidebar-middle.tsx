@@ -2,6 +2,7 @@ import {
   Archive,
   AtSign,
   MessageSquareText,
+  PencilSparkles,
   RefreshCw,
   Search,
   X
@@ -23,6 +24,7 @@ import type {
 export function AppSidebarMiddle({
   agents,
   allWorkspaceThreads,
+  canCreateThread,
   memorySearchError,
   memorySearchDeepRetryAvailable,
   memorySearchQuery,
@@ -42,10 +44,12 @@ export function AppSidebarMiddle({
   onMiddleModeChange,
   onSelectAgent,
   onSelectMemorySearchHit,
-  onSelectThread
+  onSelectThread,
+  onCreateThread
 }: {
   agents: Agent[];
   allWorkspaceThreads: Thread[];
+  canCreateThread: boolean;
   memorySearchError?: string;
   memorySearchDeepRetryAvailable: boolean;
   memorySearchQuery: string;
@@ -66,6 +70,7 @@ export function AppSidebarMiddle({
   onSelectAgent: (agent: Agent) => void;
   onSelectMemorySearchHit: (hit: MemoryRecallHit) => void;
   onSelectThread: (thread: Thread) => void;
+  onCreateThread: () => void;
 }) {
   const memorySearchAvailable = isMemorySearchAvailable(selectedMemoryHealth);
   const memorySearchTitle = memorySearchAvailable
@@ -79,8 +84,10 @@ export function AppSidebarMiddle({
   const middleActions = middleModeActions({
     memorySearchAvailable,
     memorySearchTitle,
+    canCreateThread,
     t,
-    onMiddleModeChange
+    onMiddleModeChange,
+    onCreateThread
   });
   const content = middleContent({
     agents,
@@ -153,13 +160,17 @@ function middleHeaders({
 function middleModeActions({
   memorySearchAvailable,
   memorySearchTitle,
+  canCreateThread,
   t,
-  onMiddleModeChange
+  onMiddleModeChange,
+  onCreateThread
 }: {
   memorySearchAvailable: boolean;
   memorySearchTitle: string;
+  canCreateThread: boolean;
   t: Translation;
   onMiddleModeChange: (mode: MiddleMode) => void;
+  onCreateThread: () => void;
 }) {
   const modeCloseButton = (
     <Button
@@ -177,6 +188,16 @@ function middleModeActions({
     search: modeCloseButton,
     threads: (
       <>
+        <Button
+          variant="primary"
+          className="button-icon"
+          disabled={!canCreateThread}
+          onClick={onCreateThread}
+          title={t("Create thread")}
+          aria-label={t("Create thread")}
+        >
+          <PencilSparkles size={15} />
+        </Button>
         <Button
           variant="primary"
           className="button-icon"

@@ -5,7 +5,7 @@ import { createAppActions } from "./app-actions.js";
 import { AppContent } from "./app-content.js";
 import { AppModals } from "./app-modals.js";
 import { AppSidebar } from "./app-sidebar.js";
-import { useAppSync } from "./app-sync.js";
+import { useAppDataActions } from "./use-app-data-actions.js";
 import {
   useModalBodyLock,
   useWorkspaceSelectionEffects
@@ -111,37 +111,43 @@ export function App() {
     setShowWorkspaceSettings
   });
 
+  const { api, apiPost, refresh, openThreadCreation, threadCreation } =
+    useAppDataActions({
+      t,
+      token,
+      tokenLocked,
+      busyRef,
+      lastRefreshAtRef,
+      selectedWorkspaceIdRef,
+      selectedThreadIdRef,
+      liveRefreshTimerRef,
+      autocompleteThreadPayloadRef,
+      setBusy,
+      setThreadIndexHealthByWorkspace,
+      setMemoryHealthByWorkspace,
+      setWorkspaces,
+      setSelectedWorkspaceId,
+      setSelectedThreadId,
+      setSelectedAgentId,
+      setThreads,
+      setClosedThreads,
+      setMiddleMode,
+      setAgents,
+      setRules,
+      setThreadPayload,
+      setStatusKind,
+      setStatus,
+      setLastSyncedAt
+    });
+
   const modalOpen = Boolean(
-    artifactDraft || artifactView || showShortcuts || showWorkspaceSettings
+    artifactDraft ||
+    artifactView ||
+    showShortcuts ||
+    showWorkspaceSettings ||
+    threadCreation.workspace
   );
   useModalBodyLock(modalOpen);
-
-  const { api, apiPost, refresh } = useAppSync({
-    t,
-    token,
-    tokenLocked,
-    busyRef,
-    lastRefreshAtRef,
-    selectedWorkspaceIdRef,
-    selectedThreadIdRef,
-    liveRefreshTimerRef,
-    setBusy,
-    setThreadIndexHealthByWorkspace,
-    setMemoryHealthByWorkspace,
-    setWorkspaces,
-    setSelectedWorkspaceId,
-    setSelectedThreadId,
-    setSelectedAgentId,
-    setThreads,
-    setClosedThreads,
-    setMiddleMode,
-    setAgents,
-    setRules,
-    setThreadPayload,
-    setStatusKind,
-    setStatus,
-    setLastSyncedAt
-  });
 
   const appActions = createAppActions({
     t,
@@ -222,11 +228,7 @@ export function App() {
         agents={agents}
         selectedAgentId={selectedAgentId}
         uiAgentId={uiAgentId}
-        memorySearchQuery={memorySearch.query}
-        memorySearchResult={memorySearch.result}
-        memorySearchStatus={memorySearch.status}
-        memorySearchError={memorySearch.error}
-        memorySearchDeepRetryAvailable={memorySearch.deepRetryAvailable}
+        memorySearch={memorySearch}
         onTokenChange={setToken}
         onLockToken={appActions.lockToken}
         onUnlockToken={appActions.unlockToken}
@@ -237,11 +239,7 @@ export function App() {
         onMiddleModeChange={setMiddleMode}
         onSelectThread={(thread) => void appActions.selectThread(thread)}
         onSelectAgent={appActions.selectAgent}
-        onMemorySearchQueryChange={memorySearch.setQuery}
-        onMemorySearchSubmit={() => void memorySearch.runSearch()}
-        onMemorySearchDeepRetry={() => void memorySearch.runDeepRetry()}
-        onMemorySearchAlternate={() => void memorySearch.runAlternateSearch()}
-        onSelectMemorySearchHit={memorySearch.selectHit}
+        onCreateThread={() => openThreadCreation(selectedWorkspace)}
         onGoHome={appActions.goHome}
       />
       <AppContent
@@ -282,6 +280,7 @@ export function App() {
         selectedWorkspace={selectedWorkspace}
         showShortcuts={showShortcuts}
         showWorkspaceSettings={showWorkspaceSettings}
+        threadCreation={threadCreation}
         onArtifactDraftChange={setArtifactDraft}
         onArtifactSave={() => void appActions.saveArtifact()}
         onArtifactViewClose={() => setArtifactView(undefined)}

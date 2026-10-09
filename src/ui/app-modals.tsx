@@ -4,6 +4,8 @@ import {
   KeyboardShortcutsModal
 } from "./modals.js";
 import { WorkspaceSettingsModal } from "./workspace-settings-modal.js";
+import { ThreadCreateModal } from "./thread-create-modal.js";
+import type { ThreadCreationController } from "./use-thread-creation.js";
 import type {
   ArtifactDraft,
   ArtifactView,
@@ -18,6 +20,7 @@ export function AppModals({
   savingArtifact,
   selectedMemoryHealth,
   selectedWorkspace,
+  threadCreation,
   showShortcuts,
   showWorkspaceSettings,
   onArtifactDraftChange,
@@ -38,6 +41,7 @@ export function AppModals({
   savingArtifact: boolean;
   selectedMemoryHealth?: MemoryIndexHealth;
   selectedWorkspace?: Workspace;
+  threadCreation: ThreadCreationController;
   showShortcuts: boolean;
   showWorkspaceSettings: boolean;
   onArtifactDraftChange: (draft: ArtifactDraft | undefined) => void;
@@ -86,6 +90,15 @@ export function AppModals({
       ) : null}
       {showShortcuts ? (
         <KeyboardShortcutsModal onClose={onShortcutsClose} />
+      ) : null}
+      {threadCreation.workspace ? (
+        <ThreadCreateModal
+          pending={threadCreation.pending}
+          workspace={threadCreation.workspace}
+          onClose={threadCreation.close}
+          onCreate={threadCreation.submit}
+          onRetryRead={threadCreation.retryRead}
+        />
       ) : null}
     </>
   );

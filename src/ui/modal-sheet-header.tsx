@@ -17,6 +17,7 @@ type ModalSheetHeaderProps = {
   className?: string;
   titleClassName?: string;
   descriptionClassName?: string;
+  closeDisabled?: boolean;
 };
 
 export function ModalSheetHeader({
@@ -25,7 +26,8 @@ export function ModalSheetHeader({
   eyebrow,
   className,
   titleClassName,
-  descriptionClassName
+  descriptionClassName,
+  closeDisabled = false
 }: ModalSheetHeaderProps) {
   const { t } = useTranslation();
 
@@ -43,6 +45,7 @@ export function ModalSheetHeader({
           className="button-icon modal-sheet-close"
           title={t("Close")}
           aria-label={t("Close")}
+          disabled={closeDisabled}
         >
           <X size={15} />
         </Button>

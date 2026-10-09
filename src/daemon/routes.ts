@@ -28,6 +28,7 @@ import {
   postWorkspaceSettings
 } from "./memory-routes.js";
 import type { DaemonStore } from "./store.js";
+import { postWorkspaceThreadCreation } from "./thread-routes.js";
 
 type RouteContext = {
   events: UiEventBus;
@@ -224,6 +225,11 @@ const routes: Route[] = [
     method: "GET",
     pattern: /^\/api\/workspaces\/([^/]+)\/threads$/,
     handle: listWorkspaceThreads
+  },
+  {
+    method: "POST",
+    pattern: /^\/api\/workspaces\/([^/]+)\/threads$/,
+    handle: postWorkspaceThreadCreation
   },
   {
     method: "GET",

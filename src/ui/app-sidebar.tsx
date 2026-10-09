@@ -5,17 +5,17 @@ import { Input } from "@/components/ui/input";
 import { Button, classNames } from "./common.js";
 import { AppSidebarMiddle } from "./app-sidebar-middle.js";
 import { WorkspaceListSection } from "./workspace-list-section.js";
+import type { useMemorySearch } from "./use-memory-search.js";
 import type {
   Agent,
   MemoryIndexHealth,
-  MemoryRecallHit,
-  MemoryRecallResult,
-  MemorySearchStatus,
   MiddleMode,
   StatusKind,
   Thread,
   Workspace
 } from "./types.js";
+
+type MemorySearchController = ReturnType<typeof useMemorySearch>;
 
 export function AppSidebar({
   token,
@@ -34,11 +34,7 @@ export function AppSidebar({
   agents,
   selectedAgentId,
   uiAgentId,
-  memorySearchQuery,
-  memorySearchResult,
-  memorySearchStatus,
-  memorySearchError,
-  memorySearchDeepRetryAvailable,
+  memorySearch,
   onTokenChange,
   onLockToken,
   onUnlockToken,
@@ -47,11 +43,7 @@ export function AppSidebar({
   onMiddleModeChange,
   onSelectThread,
   onSelectAgent,
-  onMemorySearchQueryChange,
-  onMemorySearchSubmit,
-  onMemorySearchDeepRetry,
-  onMemorySearchAlternate,
-  onSelectMemorySearchHit,
+  onCreateThread,
   onGoHome
 }: {
   token: string;
@@ -70,11 +62,7 @@ export function AppSidebar({
   agents: Agent[];
   selectedAgentId?: string;
   uiAgentId: string;
-  memorySearchQuery: string;
-  memorySearchResult?: MemoryRecallResult;
-  memorySearchStatus: MemorySearchStatus;
-  memorySearchError?: string;
-  memorySearchDeepRetryAvailable: boolean;
+  memorySearch: MemorySearchController;
   onTokenChange: (token: string) => void;
   onLockToken: () => void;
   onUnlockToken: () => void;
@@ -83,14 +71,13 @@ export function AppSidebar({
   onMiddleModeChange: (mode: MiddleMode) => void;
   onSelectThread: (thread: Thread) => void;
   onSelectAgent: (agent: Agent) => void;
-  onMemorySearchQueryChange: (query: string) => void;
-  onMemorySearchSubmit: () => void;
-  onMemorySearchDeepRetry: () => void;
-  onMemorySearchAlternate: () => void;
-  onSelectMemorySearchHit: (hit: MemoryRecallHit) => void;
+  onCreateThread: () => void;
   onGoHome: () => void;
 }) {
   const { t } = useTranslation();
+  const canCreateThread = Boolean(
+    selectedWorkspaceId && tokenLocked && token.trim()
+  );
   return (
     <>
       <aside className="sidebar">
@@ -159,11 +146,12 @@ export function AppSidebar({
       <AppSidebarMiddle
         agents={agents}
         allWorkspaceThreads={allWorkspaceThreads}
-        memorySearchDeepRetryAvailable={memorySearchDeepRetryAvailable}
-        memorySearchError={memorySearchError}
-        memorySearchQuery={memorySearchQuery}
-        memorySearchResult={memorySearchResult}
-        memorySearchStatus={memorySearchStatus}
+        canCreateThread={canCreateThread}
+        memorySearchDeepRetryAvailable={memorySearch.deepRetryAvailable}
+        memorySearchError={memorySearch.error}
+        memorySearchQuery={memorySearch.query}
+        memorySearchResult={memorySearch.result}
+        memorySearchStatus={memorySearch.status}
         middleMode={middleMode}
         selectedAgentId={selectedAgentId}
         selectedMemoryHealth={selectedMemoryHealth}
@@ -171,14 +159,15 @@ export function AppSidebar({
         t={t}
         uiAgentId={uiAgentId}
         visibleThreads={visibleThreads}
-        onMemorySearchQueryChange={onMemorySearchQueryChange}
-        onMemorySearchDeepRetry={onMemorySearchDeepRetry}
-        onMemorySearchAlternate={onMemorySearchAlternate}
-        onMemorySearchSubmit={onMemorySearchSubmit}
+        onMemorySearchQueryChange={memorySearch.setQuery}
+        onMemorySearchDeepRetry={memorySearch.runDeepRetry}
+        onMemorySearchAlternate={memorySearch.runAlternateSearch}
+        onMemorySearchSubmit={memorySearch.runSearch}
         onMiddleModeChange={onMiddleModeChange}
         onSelectAgent={onSelectAgent}
-        onSelectMemorySearchHit={onSelectMemorySearchHit}
+        onSelectMemorySearchHit={memorySearch.selectHit}
         onSelectThread={onSelectThread}
+        onCreateThread={onCreateThread}
       />
     </>
   );

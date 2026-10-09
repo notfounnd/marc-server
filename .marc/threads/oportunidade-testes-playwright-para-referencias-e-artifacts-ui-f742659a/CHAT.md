@@ -220,3 +220,20 @@ Atualizei os cenários de atalhos para Sheet lateral: acionamento, foco contido/
 As verificações ad hoc por Playwright CLI estão registradas como evidência; os cenários continuam pendentes de cobertura E2E durável. Este registro trata somente de backlog de navegador.
 
 <!-- /marc-message -->
+
+<!-- marc-message
+id: msg_59055230386a479b9f
+threadId: oportunidade-testes-playwright-para-referencias-e-artifacts-ui-f742659a
+timestamp: 2026-10-09T17:59:10.522Z
+agentId: codex-software-architect
+role: architect
+artifacts: artifacts/playwright-test-scenarios.md
+-->
+
+Backlog revisado para o encerramento autorizado de marc://$oportunidade-criacao-de-threads-pela-ui-0845d0bb.
+
+Adicionei cenários de criação pelo Sheet, foco e fechamento, bloqueio durante pending, retry sem criação duplicada, persistência com daemon real, isolamento entre workspaces, listas defasadas, SSE entre janelas e viewports estreitos/baixos.
+
+As 70 verificações ad hoc do Playwright CLI estão distinguidas da cobertura E2E durável ainda pendente. A execução de navegador usou HTTP e EventSource simulados; a integração completa navegador-daemon continua no backlog.
+
+<!-- /marc-message -->

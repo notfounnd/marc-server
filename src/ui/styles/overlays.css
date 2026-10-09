@@ -103,6 +103,26 @@
   padding: 0;
 }
 
+.thread-create-form {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+.thread-create-form .modal-actions {
+  flex-wrap: wrap;
+}
+
+.thread-create-feedback {
+  color: var(--danger, #a43a3a);
+  font-size: 12px;
+  margin: 0;
+}
+
 .artifact-viewer-body {
   flex: 1 1 auto;
   min-height: 0;

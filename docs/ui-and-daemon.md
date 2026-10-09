@@ -73,6 +73,8 @@ Open threads are the active working set. Closed threads are determined by `SUMMA
 
 The main list should prioritize open work. Closed work is still available for audit, follow-up, and context recovery.
 
+The Threads sidebar can create an empty thread in the selected workspace. The right-side sheet asks only for a single-line title; the user writes the first message through the existing composer. The title is trimmed before submission, and an empty title or one containing a line break receives `400 Bad Request`. While creation is pending, Close, Cancel, Escape, and backdrop dismissal are disabled. Creation writes the canonical `CHAT.md` thread before its derived index is refreshed and does not create a profile or an initial message. The UI keeps a newly created thread visible while the index catches up, then removes its temporary entry once a list response includes its ID. A thread read failure can be retried without submitting creation again.
+
 ## Messages
 
 Messages are appended as structured Markdown blocks in `CHAT.md`. The UI displays message metadata, agent identity, timestamp, body, and artifact links.
@@ -138,6 +140,7 @@ The daemon API is local infrastructure for the UI and nearby tooling. MCP client
 | `POST` | `/api/workspaces` | Register or update a workspace in the daemon registry. |
 | `DELETE` | `/api/workspaces/:workspaceId` | Remove a workspace from the daemon registry. |
 | `GET` | `/api/workspaces/:workspaceId/threads` | List workspace threads. |
+| `POST` | `/api/workspaces/:workspaceId/threads` | Create an empty thread from a JSON `{ "title": string }` payload and return its `ThreadInfo` with status `201`. |
 | `GET` | `/api/workspaces/:workspaceId/rules` | Read workspace rules. |
 | `GET` | `/api/workspaces/:workspaceId/agents` | List registered agents. |
 | `GET` | `/api/workspaces/:workspaceId/settings` | Read workspace settings used by the UI. |

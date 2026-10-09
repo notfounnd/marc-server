@@ -10,8 +10,10 @@ test("uses en_US as the default active locale", () => {
 
 test("resolves product text from the flat en_US catalog", () => {
   assert.equal(t("Cancel"), "Cancel");
+  assert.equal(t("Create thread"), "Create thread");
   assert.equal(t("Incremental rebuild"), "Incremental rebuild");
   assert.equal(t("Full rebuild"), "Full rebuild");
+  assert.equal(t("Title"), "Title");
 });
 
 test("interpolates i18next-style variables", () => {
@@ -61,6 +63,7 @@ test("keeps i18n usage scoped to the web UI", () => {
     path.join("src", "ui", "modal-sheet-header.tsx"),
     path.join("src", "ui", "modals.tsx"),
     path.join("src", "ui", "thread-view.tsx"),
+    path.join("src", "ui", "thread-create-modal.tsx"),
     path.join("src", "ui", "use-workspace-memory-actions.ts"),
     path.join("src", "ui", "workspace-settings-modal.tsx"),
     path.join("src", "ui", "workspace-overview.tsx"),

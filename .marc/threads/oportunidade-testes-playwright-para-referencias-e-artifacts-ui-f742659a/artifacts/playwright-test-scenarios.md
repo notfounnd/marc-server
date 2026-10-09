@@ -226,6 +226,23 @@ Priority: medium
 
 Coverage remains pending as durable browser tests. Implementation validation and human closure authorization are recorded in the source thread and are not substitutes for these E2E scenarios.
 
+## Thread Creation
+
+Source thread: marc://$oportunidade-criacao-de-threads-pela-ui-0845d0bb
+Priority: high
+
+- [ ] With a selected workspace and locked nonempty token, verify PencilSparkles appears before Search and opens the creation sheet even when memory search is unavailable. Verify the action is disabled without a workspace or locked token.
+- [ ] Open the sheet and verify workspace identity, initial Title focus, blank/whitespace submission prevention, Tab containment, background scroll lock, and focus return after Cancel, Close, Escape, or backdrop dismissal. Reopen and verify the canceled draft is cleared.
+- [ ] Delay the creation response and verify Title, Cancel, and Close are disabled; Escape, backdrop, and repeated submission do not dismiss the sheet or send another POST.
+- [ ] Create a thread through the browser with a real daemon and verify selection, an empty composer, no automatic message, and the first user message through the existing composer. Reload and verify the thread and message persist.
+- [ ] Fail creation and verify the sheet preserves the title and exposes retry. Fail only the subsequent read and verify retry loads the existing thread without another creation POST.
+- [ ] Delay open/closed list indexing after a successful creation, trigger workspace refresh, and verify the confirmed thread remains visible and selected without duplication. Recognize it in either list, then remove it, and verify the temporary entry does not resurrect it.
+- [ ] Switch workspace before a delayed creation/read response resolves and verify the response does not change selection or payload in the newly selected workspace.
+- [ ] Create a thread from another browser window or an external writer and verify real workspace-changed SSE refreshes the list without a manual page reload.
+- [ ] Verify layout and focus in 1440x900, 390x844, and 320x240 viewports: the sheet fits, the form scrolls when needed, both footer actions remain reachable without horizontal clipping, and existing shared-header sheets retain enabled Close controls.
+
+Coverage note: 70 ad hoc Playwright CLI checks passed for the real UI with mocked HTTP and an EventSource shim. Durable browser tests and a combined browser/daemon run remain pending; these scenarios are not marked implemented by the ad hoc run.
+
 ## Maintenance Notes
 
 - This backlog should grow as UI features are added.
