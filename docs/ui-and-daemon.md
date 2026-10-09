@@ -65,6 +65,8 @@ Each workspace view can show:
 
 The UI uses locally owned components sourced from the `neobrutalism.dev` registry on top of shadcn/ui and Tailwind CSS. The theme keeps the mARC teal accent, warm neutral surfaces, and monospace typography while using the registry component language for controls, cards, overlays, menus, and notifications.
 
+Notifications use the local Neobrutalism Toast component backed by Base UI. The application mounts one toaster at the lower right, and its adapter maps success, warning, and error messages to 2.4-second toasts. Base UI provides accessible dismissal, stacking, and pause-on-interaction behavior; notifications remain visible above open dialogs and sheets, and dismissing a toast does not dismiss its underlying dialog or sheet.
+
 The three-column workspace layout remains application-owned. Sidebar modes, independent column scrolling, the content footer, Markdown rendering, and reference autocomplete are mARC behaviors rather than library-provided navigation patterns.
 
 ## Threads

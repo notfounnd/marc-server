@@ -30,6 +30,8 @@ O desenvolvedor executou a tarefa documental e publicou sua entrega com o perfil
 
 ## Limites e continuidade
 
+Correção posterior solicitada pelo usuário: o principal ajustou diretamente os três documentos e os dois perfis para impedir diário também nos artefatos. Handoff/handover pontual continua permitido; coordenação e iterações permanecem no canal interno, e a evidência é consolidada na entrega e revisão final. Não é permitido atualizar documentos a cada achado, check ou ajuste. A correção passou em Markdown, links, pnpm validate, pnpm build e pnpm test, com 210 testes aprovados no workspace compartilhado. A avaliação técnica da correção está no artefato específico; o desenvolvimento independente de Toast não foi alterado nem aprovado por esta atividade.
+
 Sem pendências de implementação neste escopo. A política orienta agentes, mas não garante obediência de qualquer modelo ou cliente. A execução observou partes do fluxo; não substitui observar uma sessão nova que descubra o contrato atualizado. Não foram simulados todos os cenários de falha ou aprovação pendente. O aviso não bloqueante de bundle superior a 500 kB permanece fora do escopo desta alteração documental.
 
 ## Referências
@@ -37,3 +39,4 @@ Sem pendências de implementação neste escopo. A política orienta agentes, ma
 - [Plano e critérios de aceite](artifacts/plano-politica-registros-loop.md).
 - [Execução, correções e revisão final integrada](artifacts/execucao-e-revisao-politica-loop.md).
 - [Relatório do desenvolvedor](artifacts/relatorio-implementacao-politica-registros-loop.md).
+- [Correção direta da política de registros pontuais](artifacts/correcao-politica-registros-pontuais.md).

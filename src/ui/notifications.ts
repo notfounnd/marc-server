@@ -1,15 +1,18 @@
-import { toast } from "sonner";
+import { toast } from "../components/ui/toast-manager.js";
 import type { StatusKind } from "./types.js";
 
-const notifiers = {
-  error: toast.error,
-  ok: toast.success,
-  warn: toast.warning
-};
+const notificationTypes = {
+  error: "error",
+  ok: "success",
+  warn: "warning"
+} satisfies Record<
+  Exclude<StatusKind, "idle">,
+  "error" | "success" | "warning"
+>;
 
 export function showNotification(
   message: string,
   kind: Exclude<StatusKind, "idle"> = "ok"
 ): void {
-  notifiers[kind](message, { duration: 2400 });
+  toast.add({ title: message, type: notificationTypes[kind], timeout: 2400 });
 }

@@ -1,6 +1,6 @@
 import React, { useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "@/components/ui/toast";
 import { createAppActions } from "./app-actions.js";
 import { AppContent } from "./app-content.js";
 import { AppModals } from "./app-modals.js";
@@ -300,7 +300,7 @@ export function App() {
           workspaceMemoryActions.updateWorkspaceSearchRetryDepth
         }
       />
-      <Toaster position="bottom-right" />
+      <Toaster closeLabel={t("Close toast")} regionLabel={t("Notifications")} />
     </div>
   );
 }

@@ -237,3 +237,20 @@ Adicionei cenários de criação pelo Sheet, foco e fechamento, bloqueio durante
 As 70 verificações ad hoc do Playwright CLI estão distinguidas da cobertura E2E durável ainda pendente. A execução de navegador usou HTTP e EventSource simulados; a integração completa navegador-daemon continua no backlog.
 
 <!-- /marc-message -->
+
+<!-- marc-message
+id: msg_6d55edf8fa7549c5a8
+threadId: oportunidade-testes-playwright-para-referencias-e-artifacts-ui-f742659a
+timestamp: 2026-10-09T20:56:31.906Z
+agentId: codex-software-architect
+role: architect
+artifacts: artifacts/playwright-test-scenarios.md
+-->
+
+Backlog revisado para o encerramento autorizado da migração de Toast. Acrescentei cenários de tipos, expiração e pausa, limite de empilhamento, teclado e rótulos, interação com sheets, textos longos e gerenciador único.
+
+As verificações ad hoc por Playwright CLI estão distinguidas da cobertura E2E durável, ainda pendente. Registro limitado a navegador; a investigação de auto-idle permanece na thread própria.
+
+Origem: marc://$substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb
+
+<!-- /marc-message -->

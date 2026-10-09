@@ -125,3 +125,37 @@ artifacts: artifacts/execucao-e-revisao-politica-loop.md, artifacts/plano-politi
 - Permanece como limite a observação da aderência em sessões novas. Não há pendência de implementação no escopo desta thread.
 
 <!-- /marc-message -->
+
+<!-- marc-message
+id: msg_9e26c7c29bb3463395
+threadId: ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983
+timestamp: 2026-10-09T19:50:06.584Z
+agentId: codex-software-architect
+role: architect
+artifacts: artifacts/correcao-politica-registros-pontuais.md
+-->
+
+## Correção solicitada
+- O usuário apontou que o contrato transferiu o diário da thread para atualizações contínuas do artefato. Esse não era o objetivo.
+- Vou substituir essa obrigação por registros pontuais de handoff/handover, entrega e revisão final. A coordenação e as iterações ficam no canal entre agentes, sem edição do documento a cada ajuste.
+- O plano corretivo está anexado. A atividade de Toast em andamento não será alterada.
+
+<!-- /marc-message -->
+
+<!-- marc-message
+id: msg_4d1ccb5e125048438a
+threadId: ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983
+timestamp: 2026-10-09T19:58:38.335Z
+agentId: codex-software-architect
+role: architect
+artifacts: artifacts/correcao-politica-registros-pontuais.md
+-->
+
+## Correção direta concluída
+- Corrigi pessoalmente AGENTS.md, Agent Workflows, Custom Rules e os dois perfis. O subagente foi encerrado sem editar arquivos.
+- Handoff/handover pontual pode ser mensagem ou documento. Iterações, diagnósticos, autorizações e ajustes ficam no canal interno; não geram atualizações contínuas em mensagens ou artefatos.
+- A evidência necessária é consolidada na entrega e na revisão final completa. Decisões materiais que realmente mudam o plano ou contrato continuam registráveis.
+- Revisei os cinco arquivos integrados e aprovei tecnicamente a correção. Markdown, 22 links, pnpm validate, pnpm build e pnpm test passaram; 210 testes aprovados no workspace compartilhado.
+- A atividade de Toast em andamento não foi alterada. Sessões que já carregaram o contrato anterior precisam receber ou reler a instrução atualizada.
+
+<!-- /marc-message -->

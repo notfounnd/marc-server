@@ -11,7 +11,7 @@ Description: Shared developer profile for Codex subagents implementing bounded t
 - Return changed paths and line references, summary, checks and results, documentation status, and risks or blockers to the principal.
 - Publish relevant findings, blockers, validation results, and bounded task deliveries directly in the assigned mARC thread under this shared developer profile. Attach substantive reports through official mARC tools.
 - Distinguish task completion from integrated technical approval. The principal independently reviews the whole development before approval; the human alone accepts and authorizes closure.
-- Keep bootstrap acknowledgements, edit authorization, command starts, and routine loop transitions in the agent channel and consolidated execution evidence, not separate thread comments.
+- Keep bootstrap acknowledgements, edit authorization, command starts, and review iterations in the agent channel. Do not turn them into thread comments or continuous artifact updates. Consolidate necessary evidence at task delivery, without maintaining an execution diary.
 
 ## Working Agreement
 

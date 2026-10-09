@@ -1,7 +1,7 @@
 {
   "schemaVersion": 6,
-  "builtAt": "2026-10-09T18:43:42.453Z",
-  "generation": "20261009184341634_634813a2",
+  "builtAt": "2026-10-09T21:01:06.147Z",
+  "generation": "20261009210105524_db38c40e",
   "embeddingProvider": {
     "id": "transformers-js-local-e5",
     "name": "Transformers.js local multilingual E5 retrieval",
@@ -21,8 +21,8 @@
       "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983\\SUMMARY.md",
       "relativeSummaryPath": "threads/ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983/SUMMARY.md",
       "reference": "marc://$ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983",
-      "sha256": "1709a6cb9f3862c16f2820539da509ad385c54685708f050e66ef0a703042284",
-      "mtimeMs": 1791555920334.5166,
+      "sha256": "81f2f7f58c65ec2c566f48f9ff02a0b3920e00a2416d9efdf8286703ae0a2e7f",
+      "mtimeMs": 1791575913953.124,
       "recordIds": [
         "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983:identity",
         "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983:source:resultado:passage:001",
@@ -815,6 +815,21 @@
         "remover-comandos-legados-do-mcp-reduzir-sobrecarga-de-contexto-034ad1bf:source:o-que-foi-tratado:passage:001",
         "remover-comandos-legados-do-mcp-reduzir-sobrecarga-de-contexto-034ad1bf:source:validacao-registrada:passage:001",
         "remover-comandos-legados-do-mcp-reduzir-sobrecarga-de-contexto-034ad1bf:source:continuidade:passage:001"
+      ]
+    },
+    {
+      "threadId": "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb",
+      "title": "Substituir componente sonner pelo componente toast da lib Neobrutalism",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb\\SUMMARY.md",
+      "relativeSummaryPath": "threads/substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb/SUMMARY.md",
+      "reference": "marc://$substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb",
+      "sha256": "b942f3b4ba901285300def8b8c8973fcfca78b4a9a9a1496dbca1a548cfd99be",
+      "mtimeMs": 1791579424788.9626,
+      "recordIds": [
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb:identity",
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb:source:entrega-e-decisoes:passage:001",
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb:source:validacao-e-limites:passage:001",
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb:source:continuidade:passage:001"
       ]
     }
   ]

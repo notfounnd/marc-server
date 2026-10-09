@@ -243,6 +243,21 @@ Priority: high
 
 Coverage note: 70 ad hoc Playwright CLI checks passed for the real UI with mocked HTTP and an EventSource shim. Durable browser tests and a combined browser/daemon run remain pending; these scenarios are not marked implemented by the ad hoc run.
 
+## Base UI Toast Notifications
+
+Source thread: marc://$substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb
+Priority: high
+
+- [ ] Trigger existing successful, warning, and error UI actions; verify each message and icon, one shared toast viewport, and unchanged global daemon status.
+- [ ] Verify a notification expires after its 2400 ms active duration; hover or focus it, verify expiration pauses, then leave and verify expiration resumes.
+- [ ] Add four notifications; verify exactly three are visible and the limited notification cannot receive focus or pointer interaction.
+- [ ] Use F6 and Tab to reach the toast and its Close control; verify accessible Notifications and Close toast labels, Enter dismissal, and Escape dismissal.
+- [ ] Open the real Keyboard shortcuts sheet and trigger a toast; verify the toast is above the sheet and its Close control dismisses only the toast, leaving the sheet open after transitions finish. Repeat with another existing sheet.
+- [ ] At desktop and 390x844, show persistent 304- and 497-character messages, including an unbroken reference; wait for entry transitions to finish and verify readable wrapping, reachable Close, safe margins, and no horizontal overflow.
+- [ ] Mount and unmount the app through its supported lifecycle and verify notifications continue using one shared manager without duplicate rendering.
+
+Coverage note: ad hoc Playwright CLI checks covered types, expiration, hover/focus pause, stacking, keyboard, stable long-message layouts, and the real Keyboard shortcuts sheet during the source thread. These checks do not constitute durable automated E2E coverage; all scenarios remain pending. Timer and overlay assertions must account for entry/exit transitions. Daemon auto-idle analysis belongs to its separate thread and is not part of this browser backlog.
+
 ## Maintenance Notes
 
 - This backlog should grow as UI features are added.

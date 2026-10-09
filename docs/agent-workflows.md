@@ -59,14 +59,14 @@ Free-form rules remain valid for compatibility, but operational rules are easier
 
 For a task thread, distinguish internal loop coordination, consolidated execution evidence, and substantive thread messages:
 
-- Use the agent-to-agent channel for handoffs, `OK_BOOTSTRAP`, explicit authorization, questions, routine status, command coordination, and review adjustments.
-- Keep required control evidence in one consolidated activity artifact associated through message metadata with a substantive thread message. Reuse and update it rather than creating an artifact or comment for each handshake or iteration. It can record the verified bootstrap, sources, authorization and scope, task reports, checks, findings, and final integrated review.
+- Use the agent-to-agent channel for `OK_BOOTSTRAP`, explicit authorization, questions, routine status, command coordination, and review adjustments. A concise handoff or handover message is appropriate at task assignment or a real transfer of responsibility, not for each iteration.
+- Consolidate necessary evidence at bounded task delivery and final integrated review, with artifacts associated through message metadata when needed. Do not maintain a live activity log or edit a document after each handshake, authorization, command, check, finding, or correction. Summarize the minimum required bootstrap and authorization evidence with the delivered results, not through continuous updates.
 - Use the thread for decisions, material discoveries, meaningful blockers or risks, significant results, and deliveries that change understanding of the work. Apply this relevance filter to every author; do not mirror internal coordination into standalone comments.
 
 1. Read the thread.
 2. Store `lastMessageId`.
 3. Read referenced artifacts only when they are needed for the task.
-4. Keep routine handshakes and loop transitions in the agent-to-agent channel and preserve required evidence in the consolidated artifact.
+4. Keep routine handshakes and loop transitions in the agent-to-agent channel. Do not mirror them into thread messages or artifact updates.
 5. Publish substantive decisions and results to the same thread under the author's assigned profile.
 6. Keep the thread open until the human explicitly authorizes closure, including after technical approval.
 
@@ -102,6 +102,8 @@ Before dispatch, make each task atomic, clear, self-contained, and complete. Inc
 
 Use this handoff template:
 
+Record a handoff at task assignment or a handover when responsibility actually transfers. A concise thread message or document may carry that bounded record. Do not repeat it for each iteration, test, or review adjustment. Questions, authorizations, diagnostics, and corrections remain in the internal channel. A material change to the plan or contract may update that document; ordinary execution progress does not.
+
 ```md
 Goal:
 Context and sources:
@@ -120,7 +122,7 @@ Expected report:
 
 Every developer independently bootstraps the intended workspace, reads the applicable rules and task sources, and returns `OK_BOOTSTRAP` to the principal before editing. The acknowledgement states workspace identity and path, sources read, critical-rules checklist, requested and effective model and reasoning when verifiable, configuration confirmation source, planned write scope, and existing target status. It is an internal handoff, not a thread comment.
 
-The principal verifies the workspace, sources, configuration, and scope, records that verification and the explicit authorization in the consolidated activity artifact, and communicates authorization to the developer through the agent-to-agent channel. The developer waits for that authorization before editing. If the workspace, configuration, acceptance criteria, or scope cannot be verified, report the blocker and do not expand the assignment. Do not post a separate thread comment for the acknowledgement or authorization transition.
+The principal verifies the workspace, sources, configuration, and scope and communicates explicit authorization through the agent-to-agent channel. The developer waits for that authorization before editing. If the workspace, configuration, acceptance criteria, or scope cannot be verified, report the blocker and do not expand the assignment. Keep the acknowledgement and authorization internal. Consolidate the minimum required verification and authorization evidence at task delivery or final review; neither transition requires a thread comment or an activity-document update.
 
 Use this acknowledgement template:
 
@@ -136,7 +138,7 @@ Planned write scope:
 Existing target status:
 ```
 
-This acknowledgement template is for the internal handoff, not a thread post. Preserve its verified control evidence in the consolidated activity artifact.
+This acknowledgement template is for the internal handoff, not a thread post or a live activity log. Summarize its verified control evidence once with the task delivery or final integrated review, without copying every internal exchange.
 
 ### Implementation and reporting
 
@@ -175,7 +177,7 @@ Verdict: approved | pending | rejected - rationale:
 State changes after this review and required reassessment:
 ```
 
-Return final-review findings to the responsible developer and continue the loop. After corrections, reassess the integrated state, update affected evidence, and issue a new verdict. Any implementation change after approval invalidates that verdict for the new state; re-review the integration and repeat affected checks before approving. This is a harness obligation, not a message, tool, UI state, or hook gate. Technical approval follows an approved final review; it is distinct from human acceptance and thread closure.
+Return final-review findings to the responsible developer through the internal channel and continue the loop. Do not edit the review document for each finding or correction. After corrections, reassess the integrated state and consolidate the verified evidence and verdict when presenting the revised delivery. Any implementation change after approval invalidates that verdict for the new state; re-review the integration and repeat affected checks before approving. This is a harness obligation, not a message, tool, UI state, or hook gate. Technical approval follows an approved final review; it is distinct from human acceptance and thread closure.
 
 Workspace audits check structural integrity, references, and message metadata. They do not replace the principal's technical review. Use the audit scope that matches the checkpoint, including preflight before implementation from a plan and messages before completion or closure summaries after metadata is in place. Use `scope: all` only when the human requests a broad audit or thread state is uncertain.
 
@@ -185,7 +187,7 @@ After technical approval, present the integrated result for human review and add
 
 Apply the relevance filter to every author. Publish a thread message when it records a decision and rationale, a discovery that changes the approach or acceptance criteria, a material scope change, a meaningful blocker or risk, a significant iteration result, or a task delivery with its scope and validation. Developers publish their own relevant contributions under the assigned shared profile; the principal publishes its own decisions and integrated assessment. Do not require principal pre-approval of each relevant developer message, automatically relay the developer's message as the principal, or copy routine user-facing progress into the thread.
 
-Keep handshakes and ordinary loop control in the agent-to-agent channel or consolidated activity artifact, not as standalone thread comments. This includes worker creation or resumption, `OK_BOOTSTRAP`, authorization transitions, routine identity/configuration/path/hash details, command or test starts, confirmations of file or tool use, clean audits, minor edits, and every review/status transition. Include operational detail in a substantive report when it explains a decision, failure, risk, or result. The filter is based on purpose and impact, not keywords.
+Keep handshakes and ordinary loop control in the agent-to-agent channel, not in standalone thread comments or continuously edited artifacts. This includes worker creation or resumption, `OK_BOOTSTRAP`, authorization transitions, routine identity/configuration/path/hash details, command or test starts, confirmations of file or tool use, clean audits, minor edits, and every review/status transition. Neither the thread nor a document is an execution diary. Handoff and handover records are appropriate at task assignment or a real transfer of responsibility, not at every iteration. Include operational detail in a consolidated delivery or final-review report only when it explains a decision, failure, risk, or result. The filter is based on purpose and impact, not keywords.
 
 Keep messages useful and easy to scan:
 
@@ -195,7 +197,7 @@ Keep messages useful and easy to scan:
 - call out blockers or risks;
 - link artifacts when the details are long.
 
-Do not paste large logs or full plans into a message body. Attach a Markdown artifact and link it from the message. For delegated work, reuse the consolidated activity artifact for bootstrap, authorization, rounds, checks, and final-review evidence; attach it through metadata to a substantive message and update it without a separate control comment.
+Do not paste large logs or full plans into a message body. Attach a Markdown artifact and link it from the message. For delegated work, consolidate the necessary evidence at task delivery and final integrated review and associate it through message metadata. Do not create or update activity artifacts as a side effect of each loop iteration. During execution, update a plan or contract only when a material decision actually changes its content; do not transfer the execution diary from messages to documents.
 
 ## Artifacts
 
