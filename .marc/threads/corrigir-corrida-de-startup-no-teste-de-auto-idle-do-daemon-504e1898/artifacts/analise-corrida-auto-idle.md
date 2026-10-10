@@ -96,7 +96,9 @@ Critérios para a correção futura:
 - pnpm validate, pnpm build e pnpm test passam; revisão integrada confere a robustez do teste.
 - Nenhuma mudança de política de runtime deve ser incluída sem requisito e evidência próprios.
 
-Estado: análise concluída; correção pendente nesta thread separada. O usuário pediu registro separado para problema fora da demanda; não foi implementada correção fora do Toast. O principal revisou o mecanismo, a ordem dos eventos, os controles e os hashes; o encaminhamento é aprovado como análise, não como implementação de uma correção.
+Estado da investigação original: análise concluída e correção então pendente nesta thread separada. O usuário pediu registro separado para problema fora da demanda; não foi implementada correção fora do Toast naquela investigação. O principal revisou o mecanismo, a ordem dos eventos, os controles e os hashes; o encaminhamento foi aprovado como análise.
+
+Atualização de 2026-10-09 após solicitação de implementação: a correção foi realizada somente no cenário de test/daemon-runtime.test.ts e aprovada tecnicamente pelo principal. Observa abertura/close sem fetch, preserva autoIdleMs 20 e usa watchdog de 5000 ms com limpeza. Oito processos novos, arquivo completo 6/6 e suíte 210/210 passaram; controles negativos confirmaram timeout e cleanup. Plano e avaliação integrada estão em plano-correcao-auto-idle.md e atividade-correcao-auto-idle.md, anexados nesta thread. A thread permanece aberta para revisão humana.
 
 ## Evidência operacional preservada
 

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 6,
-  "builtAt": "2026-10-09T21:01:06.147Z",
-  "generation": "20261009210105524_db38c40e",
+  "builtAt": "2026-10-10T05:54:39.698Z",
+  "generation": "20261010055439012_1a7b0a80",
   "embeddingProvider": {
     "id": "transformers-js-local-e5",
     "name": "Transformers.js local multilingual E5 retrieval",
@@ -120,6 +120,21 @@
         "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684:source:desenvolvimento-e-revisao:passage:001",
         "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684:source:validacao:passage:001",
         "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684:source:limites-e-continuidade:passage:001"
+      ]
+    },
+    {
+      "threadId": "corrigir-corrida-de-startup-no-teste-de-auto-idle-do-daemon-504e1898",
+      "title": "Corrigir corrida de startup no teste de auto-idle do daemon",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\corrigir-corrida-de-startup-no-teste-de-auto-idle-do-daemon-504e1898\\SUMMARY.md",
+      "relativeSummaryPath": "threads/corrigir-corrida-de-startup-no-teste-de-auto-idle-do-daemon-504e1898/SUMMARY.md",
+      "reference": "marc://$corrigir-corrida-de-startup-no-teste-de-auto-idle-do-daemon-504e1898",
+      "sha256": "1da9084cabb438d3c40a120f4f0ed75325a24be9ca9a9f9a128eb8d27800f260",
+      "mtimeMs": 1791611209398.3948,
+      "recordIds": [
+        "corrigir-corrida-de-startup-no-teste-de-auto-idle-do-daemon-504e1898:identity",
+        "corrigir-corrida-de-startup-no-teste-de-auto-idle-do-daemon-504e1898:source:causa-e-decisao:passage:001",
+        "corrigir-corrida-de-startup-no-teste-de-auto-idle-do-daemon-504e1898:source:entrega:passage:001",
+        "corrigir-corrida-de-startup-no-teste-de-auto-idle-do-daemon-504e1898:source:validacao:passage:001"
       ]
     },
     {

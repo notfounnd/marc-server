@@ -111,26 +111,32 @@ test("daemon start is idempotent when the same fingerprint is already running", 
   }
 });
 
-test("detached daemon auto-idles when there are no leases, UI clients, or activity", async () => {
-  const dataDir = await tempDir("marc-daemon-idle-");
-  const config = await loadDaemonConfig({
-    dataDir,
-    token: "secret",
-    port: 0,
-    mode: "detached",
-    autoIdleMs: 20
-  });
-  const server = await createDaemonServer(config);
-  const baseUrl = await listen(server);
+test(
+  "detached daemon auto-idles when there are no leases, UI clients, or activity",
+  { timeout: 5000 },
+  async (context) => {
+    const dataDir = await tempDir("marc-daemon-idle-");
+    const config = await loadDaemonConfig({
+      dataDir,
+      token: "secret",
+      port: 0,
+      mode: "detached",
+      autoIdleMs: 20
+    });
+    const server = await createDaemonServer(config);
+    context.after(() => {
+      server.close();
+    });
 
-  const closed = new Promise<void>((resolve) => server.on("close", resolve));
-  const status = await fetch(`${baseUrl}/api/status`, {
-    headers: { authorization: "Bearer secret" }
-  });
-  assert.equal(status.status, 200);
-
-  await closed;
-});
+    const closed = new Promise<void>((resolve) =>
+      server.once("close", resolve)
+    );
+    await listen(server);
+    assert.equal(server.listening, true);
+    await closed;
+    assert.equal(server.listening, false);
+  }
+);
 
 test("posting a UI message does not modify RULES.md", async () => {
   const dataDir = await tempDir("marc-daemon-");

@@ -36,3 +36,52 @@ Evidências de reprodução preservadas como artefatos da thread: harness com tr
 Revisão do principal aprova o diagnóstico e o encaminhamento. A correção permanece pendente nesta thread; o runtime e a implementação de Toast não foram alterados.
 
 <!-- /marc-message -->
+
+<!-- marc-message
+id: msg_36c8398bbab940859d
+threadId: corrigir-corrida-de-startup-no-teste-de-auto-idle-do-daemon-504e1898
+timestamp: 2026-10-09T21:09:26.120Z
+agentId: codex-software-architect
+role: architect
+artifacts: artifacts/plano-correcao-auto-idle.md, artifacts/atividade-correcao-auto-idle.md
+-->
+
+Plano aprovado registrado para execução. A correção fica restrita ao cenário de auto-idle: observar abertura e fechamento, remover a requisição que precisava vencer os 20 ms e garantir limpeza com timeout de teste de 5 segundos. O prazo de auto-idle e o runtime permanecem iguais.
+
+A viabilidade foi verificada em memória: 8/8 processos novos aprovados e controle negativo com timeout/limpeza confirmados. A implementação seguirá bootstrap independente, validação completa e revisão integrada do principal. A thread permanece aberta.
+
+<!-- /marc-message -->
+
+<!-- marc-message
+id: msg_b0064690a8a44c1cbd
+threadId: corrigir-corrida-de-startup-no-teste-de-auto-idle-do-daemon-504e1898
+timestamp: 2026-10-09T21:24:59.500Z
+agentId: codex-software-architect
+role: architect
+artifacts: artifacts/atividade-correcao-auto-idle.md, artifacts/analise-corrida-auto-idle.md
+-->
+
+Correção implementada e aprovada tecnicamente após revisão integrada. Somente o cenário de auto-idle em test/daemon-runtime.test.ts mudou: observa abertura e fechamento sem exigir uma requisição HTTP dentro de 20 ms. O prazo do daemon foi preservado; o teste tem watchdog de 5 segundos e limpeza garantida.
+
+O cenário passou em 8/8 processos novos. O principal executou o arquivo completo, 6/6, e um controle negativo derivado do código final: timeout, limpeza e saída do processo confirmados. pnpm validate, pnpm build e pnpm test passaram; suíte 210/210. Comparação de hashes e reconstrução do baseline confirmam que nenhum outro arquivo ou trecho do teste foi alterado. Documentação revisada, sem mudança necessária.
+
+O relatório consolidado contém bootstrap/autorização, evidências delegadas e diretas, critérios e veredito. Resultado disponível para revisão humana. A thread permanece aberta.
+
+<!-- /marc-message -->
+
+<!-- marc-message
+id: msg_da76572ff1ba4507bb
+threadId: corrigir-corrida-de-startup-no-teste-de-auto-idle-do-daemon-504e1898
+timestamp: 2026-10-10T05:46:15.166Z
+agentId: codex-software-architect
+role: architect
+artifacts: artifacts/atividade-correcao-auto-idle.md, artifacts/plano-correcao-auto-idle.md, artifacts/analise-corrida-auto-idle.md
+-->
+
+Encerramento autorizado pelo usuário. A correção foi implementada apenas no cenário de auto-idle: observa abertura e close sem exigir uma primeira resposta HTTP dentro de 20 ms. O prazo do daemon foi preservado; o teste tem watchdog de 5 segundos e limpeza.
+
+Revisão integrada aprovada: 8/8 processos novos, arquivo completo 6/6 e suíte 210/210; validate e build aprovados. Controles negativos confirmaram timeout, limpeza e término do processo. Documentação revisada, sem alteração necessária. Inspeção de fechamento via context-mode confirmou o arquivo igual ao estado tecnicamente aprovado.
+
+O resumo executivo consolida a causa, a alteração restrita ao teste e as evidências. Esta demanda não alterou runtime, Toast ou dependências.
+
+<!-- /marc-message -->
