@@ -7,6 +7,7 @@ import {
   distanceToScore,
   generationFromTableName,
   isManagedTable,
+  lanceDbArrowTable,
   lanceDbModule,
   lanceDbRow,
   LEGACY_TABLE_NAME,
@@ -74,11 +75,13 @@ export class LanceDbMemoryVectorStore implements MemoryVectorStore {
     vectors: number[][],
     generation?: string
   ): Promise<void> {
+    if (!records.length) return;
     const db = await connectLanceDb(info);
     const rows = records.map((record, index) =>
       lanceDbRow(record, vectors[index] ?? [])
     );
-    const table = await db.createTable(tableName(generation), rows, {
+    const arrowTable = await lanceDbArrowTable(rows);
+    const table = await db.createTable(tableName(generation), arrowTable, {
       mode: "overwrite"
     });
     await createLexicalIndexes(table);
@@ -203,10 +206,10 @@ export class LanceDbMemoryVectorStore implements MemoryVectorStore {
   ): Promise<void> {
     if (!rows.length) return;
     const db = await connectLanceDb(info);
-    const table = await db.createTable(
-      LEGACY_TABLE_NAME,
+    const arrowTable = await lanceDbArrowTable(
       rows.map((row) => lanceDbRow(row, row.vector))
     );
+    const table = await db.createTable(LEGACY_TABLE_NAME, arrowTable);
     await createLexicalIndexes(table);
   }
 }

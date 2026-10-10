@@ -1,7 +1,7 @@
 {
   "schemaVersion": 6,
-  "builtAt": "2026-10-10T05:54:39.698Z",
-  "generation": "20261010055439012_1a7b0a80",
+  "builtAt": "2026-10-10T14:12:48.275Z",
+  "generation": "20261010141247871_a478751e",
   "embeddingProvider": {
     "id": "transformers-js-local-e5",
     "name": "Transformers.js local multilingual E5 retrieval",
@@ -31,6 +31,24 @@
         "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983:source:validacao:passage:001",
         "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983:source:limites-e-continuidade:passage:001",
         "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983:source:referencias:passage:001"
+      ]
+    },
+    {
+      "threadId": "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c",
+      "title": "Ajuste - Falha de schema no rebuild incremental da memória",
+      "closedAt": "2026-10-10T14:09:33.000Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c\\SUMMARY.md",
+      "relativeSummaryPath": "threads/ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c/SUMMARY.md",
+      "reference": "marc://$ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c",
+      "sha256": "fd2602039e4c2605b2e4e0258c9d610617e9335a5a373c2020fd6ccecfa69d07",
+      "mtimeMs": 1791641457584.8213,
+      "recordIds": [
+        "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c:identity",
+        "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c:source:objetivo-e-contexto:passage:001",
+        "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c:source:decisao-e-implementacao:passage:001",
+        "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c:source:validacao-e-revisao:passage:001",
+        "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c:source:limites-e-acompanhamento:passage:001",
+        "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c:source:encerramento:passage:001"
       ]
     },
     {

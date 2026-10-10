@@ -102,6 +102,8 @@ marc memory rebuild --mode full
 
 Both modes scan `.marc/threads/*/SUMMARY.md`, use manifest hashes to determine their work, write LanceDB data under `.marc/memory/`, and publish a new `manifest.json` only after the derived index operation succeeds. The manifest contract is `schemaVersion: 6` with `retrievalContract: "field-aware-hybrid-v2"`. The corpus separates one thread identity record from sentence-aware content passages of at most 320 mMARCO tokens with a 48-token overlap. Passages retain section context, while title identity is embedded once per thread. LanceDB stores separate full-text indexes for title, summary text, and title prefixes; prefix search is requested only for a single whitespace-delimited query term. Incremental reconciliation requires the current schema and retrieval contract; a missing or incompatible generation requires an explicit full rebuild. Embedding uses sequential bounded batches. `memory.embeddingBatchSize` defaults to `4` records and accepts even values from `2` through `16`.
 
+Each generation uses an explicit Arrow schema: text columns are nullable `Utf8`, and vectors are nullable fixed-size lists of `Float32` values sized from the generated vectors. Missing `closedAt` and `sectionTitle` values persist as null and read back as absent; empty strings remain empty. Empty generations skip LanceDB table creation, and the manifest is published after the store operation and any applicable validation succeed.
+
 The daemon and UI add background rebuild for interactive use:
 
 - workspace settings are stored per workspace in `.marc/marc.config.json`;

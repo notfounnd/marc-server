@@ -23,10 +23,15 @@ type LanceDbModule = typeof import("@lancedb/lancedb");
 type LanceDbConnection = Awaited<ReturnType<LanceDbModule["connect"]>>;
 type LanceDbTable = Awaited<ReturnType<LanceDbConnection["openTable"]>>;
 
-type LanceDbStoredRow = MemoryVectorRecord & {
+type LanceDbStoredRow = Omit<
+  MemoryVectorRecord,
+  "closedAt" | "sectionTitle"
+> & {
+  closedAt: string | null;
   lexicalSummary: string;
   lexicalTitle: string;
   lexicalTitlePrefix: string;
+  sectionTitle: string | null;
   vector: number[];
 };
 
@@ -80,11 +85,52 @@ export function lanceDbRow(
   const lexical = record.kind === "identity";
   return {
     ...record,
+    closedAt: record.closedAt ?? null,
     lexicalSummary: record.text,
     lexicalTitle: lexical ? record.title : "",
     lexicalTitlePrefix: lexical ? titlePrefixes(record.title) : "",
+    sectionTitle: record.sectionTitle ?? null,
     vector
   };
+}
+
+export async function lanceDbArrowTable(
+  rows: LanceDbStoredRow[]
+): Promise<import("apache-arrow").Table> {
+  const [arrow, lancedb] = await Promise.all([
+    import("apache-arrow"),
+    lanceDbModule()
+  ]);
+  const vector = rows.find((row) => row.vector.length > 0)?.vector;
+  if (!vector) throw new Error("Memory generation requires non-empty vectors.");
+  const textFields = [
+    "recordId",
+    "threadId",
+    "title",
+    "closedAt",
+    "summaryPath",
+    "relativeSummaryPath",
+    "reference",
+    "kind",
+    "sectionTitle",
+    "text",
+    "embeddingText",
+    "lexicalSummary",
+    "lexicalTitle",
+    "lexicalTitlePrefix"
+  ];
+  const schema = new arrow.Schema([
+    ...textFields.map((name) => new arrow.Field(name, new arrow.Utf8(), true)),
+    new arrow.Field(
+      "vector",
+      new arrow.FixedSizeList(
+        vector.length,
+        new arrow.Field("item", new arrow.Float32(), true)
+      ),
+      true
+    )
+  ]);
+  return lancedb.makeArrowTable(rows, { schema });
 }
 
 export function memoryVectorRowFromStored(row: unknown): MemoryVectorRow {
@@ -101,12 +147,12 @@ export function memoryVectorRecordFromStored(row: unknown): MemoryVectorRecord {
     recordId: stored.recordId,
     threadId: stored.threadId,
     title: stored.title,
-    closedAt: stored.closedAt,
+    closedAt: stored.closedAt ?? undefined,
     summaryPath: stored.summaryPath,
     relativeSummaryPath: stored.relativeSummaryPath,
     reference: stored.reference,
     kind: stored.kind,
-    sectionTitle: stored.sectionTitle,
+    sectionTitle: stored.sectionTitle ?? undefined,
     text: stored.text,
     embeddingText: stored.embeddingText
   };

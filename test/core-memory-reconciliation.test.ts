@@ -15,6 +15,7 @@ import {
   tempWorkspace,
   writeSummary
 } from "./memory-test-helpers.js";
+import { LanceDbMemoryVectorStore } from "../src/core/memory/store.js";
 
 class RecordingEmbeddingProvider extends FakeEmbeddingProvider {
   readonly batches: string[][] = [];
@@ -140,6 +141,83 @@ test("failed full rebuild preserves the active generation", async () => {
     await store.listRecordIds(info, active?.generation),
     activeRecordIds
   );
+});
+
+test("failed incremental validation keeps the active manifest and rows", async () => {
+  const info = await tempWorkspace();
+  const provider = new RecordingEmbeddingProvider();
+  const reranker = new FakeRerankingProvider();
+  const store = new InMemoryMemoryVectorStore();
+  await writeSummary(info, "thread-one", summaryFor("Thread one", "first"));
+  await rebuildMemoryInWorkspace(info, { provider, reranker, store });
+
+  const active = await readMemoryManifest(info);
+  assert.ok(active);
+  const activeRows = await store.readRows(info, active.generation);
+  await writeSummary(info, "thread-one", summaryFor("Thread one", "changed"));
+  const validateGeneration = store.validateGeneration;
+  store.validateGeneration = async () => {
+    throw new Error("Generation validation failed.");
+  };
+
+  await assert.rejects(
+    reconcileMemoryInWorkspace(info, { provider, reranker, store }),
+    /Generation validation failed/
+  );
+  store.validateGeneration = validateGeneration;
+
+  const preserved = await readMemoryManifest(info);
+  assert.deepEqual(preserved, active);
+  assert.deepEqual(await store.readRows(info, active.generation), activeRows);
+});
+
+test("empty LanceDB generations publish without a table and accept later rows", async () => {
+  const info = await tempWorkspace();
+  const store = new LanceDbMemoryVectorStore();
+  const provider = new FakeEmbeddingProvider();
+  const reranker = new FakeRerankingProvider();
+  await rebuildMemoryInWorkspace(info, { provider, reranker, store });
+
+  const emptyManifest = await readMemoryManifest(info);
+  assert.ok(emptyManifest);
+  assert.deepEqual(emptyManifest.records, []);
+  assert.equal(await store.exists(info, emptyManifest.generation), false);
+  assert.deepEqual(await store.readRows(info, emptyManifest.generation), []);
+
+  await writeSummary(
+    info,
+    "thread-later",
+    [
+      "# Summary - Later",
+      "Thread: `thread-later`",
+      "",
+      "## Outcome",
+      "",
+      "added"
+    ].join("\n")
+  );
+  await reconcileMemoryInWorkspace(info, { provider, reranker, store });
+
+  const populatedManifest = await readMemoryManifest(info);
+  assert.ok(populatedManifest);
+  assert.notEqual(populatedManifest.generation, emptyManifest.generation);
+  assert.ok(await store.exists(info, populatedManifest.generation));
+  assert.ok(
+    (await store.readRows(info, populatedManifest.generation)).length > 0
+  );
+
+  const documentCalls = provider.documentCalls;
+  await fs.rm(path.join(info.marcPath, "threads", "thread-later"), {
+    force: true,
+    recursive: true
+  });
+  await reconcileMemoryInWorkspace(info, { provider, reranker, store });
+
+  const removedManifest = await readMemoryManifest(info);
+  assert.ok(removedManifest);
+  assert.deepEqual(removedManifest.records, []);
+  assert.equal(provider.documentCalls, documentCalls);
+  assert.equal(await store.exists(info, removedManifest.generation), false);
 });
 
 async function writeSummaries(

@@ -2,8 +2,10 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   BackgroundMemoryReconciler,
-  MEMORY_REBUILD_RESOURCE
+  MEMORY_REBUILD_RESOURCE,
+  readMemoryManifest
 } from "../src/core/memory/index.js";
+import { LanceDbMemoryVectorStore } from "../src/core/memory/store.js";
 import { withWorkspaceWriteLock } from "../src/core/write-coordination.js";
 import {
   FakeRerankingProvider,
@@ -16,6 +18,19 @@ import {
   PreparedProvider,
   waitFor
 } from "./background-memory-test-helpers.js";
+
+class GatedLanceDbStore extends LanceDbMemoryVectorStore {
+  gate?: Deferred;
+  started?: Deferred;
+
+  override async rebuild(
+    ...args: Parameters<LanceDbMemoryVectorStore["rebuild"]>
+  ): Promise<void> {
+    this.started?.resolve();
+    await this.gate?.promise;
+    await super.rebuild(...args);
+  }
+}
 
 test("background memory prepare deduplicates concurrent requests", async () => {
   const info = await tempWorkspace();
@@ -88,6 +103,55 @@ test("background memory rebuild deduplicates concurrent requests", async () => {
   assert.equal(store.rebuildCalls, 1);
   assert.equal(ready.status, "ready");
   assert.ok(ready.lastRebuildAt);
+});
+
+test("background reconciliation returns a real LanceDB generation to ready", async () => {
+  const info = await tempWorkspace();
+  const provider = new PreparedProvider(true);
+  const reranker = new FakeRerankingProvider();
+  const store = new GatedLanceDbStore();
+  const memory = new BackgroundMemoryReconciler(
+    info,
+    () => provider,
+    store,
+    () => reranker
+  );
+  await writeSummary(
+    info,
+    "thread-live",
+    "# Summary - Live\n\nInitial content"
+  );
+  await memory.rebuildFull();
+  await writeSummary(
+    info,
+    "thread-live",
+    "# Summary - Live\n\nUpdated content"
+  );
+  const gate = new Deferred();
+  const started = new Deferred();
+  store.gate = gate;
+  store.started = started;
+
+  const rebuild = memory.rebuild();
+  await started.promise;
+  const rebuilding = await memory.health({ memory: { autoRebuild: true } });
+  assert.equal(rebuilding.status, "rebuilding");
+  gate.resolve();
+  await rebuild;
+
+  const ready = await memory.health({ memory: { autoRebuild: true } });
+  const manifest = await readMemoryManifest(info);
+  const persistedRows = await store.readRows(info, manifest?.generation);
+  assert.equal(ready.status, "ready");
+  assert.equal(ready.summaryCount, 1);
+  assert.equal(ready.indexedSummaryCount, 1);
+  assert.ok(ready.lastRebuildAt);
+  assert.equal(ready.lastError, null);
+  assert.ok(manifest);
+  assert.equal(manifest.records.length, 1);
+  assert.equal(persistedRows.length, 2);
+  assert.equal(provider.documentCalls, 2);
+  assert.ok(await store.exists(info, manifest.generation));
 });
 
 test("background memory runs full rebuild only when explicitly requested", async () => {
