@@ -1,7 +1,7 @@
 {
   "schemaVersion": 6,
-  "builtAt": "2026-10-10T14:12:48.275Z",
-  "generation": "20261010141247871_a478751e",
+  "builtAt": "2026-10-11T19:16:28.904Z",
+  "generation": "20261011191627641_97db0989",
   "embeddingProvider": {
     "id": "transformers-js-local-e5",
     "name": "Transformers.js local multilingual E5 retrieval",
@@ -736,6 +736,25 @@
         "oportunidade-revisao-de-arquitetura-do-projeto-fe4a1cb2:source:resultado:passage:001",
         "oportunidade-revisao-de-arquitetura-do-projeto-fe4a1cb2:source:validacao:passage:001",
         "oportunidade-revisao-de-arquitetura-do-projeto-fe4a1cb2:source:acompanhamento:passage:001"
+      ]
+    },
+    {
+      "threadId": "oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787",
+      "title": "Oportunidade - Revisao e atualizacao do mARC para MCP 2026-07-28",
+      "closedAt": "2026-10-11T19:14:21.000Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787/SUMMARY.md",
+      "reference": "marc://$oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787",
+      "sha256": "99d12aa1b2af5239ec37895035a822368104ffc8e8caba05869ff41e7455c46d",
+      "mtimeMs": 1791746109768.2578,
+      "recordIds": [
+        "oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787:identity",
+        "oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787:source:objetivo-e-decisoes:passage:001",
+        "oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787:source:entrega-integrada:passage:001",
+        "oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787:source:configuracao-local-e-conexao-confirmada:passage:001",
+        "oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787:source:validacao-e-aprovacao:passage:001",
+        "oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787:source:limites-e-contexto-futuro:passage:001",
+        "oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787:source:encerramento:passage:001"
       ]
     },
     {

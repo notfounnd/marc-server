@@ -26,3 +26,17 @@ Direcao para avaliar posteriormente:
 - Identificar a origem gerenciada da regra antes de altera-la, para que a correcao nao seja perdida em refresh de recommendations.
 
 <!-- /marc-message -->
+
+<!-- marc-message
+id: msg_c660ed662ff74551b1
+threadId: oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b
+timestamp: 2026-10-11T19:05:41.705Z
+agentId: ui-user
+role: user
+-->
+
+> A validação passou e não alterou outros arquivos. Estou concluindo build e testes, exigidos pelas regras do projeto também para mudanças na documentação.
+
+Essa frase saiu durante um desenvolvimento. Ela foi feita exatamente durante um ajuste de um markdown da documentação. O agente redou build e testes (de forma desnecessária). Esse é um bom exemplo do que me fez querer registrar essa thread.
+
+<!-- /marc-message -->

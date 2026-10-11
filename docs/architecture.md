@@ -58,6 +58,10 @@ The daemon stores its own local runtime data separately from project threads:
 
 An MCP client starts `marc mcp` over stdio. The agent calls `workspace_bootstrap`, receives the current workspace contract, then calls gated tools with `bootstrapConfirmed: true`.
 
+The stdio server uses the official MCP server SDK's modern serving API and advertises only protocol revision `2026-07-28`. Legacy initialization is rejected. `server/discover` and `tools/list` explicitly advertise private cache scope with a zero-millisecond TTL, and the 24-tool catalog remains available before and after bootstrap. The SDK's JSON text content remains the tool-result contract.
+
+The server applies one fixed one-second, process-wide window for tool calls and rejects excess calls immediately. Shutdown on stdin EOF, process signals, or transport closure stops new calls, waits for active handlers and heartbeat work, and then disposes shared memory providers. Request cancellation is checked before a tool begins domain work; cancellation does not dispose a provider shared by other requests.
+
 When an agent registers a workspace, the MCP server can notify the daemon through `/api/workspaces`. The daemon records the workspace in its registry and the UI can list its threads, agents, rules, summaries, messages, and artifacts.
 
 When the UI posts a message or artifact, the daemon writes the same Markdown-backed workspace files that MCP tools use. Browser updates flow through `/api/events`.

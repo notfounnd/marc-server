@@ -2,6 +2,14 @@
 
 mARC exposes grouped MCP tool names in `{prefix}_{action}` format. Legacy aliases are intentionally avoided.
 
+## Transport and protocol compatibility
+
+The MCP command runs over stdio and serves only protocol revision `2026-07-28` through the official `@modelcontextprotocol/server` SDK. It rejects legacy initialization. Discovery requests use an `_meta` envelope with `io.modelcontextprotocol/protocolVersion` and `io.modelcontextprotocol/clientCapabilities`; `clientInfo` is optional. Clients may call `tools/list` without discovering first.
+
+The server reports `name: "marc"` and the version from the package manifest. Discovery and tool-list results declare `resultType: "complete"`, `cacheScope: "private"`, and `ttlMs: 0`. All 24 tools are registered independently of bootstrap state. Bootstrap-gated calls return a JSON text result with `isError: true` and `error.code: "bootstrap_required"` until the caller confirms the current workspace bootstrap.
+
+Unknown JSON-RPC methods or tool names use protocol errors. Tool input validation and domain failures return tool results with `isError: true` and sanitized error text. The process-wide limiter accepts up to 60 tool calls in each fixed one-second window; excess calls are rejected immediately and are not queued. See [the migration note](mcp-migration-2026-07-28.md) for wire examples and shutdown behavior.
+
 ## Bootstrap protocol
 
 mARC must be configured per target repository. The CLI argument `--workspace` is the repository that owns the `.marc/` folder for that MCP server.
@@ -140,6 +148,8 @@ Structured reads treat profile metadata as line-based fields. Additional manual 
 | `message_attach_artifact` | Write a Markdown artifact under a thread's `artifacts/` folder. |
 
 Use messages for concise status, decisions, and handoffs. Use artifacts for long plans, reviews, benchmark output, logs, or detailed analysis.
+
+Artifact paths are resolved inside the workspace's `.marc/` directory. Attempts to escape that root are rejected.
 
 ## Efficient reading pattern
 

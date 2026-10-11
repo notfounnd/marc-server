@@ -79,6 +79,8 @@ The build removes `dist`, runs TypeScript with `tsconfig.build.json`, and builds
 
 After changing MCP tools or their schemas, rebuild and restart the MCP client session. Many MCP clients cache tool definitions for the lifetime of a session.
 
+The MCP server reports its version from `package.json`. Protocol changes are made against the pinned official server and client SDK versions listed in the manifest; the compatibility target is documented in [the MCP migration note](mcp-migration-2026-07-28.md).
+
 ## Tests
 
 ```bash
@@ -87,11 +89,14 @@ pnpm test
 
 The test suite uses Node's built-in test runner with `tsx`.
 
+MCP subprocess tests strip inherited daemon credentials by default. Tests that exercise lease cleanup provide a local fake daemon explicitly. Memory tests use empty temporary workspaces and verify the missing-model state without loading or downloading model assets.
+
 Current test areas include:
 
 - core workspace behavior;
 - daemon behavior;
-- MCP tool registration and bootstrap rules;
+- MCP source and built-CLI stdio negotiation, tool schemas, cache metadata, error envelopes, rate limiting, and shutdown;
+- MCP tool behavior through the public client SDK using isolated temporary workspaces;
 - UI i18n catalog boundaries;
 - mARC reference parsing;
 - UI link rendering utilities.

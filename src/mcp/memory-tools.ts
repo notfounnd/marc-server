@@ -1,4 +1,4 @@
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
 import {
   prepareMemory,
@@ -6,42 +6,49 @@ import {
   rebuildMemory,
   recallMemory
 } from "../core/workspace-memory.js";
-import { gatedShape, withBootstrap } from "./responses.js";
+import { gatedSchema, withBootstrap } from "./responses.js";
+import { McpToolCoordinator, registerMcpTool } from "./tool-registration.js";
 
 export function registerMemoryTools(
   server: McpServer,
-  workspaceRoot: string
+  workspaceRoot: string,
+  coordinator: McpToolCoordinator
 ): void {
-  server.tool(
+  registerMcpTool(
+    server,
+    coordinator,
     "memory_prepare",
     "Prepare the local summary-memory query interpretation, retrieval, and reranking model caches without rebuilding the committed memory index.",
-    gatedShape({}),
+    gatedSchema({}),
     async (input) =>
       withBootstrap(input, async () => prepareMemory(workspaceRoot))
   );
-
-  server.tool(
+  registerMcpTool(
+    server,
+    coordinator,
     "memory_status",
     "Read summary-memory index health without loading local interpretation, retrieval, or reranking models.",
-    gatedShape({}),
+    gatedSchema({}),
     async (input) =>
       withBootstrap(input, async () => readMemoryStatus(workspaceRoot))
   );
-
-  server.tool(
+  registerMcpTool(
+    server,
+    coordinator,
     "memory_rebuild",
     "Reconcile the committed summary-memory index by default. Pass mode full to explicitly rebuild every closed thread summary.",
-    gatedShape({ mode: z.enum(["incremental", "full"]).optional() }),
+    gatedSchema({ mode: z.enum(["incremental", "full"]).optional() }),
     async (input) =>
       withBootstrap(input, async () =>
         rebuildMemory(workspaceRoot, input.mode ?? "incremental")
       )
   );
-
-  server.tool(
+  registerMcpTool(
+    server,
+    coordinator,
     "memory_recall",
     "Interpret a development intent when requested and recall relevant historical thread summaries before proposing or changing behavior.",
-    gatedShape({
+    gatedSchema({
       query: z.string().min(1),
       queryMode: z.enum(["auto", "literal"]).optional(),
       limit: z.number().int().positive().optional(),

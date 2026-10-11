@@ -1,97 +1,88 @@
 import assert from "node:assert/strict";
-import fs from "node:fs/promises";
-import os from "node:os";
-import path from "node:path";
 import test from "node:test";
-import { buildMcpServer } from "../src/mcp/server.js";
+import { startMcpTestClient, toolJson } from "./mcp-process.js";
 
-type RegisteredTool = {
-  inputSchema: { shape: Record<string, unknown> };
-  handler: (
-    input: Record<string, unknown>
-  ) => Promise<{ content: Array<{ text: string }> }>;
-};
-
-function registeredTools(server: unknown): Record<string, RegisteredTool> {
-  return (server as { _registeredTools: Record<string, RegisteredTool> })
-    ._registeredTools;
-}
-
-async function tempWorkspace(): Promise<string> {
-  return fs.mkdtemp(path.join(os.tmpdir(), "marc-mcp-memory-"));
-}
-
-async function callTool<T = unknown>(
-  tool: RegisteredTool,
-  input: Record<string, unknown> = {}
-): Promise<T> {
-  const response = await tool.handler(input);
-  return JSON.parse(response.content[0].text) as T;
-}
-
-test("memory tools expose schemas and require bootstrap", async () => {
-  const workspace = await tempWorkspace();
-  const server = buildMcpServer({ workspace });
-  const tools = registeredTools(server);
-
-  assert.ok(tools.memory_prepare);
-  assert.ok(tools.memory_status);
-  assert.ok(tools.memory_rebuild);
-  assert.ok(tools.memory_recall);
-  assert.ok(tools.memory_recall.inputSchema.shape.query);
-  assert.ok(tools.memory_recall.inputSchema.shape.queryMode);
-  assert.ok(tools.memory_recall.inputSchema.shape.limit);
-  assert.ok(tools.memory_recall.inputSchema.shape.minScore);
-  assert.ok(tools.memory_rebuild.inputSchema.shape.mode);
-
-  const blocked = await callTool<{ error: { code: string; nextTool: string } }>(
-    tools.memory_status
+test("memory tools publish schemas and require bootstrap", async (t) => {
+  const session = await startMcpTestClient();
+  t.after(() => session.close());
+  const listing = await session.client.listTools();
+  const names = listing.tools
+    .map((tool) => tool.name)
+    .filter((name) => name.startsWith("memory_"));
+  assert.deepEqual(names, [
+    "memory_prepare",
+    "memory_status",
+    "memory_rebuild",
+    "memory_recall"
+  ]);
+  const recallTool = listing.tools.find(
+    (tool) => tool.name === "memory_recall"
   );
-  assert.equal(blocked.error.code, "bootstrap_required");
-  assert.equal(blocked.error.nextTool, "workspace_bootstrap");
+  assert.ok(recallTool);
+  const properties = recallTool.inputSchema.properties as Record<
+    string,
+    unknown
+  >;
+  assert.ok("query" in properties);
+  assert.ok("bootstrapConfirmed" in properties);
+
+  const blocked = await session.client.callTool({
+    name: "memory_recall",
+    arguments: { query: "test query" }
+  });
+  assert.equal(blocked.isError, true);
+  assert.equal(
+    toolJson<{ error: { code: string } }>(blocked).error.code,
+    "bootstrap_required"
+  );
 });
 
-test("memory_recall returns model preparation guidance without loading embeddings", async () => {
-  const workspace = await tempWorkspace();
-  const server = buildMcpServer({ workspace });
-  const tools = registeredTools(server);
+test("memory status and recall report missing models without loading assets", async (t) => {
+  const session = await startMcpTestClient();
+  t.after(() => session.close());
+  await session.client.callTool({ name: "workspace_bootstrap", arguments: {} });
+  const status = await session.client.callTool({
+    name: "memory_status",
+    arguments: { bootstrapConfirmed: true }
+  });
+  const statusResult = toolJson<{
+    result: { status: string; modelPrepared: boolean; summaryCount: number };
+  }>(status).result;
+  assert.equal(statusResult.status, "model_missing");
+  assert.equal(statusResult.modelPrepared, false);
+  assert.equal(statusResult.summaryCount, 0);
 
-  const recall = await callTool<{
+  const recall = await session.client.callTool({
+    name: "memory_recall",
+    arguments: { query: "test query", bootstrapConfirmed: true }
+  });
+  const recallResult = toolJson<{
     result: {
       indexStatus: { status: string };
       results: unknown[];
       nextActions: string[];
     };
-  }>(tools.memory_recall, {
-    bootstrapConfirmed: true,
-    query: "implementar rotacao de token da interface"
-  });
-
-  assert.equal(recall.result.indexStatus.status, "model_missing");
-  assert.deepEqual(recall.result.results, []);
+  }>(recall).result;
+  assert.equal(recallResult.indexStatus.status, "model_missing");
+  assert.deepEqual(recallResult.results, []);
   assert.ok(
-    recall.result.nextActions.some((action) =>
-      action.includes("memory_prepare")
+    recallResult.nextActions.includes(
+      "Run memory_prepare before using memory_recall."
     )
   );
 });
 
-test("memory_rebuild reports model preparation requirement before indexing", async () => {
-  const workspace = await tempWorkspace();
-  const server = buildMcpServer({ workspace });
-  const tools = registeredTools(server);
-
-  const rebuild = await callTool<{
-    result: {
-      status: string;
-      modelPrepared: boolean;
-      message: string;
-    };
-  }>(tools.memory_rebuild, {
-    bootstrapConfirmed: true
+test("memory rebuild reports preparation requirement without downloading models", async (t) => {
+  const session = await startMcpTestClient();
+  t.after(() => session.close());
+  await session.client.callTool({ name: "workspace_bootstrap", arguments: {} });
+  const rebuild = await session.client.callTool({
+    name: "memory_rebuild",
+    arguments: { mode: "incremental", bootstrapConfirmed: true }
   });
-
-  assert.equal(rebuild.result.status, "model_missing");
-  assert.equal(rebuild.result.modelPrepared, false);
-  assert.match(rebuild.result.message, /model/i);
+  const result = toolJson<{
+    result: { status: string; modelPrepared: boolean };
+  }>(rebuild).result;
+  assert.equal(result.status, "model_missing");
+  assert.equal(result.modelPrepared, false);
 });

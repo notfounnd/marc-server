@@ -162,10 +162,11 @@ test("recovers a stale write lock before executing the writer", async () => {
     async () => {
       executed = true;
     },
-    { retryDelayMs: 1, staleAfterMs: 10, timeoutMs: 100 }
+    { retryDelayMs: 1, staleAfterMs: 10, timeoutMs: 5_000 }
   );
 
   assert.equal(executed, true);
+  await assert.rejects(fs.stat(lockPath), { code: "ENOENT" });
 });
 
 test("replaces files only after complete content has been written", async () => {

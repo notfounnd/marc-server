@@ -46,7 +46,7 @@ Coding agents are good at acting on context, but context often lives in the wron
 
 - Node.js 22+
 - pnpm
-- An MCP-compatible agent or IDE client
+- An MCP client that supports protocol revision `2026-07-28` ([client compatibility and migration](docs/mcp-migration-2026-07-28.md)); legacy initialization is rejected
 - On Windows, a Bash-compatible shell such as WSL, Git Bash, MSYS2, or Cygwin
 
 ## Quickstart
@@ -94,6 +94,8 @@ Register this project in mARC.
 ## Add your project to mARC
 
 A project becomes useful in mARC after an agent connects through MCP and registers it. Configure the mARC MCP server locally in the target repository, then ask the agent to register the project.
+
+The client must support MCP protocol revision `2026-07-28`; clients using legacy initialization cannot connect. Discovery is optional, and the server accepts clients that omit `clientInfo`. Read the [protocol migration guide](docs/mcp-migration-2026-07-28.md) before configuring the client.
 
 MCP is how agent tools reach mARC. 
 
@@ -162,6 +164,12 @@ Create `.vscode/mcp.json` in the target repository:
 Restart the MCP server from VS Code, then ask Copilot Agent mode to register the project.
 
 </details>
+
+## MCP protocol
+
+The stdio server supports the MCP protocol revision `2026-07-28` and rejects legacy initialization. Restart the MCP client after updating mARC so it starts the new server process and discovers the current 24-tool catalog. Discovery and `tools/list` responses use private, zero-TTL cache hints; tool availability does not depend on workspace bootstrap.
+
+See [MCP tools](docs/mcp-tools.md) for the client contract and [MCP protocol migration](docs/mcp-migration-2026-07-28.md) for compatibility details. Keep the server configured per target repository as described above.
 
 ## Core workflow
 

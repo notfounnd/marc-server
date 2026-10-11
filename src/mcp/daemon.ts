@@ -28,9 +28,7 @@ export async function notifyDaemon(
   );
 
   if (response.ok) return;
-  throw new Error(
-    `Daemon registration failed: ${response.status} ${await response.text()}`
-  );
+  throw new Error(`Daemon registration failed: ${response.status}`);
 }
 
 export async function unregisterFromDaemon(
@@ -45,52 +43,59 @@ export async function unregisterFromDaemon(
     ),
     {
       method: "DELETE",
-      headers: {
-        authorization: `Bearer ${connection.token}`
-      }
+      headers: { authorization: `Bearer ${connection.token}` },
+      signal: AbortSignal.timeout(5_000)
     }
   );
 
   if (response.ok) return;
   if (response.status === 404) return;
-  throw new Error(
-    `Daemon unregister failed: ${response.status} ${await response.text()}`
-  );
+  throw new Error(`Daemon unregister failed: ${response.status}`);
 }
 
 export async function startDaemonLeaseHeartbeat(
   options: McpOptions
-): Promise<NodeJS.Timeout | undefined> {
+): Promise<() => Promise<void>> {
   const connection = daemonConnection(options);
-  if (!connection) return undefined;
+  if (!connection) return async () => undefined;
 
   const workspace = await getWorkspaceInfo(options.workspace ?? process.cwd());
   const clientId = `mcp-${process.pid}-${randomUUID()}`;
+  const pending = new Set<Promise<void>>();
   const renew = () => {
-    void renewDaemonLease(connection, clientId, workspace).catch(
+    const operation = renewDaemonLease(connection, clientId, workspace).catch(
       () => undefined
     );
+    pending.add(operation);
+    void operation.finally(() => pending.delete(operation));
   };
   renew();
   const timer = setInterval(renew, 15_000);
-
-  const cleanup = () => {
+  timer.unref();
+  let cleanup: Promise<void> | undefined;
+  return () => {
+    if (cleanup) return cleanup;
     clearInterval(timer);
-    void fetch(
-      new URL(
-        `/api/leases/${encodeURIComponent(clientId)}`,
-        connection.daemonUrl
-      ),
-      {
-        method: "DELETE",
-        headers: { authorization: `Bearer ${connection.token}` }
+    cleanup = (async () => {
+      await Promise.all([...pending]);
+      try {
+        await fetch(
+          new URL(
+            `/api/leases/${encodeURIComponent(clientId)}`,
+            connection.daemonUrl
+          ),
+          {
+            method: "DELETE",
+            headers: { authorization: `Bearer ${connection.token}` },
+            signal: AbortSignal.timeout(5_000)
+          }
+        );
+      } catch {
+        // Lease expiration is the fallback if the daemon is unavailable.
       }
-    ).catch(() => undefined);
+    })();
+    return cleanup;
   };
-  process.once("exit", cleanup);
-  process.once("SIGINT", cleanup);
-  process.once("SIGTERM", cleanup);
-  return timer;
 }
 
 function daemonConnection(options: McpOptions): DaemonConnection | undefined {
@@ -121,6 +126,7 @@ async function renewDaemonLease(
         "content-type": "application/json",
         authorization: `Bearer ${connection.token}`
       },
+      signal: AbortSignal.timeout(5_000),
       body: JSON.stringify({
         workspaceId: workspace.id,
         clientType: "mcp",

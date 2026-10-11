@@ -88,7 +88,11 @@ Use a known, valid, confirmed configuration without asking the same question aga
 
 ### Persistent profiles and runtime subagents
 
-Persistent profiles represent recurring roles and remain separate from spawned runtime instances. Before assignment or publication, the principal checks the current profile inventory and resolves a profile for its own role and a suitable shared profile for the developer role from their stated responsibilities. The principal asks the human to confirm any absent or ambiguous role mapping before administering profiles or publishing. Do not impose a fixed profile count, closed ID list, or tool prefix. Only the principal administers the catalog through official mARC MCP tools. Developers with the same role reuse the assigned shared profile and may publish their own relevant contributions directly in the authorized thread through official mARC tools; they do not create, update, or register profiles per spawn, and do not dispatch other developers. The principal publishes its own decisions, reviews, and integrated assessment. It need not approve each relevant developer message in advance or repost the developer's report as its own. Developers implement only after independent `OK_BOOTSTRAP` and explicit authorization, and return execution evidence to the principal. The principal identifies the shared executing profile and runtime identity in task evidence when needed. Profile and configuration choices belong to activity evidence. Do not automatically rename or delete profiles, or rewrite profile history, as a side effect of assignment or spawn. Explicit catalog maintenance, including profile renames, deletions, or history edits, requires human authorization.
+Persistent profiles represent recurring roles and remain separate from spawned runtime instances. Before assignment or publication, the principal checks the current profile inventory and resolves a profile for its own role and a suitable shared profile for the developer role from their stated responsibilities. The principal asks the human to confirm any absent or ambiguous role mapping before administering profiles or publishing. Do not impose a fixed profile count, closed ID list, or tool prefix. Only the principal administers the catalog through official mARC MCP tools.
+
+Developers with the same role reuse the assigned shared profile and must publish their own consolidated delivery for completed delegated development tracked in the authorized thread through official mARC tools, unless the human explicitly exempts that scope. They may also publish other relevant contributions; they do not create, update, or register profiles per spawn, and do not dispatch other developers. The principal publishes its own decisions, reviews, and integrated assessment. It need not approve each relevant developer message in advance and must not publish the developer's delivery as its own. Developers implement only after independent `OK_BOOTSTRAP` and explicit authorization, and return execution evidence to the principal.
+
+The principal identifies the shared executing profile and runtime identity in task evidence when needed. Profile and configuration choices belong to activity evidence. Do not automatically rename or delete profiles, or rewrite profile history, as a side effect of assignment or spawn. Explicit catalog maintenance, including profile renames, deletions, or history edits, requires human authorization.
 
 Profiles describe recurring roles rather than fixing model or reasoning settings. Record task-specific configuration, requested and effective reasoning, and the confirmation source in the handoff or evidence instead of creating profiles for configuration variations. Runtime developers with the same role reuse the appropriate shared profile.
 
@@ -99,6 +103,8 @@ The default ceiling is two active developers only when there is no explicit huma
 ### Prepare a complete task brief
 
 Before dispatch, make each task atomic, clear, self-contained, and complete. Include the context needed to act, inputs and sources, goal and non-goals, exact authorized paths and exclusions, expected output, acceptance criteria, required validation, dependencies, blocker conditions, and the expected report. Resolve open design choices before dispatch instead of asking the developer to decide what should be built.
+
+For delegated development tracked in a thread, the brief must specify two complementary deliverables: a detailed internal report to the principal and a consolidated thread delivery authored by the developer under the assigned shared profile. An agent-to-agent report does not replace the authored delivery. The principal must not waive it or reserve all publication for itself, including through handoff wording such as "internal report only; the principal publishes everything." Only an explicit human instruction can exempt publication for the stated scope; include that instruction in the brief.
 
 Use this handoff template:
 
@@ -115,7 +121,7 @@ Acceptance criteria:
 Required validation:
 Dependencies:
 Blocker conditions:
-Expected report:
+Expected internal report and authored thread delivery:
 ```
 
 ### Bootstrap and authorization
@@ -142,7 +148,11 @@ This acknowledgement template is for the internal handoff, not a thread post or 
 
 ### Implementation and reporting
 
-After authorization, edit only the approved paths, preserve existing user work, and run the checks required by the brief and applicable project rules. Return the detailed task report to the principal through the agent-to-agent channel. The developer may publish its own concise, relevant contribution in the authorized thread with the assigned shared profile, without prior approval of each message. State the task's scope, checks actually run, and remaining risks; a task report is not approval of the whole thread. Report blockers or necessary scope changes to the principal before expanding the work. Do not silently substitute tools, model settings, or implementation scope.
+After authorization, edit only the approved paths, preserve existing user work, and run the checks required by the brief and applicable project rules. Return the detailed task report to the principal through the agent-to-agent channel. For completed delegated development tracked in a thread, the developer must also publish its own consolidated delivery through official mARC tools under the assigned shared profile, unless the human explicitly exempts that scope. Publication requires no principal pre-approval of each message. State the authorized scope, changes, checks actually run and their results, remaining risks or blockers, and pending principal review. This delivery is not technical approval of the task or the whole thread.
+
+Publish at the actual handover after the authorized scope and required checks are complete, not at every attempted completion, correction, command, or review iteration. Follow the [shared message format](#shared-message-format) and attach substantive reports through message metadata before referring to them. Further posts are appropriate only for another genuine delivery or material information useful to the thread. Keep detailed review exchanges internal and consolidate evidence instead of updating artifacts after every iteration.
+
+Include the delivery's message ID in the internal report. If publication is blocked by unavailable MCP access or an absent or ambiguous assigned profile, report that actual blocker to the principal; do not invent a message ID, register another profile, or treat the internal report as a published delivery. If a human exception applies, identify its source and scope instead. Report necessary scope changes before expanding the work. Do not silently substitute tools, model settings, or implementation scope.
 
 Use this completion report template:
 
@@ -153,9 +163,12 @@ Checks run and results:
 Documentation status:
 Remaining risks or blockers:
 Deviations from the brief:
+Authored thread delivery (message ID, publication blocker, or explicit human exception):
 ```
 
 ### Independent review and human acceptance
+
+As part of reviewing the delivery, the principal verifies that the developer's own thread message exists under the assigned profile and accurately reflects the work and evidence. If it is missing without an explicit human exception, return that finding to the developer to publish or resolve the reported blocker. Do not ghostwrite the delivery or attribute a retransmitted developer report to the principal. This authorship check neither substitutes for the technical quality assessment nor creates a tool, UI, or hook gate.
 
 Task and iteration reviews guide corrections during development. After all planned work and the last correction are integrated, the principal must conduct an independent final review of the entire authorized, integrated development before presenting it as complete or technically approved. This review is the principal's responsibility and must begin from these instructions; do not wait for the human to ask whether it happened. Assess the approved goal and decisions, every task and correction plus their integration, relevant behavior and failure cases, architecture and maintainability, applicable rules, actual validation evidence and its limits, documentation, scope preservation, and remaining risks.
 
@@ -188,6 +201,45 @@ After technical approval, present the integrated result for human review and add
 Apply the relevance filter to every author. Publish a thread message when it records a decision and rationale, a discovery that changes the approach or acceptance criteria, a material scope change, a meaningful blocker or risk, a significant iteration result, or a task delivery with its scope and validation. Developers publish their own relevant contributions under the assigned shared profile; the principal publishes its own decisions and integrated assessment. Do not require principal pre-approval of each relevant developer message, automatically relay the developer's message as the principal, or copy routine user-facing progress into the thread.
 
 Keep handshakes and ordinary loop control in the agent-to-agent channel, not in standalone thread comments or continuously edited artifacts. This includes worker creation or resumption, `OK_BOOTSTRAP`, authorization transitions, routine identity/configuration/path/hash details, command or test starts, confirmations of file or tool use, clean audits, minor edits, and every review/status transition. Neither the thread nor a document is an execution diary. Handoff and handover records are appropriate at task assignment or a real transfer of responsibility, not at every iteration. Include operational detail in a consolidated delivery or final-review report only when it explains a decision, failure, risk, or result. The filter is based on purpose and impact, not keywords.
+
+### Shared message format
+
+This guidance applies to every author publishing in the workspace, regardless of role, model, or client. Read it during onboarding and apply it before posting. Use the workspace conversation language for actual messages; the examples below are English technical documentation, not a language override.
+
+- Keep a short message about one subject as a concise paragraph. Do not add empty headings or force every message into the same template.
+- Separate distinct subjects with real paragraph breaks. For several points, use flat bullets or short labeled sections that group related information. Use Markdown deliberately, not merely as a container for a long block of prose.
+- Give each paragraph or bullet one main purpose. Do not combine delivery, validation results, approval state, diagnostics, and next steps in a single dense paragraph.
+- Keep relevant context and distinguish implementation completion, technical review, human acceptance, and closure. Readability is not a reason to omit a meaningful blocker, limit, or pending decision.
+- State the checks actually run and their results. Test counts can help; full logs, hashes, fingerprints, line-ending diagnostics, and intermediate command details normally belong in the attached report. Include such a detail in the message only when it explains a material decision, failure, or risk.
+- Use inline code for command names and technical identifiers, and artifact metadata for attached reports. Do not repeat an attached artifact path in the prose merely to announce it.
+
+Before publishing, each author checks whether a reader can quickly identify the result or decision, supporting validation when applicable, and remaining limits or next steps. If those subjects are mixed together, restructure the message. This is an author-side check, not a requirement for principal pre-approval, a new tool gate, or an additional comment or artifact. It does not change which events warrant publication and must not create an execution diary.
+
+Avoid a delivery compressed into unrelated facts:
+
+```md
+Implemented the change and delivered the report. Focused checks passed, all tests passed, and validate and build passed. The integrity fingerprint is 8f30a1. The report records package line endings. Principal review remains pending.
+```
+
+Prefer a structure that exposes the same relevant result and state:
+
+```md
+## Delivery
+
+- Implemented the change within the authorized scope.
+- Attached the report with evidence and technical diagnostics.
+
+## Validation
+
+- Focused checks and the full test suite passed.
+- `pnpm validate` and `pnpm build` passed.
+
+## Pending
+
+- Principal review remains pending. This is a task delivery, not integrated technical approval.
+```
+
+These are structural examples, not prescribed wording or reusable validation claims. Use only the sections that the actual message needs and report only verified results. A decision or blocker can use a different structure while following the same readability criteria.
 
 Keep messages useful and easy to scan:
 
