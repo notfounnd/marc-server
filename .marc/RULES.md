@@ -127,10 +127,10 @@
    - Evidence: mention the backlog check and any update made before thread closure.
    - Severity: warning
 
-3. **Run the project validation flow before completion**
-   - Trigger: before reporting code, tooling, test, build, lint, formatting, or documentation changes as complete.
-   - Do instead: run `pnpm validate`, `pnpm build`, and `pnpm test`, unless the user explicitly narrows the validation scope.
-   - Evidence: report which commands were executed and whether each passed.
+3. **Select validation by delivery impact**
+   - Trigger: selecting checks or reporting completion for editorial content, mARC records, harness guidance, documentation examples, executable changes, or a release-ready delivery.
+   - Do instead: for editorial content, including changelog corrections, and mARC records, run applicable focused checks for content, Markdown, links, references, and metadata; ordinary `CHAT` or `SUMMARY` content does not by itself change a persistence contract. For harness changes, add review of instruction coherence, source authority, scenarios, and workflow preservation. For executable documentation examples, use safe, specific checks; do not execute destructive or out-of-scope examples. Run `pnpm validate`, `pnpm build`, and `pnpm test`, plus specific checks, for code, tests, tooling, dependencies, executable configuration, or parsing and persistence contract changes. Require the full suite for a release-ready declaration and use the broadest impact for mixed deliveries. Clarify uncertain impact before omitting checks. An explicit human exception must state its scope and limits.
+   - Evidence: classify the delivery and completion claim in the consolidated report; state checks actually run, results, and limits. A non-applicable command is neither a passing check nor a pending check. Do not claim results without evidence. The principal still performs an independent integrated review.
    - Severity: critical
 
 ### Code Style

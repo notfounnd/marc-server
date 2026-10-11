@@ -102,7 +102,7 @@ The default ceiling is two active developers only when there is no explicit huma
 
 ### Prepare a complete task brief
 
-Before dispatch, make each task atomic, clear, self-contained, and complete. Include the context needed to act, inputs and sources, goal and non-goals, exact authorized paths and exclusions, expected output, acceptance criteria, required validation, dependencies, blocker conditions, and the expected report. Resolve open design choices before dispatch instead of asking the developer to decide what should be built.
+Before dispatch, make each task atomic, clear, self-contained, and complete. Include the context needed to act, inputs and sources, goal and non-goals, exact authorized paths and exclusions, expected output, acceptance criteria, delivery-impact classification and completion claim, validation plan with applicable checks and limits, dependencies, blocker conditions, and the expected report. Resolve open design choices before dispatch instead of asking the developer to decide what should be built.
 
 For delegated development tracked in a thread, the brief must specify two complementary deliverables: a detailed internal report to the principal and a consolidated thread delivery authored by the developer under the assigned shared profile. An agent-to-agent report does not replace the authored delivery. The principal must not waive it or reserve all publication for itself, including through handoff wording such as "internal report only; the principal publishes everything." Only an explicit human instruction can exempt publication for the stated scope; include that instruction in the brief.
 
@@ -118,7 +118,8 @@ Authorized write paths:
 Exclusions:
 Expected output:
 Acceptance criteria:
-Required validation:
+Delivery impact and completion claim:
+Validation plan and limits:
 Dependencies:
 Blocker conditions:
 Expected internal report and authored thread delivery:
@@ -148,7 +149,7 @@ This acknowledgement template is for the internal handoff, not a thread post or 
 
 ### Implementation and reporting
 
-After authorization, edit only the approved paths, preserve existing user work, and run the checks required by the brief and applicable project rules. Return the detailed task report to the principal through the agent-to-agent channel. For completed delegated development tracked in a thread, the developer must also publish its own consolidated delivery through official mARC tools under the assigned shared profile, unless the human explicitly exempts that scope. Publication requires no principal pre-approval of each message. State the authorized scope, changes, checks actually run and their results, remaining risks or blockers, and pending principal review. This delivery is not technical approval of the task or the whole thread.
+After authorization, edit only the approved paths, preserve existing user work, and run the checks required by the brief and applicable project rules. Classify the integrated delivery by impact and completion claim; report the evidence for checks actually run, their results, and limits. Return the detailed task report to the principal through the agent-to-agent channel. For completed delegated development tracked in a thread, the developer must also publish its own consolidated delivery through official mARC tools under the assigned shared profile, unless the human explicitly exempts that scope. Publication requires no principal pre-approval of each message. State the authorized scope, changes, checks actually run and their results, remaining risks or blockers, and pending principal review. This delivery is not technical approval of the task or the whole thread.
 
 Publish at the actual handover after the authorized scope and required checks are complete, not at every attempted completion, correction, command, or review iteration. Follow the [shared message format](#shared-message-format) and attach substantive reports through message metadata before referring to them. Further posts are appropriate only for another genuine delivery or material information useful to the thread. Keep detailed review exchanges internal and consolidate evidence instead of updating artifacts after every iteration.
 
@@ -159,7 +160,8 @@ Use this completion report template:
 ```md
 Changed paths and line references:
 Summary:
-Checks run and results:
+Delivery impact and completion claim:
+Checks run, results, and limits:
 Documentation status:
 Remaining risks or blockers:
 Deviations from the brief:
@@ -168,7 +170,7 @@ Authored thread delivery (message ID, publication blocker, or explicit human exc
 
 ### Independent review and human acceptance
 
-As part of reviewing the delivery, the principal verifies that the developer's own thread message exists under the assigned profile and accurately reflects the work and evidence. If it is missing without an explicit human exception, return that finding to the developer to publish or resolve the reported blocker. Do not ghostwrite the delivery or attribute a retransmitted developer report to the principal. This authorship check neither substitutes for the technical quality assessment nor creates a tool, UI, or hook gate.
+As part of reviewing the delivery, the principal verifies that the developer's own thread message exists under the assigned profile and accurately reflects the work and evidence. The principal also independently checks that the impact classification matches the integrated changes and completion claim, that the selected checks are sufficient, and that results and limits are supported; non-applicable commands must not be presented as passes or pending checks. This verification does not replace the independent integrated review. If the message is missing without an explicit human exception, return that finding to the developer to publish or resolve the reported blocker. Do not ghostwrite the delivery or attribute a retransmitted developer report to the principal. This authorship check neither substitutes for the technical quality assessment nor creates a tool, UI, or hook gate.
 
 Task and iteration reviews guide corrections during development. After all planned work and the last correction are integrated, the principal must conduct an independent final review of the entire authorized, integrated development before presenting it as complete or technically approved. This review is the principal's responsibility and must begin from these instructions; do not wait for the human to ask whether it happened. Assess the approved goal and decisions, every task and correction plus their integration, relevant behavior and failure cases, architecture and maintainability, applicable rules, actual validation evidence and its limits, documentation, scope preservation, and remaining risks.
 

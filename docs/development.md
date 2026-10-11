@@ -158,17 +158,19 @@ or refresh recommendations directly with:
 workspace_update_recommendations
 ```
 
-## Validation checklist
+## Validation by impact
 
-Before calling documentation or tooling work complete:
+Select checks by delivery impact, not by file extension, using the canonical policy in `.marc/RULES.md` under `Custom Rules` and the [delegated workflow](agent-workflows.md#development-loop-for-delegated-work). Editorial content, including changelog corrections, and mARC records need applicable content, Markdown, link, reference, and metadata checks. Harness changes also need review of instruction coherence, source authority, scenarios, and workflow preservation. Executable documentation examples need safe, specific checks, not blind or destructive execution. Documentation alone does not trigger the full product suite.
+
+Run the full flow below, plus specific checks, for code, tests, tooling, dependencies, executable configuration, or parsing and persistence contract changes. Mixed deliveries use the broadest impact. A release-ready declaration requires the full flow even if the last change was documentation. Clarify uncertain impact before omitting checks; record the classification, checks actually run, results, and limits. Non-applicable commands are neither passes nor pending checks. The principal's independent integrated review remains required.
 
 ```bash
-pnpm run validate
-pnpm test
+pnpm validate
 pnpm build
+pnpm test
 ```
 
-If the work changes MCP tool names, schemas, or behavior, inspect the built server from `dist/mcp/server.js` after the build and restart the MCP client before live validation.
+If executable work changes MCP tool names, schemas, or behavior, include the full flow, inspect the built server from `dist/mcp/server.js` after the build, and restart the MCP client before live validation.
 
 ## Also see
 

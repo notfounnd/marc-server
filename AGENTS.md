@@ -88,6 +88,6 @@ pnpm build
 pnpm test
 ```
 
-Run the required checks before reporting implementation or documentation work complete unless the user explicitly narrows validation. Report commands not run and why. Review project documentation as part of completion and state whether it changed or needed no update.
+Select checks by delivery impact using the canonical policy in [`.marc/RULES.md`](.marc/RULES.md) under `Custom Rules` and the [delegated workflow](docs/agent-workflows.md#development-loop-for-delegated-work). Editorial content, mARC records, harness guidance, and documentation examples use applicable localized or example-specific checks. Changes to code, tests, tooling, dependencies, executable configuration, or parsing and persistence contracts require the full validation flow; so do mixed deliveries with that impact and any declaration that a release is ready. Clarify uncertain impact before omitting checks. Record the classification, checks actually run, results, and limits; a non-applicable command is neither a pass nor a pending check. The principal's independent integrated review remains required.
 
 `pnpm validate` is not read-only. It starts with `pnpm run code:fix`, which runs lint fixes and Prettier write mode before checks and typechecking. Confirm these side effects fit the authorized scope, inspect affected files, and preserve user work. Do not broadly revert formatter or lint output. Report scope conflicts and let the principal resolve them before proceeding.
