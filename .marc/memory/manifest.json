@@ -1,7 +1,7 @@
 {
   "schemaVersion": 6,
-  "builtAt": "2026-10-12T01:29:57.377Z",
-  "generation": "20261012012956053_8fdcc1df",
+  "builtAt": "2026-10-12T14:27:29.208Z",
+  "generation": "20261012142727060_a5ed27f0",
   "embeddingProvider": {
     "id": "transformers-js-local-e5",
     "name": "Transformers.js local multilingual E5 retrieval",
@@ -849,6 +849,25 @@
         "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186:source:validacao:passage:001",
         "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186:source:riscos-e-continuidade:passage:001",
         "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186:source:referencias:passage:001"
+      ]
+    },
+    {
+      "threadId": "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7",
+      "title": "Oportunidade - Tools MCP para summary e encerramento de threads",
+      "closedAt": "2026-10-12T14:25:38.134Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7/SUMMARY.md",
+      "reference": "marc://$oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7",
+      "sha256": "ab8a2da351e73a76f864fe356ff804262afb652121a23ab8d4e2ddb2bc5ab1b5",
+      "mtimeMs": 1791815138145.7825,
+      "recordIds": [
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7:identity",
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7:source:decisoes-que-orientam-o-resultado:passage:001",
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7:source:entrega-e-integridade:passage:001",
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7:source:correcao-dos-testes-e-validacao:passage:001",
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7:source:correcao-dos-testes-e-validacao:passage:002",
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7:source:revisao-e-limites:passage:001",
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7:source:registros-e-continuidade:passage:001"
       ]
     },
     {

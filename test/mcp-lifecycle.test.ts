@@ -4,104 +4,107 @@ import fs from "node:fs/promises";
 import http from "node:http";
 import os from "node:os";
 import path from "node:path";
-import test from "node:test";
+import test, { type TestContext } from "node:test";
 import { McpTestProcess, repositoryFileExists } from "./mcp-process.js";
 
 const protocolMetadata = {
   "io.modelcontextprotocol/protocolVersion": "2026-07-28",
   "io.modelcontextprotocol/clientCapabilities": {}
 };
-for (const entry of ["source", "dist"] as const) {
-  test(
-    `${entry} stdio serves modern discovery, tool catalog, and EOF cleanup`,
-    {
-      skip: entry === "dist" && !(await repositoryFileExists("dist/cli.js"))
-    },
-    async (t) => {
-      const workspace = await fs.mkdtemp(
-        path.join(os.tmpdir(), "marc-mcp-wire-")
-      );
-      const server = new McpTestProcess(entry, workspace);
-      t.after(async () => {
-        try {
-          const exit = await server.closeProcess();
-          assert.equal(exit.code, 0, server.stderr);
-        } finally {
-          await server.waitForExit();
-          await fs.rm(workspace, { recursive: true, force: true });
-        }
-      });
+assert.ok(await repositoryFileExists("dist/cli.js"));
 
-      await server.send({
-        jsonrpc: "2.0",
-        id: 1,
-        method: "server/discover",
-        params: { _meta: protocolMetadata }
-      });
-      const discovery = await server.readMessage();
-      assert.equal("error" in discovery, false);
-      assert.ok("result" in discovery);
-      const discoveryResult = discovery.result as {
-        supportedVersions: string[];
-        capabilities: { tools?: unknown };
-        resultType: string;
-        ttlMs: number;
-        cacheScope: string;
-        _meta: Record<string, { name: string; version: string }>;
-      };
-      assert.deepEqual(discoveryResult.supportedVersions, ["2026-07-28"]);
-      assert.ok(discoveryResult.capabilities.tools);
-      assert.equal(discoveryResult.resultType, "complete");
-      assert.equal(discoveryResult.ttlMs, 0);
-      assert.equal(discoveryResult.cacheScope, "private");
-      const packageInfo = JSON.parse(
-        await fs.readFile(path.join(process.cwd(), "package.json"), "utf8")
-      ) as { version: string };
-      const serverInfo =
-        discoveryResult._meta["io.modelcontextprotocol/serverInfo"];
-      assert.equal(serverInfo.name, "marc");
-      assert.equal(serverInfo.version, packageInfo.version);
+test("source stdio serves modern discovery, tool catalog, and EOF cleanup", async (t) => {
+  await verifyModernStdioLifecycle(t, "source");
+});
 
-      await server.send({
-        jsonrpc: "2.0",
-        id: 2,
-        method: "tools/list",
-        params: { _meta: protocolMetadata }
-      });
-      const listing = await server.readMessage();
-      assert.ok("result" in listing);
-      const listingResult = listing.result as {
-        tools: Array<{
-          name: string;
-          inputSchema: { properties?: Record<string, unknown> };
-        }>;
-        resultType: string;
-        ttlMs: number;
-        cacheScope: string;
-      };
-      assert.equal(listingResult.tools.length, 24);
-      assert.equal(listingResult.resultType, "complete");
-      assert.equal(listingResult.ttlMs, 0);
-      assert.equal(listingResult.cacheScope, "private");
-      const ungatedTools = new Set([
-        "marc_helper",
-        "workspace_bootstrap",
-        "workspace_update_recommendations"
-      ]);
-      assert.ok(
-        listingResult.tools.every(
-          (tool) =>
-            Object.hasOwn(
-              tool.inputSchema.properties ?? {},
-              "bootstrapConfirmed"
-            ) === !ungatedTools.has(tool.name)
-        )
-      );
+test("dist stdio serves modern discovery, tool catalog, and EOF cleanup", async (t) => {
+  await verifyModernStdioLifecycle(t, "dist");
+});
 
+async function verifyModernStdioLifecycle(
+  t: TestContext,
+  entry: "source" | "dist"
+): Promise<void> {
+  const workspace = await fs.mkdtemp(path.join(os.tmpdir(), "marc-mcp-wire-"));
+  const server = new McpTestProcess(entry, workspace);
+  t.after(async () => {
+    try {
       const exit = await server.closeProcess();
       assert.equal(exit.code, 0, server.stderr);
+    } finally {
+      await server.waitForExit();
+      await fs.rm(workspace, { recursive: true, force: true });
     }
+  });
+
+  await server.send({
+    jsonrpc: "2.0",
+    id: 1,
+    method: "server/discover",
+    params: { _meta: protocolMetadata }
+  });
+  const discovery = await server.readMessage();
+  assert.equal("error" in discovery, false);
+  assert.ok("result" in discovery);
+  const discoveryResult = discovery.result as {
+    supportedVersions: string[];
+    capabilities: { tools?: unknown };
+    resultType: string;
+    ttlMs: number;
+    cacheScope: string;
+    _meta: Record<string, { name: string; version: string }>;
+  };
+  assert.deepEqual(discoveryResult.supportedVersions, ["2026-07-28"]);
+  assert.ok(discoveryResult.capabilities.tools);
+  assert.equal(discoveryResult.resultType, "complete");
+  assert.equal(discoveryResult.ttlMs, 0);
+  assert.equal(discoveryResult.cacheScope, "private");
+  const packageInfo = JSON.parse(
+    await fs.readFile(path.join(process.cwd(), "package.json"), "utf8")
+  ) as { version: string };
+  const serverInfo =
+    discoveryResult._meta["io.modelcontextprotocol/serverInfo"];
+  assert.equal(serverInfo.name, "marc");
+  assert.equal(serverInfo.version, packageInfo.version);
+
+  await server.send({
+    jsonrpc: "2.0",
+    id: 2,
+    method: "tools/list",
+    params: { _meta: protocolMetadata }
+  });
+  const listing = await server.readMessage();
+  assert.ok("result" in listing);
+  const listingResult = listing.result as {
+    tools: Array<{
+      name: string;
+      inputSchema: { properties?: Record<string, unknown> };
+    }>;
+    resultType: string;
+    ttlMs: number;
+    cacheScope: string;
+  };
+  assert.equal(listingResult.tools.length, 25);
+  assert.equal(listingResult.resultType, "complete");
+  assert.equal(listingResult.ttlMs, 0);
+  assert.equal(listingResult.cacheScope, "private");
+  const ungatedTools = new Set([
+    "marc_helper",
+    "workspace_bootstrap",
+    "workspace_update_recommendations"
+  ]);
+  assert.ok(
+    listingResult.tools.every(
+      (tool) =>
+        Object.hasOwn(
+          tool.inputSchema.properties ?? {},
+          "bootstrapConfirmed"
+        ) === !ungatedTools.has(tool.name)
+    )
   );
+
+  const exit = await server.closeProcess();
+  assert.equal(exit.code, 0, server.stderr);
 }
 
 type HeartbeatCloseStrategy = {
@@ -121,14 +124,12 @@ const heartbeatCloseStrategies: HeartbeatCloseStrategy[] = [
     name: "stdout error",
     close: async (server) => {
       server.child.stdout.destroy();
-      await server
-        .send({
-          jsonrpc: "2.0",
-          id: 1,
-          method: "server/discover",
-          params: { _meta: protocolMetadata }
-        })
-        .catch(() => undefined);
+      await server.send({
+        jsonrpc: "2.0",
+        id: 1,
+        method: "server/discover",
+        params: { _meta: protocolMetadata }
+      });
       const exit = await server.waitForExit();
       assert.equal(exit.code, 0, server.stderr);
     }
@@ -147,6 +148,10 @@ for (const strategy of heartbeatCloseStrategies) {
     const renewed = new Promise<void>((resolve) => {
       resolveRenew = resolve;
     });
+    const renewalHandlers = new Map<string, () => void>([
+      ["PUT", resolveRenew],
+      ["DELETE", () => undefined]
+    ]);
     const daemon = http.createServer((request, response) => {
       requests.push({
         method: request.method,
@@ -156,20 +161,23 @@ for (const strategy of heartbeatCloseStrategies) {
       request.resume();
       response.writeHead(204);
       response.end();
-      if (request.method !== "PUT") return;
-      resolveRenew();
+      const handler = renewalHandlers.get(request.method ?? "");
+      assert.ok(handler, `Unexpected daemon method: ${request.method}`);
+      handler();
     });
     const workspace = await fs.mkdtemp(
       path.join(os.tmpdir(), `marc-mcp-heartbeat-${strategy.name}-`)
     );
-    const serverRef: { current?: McpTestProcess } = {};
+    const servers = new Set<McpTestProcess>();
     t.after(async () => {
       try {
-        const process = serverRef.current;
-        if (!process) return;
-        const exit = await process.closeProcess();
-        assert.equal(exit.code, 0, process.stderr);
-        await process.waitForExit();
+        await Promise.all(
+          [...servers].map(async (process) => {
+            const exit = await process.closeProcess();
+            assert.equal(exit.code, 0, process.stderr);
+            await process.waitForExit();
+          })
+        );
       } finally {
         await new Promise<void>((resolve) => daemon.close(() => resolve()));
         await fs.rm(workspace, { recursive: true, force: true });
@@ -179,14 +187,12 @@ for (const strategy of heartbeatCloseStrategies) {
     daemon.listen(0, "127.0.0.1");
     await once(daemon, "listening");
     const address = daemon.address();
-    if (!address || typeof address === "string") {
-      throw new Error("Fake daemon did not bind to a TCP port.");
-    }
+    assert.ok(address && typeof address !== "string");
     const runningServer = new McpTestProcess("source", workspace, {
-      MARC_DAEMON_URL: `http://127.0.0.1:${address.port}`,
+      MARC_DAEMON_URL: `http://127.0.0.1:${(address as import("node:net").AddressInfo).port}`,
       MARC_TOKEN: token
     });
-    serverRef.current = runningServer;
+    servers.add(runningServer);
     let timeout: NodeJS.Timeout | undefined;
     try {
       await Promise.race([
@@ -207,6 +213,7 @@ for (const strategy of heartbeatCloseStrategies) {
 
     await strategy.close(runningServer);
     assert.ok(requests.some((request) => request.method === "DELETE"));
+    assert.ok(requests.some((request) => request.method === "PUT"));
     assert.ok(
       requests.every((request) => request.authorization === `Bearer ${token}`)
     );

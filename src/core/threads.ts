@@ -3,6 +3,7 @@ import { newId, slugify } from "./ids.js";
 import { MESSAGE_STYLE_GUIDE, validateMessageBody } from "./guards.js";
 import { parseMessages, renderChatHeader, renderMessage } from "./markdown.js";
 import { safeJoin } from "./paths.js";
+import { readThreadSummarySnapshotInWorkspace } from "./thread-summary.js";
 import {
   threadWriteResource,
   withWorkspaceWriteLock,
@@ -103,15 +104,15 @@ export async function readThreadInWorkspace(
   const includeMessages = options.includeMessages ?? true;
   const includeSummary = options.includeSummary ?? true;
   const summary = includeSummary
-    ? await readTextIfExists(
-        safeJoin(info.marcPath, "threads", threadId, "SUMMARY.md")
-      )
-    : "";
+    ? await readThreadSummarySnapshotInWorkspace(info, threadId)
+    : undefined;
 
   return {
     ...(options.includeMarkdown ? { markdown } : {}),
     ...(includeMessages ? { messages } : {}),
-    ...(summary ? { summary } : {}),
+    ...(summary
+      ? { summary: summary.summary, summaryRevision: summary.summaryRevision }
+      : {}),
     ...stats
   };
 }
@@ -155,6 +156,7 @@ export async function readThreadInfoInWorkspace(
   const markdown = await fs.readFile(chatPath, "utf8");
   const messages = parseMessages(markdown);
   const stats = threadMessageStats(messages);
+  const summary = await readThreadSummarySnapshotInWorkspace(info, threadId);
   const threads = await listThreadsInWorkspace(info, { status: "all" });
   const thread = threads.find((item) => item.id === threadId);
   if (!thread) {
@@ -165,7 +167,8 @@ export async function readThreadInfoInWorkspace(
     ...thread,
     ...stats,
     updatedAt: stats.updatedAt ?? thread.createdAt,
-    summaryAvailable: Boolean(thread.summaryPath)
+    summaryAvailable: Boolean(summary),
+    ...(summary ? { summaryRevision: summary.summaryRevision } : {})
   };
 }
 
@@ -194,10 +197,6 @@ async function exists(filePath: string): Promise<boolean> {
   } catch {
     return false;
   }
-}
-
-async function readTextIfExists(filePath: string): Promise<string> {
-  return (await exists(filePath)) ? fs.readFile(filePath, "utf8") : "";
 }
 
 function threadMessageStats(messages: ChatMessage[]): {

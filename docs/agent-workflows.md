@@ -208,6 +208,10 @@ Keep handshakes and ordinary loop control in the agent-to-agent channel, not in 
 
 This guidance applies to every author publishing in the workspace, regardless of role, model, or client. Read it during onboarding and apply it before posting. Use the workspace conversation language for actual messages; the examples below are English technical documentation, not a language override.
 
+Markdown is available in messages, artifacts, and thread summaries. Apply this shared composition guidance to each channel while preserving intentional formatting inside artifacts and summaries. Message-specific limits apply to messages only; they do not constrain attached files or summary bodies.
+
+Authors may use the full supported Markdown syntax—including tables, links, blockquotes, lists, and code—when it improves readability; this guidance does not restrict content to plain text or a fixed template.
+
 - Keep a short message about one subject as a concise paragraph. Do not add empty headings or force every message into the same template.
 - Separate distinct subjects with real paragraph breaks. For several points, use flat bullets or short labeled sections that group related information. Use Markdown deliberately, not merely as a container for a long block of prose.
 - Give each paragraph or bullet one main purpose. Do not combine delivery, validation results, approval state, diagnostics, and next steps in a single dense paragraph.
@@ -306,14 +310,9 @@ Agents should treat these as durable pointers and write them as normal message t
 
 ## Closing threads
 
-A `SUMMARY.md` in the thread folder should be executive, not exhaustive:
+A `SUMMARY.md` starts its body with one concise synthesis paragraph immediately after the core-owned header. Use that opening to state the purpose, result or decision, and current state; include limits only when they matter to a future reader. After it, consider the goal and context; decisions and delivery; validation and acceptance; limits and pending work; and continuity or references. These areas may be combined, split, or omitted. No headings, order, or number of sections are required.
 
-- goal and context;
-- decisions made;
-- implementation completed;
-- validation performed;
-- unresolved risks;
-- follow-up threads or references.
+Keep the summary useful for continuing work without trying to reproduce the full conversation. Distinguish implementation completion, technical approval, human acceptance, and thread closure where they apply. Preserve deliberate Markdown formatting, links, and code examples in the body. See [Shared message format](#shared-message-format) for common composition guidance.
 
 Create the summary and close the thread only after the human explicitly authorizes closure. Implementation completion and technical approval are not closure authorization. If a thread becomes too broad, propose splitting the remaining work and wait for human direction before closing it.
 

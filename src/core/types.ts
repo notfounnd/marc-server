@@ -126,6 +126,7 @@ export type ThreadReadResult = {
   markdown?: string;
   messages?: ChatMessage[];
   summary?: string;
+  summaryRevision?: string;
   messageCount: number;
   lastMessageId?: string;
   updatedAt?: string;
@@ -156,6 +157,24 @@ export type ThreadInfoResult = ThreadInfo & {
   lastMessageId?: string;
   updatedAt: string;
   summaryAvailable: boolean;
+  summaryRevision?: string;
+};
+
+export type SummaryProjectionState = {
+  threadIndex: "updated" | "pending";
+  memory: "current" | "scheduled" | "pending";
+  errors: Array<"thread_index_refresh_failed" | "memory_status_failed">;
+};
+
+export type ThreadSummaryWriteResult = {
+  threadId: string;
+  reference: string;
+  summaryPath: string;
+  status: "closed";
+  closedAt: string;
+  summaryRevision: string;
+  outcome: "created" | "updated" | "unchanged";
+  projections: SummaryProjectionState;
 };
 
 export type ThreadTailOptions = {

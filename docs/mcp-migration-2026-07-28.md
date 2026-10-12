@@ -20,7 +20,7 @@ Clients must support the modern MCP protocol envelope and send the protocol revi
 }
 ```
 
-Discovery returns the sole supported revision, the server identity derived from `package.json`, and cache metadata. `server/discover` and `tools/list` both advertise `resultType: "complete"`, `cacheScope: "private"`, and `ttlMs: 0`. A client may request `tools/list` without discovering first. The server registers all 24 tools regardless of workspace bootstrap state.
+Discovery returns the sole supported revision, the server identity derived from `package.json`, and cache metadata. `server/discover` and `tools/list` both advertise `resultType: "complete"`, `cacheScope: "private"`, and `ttlMs: 0`. A client may request `tools/list` without discovering first. The server registers all 25 tools regardless of workspace bootstrap state.
 
 `serveStdio` is configured with `legacy: "reject"`, so clients using the older initialization flow cannot connect. An opening request with no protocol-version claim is rejected with JSON-RPC error `-32022`. After the modern connection opens, each request is checked independently: an explicit unsupported revision returns `-32022` with the supported and requested revisions, including `tools/call`; an incompatible notification is dropped without reaching a tool. Missing or malformed metadata is delegated to SDK validation and returns `-32602`. A client that does not support `2026-07-28` must update its MCP implementation before connecting.
 

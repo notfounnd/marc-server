@@ -21,6 +21,7 @@ const expectedTools = [
   "thread_read",
   "thread_read_since",
   "thread_tail",
+  "thread_write_summary",
   "workspace_audit",
   "workspace_bootstrap",
   "workspace_info",
@@ -36,7 +37,7 @@ test("public tools/list exposes the stable canonical catalog and gated schemas",
   t.after(() => session.close());
   const listing = await session.client.listTools();
 
-  assert.equal(listing.tools.length, 24);
+  assert.equal(listing.tools.length, 25);
   assert.deepEqual(
     listing.tools.map((tool) => tool.name).sort(),
     expectedTools
@@ -52,6 +53,19 @@ test("public tools/list exposes the stable canonical catalog and gated schemas",
     threadList.inputSchema.properties as Record<string, { enum?: string[] }>
   ).status;
   assert.deepEqual(threadStatus.enum, ["open", "closed", "all"]);
+  const summaryWriter = listing.tools.find(
+    (tool) => tool.name === "thread_write_summary"
+  );
+  assert.ok(summaryWriter);
+  const summaryProperties = summaryWriter.inputSchema.properties as Record<
+    string,
+    { enum?: string[]; type?: string }
+  >;
+  assert.ok("bootstrapConfirmed" in summaryProperties);
+  assert.equal(summaryProperties.threadId.type, "string");
+  assert.equal(summaryProperties.body.type, "string");
+  assert.deepEqual(summaryProperties.mode.enum, ["create", "update"]);
+  assert.equal(summaryProperties.expectedSummaryRevision.type, "string");
 });
 
 test("bootstrap gate is a tool error and does not alter the public catalog", async (t) => {
@@ -68,6 +82,18 @@ test("bootstrap gate is a tool error and does not alter the public catalog", asy
   assert.equal(gated.isError, true);
   assert.equal(
     toolJson<{ error: { code: string } }>(gated).error.code,
+    "bootstrap_required"
+  );
+  const summaryGated = await session.client.callTool({
+    name: "thread_write_summary",
+    arguments: {
+      threadId: "summary-gate-test-abcdef12",
+      body: "This call must stop at the workspace bootstrap gate."
+    }
+  });
+  assert.equal(summaryGated.isError, true);
+  assert.equal(
+    toolJson<{ error: { code: string } }>(summaryGated).error.code,
     "bootstrap_required"
   );
   const bootstrap = await session.client.callTool({
@@ -150,6 +176,32 @@ test("marc_helper returns the requested topic through JSON text content", async 
   assert.ok(body.availableTopics.includes("incremental_reading"));
   assert.ok(
     body.examples.some((example) => example.includes("workspace_bootstrap"))
+  );
+
+  const threadGuideResult = await session.client.callTool({
+    name: "marc_helper",
+    arguments: { topic: "threads" }
+  });
+  const threadGuide = toolJson<{
+    relatedTools: string[];
+    examples: string[];
+    notes: string[];
+  }>(threadGuideResult);
+  assert.ok(threadGuide.relatedTools.includes("thread_write_summary"));
+  assert.ok(
+    threadGuide.examples.some((example) =>
+      example.includes("expectedSummaryRevision")
+    )
+  );
+  assert.ok(
+    threadGuide.examples.some((example) =>
+      example.includes("full IDs for writes")
+    )
+  );
+  assert.ok(
+    threadGuide.notes.some((note) =>
+      note.includes("docs/agent-workflows.md#closing-threads")
+    )
   );
 });
 

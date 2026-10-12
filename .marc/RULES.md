@@ -14,6 +14,7 @@
 ## Conversation Rules
 
 - Keep messages useful, readable, and complete; use artifact metadata when relevant.
+- Use the workspace's canonical rules as the authority for shared Markdown composition across messages, artifacts, and summaries.
 - Prefer creating a new thread for a new task.
 
 ## Message Style
@@ -107,10 +108,10 @@
 
 ### Message Formatting
 
-1. **Apply the shared format before publishing**
-   - Trigger: any author prepares a mARC workspace message, regardless of role, model, or client.
-   - Do instead: follow the [shared message format](../docs/agent-workflows.md#shared-message-format). Use a concise paragraph for one subject and real paragraph breaks, flat bullets, or short sections for multiple subjects. Separate result or decision, validation, and pending work when applicable instead of compressing them into a dense block. Keep meaningful context and state limits accurately. Put hashes, full logs, fingerprints, line-ending diagnostics, and intermediate details in an attached report unless they explain a material decision or risk. Before posting, the author checks that a reader can quickly identify the result, supporting validation, and next step. This is not a fixed template, principal pre-approval, a tool gate, or a reason to post extra messages or maintain a diary.
-   - Evidence: the published message demonstrates the appropriate structure and verified results. No separate checklist comment or artifact is required to prove the formatting check.
+1. **Apply the shared format to mARC Markdown**
+   - Trigger: any author prepares mARC Markdown content, including messages, artifacts, or thread summaries, regardless of role, model, or client.
+   - Do instead: follow the [shared Markdown composition guidance](../docs/agent-workflows.md#shared-message-format) and its applicable channel-specific guidance. Use that existing guide as the common composition source; other harness instructions and technical documents must reference it instead of duplicating a formatting policy. Respect message-specific limits and artifact metadata where applicable, without extending message limits to artifact or summary files. This is author guidance, not a fixed template, principal pre-approval, a tool gate, or a reason to create an execution diary.
+   - Evidence: the authored content demonstrates the shared guidance and appropriate structure for its purpose. No separate checklist comment or artifact is required to prove the formatting check.
    - Severity: critical
 
 ### Flow Rules
@@ -164,6 +165,14 @@
    - Do instead: keep the guard as an early return.
    - Evidence: avoid introducing Strategy pattern for a simple guard.
    - Severity: warning
+
+### Test Design
+
+1. **Keep test scenarios deterministic and branch-free**
+   - Trigger: writing or modifying tests and their scenario fixtures.
+   - Do instead: declare each scenario, input, expected result, and assertion explicitly. Do not use `if`, `else`, `switch`, ternary expressions, or exception-driven skips to choose whether or how a test runs. Do not relocate those branches to a fixture, helper, or embedded test script. Use typed declarative fixtures and the smallest internal dependency boundary for environment-dependent metadata or errors, preserving the real Node implementation as the production default and explicit real-filesystem integration coverage.
+   - Evidence: inspect the affected tests, fixtures, and embedded scripts for conditional scenario logic and skips; report the scenarios actually executed. A missing environment prerequisite must not silently skip the behavior under test.
+   - Severity: critical
 
 ### Development Loop
 

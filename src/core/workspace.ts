@@ -32,6 +32,10 @@ import {
   readThreadTailInWorkspace
 } from "./threads.js";
 import {
+  writeThreadSummaryInWorkspace,
+  type ThreadSummaryWriteInput
+} from "./thread-summary.js";
+import {
   withWorkspaceWriteLock,
   writeFileAtomically
 } from "./write-coordination.js";
@@ -50,6 +54,7 @@ import type {
   ThreadReadSinceResult,
   ThreadTailOptions,
   ThreadTailResult,
+  ThreadSummaryWriteResult,
   WorkspaceInfo,
   WorkspaceRecommendationsUpdate,
   WorkspaceStatus
@@ -132,6 +137,14 @@ export async function createThread(
 ): Promise<ThreadInfo> {
   const info = await initWorkspace(workspaceRoot);
   return createThreadInWorkspace(info, title);
+}
+
+export async function writeThreadSummary(
+  workspaceRoot: string,
+  input: ThreadSummaryWriteInput
+): Promise<ThreadSummaryWriteResult> {
+  const info = await getWorkspaceInfo(workspaceRoot);
+  return writeThreadSummaryInWorkspace(info, input);
 }
 
 export async function listThreads(

@@ -58,7 +58,7 @@ The daemon stores its own local runtime data separately from project threads:
 
 An MCP client starts `marc mcp` over stdio. The agent calls `workspace_bootstrap`, receives the current workspace contract, then calls gated tools with `bootstrapConfirmed: true`.
 
-The stdio server uses the official MCP server SDK's modern serving API and advertises only protocol revision `2026-07-28`. Legacy initialization is rejected. `server/discover` and `tools/list` explicitly advertise private cache scope with a zero-millisecond TTL, and the 24-tool catalog remains available before and after bootstrap. The SDK's JSON text content remains the tool-result contract.
+The stdio server uses the official MCP server SDK's modern serving API and advertises only protocol revision `2026-07-28`. Legacy initialization is rejected. `server/discover` and `tools/list` explicitly advertise private cache scope with a zero-millisecond TTL, and the 25-tool catalog remains available before and after bootstrap. The SDK's JSON text content remains the tool-result contract.
 
 The server applies one fixed one-second, process-wide window for tool calls and rejects excess calls immediately. Shutdown on stdin EOF, process signals, or transport closure stops new calls, waits for active handlers and heartbeat work, and then disposes shared memory providers. Request cancellation is checked before a tool begins domain work; cancellation does not dispose a provider shared by other requests.
 
@@ -97,7 +97,7 @@ Architecture Decision Records (ADR) document the major decisions behind mARC's c
 
 Threads start open. Messages are appended to `CHAT.md` with structured metadata comments. Artifacts are stored in the thread's `artifacts/` directory and linked from messages.
 
-A thread is closed by adding `SUMMARY.md`. The summary is intended to be an executive summary: what was decided, what changed, validation, risks, and useful follow-up context. Closed threads stay available through archive views and direct reads.
+`thread_write_summary` creates `SUMMARY.md` and closes the thread. The caller supplies the body; the core owns the title and metadata header. Updates to an existing summary use its current revision. See [Closing threads](agent-workflows.md#closing-threads) for composition guidance. Closed threads stay available through archive views and direct reads.
 
 ## Internal references
 

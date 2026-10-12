@@ -6,8 +6,10 @@ import {
   readThread,
   readThreadInfo,
   readThreadSince,
-  readThreadTail
+  readThreadTail,
+  writeThreadSummary
 } from "../core/workspace.js";
+import { ThreadSummaryError } from "../core/thread-summary.js";
 import { gatedSchema, toolError, withBootstrap } from "./responses.js";
 import { resolveThreadId } from "./thread-resolution.js";
 import { McpToolCoordinator, registerMcpTool } from "./tool-registration.js";
@@ -27,6 +29,40 @@ export function registerThreadTools(
     gatedSchema({ title: z.string().min(1) }),
     async (input) =>
       withBootstrap(input, async () => createThread(workspaceRoot, input.title))
+  );
+  registerMcpTool(
+    server,
+    coordinator,
+    "thread_write_summary",
+    "Create or update a thread summary. Creation closes the thread by writing SUMMARY.md; updates require the current summary revision. The caller supplies free-form Markdown. See docs/agent-workflows.md#closing-threads for composition guidance.",
+    gatedSchema({
+      threadId: z.string().min(1),
+      body: z.string(),
+      mode: z.enum(["create", "update"]).optional(),
+      expectedSummaryRevision: z
+        .string()
+        .optional()
+        .describe(
+          "Required for update; the lowercase SHA-256 revision from thread_read or thread_info."
+        )
+    }),
+    async (input) => {
+      try {
+        return await withBootstrap(input, async () =>
+          writeThreadSummary(workspaceRoot, {
+            threadId: input.threadId,
+            body: input.body,
+            mode: input.mode,
+            expectedSummaryRevision: input.expectedSummaryRevision
+          })
+        );
+      } catch (error) {
+        if (error instanceof ThreadSummaryError) {
+          return toolError(error.code, error.message, error.details);
+        }
+        return toolError("internal_error", "Tool execution failed.");
+      }
+    }
   );
   registerMcpTool(
     server,

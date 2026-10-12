@@ -110,17 +110,21 @@ const MARC_HELPER_GUIDES: Record<
       "thread_read",
       "thread_info",
       "thread_tail",
-      "thread_read_since"
+      "thread_read_since",
+      "thread_write_summary"
     ],
     examples: [
       "thread_create with a clear task title for new work.",
       "thread_list defaults to open threads; pass status closed or all when needed.",
       "thread_info gives cheap metadata before deciding whether to read content.",
       "Thread read tools accept a unique 8-character hexadecimal suffix; use full IDs for writes.",
+      "Use thread_write_summary with a full thread ID; create closes only when authorized, and update requires expectedSummaryRevision from thread_info or thread_read with includeSummary true.",
+      "Provide only the caller-authored summary body; the core owns its title and metadata header.",
       "When the user gives a specific mARC source, read that source before broad workspace investigation."
     ],
     notes: [
       "Closed threads are controlled by SUMMARY.md in the thread folder.",
+      "See docs/agent-workflows.md#closing-threads for the canonical summary composition and closure guidance.",
       "Prefer a new thread when a conversation becomes too broad or needs a separate outcome."
     ]
   },

@@ -4,7 +4,9 @@ mARC can maintain a shared semantic memory index for closed thread summaries. Th
 
 ## Source of truth
 
-Only closed-thread `SUMMARY.md` content is indexed. When available, the canonical title is read from `CHAT.md` and stored with the summary records, but message bodies are not indexed. Artifacts, docs, rules, and agent profiles are not part of the memory corpus.
+Only closed-thread `SUMMARY.md` content is indexed. Use `thread_write_summary` to create a summary or revision-check an update; the Markdown file remains the source of truth. When available, the canonical title is read from `CHAT.md` and stored with the summary records, but message bodies are not indexed. Artifacts, docs, rules, and agent profiles are not part of the memory corpus.
+
+A summary write commits the source before refreshing derived projections. The result reports thread-index and memory projection state; an unavailable refresh does not undo the saved summary. Automatic memory rebuilds may schedule an incremental reconciliation when eligible. If memory remains pending, run `memory_rebuild` in its default incremental mode. Summary writes do not prepare or download retrieval models.
 
 The committed index is derived data:
 
@@ -92,7 +94,7 @@ Memory rebuilds operate on closed-thread `SUMMARY.md` files. The core exposes tw
 - `incremental` is the normal reconciliation path. It embeds only new or changed summary records and removes records whose source summary disappeared.
 - `full` rebuilds the entire derived snapshot. It remains an explicit manual operation for recovery or provider-contract changes.
 
-CLI rebuild remains explicit and synchronous. It should run after a thread is closed or a `SUMMARY.md` changes:
+Automatic incremental reconciliation may be scheduled after a summary write when `memory.autoRebuild` is enabled and the workspace is eligible. `memory_rebuild` remains an explicit synchronous reconciliation path when the write reports memory as pending or an automatic rebuild is disabled or unavailable. It defaults to `incremental`; use `full` only for recovery or provider-contract changes. Neither summary writes nor status checks prepare or download models:
 
 ```bash
 marc memory status

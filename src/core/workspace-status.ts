@@ -9,11 +9,14 @@ import {
 import {
   BackgroundThreadIndexReconciler,
   JsonThreadIndexStore,
+  ThreadIndexReconciler,
   threadIndexPath
 } from "./thread-index.js";
 import type {
+  SummaryProjectionState,
   ThreadInfo,
   ThreadListOptions,
+  ThreadIndexStore,
   WorkspaceInfo,
   WorkspaceSettings,
   WorkspaceStatus
@@ -24,6 +27,11 @@ const backgroundThreadIndexes = new Map<
   BackgroundThreadIndexReconciler
 >();
 const backgroundMemories = new Map<string, BackgroundMemoryReconciler>();
+
+export type WorkspaceStatusDependencies = {
+  createThreadIndexStore?: (indexPath: string) => ThreadIndexStore;
+  memoryReconciler?: BackgroundMemoryReconciler;
+};
 
 export async function listThreadsCachedInWorkspace(
   info: WorkspaceInfo,
@@ -38,11 +46,46 @@ export async function rebuildThreadIndexInWorkspace(
   await (await backgroundThreadIndex(info)).rebuild();
 }
 
+export async function refreshThreadSummaryProjectionsInWorkspace(
+  info: WorkspaceInfo,
+  dependencies: WorkspaceStatusDependencies = {}
+): Promise<SummaryProjectionState> {
+  const errors: SummaryProjectionState["errors"] = [];
+  let threadIndex: SummaryProjectionState["threadIndex"] = "pending";
+  let memory: SummaryProjectionState["memory"] = "pending";
+
+  try {
+    await new ThreadIndexReconciler(
+      safeJoin(info.marcPath, "threads"),
+      (
+        dependencies.createThreadIndexStore ??
+        ((indexPath) => new JsonThreadIndexStore(indexPath))
+      )(threadIndexPath(info.marcPath))
+    ).reconcile();
+    threadIndex = "updated";
+  } catch {
+    errors.push("thread_index_refresh_failed");
+  }
+
+  try {
+    const status = await readWorkspaceStatusInWorkspace(info, {
+      memoryReconciler: dependencies.memoryReconciler
+    });
+    memory = memoryProjectionState(status.modules.memory);
+  } catch {
+    errors.push("memory_status_failed");
+  }
+
+  return { threadIndex, memory, errors };
+}
+
 export async function readWorkspaceStatusInWorkspace(
-  info: WorkspaceInfo
+  info: WorkspaceInfo,
+  dependencies: WorkspaceStatusDependencies = {}
 ): Promise<WorkspaceStatus> {
   const index = await backgroundThreadIndex(info);
-  const memoryIndex = await backgroundMemory(info);
+  const memoryIndex =
+    dependencies.memoryReconciler ?? (await backgroundMemory(info));
   const settings = await readWorkspaceSettingsInWorkspace(info);
   let threadIndex = await index.health();
   if (threadIndex.status === "unavailable" && !threadIndex.rebuilding) {
@@ -147,4 +190,19 @@ function shouldAutoRebuildMemory(
   if (memory.preparing) return false;
   if (memory.rebuilding) return false;
   return memory.status === "missing" || memory.status === "stale";
+}
+
+function memoryProjectionState(
+  memory: WorkspaceStatus["modules"]["memory"]
+): SummaryProjectionState["memory"] {
+  if (memory.status === "ready" && !memory.stale) return "current";
+  if (memory.rebuilding) return "scheduled";
+  if (
+    memory.autoRebuild &&
+    memory.rebuildReady &&
+    (memory.status === "missing" || memory.status === "stale")
+  ) {
+    return "scheduled";
+  }
+  return "pending";
 }

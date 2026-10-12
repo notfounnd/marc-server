@@ -6,7 +6,7 @@ mARC exposes grouped MCP tool names in `{prefix}_{action}` format. Legacy aliase
 
 The MCP command runs over stdio and serves only protocol revision `2026-07-28` through the official `@modelcontextprotocol/server` SDK. It rejects legacy initialization. Discovery requests use an `_meta` envelope with `io.modelcontextprotocol/protocolVersion` and `io.modelcontextprotocol/clientCapabilities`; `clientInfo` is optional. Clients may call `tools/list` without discovering first.
 
-The server reports `name: "marc"` and the version from the package manifest. Discovery and tool-list results declare `resultType: "complete"`, `cacheScope: "private"`, and `ttlMs: 0`. All 24 tools are registered independently of bootstrap state. Bootstrap-gated calls return a JSON text result with `isError: true` and `error.code: "bootstrap_required"` until the caller confirms the current workspace bootstrap.
+The server reports `name: "marc"` and the version from the package manifest. Discovery and tool-list results declare `resultType: "complete"`, `cacheScope: "private"`, and `ttlMs: 0`. All 25 tools are registered independently of bootstrap state. Bootstrap-gated calls return a JSON text result with `isError: true` and `error.code: "bootstrap_required"` until the caller confirms the current workspace bootstrap.
 
 Unknown JSON-RPC methods or tool names use protocol errors. Tool input validation and domain failures return tool results with `isError: true` and sanitized error text. The process-wide limiter accepts up to 60 tool calls in each fixed one-second window; excess calls are rejected immediately and are not queued. See [the migration note](mcp-migration-2026-07-28.md) for wire examples and shutdown behavior.
 
@@ -139,6 +139,17 @@ Structured reads treat profile metadata as line-based fields. Additional manual 
 | `thread_read` | Read a transcript; Markdown is omitted by default to reduce token use. |
 | `thread_read_since` | Read messages added after a stored `lastMessageId`. |
 | `thread_tail` | Read the last N messages. |
+| `thread_write_summary` | Create a caller-authored summary to close a thread, or update an existing summary with a revision check. |
+
+### Thread summaries
+
+`thread_write_summary` accepts a full `threadId`, a non-empty Markdown `body`, and an optional `mode` (`create` by default or `update`). `body` contains only caller-authored content. The core owns the title from `CHAT.md`, canonical `Thread` and `Closed` metadata, and the header separator before the body. Creation writes that header and closes the thread; use create only after the human authorizes closure. See [Closing threads](agent-workflows.md#closing-threads) for canonical composition and closure guidance. Updates require `expectedSummaryRevision`, the lowercase SHA-256 revision returned by `thread_info` or `thread_read` with `includeSummary: true`. An update with an equivalent body returns `outcome: "unchanged"` before checking the supplied revision; a changed body must match the current revision. Create retries with the same body are unchanged; attempting to create different content over an existing summary returns `summary_exists`.
+
+Updates accept legacy summaries with older or incomplete headers. On an intentional content change, the core writes a canonical header and preserves an existing valid close date; a legacy summary without `Closed` uses its prior file modification time. Equivalent retries preserve the existing bytes and modification time. Explicit invalid or contradictory metadata returns `metadata_invalid`.
+
+The result includes the canonical `threadId` and `reference`, relative `summaryPath`, closed status and `closedAt`, the new or existing `summaryRevision`, an `outcome` of `created`, `updated`, or `unchanged`, and `projections`. The projection state reports whether the thread index is `updated` or `pending`, whether summary memory is `current`, `scheduled`, or `pending`, and any sanitized projection errors. The summary source remains committed if a derived projection fails.
+
+`thread_info` includes `summaryRevision` when a summary exists. `thread_read` includes `summary` and its matching `summaryRevision` only when requested with `includeSummary: true`; a read without the summary does not return its revision. Write errors include `invalid_input`, `invalid_thread`, `thread_not_found`, `summary_exists`, `summary_not_found`, `revision_conflict`, `metadata_invalid`, `path_invalid`, and `write_failed`. A revision conflict reports the current revision so the caller can reread and decide whether to retry. Projection failures are reported separately and do not hide a committed source write.
 
 ### Thread ID resolution
 

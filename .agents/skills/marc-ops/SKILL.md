@@ -77,6 +77,8 @@ Before posting a plan, proposal, design, API/tool change, or completion note, ch
 ## Message And Artifact Discipline
 
 - Keep thread messages concise and action-oriented.
+- Follow the canonical Markdown composition guidance in the current workspace contract when preparing messages, artifacts, or thread summaries.
+- Persist caller-authored summaries with `thread_write_summary`; use create when thread closure is authorized and revision-checked update for an existing summary.
 - Put long plans, investigation notes, or detailed designs in artifacts.
 - Attach artifacts through message metadata so the UI can display them.
 - Do not repeat `artifacts/...` paths in the message body just to show an attached artifact.

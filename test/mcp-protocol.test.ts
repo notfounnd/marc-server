@@ -19,6 +19,8 @@ const protocolVersionGuidance =
   "mARC supports MCP 2026-07-28 only. Check your agent harness documentation for protocol support and any required configuration or upgrade.";
 const repositoryRoot = process.cwd();
 
+assert.ok(await repositoryFileExists("dist/cli.js"));
+
 test("modern tools/list does not require a prior discovery request", async (t) => {
   const workspace = await fs.mkdtemp(path.join(os.tmpdir(), "marc-mcp-list-"));
   const server = new McpTestProcess("source", workspace);
@@ -40,7 +42,7 @@ test("modern tools/list does not require a prior discovery request", async (t) =
   const listing = await server.readMessage();
   assert.ok("result" in listing);
   const result = listing.result as { tools: unknown[] };
-  assert.equal(result.tools.length, 24);
+  assert.equal(result.tools.length, 25);
 });
 
 test("discovery reports missing and malformed metadata and pins the supported revision", async (t) => {
@@ -225,52 +227,46 @@ test("the process-wide fixed-window tool limiter rejects the 61st fast call", as
 });
 
 for (const entry of ["source", "dist"] as const) {
-  test(
-    `${entry} public Client negotiates 2026-07-28 and receives safe tool errors`,
-    {
-      skip: entry === "dist" && !(await repositoryFileExists("dist/cli.js"))
-    },
-    async (t) => {
-      const workspace = await fs.mkdtemp(
-        path.join(os.tmpdir(), `marc-mcp-client-${entry}-`)
-      );
-      const server = new McpTestProcess(entry, workspace);
-      const client = new Client(
-        { name: "mcp-migration-test", version: "1.0.0" },
-        { versionNegotiation: { mode: { pin: "2026-07-28" } } }
-      );
-      t.after(async () => {
-        try {
-          await client.close();
-          const exit = await server.closeProcess();
-          assert.equal(exit.code, 0, server.stderr);
-        } finally {
-          await server.waitForExit();
-          await fs.rm(workspace, { recursive: true, force: true });
-        }
-      });
+  test(`${entry} public Client negotiates 2026-07-28 and receives safe tool errors`, async (t) => {
+    const workspace = await fs.mkdtemp(
+      path.join(os.tmpdir(), `marc-mcp-client-${entry}-`)
+    );
+    const server = new McpTestProcess(entry, workspace);
+    const client = new Client(
+      { name: "mcp-migration-test", version: "1.0.0" },
+      { versionNegotiation: { mode: { pin: "2026-07-28" } } }
+    );
+    t.after(async () => {
+      try {
+        await client.close();
+        const exit = await server.closeProcess();
+        assert.equal(exit.code, 0, server.stderr);
+      } finally {
+        await server.waitForExit();
+        await fs.rm(workspace, { recursive: true, force: true });
+      }
+    });
 
-      await client.connect(server);
-      assert.equal(client.getProtocolEra(), "modern");
-      const serverInfo = client.getServerVersion();
-      const packageInfo = JSON.parse(
-        await fs.readFile(path.join(repositoryRoot, "package.json"), "utf8")
-      ) as { version: string };
-      assert.ok(serverInfo);
-      assert.equal(serverInfo.name, "marc");
-      assert.equal(serverInfo.version, packageInfo.version);
-      const catalog = await client.listTools();
-      assert.equal(catalog.tools.length, 24);
-      const result = await client.callTool({
-        name: "thread_list",
-        arguments: {}
-      });
-      assert.equal(result.isError, true);
-      const body = result.content[0];
-      assert.equal(body.type, "text");
-      assert.equal(JSON.parse(body.text).error.code, "bootstrap_required");
-    }
-  );
+    await client.connect(server);
+    assert.equal(client.getProtocolEra(), "modern");
+    const serverInfo = client.getServerVersion();
+    const packageInfo = JSON.parse(
+      await fs.readFile(path.join(repositoryRoot, "package.json"), "utf8")
+    ) as { version: string };
+    assert.ok(serverInfo);
+    assert.equal(serverInfo.name, "marc");
+    assert.equal(serverInfo.version, packageInfo.version);
+    const catalog = await client.listTools();
+    assert.equal(catalog.tools.length, 25);
+    const result = await client.callTool({
+      name: "thread_list",
+      arguments: {}
+    });
+    assert.equal(result.isError, true);
+    const body = result.content[0];
+    assert.equal(body.type, "text");
+    assert.equal(JSON.parse(body.text).error.code, "bootstrap_required");
+  });
 }
 
 test("legacy opening is rejected and the same stdio connection can open modern", async (t) => {

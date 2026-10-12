@@ -41,6 +41,7 @@ const WORKSPACE_MAINTENANCE_GUIDE = [
 ];
 const CONVERSATION_RULES_GUIDE = [
   "- Keep messages useful, readable, and complete; use artifact metadata when relevant.",
+  "- Use the workspace's canonical rules as the authority for shared Markdown composition across messages, artifacts, and summaries.",
   "- Prefer creating a new thread for a new task."
 ];
 const WORKSPACE_SKILL_PATH = ".agents/skills/marc-ops/SKILL.md";

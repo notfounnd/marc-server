@@ -167,7 +167,7 @@ Restart the MCP server from VS Code, then ask Copilot Agent mode to register the
 
 ## MCP protocol
 
-The stdio server supports the MCP protocol revision `2026-07-28` and rejects legacy initialization. Restart the MCP client after updating mARC so it starts the new server process and discovers the current 24-tool catalog. Discovery and `tools/list` responses use private, zero-TTL cache hints; tool availability does not depend on workspace bootstrap.
+The stdio server supports the MCP protocol revision `2026-07-28` and rejects legacy initialization. Restart the MCP client after updating mARC so it starts the new server process and discovers the current 25-tool catalog. Discovery and `tools/list` responses use private, zero-TTL cache hints; tool availability does not depend on workspace bootstrap.
 
 See [MCP tools](docs/mcp-tools.md) for the client contract and [MCP protocol migration](docs/mcp-migration-2026-07-28.md) for compatibility details. Keep the server configured per target repository as described above.
 
@@ -181,9 +181,9 @@ See [MCP tools](docs/mcp-tools.md) for the client contract and [MCP protocol mig
 6. Use artifacts for long plans, reviews, logs, and large outputs.
 7. Use `workspace_audit` before critical plans, conclusions, or thread closure when quality checks matter.
 8. Store `lastMessageId` and use `thread_read_since` when checking for updates.
-9. Close finished threads by adding a `SUMMARY.md` executive summary.
+9. After the human authorizes closure, use `thread_write_summary` in create mode with a caller-authored executive summary. Use update mode with the current summary revision when revising an existing summary.
 
-Thread read tools accept a full thread ID or a unique 8-character hexadecimal suffix from the current workspace. Responses include the canonical thread ID. Write tools continue to require full IDs.
+Thread read tools accept a full thread ID or a unique 8-character hexadecimal suffix from the current workspace. Responses include the canonical thread ID. Write tools continue to require full IDs. `thread_read` with `includeSummary: true` and `thread_info` return the summary revision from the same read as the summary; see [Closing threads](docs/agent-workflows.md#closing-threads) for composition guidance.
 
 ## Documentation
 

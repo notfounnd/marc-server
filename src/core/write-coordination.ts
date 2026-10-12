@@ -16,6 +16,15 @@ export type WorkspaceWriteLockAttempt<T> =
   | { acquired: false }
   | { acquired: true; value: T };
 
+export type AtomicRename = (
+  sourcePath: string,
+  destinationPath: string
+) => Promise<void>;
+
+export type AtomicWriteOptions = {
+  rename?: AtomicRename;
+};
+
 export function threadWriteResource(threadId: string): string {
   return `thread:${threadId}`;
 }
@@ -88,7 +97,8 @@ export async function workspaceWriteLockActive(
 
 export async function writeFileAtomically(
   filePath: string,
-  content: string
+  content: string,
+  options: AtomicWriteOptions = {}
 ): Promise<void> {
   const directory = path.dirname(filePath);
   const temporaryPath = path.join(
@@ -99,7 +109,7 @@ export async function writeFileAtomically(
 
   try {
     await fs.writeFile(temporaryPath, content, "utf8");
-    await fs.rename(temporaryPath, filePath);
+    await (options.rename ?? fs.rename)(temporaryPath, filePath);
   } finally {
     await fs.rm(temporaryPath, { force: true }).catch(() => undefined);
   }
