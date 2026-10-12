@@ -1,4 +1,10 @@
-# Migração de Sonner para Toast Neobrutalism
+# Substituir componente sonner pelo componente toast da lib Neobrutalism
+
+Thread: marc://$substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb
+
+Closed: `2026-10-09T20:57:04.788Z`
+
+---
 
 Encerramento autorizado pelo usuário em 2026-10-09. Aprovação técnica do principal registrada na atividade consolidada.
 

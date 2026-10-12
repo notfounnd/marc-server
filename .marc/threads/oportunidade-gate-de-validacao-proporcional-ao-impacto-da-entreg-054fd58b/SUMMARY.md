@@ -1,4 +1,10 @@
-# Validação proporcional ao impacto da entrega
+# Oportunidade - Gate de validação proporcional ao impacto da entrega
+
+Thread: marc://$oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b
+
+Closed: `2026-10-11T22:45:44.347Z`
+
+---
 
 ## Objetivo
 

@@ -1,8 +1,10 @@
-# Summary: reformatar Custom Rules com base na auditoria
+# Oportunidade: reformatar Custom Rules com base na auditoria
 
-Thread: `oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be`
+Thread: marc://$oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be
 
-Status: closed
+Closed: `2026-05-18T23:31:54.762Z`
+
+---
 
 ## Resultado
 

@@ -1,7 +1,10 @@
-# Resumo executivo
+# Oportunidade - Tuning de recall e ranking da memory
 
-Thread: `oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb`
+Thread: marc://$oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb
+
 Closed: `2026-07-07T22:15:00.000Z`
+
+---
 
 ## Objetivo
 

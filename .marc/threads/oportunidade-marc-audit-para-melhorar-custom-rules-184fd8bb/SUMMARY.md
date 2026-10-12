@@ -1,4 +1,10 @@
-# Summary
+# Oportunidade - marc_audit para melhorar Custom Rules
+
+Thread: marc://$oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb
+
+Closed: `2026-05-18T17:36:57.903Z`
+
+---
 
 ## Goal
 

@@ -1,7 +1,10 @@
-# Resumo executivo
+# Oportunidade - Settings estruturado em JSON para reduzir parser customizado
 
-Thread: `oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9`
+Thread: marc://$oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9
+
 Closed: `2026-07-13T23:31:15.250Z`
+
+---
 
 ## Resultado
 

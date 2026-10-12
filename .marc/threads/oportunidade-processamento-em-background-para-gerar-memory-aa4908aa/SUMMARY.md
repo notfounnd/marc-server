@@ -1,7 +1,10 @@
-# Resumo executivo
+# Oportunidade - Processamento em background para gerar memory
 
-Thread: `oportunidade-processamento-em-background-para-gerar-memory-aa4908aa`
+Thread: marc://$oportunidade-processamento-em-background-para-gerar-memory-aa4908aa
+
 Closed: `2026-07-10T17:05:00.000Z`
+
+---
 
 ## Resultado
 

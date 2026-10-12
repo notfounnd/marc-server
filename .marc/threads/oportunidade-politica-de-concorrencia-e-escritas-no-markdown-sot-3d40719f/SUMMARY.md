@@ -1,7 +1,10 @@
-# Resumo - Política de concorrência e escritas no Markdown SoT
+# Oportunidade - Politica de concorrencia e escritas no Markdown SoT
 
-Thread: `oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f`
+Thread: marc://$oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f
+
 Closed: `2026-05-24T19:23:28.258Z`
+
+---
 
 ## Resultado
 

@@ -1,7 +1,10 @@
-# Resumo executivo
+# Oportunidade - Popup para postar artifacts pela UI
 
-Thread: `oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd`
+Thread: marc://$oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd
+
 Closed: `2026-05-06T01:21:05.418Z`
+
+---
 
 ## Objetivo
 

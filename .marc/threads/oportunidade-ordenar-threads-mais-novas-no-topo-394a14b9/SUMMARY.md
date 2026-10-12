@@ -1,7 +1,10 @@
-# Resumo executivo
+# Oportunidade - Ordenar threads mais novas no topo
 
-Thread: `oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9`
+Thread: marc://$oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9
+
 Closed: `2026-05-05T23:18:38.188Z`
+
+---
 
 ## Objetivo
 

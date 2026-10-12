@@ -1,7 +1,10 @@
-# Resumo executivo
+# Oportunidade - Referências internas e menções direcionadas
 
-Thread: `oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4`
+Thread: marc://$oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4
+
 Closed: `2026-05-06T05:01:27.248Z`
+
+---
 
 ## Objetivo
 

@@ -1,7 +1,10 @@
-# Resumo executivo
+# Documentar o fluxo de desenvolvimento em loop e a política de modelos, reasoning e delegação
 
 Thread: marc://$documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81
+
 Closed: `2026-10-09T03:33:26Z`
+
+---
 
 ## Objetivo e aceite
 

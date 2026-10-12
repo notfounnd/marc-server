@@ -1,7 +1,10 @@
-# Resumo executivo
+# Oportunidade - Revisão e atualização do mARC para MCP 2026-07-28
 
 Thread: marc://$oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787
+
 Closed: `2026-10-11T19:14:21.000Z`
+
+---
 
 ## Objetivo e decisões
 

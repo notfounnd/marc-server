@@ -1,4 +1,10 @@
-# Resumo
+# Oportunidade - Revisao de arquitetura do projeto
+
+Thread: marc://$oportunidade-revisao-de-arquitetura-do-projeto-fe4a1cb2
+
+Closed: `2026-05-20T04:10:39.350Z`
+
+---
 
 Thread encerrada após a revisão de arquitetura e a evolução do quality gate do projeto mARC.
 

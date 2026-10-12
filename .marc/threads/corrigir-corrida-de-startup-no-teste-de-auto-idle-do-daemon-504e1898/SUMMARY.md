@@ -1,4 +1,10 @@
-# Correção da corrida no teste de auto-idle
+# Corrigir corrida de startup no teste de auto-idle do daemon
+
+Thread: marc://$corrigir-corrida-de-startup-no-teste-de-auto-idle-do-daemon-504e1898
+
+Closed: `2026-10-10T05:46:49.398Z`
+
+---
 
 Encerramento autorizado pelo usuário em 2026-10-10. Implementação e revisão técnica aprovadas em 2026-10-09.
 

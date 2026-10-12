@@ -1,6 +1,10 @@
-# Sumario executivo
+# Oportunidade - Rebuild incremental e batches limitados da memory
+
+Thread: marc://$oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682
 
 Closed: `2026-07-20T22:54:00.000Z`
+
+---
 
 ## Resultado
 

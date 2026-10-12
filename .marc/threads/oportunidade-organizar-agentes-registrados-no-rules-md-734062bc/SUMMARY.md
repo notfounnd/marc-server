@@ -1,4 +1,10 @@
-# Executive Summary
+# Oportunidade - Organizar agentes registrados no RULES.md
+
+Thread: marc://$oportunidade-organizar-agentes-registrados-no-rules-md-734062bc
+
+Closed: `2026-05-11T04:38:05.142Z`
+
+---
 
 ## Outcome
 

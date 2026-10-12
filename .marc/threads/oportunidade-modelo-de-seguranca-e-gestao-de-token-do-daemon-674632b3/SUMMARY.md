@@ -1,7 +1,10 @@
-# Resumo - Modelo de segurança e gestão de token do daemon
+# Oportunidade - Modelo de seguranca e gestao de token do daemon
 
-Thread: `oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3`
+Thread: marc://$oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3
+
 Closed: `2026-05-24T23:15:59.807Z`
+
+---
 
 ## Resultado executivo
 

@@ -1,7 +1,10 @@
-# Sumário executivo — Falha de schema no rebuild incremental da memória
+# Ajuste - Falha de schema no rebuild incremental da memória
 
-Thread: `ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c`
+Thread: marc://$ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c
+
 Closed: `2026-10-10T14:09:33.000Z`
+
+---
 
 ## Objetivo e contexto
 

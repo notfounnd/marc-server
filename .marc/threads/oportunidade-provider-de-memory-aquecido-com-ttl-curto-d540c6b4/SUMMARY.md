@@ -1,7 +1,10 @@
-# Resumo executivo
+# Oportunidade - Provider de memory aquecido com TTL curto
 
-Thread: `oportunidade-provider-de-memory-aquecido-com-ttl-curto-d540c6b4`
+Thread: marc://$oportunidade-provider-de-memory-aquecido-com-ttl-curto-d540c6b4
+
 Closed: `2026-07-14T16:52:00.000Z`
+
+---
 
 ## Objetivo
 

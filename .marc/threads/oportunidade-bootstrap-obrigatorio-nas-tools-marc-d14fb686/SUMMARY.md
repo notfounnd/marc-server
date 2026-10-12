@@ -1,7 +1,10 @@
-# Resumo executivo
+# Oportunidade - Bootstrap obrigatório nas tools mARC
 
-Thread: `oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686`
+Thread: marc://$oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686
+
 Closed: `2026-05-06T15:51:43.162Z`
+
+---
 
 ## Objetivo
 

@@ -1,7 +1,10 @@
-# Resumo executivo
+# Oportunidade - Autocomplete de referências no composer
 
-Thread: `oportunidade-autocomplete-de-referencias-no-composer-2341bc9f`
+Thread: marc://$oportunidade-autocomplete-de-referencias-no-composer-2341bc9f
+
 Closed: `2026-05-11T00:43:20.102Z`
+
+---
 
 ## Objetivo
 

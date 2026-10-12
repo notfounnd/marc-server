@@ -1,7 +1,10 @@
-# Resumo executivo
+# Oportunidade - Status health e rebuild de índice em background
 
-Thread: `oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186`
+Thread: marc://$oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186
+
 Closed: `2026-05-15T17:30:00.000Z`
+
+---
 
 ## Objetivo
 

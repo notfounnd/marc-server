@@ -1,4 +1,10 @@
-# Resumo - Esquemas de visualização das colunas da UI
+# Oportunidade - Esquemas de visualização das colunas da UI
+
+Thread: marc://$oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b
+
+Closed: `2026-05-22T02:20:47.643Z`
+
+---
 
 ## Resultado
 

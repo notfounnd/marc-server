@@ -1,7 +1,10 @@
-# Resumo executivo
+# Oportunidade - Banco de embeddings quantizado e indice estruturado de sumarios
 
-Thread: `oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac`
+Thread: marc://$oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac
+
 Closed: `2026-07-07T00:55:19.196Z`
+
+---
 
 ## Objetivo
 

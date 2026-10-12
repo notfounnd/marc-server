@@ -1,7 +1,10 @@
-# Resumo executivo
+# Oportunidade - Daemon detached e instalacao global via npm
 
-Thread: `oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c`
+Thread: marc://$oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c
+
 Closed: `2026-05-16T04:58:26.485Z`
+
+---
 
 ## Objetivo
 

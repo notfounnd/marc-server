@@ -1,7 +1,10 @@
-### Sumario executivo
+# Oportunidade - Indicador visual de memory na interface
 
-Thread: `oportunidade-indicador-visual-de-memory-na-interface-174c48b6`
+Thread: marc://$oportunidade-indicador-visual-de-memory-na-interface-174c48b6
+
 Closed: `2026-07-07T05:16:41.873Z`
+
+---
 
 ## Resultado
 

@@ -1,6 +1,10 @@
-# Resumo Executivo
+# Ajustar a política de registros do loop para separar orquestração e mensagens de desenvolvimento
+
+Thread: marc://$ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983
 
 Closed: `2026-10-09T14:24:04Z`
+
+---
 
 ## Resultado
 

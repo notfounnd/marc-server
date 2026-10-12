@@ -1,7 +1,10 @@
-# Resumo executivo
+# Oportunidade - Revisão en-US do projeto
 
-Thread: `oportunidade-revisao-en-us-do-projeto-c14150b8`
+Thread: marc://$oportunidade-revisao-en-us-do-projeto-c14150b8
+
 Closed: `2026-05-11T22:35:27.000Z`
+
+---
 
 ## Objetivo
 

@@ -1,7 +1,10 @@
-# Resumo executivo
+# Oportunidade - Atalhos de teclado em sheet lateral
 
 Thread: marc://$oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1
+
 Closed: `2026-10-09T13:05:00Z`
+
+---
 
 ## Objetivo e encerramento
 

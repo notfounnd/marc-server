@@ -1,4 +1,10 @@
-# Leitura MCP de threads por sufixo de ID
+# Oportunidade - Busca MCP de thread por sufixo de ID
+
+Thread: marc://$oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa
+
+Closed: `2026-10-12T01:27:15.254Z`
+
+---
 
 ## Resultado e encerramento
 

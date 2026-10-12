@@ -1,7 +1,10 @@
-# Executive Summary
+# Oportunidade - Encerramento de threads por SUMMARY e índice JSON
 
-Thread: `oportunidade-encerramento-de-threads-por-summary-e-indice-json-ce47939a`
+Thread: marc://$oportunidade-encerramento-de-threads-por-summary-e-indice-json-ce47939a
+
 Closed: `2026-05-01T05:04:00.000Z`
+
+---
 
 ## Resultado
 

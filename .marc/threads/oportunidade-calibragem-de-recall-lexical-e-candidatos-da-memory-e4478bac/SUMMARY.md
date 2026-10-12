@@ -1,7 +1,10 @@
-# Resumo executivo
+# Oportunidade - Calibragem de recall lexical e candidatos da memory
 
-Thread: `oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac`
+Thread: marc://$oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac
+
 Closed: `2026-07-21T04:41:33Z`
+
+---
 
 ## Objetivo
 

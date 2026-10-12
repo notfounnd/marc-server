@@ -1,6 +1,10 @@
 # Oportunidade - Mecanismo de busca sobre o conhecimento do projeto
 
-Closed: 2026-07-09T04:44:18Z
+Thread: marc://$oportunidade-mecanismo-de-busca-sobre-o-conhecimento-do-projeto-b64903bd
+
+Closed: `2026-07-09T04:44:18Z`
+
+---
 
 ## Executive Summary
 

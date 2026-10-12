@@ -1,4 +1,10 @@
-# Resumo executivo — Criação de threads pela UI
+# Oportunidade - Criacao de threads pela UI
+
+Thread: marc://$oportunidade-criacao-de-threads-pela-ui-0845d0bb
+
+Closed: `2026-10-09T18:00:27.243Z`
+
+---
 
 Encerramento autorizado pelo usuário em 2026-10-09 com “Finalize a thread”. Implementação concluída e aprovada tecnicamente pelo principal após revisão integrada.
 

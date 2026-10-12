@@ -1,4 +1,10 @@
-# Resumo Executivo
+# Remover comandos legados do MCP - Reduzir sobrecarga de contexto
+
+Thread: marc://$remover-comandos-legados-do-mcp-reduzir-sobrecarga-de-contexto-034ad1bf
+
+Closed: `2026-05-02T20:26:52.397Z`
+
+---
 
 ## Resultado
 

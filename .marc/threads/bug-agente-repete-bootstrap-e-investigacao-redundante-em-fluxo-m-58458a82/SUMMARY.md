@@ -1,4 +1,10 @@
-# Resumo Executivo
+# Bug: agente repete bootstrap e investigacao redundante em fluxo mARC
+
+Thread: marc://$bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82
+
+Closed: `2026-05-20T06:00:32.717Z`
+
+---
 
 ## Resultado
 

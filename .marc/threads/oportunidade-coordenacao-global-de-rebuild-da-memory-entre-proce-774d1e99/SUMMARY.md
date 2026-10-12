@@ -1,7 +1,10 @@
-# Resumo executivo
+# Oportunidade - Coordenacao global de rebuild da memory entre processos
 
-Thread: `oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99`
+Thread: marc://$oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99
+
 Closed: `2026-07-15T03:41:13.693Z`
+
+---
 
 ## Objetivo
 

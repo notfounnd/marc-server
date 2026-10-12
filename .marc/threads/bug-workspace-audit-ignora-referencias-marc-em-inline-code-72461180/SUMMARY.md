@@ -1,4 +1,10 @@
-# Resumo Executivo
+# Bug: workspace_audit ignora referencias mARC em inline code
+
+Thread: marc://$bug-workspace-audit-ignora-referencias-marc-em-inline-code-72461180
+
+Closed: `2026-05-20T17:02:36.733Z`
+
+---
 
 ## Resultado
 

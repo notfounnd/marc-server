@@ -1,7 +1,10 @@
-# Resumo executivo
+# Oportunidade - Reestruturar INSTRUCTIONS e RULES para bootstrap
 
-Thread: `oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486`
+Thread: marc://$oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486
+
 Closed: `2026-05-06T05:54:55.283Z`
+
+---
 
 ## Objetivo
 

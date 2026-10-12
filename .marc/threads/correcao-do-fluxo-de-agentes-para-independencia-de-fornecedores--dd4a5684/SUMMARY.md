@@ -1,7 +1,10 @@
-# Resumo executivo
+# Correção do fluxo de agentes para independência de fornecedores e perfis
 
 Thread: marc://$correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684
+
 Closed: `2026-10-09T04:36:05Z`
+
+---
 
 ## Objetivo e aceite
 

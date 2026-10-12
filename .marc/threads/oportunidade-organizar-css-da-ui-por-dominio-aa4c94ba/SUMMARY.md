@@ -1,7 +1,10 @@
-# Resumo executivo
+# Oportunidade - Organizar CSS da UI por domínio
 
-Thread: `oportunidade-organizar-css-da-ui-por-dominio-aa4c94ba`
+Thread: marc://$oportunidade-organizar-css-da-ui-por-dominio-aa4c94ba
+
 Closed: `2026-05-27T01:40:53Z`
+
+---
 
 ## Objetivo
 

@@ -1,7 +1,10 @@
-# Resumo Executivo
+# Oportunidade - Leitura incremental de threads por cursor
 
-Thread: `oportunidade-leitura-incremental-de-threads-por-cursor-3c45fa83`
+Thread: marc://$oportunidade-leitura-incremental-de-threads-por-cursor-3c45fa83
+
 Closed: `2026-05-01T23:47:41.015Z`
+
+---
 
 ## Resultado
 

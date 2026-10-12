@@ -1,4 +1,10 @@
-# Resumo Executivo
+# Oportunidade - Reforçar gatilhos de ativação da skill marc-ops
+
+Thread: marc://$oportunidade-reforcar-gatilhos-de-ativacao-da-skill-marc-ops-934c4896
+
+Closed: `2026-07-16T18:57:43.514Z`
+
+---
 
 ## Resultado
 

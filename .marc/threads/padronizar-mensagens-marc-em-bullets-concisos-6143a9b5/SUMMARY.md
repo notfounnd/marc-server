@@ -1,4 +1,10 @@
-# Resumo Executivo
+# Padronizar mensagens mARC em bullets concisos
+
+Thread: marc://$padronizar-mensagens-marc-em-bullets-concisos-6143a9b5
+
+Closed: `2026-05-02T20:26:52.426Z`
+
+---
 
 ## Resultado
 

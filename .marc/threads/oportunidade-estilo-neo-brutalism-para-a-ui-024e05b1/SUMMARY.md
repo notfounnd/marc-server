@@ -1,7 +1,10 @@
-# Resumo - Estilo neo-brutalism para a UI
+# Oportunidade - Estilo neo-brutalism para a UI
 
 Thread: marc://$oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1
+
 Closed: `2026-05-26T03:01:30.000Z`
+
+---
 
 ## Resultado
 

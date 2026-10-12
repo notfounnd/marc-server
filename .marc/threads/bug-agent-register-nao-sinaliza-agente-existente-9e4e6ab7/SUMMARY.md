@@ -1,6 +1,10 @@
-# Sumario executivo
+# Bug: agent_register nao sinaliza agente existente
+
+Thread: marc://$bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7
 
 Closed: `2026-05-13T05:35:00.000Z`
+
+---
 
 ## Resultado
 

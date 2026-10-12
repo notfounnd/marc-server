@@ -1,7 +1,10 @@
-# Resumo executivo
+# Oportunidade - Elegibilidade semântica e candidatos lexicais da memory
 
 Thread: marc://$oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba
+
 Closed: `2026-10-08T22:39:53Z`
+
+---
 
 ## Resultado
 

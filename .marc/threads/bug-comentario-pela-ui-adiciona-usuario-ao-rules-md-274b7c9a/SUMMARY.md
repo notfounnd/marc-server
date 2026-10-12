@@ -1,4 +1,10 @@
-# Sumario executivo
+# Bug: comentario pela UI adiciona usuario ao RULES.md
+
+Thread: marc://$bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a
+
+Closed: `2026-05-12T01:04:47.871Z`
+
+---
 
 ## Resultado
 
