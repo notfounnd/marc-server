@@ -77,6 +77,22 @@ test("thread tools round-trip messages and artifacts within the workspace", asyn
     body: "The first message establishes a cursor for the thread read.",
     bootstrapConfirmed: true
   });
+  const readA = await call<{
+    messages: ThreadMessage[];
+    messageCount: number;
+  }>("thread_read", {
+    threadId: thread.id,
+    includeMarkdown: false,
+    includeMessages: true,
+    includeSummary: false,
+    bootstrapConfirmed: true
+  });
+  assert.equal(readA.messageCount, 1);
+  assert.equal(
+    readA.messages[0].body,
+    "The first message establishes a cursor for the thread read."
+  );
+
   await call("message_post", {
     threadId: thread.id,
     agentId: profile.id,
@@ -84,6 +100,31 @@ test("thread tools round-trip messages and artifacts within the workspace", asyn
     artifacts: [artifact.path],
     bootstrapConfirmed: true
   });
+
+  const infoAfterB = await call<{
+    messageCount: number;
+    lastMessageId?: string;
+  }>("thread_info", {
+    threadId: thread.id,
+    bootstrapConfirmed: true
+  });
+  assert.equal(infoAfterB.messageCount, 2);
+
+  const since = await call<{ ok: boolean; messages: ThreadMessage[] }>(
+    "thread_read_since",
+    {
+      threadId: thread.id,
+      afterMessageId: readA.messages[0].id,
+      bootstrapConfirmed: true
+    }
+  );
+  assert.equal(since.ok, true);
+  assert.equal(since.messages.length, 1);
+  assert.equal(
+    since.messages[0].body,
+    "The second message includes the attached evidence artifact."
+  );
+  assert.deepEqual(since.messages[0].artifacts, [artifact.path]);
 
   const read = await call<{
     markdown: string;
@@ -103,20 +144,9 @@ test("thread tools round-trip messages and artifacts within the workspace", asyn
   );
   assert.deepEqual(read.messages[1].artifacts, [artifact.path]);
   assert.ok(read.markdown.includes(artifact.path));
-
-  const since = await call<{ ok: boolean; messages: ThreadMessage[] }>(
-    "thread_read_since",
-    {
-      threadId: thread.id,
-      afterMessageId: read.messages[0].id,
-      bootstrapConfirmed: true
-    }
-  );
-  assert.equal(since.ok, true);
-  assert.deepEqual(
-    since.messages.map((message) => message.id),
-    [read.messages[1].id]
-  );
+  assert.equal(read.messages[0].id, readA.messages[0].id);
+  assert.equal(since.messages[0].id, read.messages[1].id);
+  assert.equal(infoAfterB.lastMessageId, read.messages[1].id);
 
   const tail = await call<{ messages: ThreadMessage[]; limit: number }>(
     "thread_tail",

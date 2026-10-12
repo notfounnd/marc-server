@@ -70,32 +70,32 @@ const MARC_HELPER_GUIDES: Record<
     ],
     examples: [
       "workspace_register creates .marc files and registers the workspace with the daemon when configured.",
-      "workspace_update_recommendations refreshes the recommended bootstrap protocol and workspace rules without overwriting Custom Rules."
+      "workspace_update_recommendations refreshes managed instructions, rules, and skill while preserving Custom Rules; it does not establish or restore bootstrap context."
     ],
     notes: [
-      "Establish bootstrap context before gated tools, then reuse the current workspace contract while it remains known.",
-      "Rerun workspace_bootstrap only when bootstrap context is missing, stale, or uncertain.",
-      "workspace_update_recommendations remains free so recommended instructions and rules can be refreshed manually.",
+      "Call workspace_bootstrap at session start or when context is missing, stale, or uncertain; reuse a known current contract.",
+      "Refreshing recommendations does not replace bootstrap.",
       "Keep project-specific behavior in RULES.md under Custom Rules; INSTRUCTIONS.md should stay short and procedural.",
-      "Markdown remains the source of truth for project-readable mARC content.",
+      "Use Markdown for human-readable knowledge and coordination records; preserve structured formats such as JSON.",
       "After new MCP tools are added, rebuild and restart the MCP client because tool schemas may be cached."
     ]
   },
   agents: {
-    purpose: "Register and inspect participants that post to mARC threads.",
+    purpose:
+      "Discover and reuse participant profiles, and register or update one when necessary and permitted by the workspace contract.",
     whenToUse: [
-      "Before an agent posts messages.",
-      "When a coordinator needs to understand which participant wrote a message."
+      "When identifying a profile for a mARC message.",
+      "When profile details are needed to understand a participant."
     ],
     relatedTools: ["agent_register", "agent_list", "agent_read_profile"],
     examples: [
-      "agent_register with id codex-dev, role developer, model gpt-5.5, and a short description.",
-      "agent_list before writing a mention such as marc://@codex-dev.",
-      "agent_read_profile for a referenced participant before assigning review work."
+      "Call agent_list or inspect the bootstrap agent inventory before choosing a profile.",
+      "Call agent_read_profile when additional profile context is relevant.",
+      "Call agent_register only when a profile must be created or updated and the workspace contract permits it."
     ],
     notes: [
-      "Use stable, specific agent IDs such as codex-dev, qa-reviewer, or architect-reviewer.",
-      "The orchestrating agent decides how to delegate to subagents; mARC stores the shared context."
+      "Reuse an existing profile when it fits; do not assume a fixed ID or role catalog.",
+      "Follow the current workspace contract for profile selection and administration."
     ]
   },
   threads: {
@@ -124,7 +124,7 @@ const MARC_HELPER_GUIDES: Record<
     ],
     notes: [
       "Closed threads are controlled by SUMMARY.md in the thread folder.",
-      "See docs/agent-workflows.md#closing-threads for the canonical summary composition and closure guidance.",
+      "Follow the current workspace contract for thread composition and closure guidance.",
       "Prefer a new thread when a conversation becomes too broad or needs a separate outcome."
     ]
   },
@@ -137,12 +137,13 @@ const MARC_HELPER_GUIDES: Record<
     relatedTools: ["message_post", "agent_register", "thread_read"],
     examples: [
       "message_post with a readable implementation summary, validation commands, and any relevant risks.",
-      "message_post after reading a thread to acknowledge the context and next action."
+      "message_post for a material decision, finding, risk, blocker, result, consolidated delivery, or genuine handoff."
     ],
     notes: [
       "Messages should preserve useful context instead of being brief but empty.",
       "Use bullets or short labeled sections when a message has multiple points.",
-      "Use artifacts for large outputs, detailed reviews, logs, or long plans."
+      "Use artifacts for large outputs, detailed reviews, logs, or long plans.",
+      "Share material decisions, findings, risks, blockers, and results; avoid routine read acknowledgments and iteration-by-iteration status updates."
     ]
   },
   artifacts: {
@@ -176,12 +177,15 @@ const MARC_HELPER_GUIDES: Record<
       "thread_tail"
     ],
     examples: [
-      "First read: call thread_read and store lastMessageId in your working context.",
+      "First read: call thread_read, read and process the returned message content, then store its lastMessageId as the consumed cursor.",
       "Later read: call thread_read_since with threadId and afterMessageId set to the stored lastMessageId.",
       "If cursor_not_found returns shouldReadFullThread true, tell the user the incremental read failed and call thread_read.",
       "Use thread_tail with limit 5 or 10 for recent context when no cursor is available."
     ],
     notes: [
+      "Store or advance a cursor only after you have read and processed the message content.",
+      "thread_info metadata does not advance a consumed-content cursor.",
+      "thread_tail proves only its returned window was read; it does not establish that earlier backlog was consumed.",
       "thread_read omits markdown by default to avoid duplicating markdown plus parsed messages.",
       "Use includeMarkdown true only when raw CHAT.md content is specifically needed.",
       "Prefer the smallest read that answers the current question."

@@ -29,14 +29,7 @@ When general mARC profile registration is required, use:
 agent_register
 ```
 
-Use the bootstrap agent inventory or `agent_list` before choosing a new ID when an existing profile may already fit. Use a stable ID that other participants can mention.
-
-Recommended agent ID convention:
-
-- use lowercase slugs;
-- use letters, numbers, and hyphens;
-- prefer role-oriented IDs. For example, `shared-developer` could describe a shared developer profile, but the workspace inventory determines actual IDs and no prefix or name is required.
-- keep the ID stable because `marc://@agent-id` references may outlive the current session.
+Use the bootstrap agent inventory or `agent_list` before choosing a new ID when an existing profile may already fit. If registration is needed and permitted, choose a unique ID consistent with the workspace's conventions and keep it stable while references may depend on it. There is no universal ID prefix or role catalog.
 
 `agent_register` writes the profile header from the canonical ID, not from a custom display name. The official profile metadata is line-based: `ID`, `Role`, `Model` and `Description`. Longer manual context belongs below those fields, is preserved by later profile refreshes, and is read through `agent_read_profile`.
 
@@ -63,14 +56,17 @@ For a task thread, distinguish internal loop coordination, consolidated executio
 - Consolidate necessary evidence at bounded task delivery and final integrated review, with artifacts associated through message metadata when needed. Do not maintain a live activity log or edit a document after each handshake, authorization, command, check, finding, or correction. Summarize the minimum required bootstrap and authorization evidence with the delivered results, not through continuous updates.
 - Use the thread for decisions, material discoveries, meaningful blockers or risks, significant results, and deliveries that change understanding of the work. Apply this relevance filter to every author; do not mirror internal coordination into standalone comments.
 
-1. Read the thread.
-2. Store `lastMessageId`.
-3. Read referenced artifacts only when they are needed for the task.
-4. Keep routine handshakes and loop transitions in the agent-to-agent channel. Do not mirror them into thread messages or artifact updates.
-5. Publish substantive decisions and results to the same thread under the author's assigned profile.
-6. Keep the thread open until the human explicitly authorizes closure, including after technical approval.
+Treat a cursor as the last message whose content was actually read and processed, not the latest ID reported by metadata. `thread_info` does not advance the consumed-content cursor. `thread_tail` establishes context only for its returned window and does not prove that earlier backlog was read.
 
-Use `thread_read_since` for later updates instead of rereading the full transcript.
+1. Read the relevant thread content.
+2. After processing the returned message content, store `lastMessageId` for the last message consumed.
+3. Use `thread_read_since` with that cursor for later updates; process new content before advancing it.
+4. Read referenced artifacts only when they are needed for the task.
+5. Keep routine handshakes and loop transitions in the agent-to-agent channel. Do not mirror them into thread messages or artifact updates.
+6. Publish substantive decisions and results to the same thread under the author's assigned profile.
+7. Keep the thread open until the human explicitly authorizes closure, including after technical approval.
+
+Use `thread_read_since` instead of rereading the full transcript when a valid consumed-content cursor is available.
 
 ## Development loop for delegated work
 

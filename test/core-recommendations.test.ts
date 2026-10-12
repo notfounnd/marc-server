@@ -284,7 +284,10 @@ test("replaces stale workspace recommendation sections", async () => {
   assert.match(instructions, /## Bootstrap Protocol/);
   assert.doesNotMatch(rules, /register_agent/);
   assert.doesNotMatch(rules, /Keep messages concise/);
-  assert.match(rules, /`agent_register`/);
+  assert.match(
+    rules,
+    /Register or update a profile only when necessary and permitted/
+  );
   assert.match(rules, /Keep messages useful, readable, and complete/);
   assert.match(
     rules,

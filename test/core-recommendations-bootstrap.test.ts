@@ -92,3 +92,92 @@ test("guides agents to attach artifacts through message metadata", async () => {
   );
   assert.doesNotMatch(rules, /link artifacts when relevant/i);
 });
+
+test("guides agents to advance thread cursors only after consuming message content", async () => {
+  const workspace = await tempWorkspace();
+
+  await updateWorkspaceRecommendations(workspace);
+  const rules = await readRules(workspace);
+  const skill = await readWorkspaceSkill(workspace);
+
+  assert.match(
+    skill,
+    /Advance the consumed cursor only after you have read and processed message content/
+  );
+  assert.match(
+    skill,
+    /Metadata from `thread_info` does not advance the consumed-content cursor/
+  );
+  assert.match(skill, /`thread_tail` proves only the returned window was read/);
+  assert.match(
+    rules,
+    /Store a thread cursor only after its message content has been read and consumed/
+  );
+  assert.match(
+    rules,
+    /`thread_info` metadata does not advance the consumed-content cursor/
+  );
+  assert.match(rules, /`thread_tail` covers only its returned window/);
+});
+
+test("guides agents to reuse profiles and publish material thread updates", async () => {
+  const workspace = await tempWorkspace();
+
+  await updateWorkspaceRecommendations(workspace);
+  const rules = await readRules(workspace);
+  const skill = await readWorkspaceSkill(workspace);
+
+  assert.match(
+    skill,
+    /Discover and reuse a suitable profile before registering/
+  );
+  assert.match(
+    skill,
+    /only when necessary and permitted by the workspace contract/
+  );
+  assert.match(
+    skill,
+    /Publish material decisions, findings, risks, blockers, and results/
+  );
+  assert.match(
+    skill,
+    /Avoid routine read acknowledgments and iteration-by-iteration status updates/
+  );
+  assert.doesNotMatch(skill, /Prefer incremental thread comments/);
+  assert.match(rules, /Reuse an existing profile when it fits/);
+  assert.match(
+    rules,
+    /Register or update a profile only when necessary and permitted/
+  );
+  assert.match(
+    rules,
+    /Publish material decisions, discoveries, risks, blockers, results, and consolidated deliveries or genuine handoffs/
+  );
+});
+
+test("distinguishes bootstrap from recommendation refresh and preserves JSON formats", async () => {
+  const workspace = await tempWorkspace();
+
+  await updateWorkspaceRecommendations(workspace);
+  const rules = await readRules(workspace);
+  const skill = await readWorkspaceSkill(workspace);
+
+  assert.match(skill, /Refreshing recommendations does not replace bootstrap/);
+  assert.match(
+    rules,
+    /Run `workspace_update_recommendations` before starting work on a thread/
+  );
+  assert.match(
+    skill,
+    /Keep Markdown for human-readable knowledge and coordination records/
+  );
+  assert.match(skill, /preserve structured formats such as JSON/);
+  assert.match(
+    rules,
+    /Use Markdown for human-readable knowledge and coordination records; preserve structured workspace formats such as JSON/
+  );
+  assert.match(
+    rules,
+    /Refreshing recommendations does not establish or restore bootstrap context/
+  );
+});

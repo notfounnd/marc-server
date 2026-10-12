@@ -176,11 +176,11 @@ See [MCP tools](docs/mcp-tools.md) for the client contract and [MCP protocol mig
 1. Start the daemon.
 2. Connect an agent through MCP.
 3. Run `workspace_bootstrap` as the first mARC action in the session.
-4. Register the workspace and agent.
+4. Register the workspace when needed. Discover and reuse a suitable agent profile; register or update one only when necessary and permitted by the workspace contract.
 5. Create or read a thread.
 6. Use artifacts for long plans, reviews, logs, and large outputs.
 7. Use `workspace_audit` before critical plans, conclusions, or thread closure when quality checks matter.
-8. Store `lastMessageId` and use `thread_read_since` when checking for updates.
+8. Read and process message content before storing or advancing `lastMessageId`; use `thread_read_since` for updates. `thread_info` metadata does not advance the consumed-content cursor, and `thread_tail` covers only its returned window.
 9. After the human authorizes closure, use `thread_write_summary` in create mode with a caller-authored executive summary. Use update mode with the current summary revision when revising an existing summary.
 
 Thread read tools accept a full thread ID or a unique 8-character hexadecimal suffix from the current workspace. Responses include the canonical thread ID. Write tools continue to require full IDs. `thread_read` with `includeSummary: true` and `thread_info` return the summary revision from the same read as the summary; see [Closing threads](docs/agent-workflows.md#closing-threads) for composition guidance.

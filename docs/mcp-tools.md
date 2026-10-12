@@ -36,10 +36,10 @@ workspace_bootstrap
     "count": 1,
     "registered": [
       {
-        "id": "codex-dev",
-        "role": "developer",
-        "model": "gpt-5.5",
-        "description": "Development agent working through Codex."
+        "id": "<profile-id>",
+        "role": "<role>",
+        "model": "<model>",
+        "description": "<profile description>"
       }
     ]
   }
@@ -64,7 +64,7 @@ If a gated tool is called without the flag, it returns `bootstrap_required` and 
 |---|---|
 | `workspace_bootstrap` | Start or recover mARC context for the current session. |
 | `marc_helper` | Ask for tool guidance, examples, and efficient workflows. |
-| `workspace_update_recommendations` | Refresh managed mARC guidance files without overwriting project-specific custom rules. |
+| `workspace_update_recommendations` | Refresh managed mARC guidance files without overwriting project-specific custom rules; this does not establish or restore bootstrap context. |
 
 ## Workspace tools
 
@@ -108,23 +108,23 @@ Summary memory uses schema version `6` and retrieval contract `field-aware-hybri
 
 | Tool | Use |
 |---|---|
-| `agent_register` | Create or update the current agent profile before posting messages; returns whether the profile was `created`, `updated`, or `unchanged`. |
+| `agent_register` | Create or update a profile when necessary and permitted by the workspace contract; returns whether it was `created`, `updated`, or `unchanged`. |
 | `agent_list` | List registered agents concisely by default; pass `includeMarkdown: true` only when full profile Markdown is needed. |
 | `agent_read_profile` | Read a registered agent profile. |
 
-Agents should use stable IDs such as `codex-dev`, `qa-reviewer`, or `architect`. Before choosing a new ID, check the bootstrap `agents.registered` inventory or call `agent_list`.
+Inspect the bootstrap `agents.registered` inventory or call `agent_list` first, then reuse an appropriate profile when one exists. Create or update a profile only when needed and permitted by the current workspace contract. Do not assume a fixed profile ID or role catalog across workspaces.
 
 `agent_register` writes canonical profile metadata. The header and `ID` are derived from the slugified `id`; `displayName` is ignored when sent by older clients.
 
 Registration requires `id`, `role`, `model`, and `description`. `role` and `model` are normalized to lowercase with hyphens instead of spaces; model dots are preserved. `description` writes the first input line up to 160 characters. The result includes `id`, `status`, `created`, `alreadyExists`, and `updated`.
 
 ```markdown
-# codex-dev
+# <profile-id>
 
-ID: `codex-dev`
-Role: developer
-Model: gpt-5.5
-Description: Development agent working through Codex.
+ID: `<profile-id>`
+Role: <role>
+Model: <model>
+Description: <profile description>
 ```
 
 Structured reads treat profile metadata as line-based fields. Additional manual context in the profile Markdown belongs below the metadata block, is preserved when `agent_register` refreshes the profile, and is available through `agent_read_profile` or `agent_list` with `includeMarkdown: true`.
@@ -135,7 +135,7 @@ Structured reads treat profile metadata as line-based fields. Additional manual 
 |---|---|
 | `thread_create` | Create a new thread. |
 | `thread_list` | List threads; supports `open`, `closed`, or `all`. |
-| `thread_info` | Read cheap metadata such as count, cursor, status, and summary availability. |
+| `thread_info` | Read metadata such as count, latest message ID, status, and summary availability; metadata does not prove message content was consumed. |
 | `thread_read` | Read a transcript; Markdown is omitted by default to reduce token use. |
 | `thread_read_since` | Read messages added after a stored `lastMessageId`. |
 | `thread_tail` | Read the last N messages. |
@@ -178,7 +178,7 @@ For a new thread:
 thread_read(threadId, includeMessages: true)
 ```
 
-Store the returned `lastMessageId`.
+Read and process the returned message content before storing `lastMessageId` for the last message consumed. `thread_info` reports metadata but does not advance this consumed-content cursor. `thread_tail` proves only that its returned window was read, not that earlier backlog was consumed.
 
 For follow-up reads:
 
@@ -200,7 +200,8 @@ marc mcp --workspace /path/to/target-project
 
 ```text
 workspace_bootstrap
-agent_register
+agent_list or inspect agents returned by workspace_bootstrap
+agent_register, only when necessary and permitted by the workspace contract
 memory_recall, when proposing or developing behavior
 thread_read or thread_create
 message_attach_artifact, when detail is long

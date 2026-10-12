@@ -146,17 +146,9 @@ The project-local `.marc/INSTRUCTIONS.md` file is managed by mARC. Do not edit o
 
 Project-specific guidance belongs in `.marc/RULES.md` under `Custom Rules`.
 
-Before acting on a mARC thread, run:
+`workspace_bootstrap` establishes or restores the current workspace contract. Call it at session start or when bootstrap context is missing, stale, or uncertain; reuse a known current contract while it remains valid.
 
-```text
-workspace_bootstrap
-```
-
-or refresh recommendations directly with:
-
-```text
-workspace_update_recommendations
-```
+Use `workspace_update_recommendations` only to refresh managed recommendations. A refresh does not establish or restore bootstrap context and is not a substitute for `workspace_bootstrap`.
 
 ## Validation by impact
 

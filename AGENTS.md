@@ -25,14 +25,14 @@ For thread records, `CHAT.md` messages, `SUMMARY.md` files, and attached artifac
 ## mARC Threads and Records
 
 - When the user provides a specific mARC source, read that source before broad workspace investigation.
-- When continuing a thread, use `thread_read` to read it and store `lastMessageId`. Use `thread_read_since` with a valid cursor for later updates. If no cursor is available, use `thread_read`. If `thread_read_since` returns `shouldReadFullThread: true`, tell the user the cursor failed and call `thread_read`.
+- When continuing a thread, store `lastMessageId` as the consumed cursor only after reading and processing that message's content. `thread_info` metadata does not advance the cursor, and `thread_tail` covers only its returned window. Use `thread_read_since` for later updates; if no valid cursor is available or `shouldReadFullThread` is true, use `thread_read`.
 - Before proposing or changing behavior that may depend on historical decisions, call `memory_recall`. If it returns a strong match, read the referenced thread before reopening or contradicting that decision.
 - For work tracked in a thread, prepare and attach the detailed plan as an artifact before development begins. Keep the plan readable, include a concise summary and pending questions, and do not sacrifice grammar for brevity.
 - Keep loop coordination in the agent-to-agent channel. Neither thread messages nor artifacts are execution diaries. Do not post or update documents for each handshake, authorization, command, status, clean audit, finding, or correction. A concise handoff or handover message or document is appropriate at task assignment or a real transfer of responsibility, not for every iteration. Consolidate necessary evidence at task delivery and final integrated review. Publish material decisions, discoveries, blockers, risks, and results when they change understanding or require a decision; do not mirror internal coordination.
 - The principal checks the profile inventory and resolves role mappings. Only the principal administers the profile catalog. Developers reuse the assigned shared profile and must publish their own consolidated delivery for completed delegated development tasks tracked in the authorized thread through official mARC tools, unless the human explicitly exempts that scope. They may also publish other relevant contributions; they do not create or update profiles, register per spawn, or dispatch other developers. The principal need not pre-approve each relevant developer message and must not publish the developer's delivery as its own.
 - Attach artifact files through message metadata before referring to them in a message. Use actual newline characters in message bodies, not the literal backslash-n sequence. Write marc:// references as ordinary raw message text, never as inline code.
-- Before publishing any workspace message, follow the [shared message format](docs/agent-workflows.md#shared-message-format) and the Message Formatting Custom Rule, regardless of role or model. Separate distinct subjects into readable paragraphs, flat bullets, or short sections. Do not compress delivery, validation, diagnostics, and pending work into a dense paragraph. Each author checks its own message before posting; this requires neither principal pre-approval nor an extra message or artifact.
-- Use `workspace_update_recommendations` before starting work on a thread, as required by `RULES.md`. Run `workspace_audit` at meaningful completed checkpoints, not as a repeated ritual. Use `scope: preflight` before implementation from a plan. For artifact and reference checks, first create the relevant files, metadata, and references, then audit the applicable scope. Run `scope: messages` before completion or closure summaries after message metadata is in place. Use `scope: all` only for a user-requested broad audit or uncertain thread state.
+- For messages, artifacts, and thread summaries, follow the [shared Markdown composition guidance](docs/agent-workflows.md#shared-message-format) and [Message Formatting Custom Rule](.marc/RULES.md#message-formatting).
+- Run `workspace_update_recommendations` before starting work on a thread, as required by `RULES.md`. A refresh does not establish or restore bootstrap context; use `workspace_bootstrap` at session start or when context is missing, stale, or uncertain. Run `workspace_audit` at meaningful completed checkpoints, not as a repeated ritual. Use `scope: preflight` before implementation from a plan. For artifact and reference checks, first create the relevant files, metadata, and references, then audit the applicable scope. Run `scope: messages` before completion or closure summaries after message metadata is in place. Use `scope: all` only for a user-requested broad audit or uncertain thread state.
 - Treat `workspace_audit` as a structural check for records, references, and metadata, not as a substitute for the principal's technical quality review. Follow the complete `RULES.md` and `marc-ops` skill for exact applicability without duplicating them here.
 
 ## Collaboration Protocol
@@ -71,16 +71,11 @@ Before any edit, the developer independently bootstraps, reads the applicable ru
 
 ## Repository Working Rules
 
-- Keep project-owned code, schemas, technical documentation, and examples in en-US. Use pt-BR for direct user communication and mARC conversation, consistent with `RULES.md`.
-- Use context-mode for repository inspection and command-output review. Use Bash for workspace commands. Do not use PowerShell.
-- Do not run Git commands in this workspace unless the user explicitly authorizes them. Respect tool and command approval prompts. Do not bypass, evade, or work around a denied or pending approval.
-- Use Playwright CLI for UI/browser validation. Do not use Playwright MCP.
-- Do not add vendor-specific or client-specific hooks or configuration by default. Require a separate explicit user request.
-- Use the native `apply_patch` tool for manual file edits rather than shell-based file writes. Keep changes within authorized paths and do not duplicate the full code-style checklist from `RULES.md`.
+Follow [`.marc/RULES.md` under Custom Rules](.marc/RULES.md#custom-rules) as the canonical source for language, shell, repository inspection, Git authorization, browser validation, hooks, and manual editing restrictions. Keep this entrypoint as a concise index rather than a competing policy source.
 
 ## Validation
 
-The project requires Node.js 22 or newer and pnpm 10.10.0, as declared in [`package.json`](package.json). The standard validation commands are:
+The project requires Node.js 22 or newer and pnpm 10.10.0, as declared in [`package.json`](package.json). Follow [validation by impact](docs/development.md#validation-by-impact) and the canonical selection policy under `Custom Rules` in [`.marc/RULES.md`](.marc/RULES.md#custom-rules).
 
 ```bash
 pnpm validate
@@ -88,6 +83,4 @@ pnpm build
 pnpm test
 ```
 
-Select checks by delivery impact using the canonical policy in [`.marc/RULES.md`](.marc/RULES.md) under `Custom Rules` and the [delegated workflow](docs/agent-workflows.md#development-loop-for-delegated-work). Editorial content, mARC records, harness guidance, and documentation examples use applicable localized or example-specific checks. Changes to code, tests, tooling, dependencies, executable configuration, or parsing and persistence contracts require the full validation flow; so do mixed deliveries with that impact and any declaration that a release is ready. Clarify uncertain impact before omitting checks. Record the classification, checks actually run, results, and limits; a non-applicable command is neither a pass nor a pending check. The principal's independent integrated review remains required.
-
-`pnpm validate` is not read-only. It starts with `pnpm run code:fix`, which runs lint fixes and Prettier write mode before checks and typechecking. Confirm these side effects fit the authorized scope, inspect affected files, and preserve user work. Do not broadly revert formatter or lint output. Report scope conflicts and let the principal resolve them before proceeding.
+`pnpm validate` runs write-mode lint and formatting before checks and typechecking. Confirm its side effects fit the authorized scope, inspect affected files, preserve existing work, and report scope conflicts rather than reverting or expanding changes. Record the delivery classification, checks, results, and limits. The principal's independent integrated review remains required.

@@ -160,6 +160,23 @@ test("workspace status and audit use the bootstrap envelope over the wire", asyn
 test("marc_helper returns the requested topic through JSON text content", async (t) => {
   const session = await startMcpTestClient();
   t.after(() => session.close());
+  const bootstrap = await session.client.callTool({
+    name: "workspace_bootstrap",
+    arguments: {}
+  });
+  assert.equal(bootstrap.isError, undefined);
+  await fs.appendFile(
+    path.join(session.workspace, ".marc", "RULES.md"),
+    "\n### Consumer Custom Rule\n\n- Consumer-specific rule text.\n"
+  );
+  const readGuide = async <Result>(topic: string): Promise<Result> =>
+    toolJson<Result>(
+      await session.client.callTool({
+        name: "marc_helper",
+        arguments: { topic }
+      })
+    );
+
   const helper = await session.client.callTool({
     name: "marc_helper",
     arguments: { topic: "overview" }
@@ -178,15 +195,11 @@ test("marc_helper returns the requested topic through JSON text content", async 
     body.examples.some((example) => example.includes("workspace_bootstrap"))
   );
 
-  const threadGuideResult = await session.client.callTool({
-    name: "marc_helper",
-    arguments: { topic: "threads" }
-  });
-  const threadGuide = toolJson<{
+  const threadGuide = await readGuide<{
     relatedTools: string[];
     examples: string[];
     notes: string[];
-  }>(threadGuideResult);
+  }>("threads");
   assert.ok(threadGuide.relatedTools.includes("thread_write_summary"));
   assert.ok(
     threadGuide.examples.some((example) =>
@@ -200,7 +213,74 @@ test("marc_helper returns the requested topic through JSON text content", async 
   );
   assert.ok(
     threadGuide.notes.some((note) =>
-      note.includes("docs/agent-workflows.md#closing-threads")
+      note.includes("workspace contract for thread composition and closure")
+    )
+  );
+  assert.doesNotMatch(JSON.stringify(threadGuide), /docs\/agent-workflows\.md/);
+  await assert.rejects(
+    fs.access(path.join(session.workspace, "docs", "agent-workflows.md"))
+  );
+
+  const agentGuide = await readGuide<{
+    examples: string[];
+    notes: string[];
+  }>("agents");
+  assert.ok(
+    agentGuide.notes.some((note) => note.includes("Reuse an existing profile"))
+  );
+  assert.doesNotMatch(
+    JSON.stringify(agentGuide),
+    /codex-dev|qa-reviewer|architect/
+  );
+
+  const messagesGuide = await readGuide<{
+    examples: string[];
+    notes: string[];
+  }>("messages");
+  assert.ok(
+    messagesGuide.notes.some((note) =>
+      note.includes(
+        "material decisions, findings, risks, blockers, and results"
+      )
+    )
+  );
+  assert.doesNotMatch(JSON.stringify(messagesGuide), /acknowledge reading/);
+
+  const incrementalGuide = await readGuide<{
+    examples: string[];
+    notes: string[];
+  }>("incremental_reading");
+  assert.ok(
+    incrementalGuide.notes.some((note) =>
+      note.includes("read and processed the message content")
+    )
+  );
+  assert.ok(
+    incrementalGuide.notes.some((note) =>
+      note.includes("thread_info metadata does not advance")
+    )
+  );
+  assert.ok(
+    incrementalGuide.notes.some((note) =>
+      note.includes("thread_tail proves only its returned window")
+    )
+  );
+
+  const workspaceGuide = await readGuide<{
+    notes: string[];
+  }>("workspace");
+  assert.doesNotMatch(
+    JSON.stringify(workspaceGuide),
+    /Consumer-specific rule text/
+  );
+  assert.ok(
+    workspaceGuide.notes.some((note) =>
+      note.includes("Refreshing recommendations does not replace bootstrap")
+    )
+  );
+  assert.ok(
+    workspaceGuide.notes.some((note) =>
+      note.includes("preserve structured formats such as JSON")
     )
   );
 });

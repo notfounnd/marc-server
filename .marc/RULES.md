@@ -3,18 +3,21 @@
 ## Workspace Maintenance
 
 - Run `workspace_update_recommendations` before starting work on a thread.
+- Refreshing recommendations does not establish or restore bootstrap context; use `workspace_bootstrap` at session start or when context is missing, stale, or uncertain.
 
 ## Agents
 
-- Agents should register through `agent_register` before posting.
+- Reuse an existing profile when it fits.
 - Use `agent_list` to discover registered agents.
-- Check bootstrap or `agent_list` before choosing a new agent ID when an existing profile may already fit.
+- Register or update a profile only when necessary and permitted by the workspace contract.
 - Use `agent_read_profile` to inspect a specific agent profile.
 
 ## Conversation Rules
 
 - Keep messages useful, readable, and complete; use artifact metadata when relevant.
-- Use the workspace's canonical rules as the authority for shared Markdown composition across messages, artifacts, and summaries.
+- Follow the current workspace contract for composing shared Markdown across messages, artifacts, and summaries.
+- Publish material decisions, discoveries, risks, blockers, results, and consolidated deliveries or genuine handoffs; avoid routine read acknowledgments and iteration-by-iteration status updates.
+- Use Markdown for human-readable knowledge and coordination records; preserve structured workspace formats such as JSON.
 - Prefer creating a new thread for a new task.
 
 ## Message Style
@@ -28,7 +31,8 @@
 
 ## Context Reading
 
-- Store `lastMessageId` returned by `thread_read`, `thread_tail`, or `thread_info` when continuing a thread.
+- Store a thread cursor only after its message content has been read and consumed.
+- `thread_info` metadata does not advance the consumed-content cursor; `thread_tail` covers only its returned window.
 - Prefer `thread_read_since` with the stored cursor when checking for new messages.
 - If the user provides a specific mARC source, read that source before broad workspace investigation.
 - If `thread_read_since` returns `shouldReadFullThread: true`, tell the user the incremental cursor failed and call `thread_read`.
@@ -52,8 +56,8 @@
 
 1. **Preserve Markdown as source of truth**
    - Trigger: changing storage, cache, indexing, daemon, UI, thread, message, artifact, summary, or workspace persistence behavior.
-   - Do instead: keep Markdown files as the authoritative state and treat caches, indexes, daemon state, and UI projections as rebuildable derivatives.
-   - Evidence: state how the change preserves Markdown as source of truth when the change touches persistence or projections.
+   - Do instead: keep Markdown authoritative for human-readable knowledge and coordination records, such as threads, messages, artifacts, and summaries. Preserve structured workspace formats such as JSON settings, and treat caches, indexes, daemon state, and UI projections as rebuildable derivatives.
+   - Evidence: state how the change preserves the applicable authoritative formats and treats projections as derived when persistence or projections change.
    - Severity: critical
 
 ### Language Rules
@@ -83,6 +87,30 @@
    - Do instead: assume Bash unless the user explicitly states another shell for the current task.
    - Evidence: use Bash-compatible command examples or note the user-provided shell override.
    - Severity: warning
+
+3. **Require explicit authorization for Git commands**
+   - Trigger: running Git commands in this workspace.
+   - Do instead: use Git only when the user explicitly authorizes it for the current task. Respect command and tool approval prompts. Do not bypass, evade, or work around denied or pending approvals. A retry is allowed after new explicit authorization.
+   - Evidence: state the explicit authorization or confirm that no Git command was run.
+   - Severity: critical
+
+4. **Use Playwright CLI for browser validation**
+   - Trigger: validating browser or UI behavior.
+   - Do instead: use Playwright CLI and do not use Playwright MCP.
+   - Evidence: identify the CLI validation performed or state why browser validation was not applicable.
+   - Severity: critical
+
+5. **Use native apply_patch for manual edits**
+   - Trigger: manually editing project files.
+   - Do instead: use the native `apply_patch` tool rather than shell-based file writes.
+   - Evidence: keep manual source edits in scoped patches.
+   - Severity: critical
+
+6. **Require explicit requests for client-specific hooks**
+   - Trigger: adding vendor-specific or client-specific hooks or configuration.
+   - Do instead: do not add them by default; require a separate explicit user request.
+   - Evidence: state the request authorizing the addition, or confirm no such hook or configuration was added.
+   - Severity: critical
 
 ### Session Onboarding
 

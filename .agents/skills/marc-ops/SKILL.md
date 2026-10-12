@@ -46,7 +46,7 @@ Apply this workflow in these situations. These are examples, not exact prompt ma
 3. Reuse the current workspace contract while it remains known; do not repeat bootstrap as a ritual before each mARC action.
 4. Call `memory_recall` with the current development intent before proposing or changing behavior when historical decisions may be relevant.
 5. If `memory_recall` returns a strong match, read the referenced thread before reopening or contradicting the historical decision.
-6. Read the target thread before proposing or changing anything. Use `thread_read_since` when you have a valid cursor and fall back to `thread_read` when the cursor is missing.
+6. Read the target thread before proposing or changing anything. Advance the consumed cursor only after you have read and processed message content; use `thread_read_since` with that cursor and fall back to `thread_read` when it is missing or invalid.
 7. Convert applicable `Custom Rules` into a short working checklist before proposing, developing, concluding, or closing.
 8. Leave evidence when a critical rule asks for it. Evidence can be sources read, artifacts attached, validation commands, audit output, or explicit unresolved blockers.
 9. Attach artifacts before referencing them in `message_post`.
@@ -59,8 +59,20 @@ Apply this workflow in these situations. These are examples, not exact prompt ma
 - Treat `Trigger`, `Do instead`, `Evidence`, and `Severity` fields as executable instructions.
 - For free-form custom rules, extract the concrete action and apply it as a checklist item.
 - Preserve project-specific rules in `Custom Rules`. Do not move them into generated managed sections unless the user explicitly asks.
+- Keep Markdown for human-readable knowledge and coordination records; preserve structured formats such as JSON.
+- Refreshing recommendations does not replace bootstrap; use `workspace_bootstrap` to establish or recover the workspace contract.
 - If rules conflict, follow the more specific project rule and state the conflict in the plan or thread comment.
 - If a required rule cannot be satisfied, stop at the smallest useful point and state the blocker before proceeding.
+
+## Profile Discipline
+
+- Discover and reuse a suitable profile before registering; create or update one only when necessary and permitted by the workspace contract.
+- Do not assume a fixed profile ID, role catalog, or registration policy across workspaces.
+
+## Context Reading Discipline
+
+- Advance the consumed cursor only after you have read and processed message content.
+- Metadata from `thread_info` does not advance the consumed-content cursor; `thread_tail` proves only the returned window was read.
 
 ## Preflight Checklist
 
@@ -84,7 +96,8 @@ Before posting a plan, proposal, design, API/tool change, or completion note, ch
 - Do not repeat `artifacts/...` paths in the message body just to show an attached artifact.
 - Mention artifact paths or `marc://` artifact references only when the identifier itself is important to the message.
 - Do not say an artifact is attached when only a plain text path was written.
-- Prefer incremental thread comments that say what changed, what was validated, and what remains pending.
+- Publish material decisions, findings, risks, blockers, and results, with consolidated deliveries or genuine handoffs when responsibility changes.
+- Avoid routine read acknowledgments and iteration-by-iteration status updates; do not suppress material information or require silence.
 
 ## Audit Discipline
 

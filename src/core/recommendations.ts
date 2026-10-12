@@ -16,13 +16,14 @@ const CUSTOM_RULES_STRUCTURE_COMMENT =
   "<!-- Prefer ### or deeper headings to organize project-specific rules in this section. -->";
 const LEGACY_REGISTERED_AGENTS_HEADING = "### Registered Agents (Marckers)";
 const AGENTS_GUIDE = [
-  "- Agents should register through `agent_register` before posting.",
+  "- Reuse an existing profile when it fits.",
   "- Use `agent_list` to discover registered agents.",
-  "- Check bootstrap or `agent_list` before choosing a new agent ID when an existing profile may already fit.",
+  "- Register or update a profile only when necessary and permitted by the workspace contract.",
   "- Use `agent_read_profile` to inspect a specific agent profile."
 ];
 const CONTEXT_READING_GUIDE = [
-  "- Store `lastMessageId` returned by `thread_read`, `thread_tail`, or `thread_info` when continuing a thread.",
+  "- Store a thread cursor only after its message content has been read and consumed.",
+  "- `thread_info` metadata does not advance the consumed-content cursor; `thread_tail` covers only its returned window.",
   "- Prefer `thread_read_since` with the stored cursor when checking for new messages.",
   "- If the user provides a specific mARC source, read that source before broad workspace investigation.",
   "- If `thread_read_since` returns `shouldReadFullThread: true`, tell the user the incremental cursor failed and call `thread_read`.",
@@ -37,11 +38,14 @@ const OPERATIONAL_CUSTOM_RULES_GUIDE = [
   "- Use `Severity` with `critical`, `warning`, or `suggestion`."
 ];
 const WORKSPACE_MAINTENANCE_GUIDE = [
-  "- Run `workspace_update_recommendations` before starting work on a thread."
+  "- Run `workspace_update_recommendations` before starting work on a thread.",
+  "- Refreshing recommendations does not establish or restore bootstrap context; use `workspace_bootstrap` at session start or when context is missing, stale, or uncertain."
 ];
 const CONVERSATION_RULES_GUIDE = [
   "- Keep messages useful, readable, and complete; use artifact metadata when relevant.",
-  "- Use the workspace's canonical rules as the authority for shared Markdown composition across messages, artifacts, and summaries.",
+  "- Follow the current workspace contract for composing shared Markdown across messages, artifacts, and summaries.",
+  "- Publish material decisions, discoveries, risks, blockers, results, and consolidated deliveries or genuine handoffs; avoid routine read acknowledgments and iteration-by-iteration status updates.",
+  "- Use Markdown for human-readable knowledge and coordination records; preserve structured workspace formats such as JSON.",
   "- Prefer creating a new thread for a new task."
 ];
 const WORKSPACE_SKILL_PATH = ".agents/skills/marc-ops/SKILL.md";
