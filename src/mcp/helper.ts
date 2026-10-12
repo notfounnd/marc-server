@@ -116,6 +116,7 @@ const MARC_HELPER_GUIDES: Record<
       "thread_create with a clear task title for new work.",
       "thread_list defaults to open threads; pass status closed or all when needed.",
       "thread_info gives cheap metadata before deciding whether to read content.",
+      "Thread read tools accept a unique 8-character hexadecimal suffix; use full IDs for writes.",
       "When the user gives a specific mARC source, read that source before broad workspace investigation."
     ],
     notes: [

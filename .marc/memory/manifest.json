@@ -1,7 +1,7 @@
 {
   "schemaVersion": 6,
-  "builtAt": "2026-10-11T19:16:28.904Z",
-  "generation": "20261011191627641_97db0989",
+  "builtAt": "2026-10-12T01:29:57.377Z",
+  "generation": "20261012012956053_8fdcc1df",
   "embeddingProvider": {
     "id": "transformers-js-local-e5",
     "name": "Transformers.js local multilingual E5 retrieval",
@@ -251,6 +251,23 @@
       ]
     },
     {
+      "threadId": "oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa",
+      "title": "Oportunidade - Busca MCP de thread por sufixo de ID",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa/SUMMARY.md",
+      "reference": "marc://$oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa",
+      "sha256": "7ea76f54553ed9ed4e927e7428e1e16b4a79329e51e1b43fc9dc9915a657c2f9",
+      "mtimeMs": 1791768435254.6582,
+      "recordIds": [
+        "oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa:identity",
+        "oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa:source:resultado-e-encerramento:passage:001",
+        "oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa:source:decisoes-e-implementacao:passage:001",
+        "oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa:source:validacao-da-entrega:passage:001",
+        "oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa:source:limites-preservados:passage:001",
+        "oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa:source:registros-de-entrega-e-revisao:passage:001"
+      ]
+    },
+    {
       "threadId": "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac",
       "title": "Oportunidade - Calibragem de recall lexical e candidatos da memory",
       "closedAt": "2026-07-21T04:41:33Z",
@@ -417,6 +434,24 @@
         "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1:source:validacao:passage:001",
         "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1:source:backlog-playwright:passage:001",
         "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1:source:pendencias:passage:001"
+      ]
+    },
+    {
+      "threadId": "oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b",
+      "title": "Oportunidade - Gate de validação proporcional ao impacto da entrega",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b/SUMMARY.md",
+      "reference": "marc://$oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b",
+      "sha256": "6250bc1e8ec418f62e245df7bc6ce533418dec2f2065010787527c808f252687",
+      "mtimeMs": 1791758744347.0598,
+      "recordIds": [
+        "oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b:identity",
+        "oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b:source:objetivo:passage:001",
+        "oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b:source:decisoes:passage:001",
+        "oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b:source:implementacao:passage:001",
+        "oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b:source:validacao-e-aceite:passage:001",
+        "oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b:source:limites:passage:001",
+        "oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b:source:evidencias:passage:001"
       ]
     },
     {
@@ -740,12 +775,12 @@
     },
     {
       "threadId": "oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787",
-      "title": "Oportunidade - Revisao e atualizacao do mARC para MCP 2026-07-28",
+      "title": "Oportunidade - Revisão e atualização do mARC para MCP 2026-07-28",
       "closedAt": "2026-10-11T19:14:21.000Z",
       "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787\\SUMMARY.md",
       "relativeSummaryPath": "threads/oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787/SUMMARY.md",
       "reference": "marc://$oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787",
-      "sha256": "99d12aa1b2af5239ec37895035a822368104ffc8e8caba05869ff41e7455c46d",
+      "sha256": "300931a7cf10d324c0faa7e74de75edbd00c393eafa53b1af1e3a008e715d3c9",
       "mtimeMs": 1791746109768.2578,
       "recordIds": [
         "oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787:identity",

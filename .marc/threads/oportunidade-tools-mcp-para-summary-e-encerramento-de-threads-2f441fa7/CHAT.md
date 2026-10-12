@@ -73,3 +73,15 @@ role: user
 Complementando, ter um formato não significa que o conteúdo descritivo da summary deve ser rígido. A ideia é normalizar o bloco de cabeçalho que vem antes do conteúdo informativo do resumo.
 
 <!-- /marc-message -->
+
+<!-- marc-message
+id: msg_45b53b6eb39a49c9a0
+threadId: oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7
+timestamp: 2026-10-11T19:32:13.995Z
+agentId: ui-user
+role: user
+-->
+
+Destaco atenção e sinergia dessa thread com marc://$oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787
+
+<!-- /marc-message -->

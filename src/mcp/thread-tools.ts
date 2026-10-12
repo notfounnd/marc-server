@@ -8,7 +8,8 @@ import {
   readThreadSince,
   readThreadTail
 } from "../core/workspace.js";
-import { gatedSchema, withBootstrap } from "./responses.js";
+import { gatedSchema, toolError, withBootstrap } from "./responses.js";
+import { resolveThreadId } from "./thread-resolution.js";
 import { McpToolCoordinator, registerMcpTool } from "./tool-registration.js";
 import type { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
@@ -84,59 +85,104 @@ export function registerThreadTools(
     server,
     coordinator,
     "thread_read",
-    "Read a thread transcript. Returns lastMessageId; agents should store it and prefer thread_read_since on later reads. Markdown is omitted by default to avoid duplicating messages.",
+    "Read a thread transcript by full ID or unique 8-character hexadecimal suffix. Returns the canonical threadId and lastMessageId; agents should store the cursor and prefer thread_read_since on later reads. Markdown is omitted by default to avoid duplicating messages.",
     gatedSchema({
-      threadId: z.string().min(1),
+      threadId: z
+        .string()
+        .min(1)
+        .describe("Full thread ID or an 8-character hexadecimal suffix."),
       includeMarkdown: z.boolean().optional(),
       includeMessages: z.boolean().optional(),
       includeSummary: z.boolean().optional()
     }),
     async (input) =>
-      withBootstrap(input, async () =>
-        readThread(workspaceRoot, input.threadId, {
+      withResolvedThread(input, workspaceRoot, async (threadId) => ({
+        ...(await readThread(workspaceRoot, threadId, {
           includeMarkdown: input.includeMarkdown,
           includeMessages: input.includeMessages,
           includeSummary: input.includeSummary
-        })
-      )
+        })),
+        threadId
+      }))
   );
   registerMcpTool(
     server,
     coordinator,
     "thread_read_since",
-    "Read only messages added after afterMessageId. If the cursor is missing, returns cursor_not_found and shouldReadFullThread=true so the agent can announce fallback and call thread_read explicitly.",
+    "Read only messages added after afterMessageId by full thread ID or unique 8-character hexadecimal suffix. Returns the canonical threadId. If the cursor is missing, returns cursor_not_found and shouldReadFullThread=true so the agent can announce fallback and call thread_read explicitly.",
     gatedSchema({
-      threadId: z.string().min(1),
+      threadId: z
+        .string()
+        .min(1)
+        .describe("Full thread ID or an 8-character hexadecimal suffix."),
       afterMessageId: z.string().min(1)
     }),
     async (input) =>
-      withBootstrap(input, async () =>
-        readThreadSince(workspaceRoot, input.threadId, input.afterMessageId)
-      )
+      withResolvedThread(input, workspaceRoot, async (threadId) => ({
+        ...(await readThreadSince(
+          workspaceRoot,
+          threadId,
+          input.afterMessageId
+        )),
+        threadId
+      }))
   );
   registerMcpTool(
     server,
     coordinator,
     "thread_info",
-    "Read cheap thread metadata including messageCount, lastMessageId, updatedAt, status, and summary availability.",
-    gatedSchema({ threadId: z.string().min(1) }),
+    "Read cheap thread metadata by full ID or unique 8-character hexadecimal suffix. Returns the canonical threadId and the existing id field.",
+    gatedSchema({
+      threadId: z
+        .string()
+        .min(1)
+        .describe("Full thread ID or an 8-character hexadecimal suffix.")
+    }),
     async (input) =>
-      withBootstrap(input, async () =>
-        readThreadInfo(workspaceRoot, input.threadId)
-      )
+      withResolvedThread(input, workspaceRoot, async (threadId) => {
+        const info = await readThreadInfo(workspaceRoot, threadId);
+        return { ...info, threadId: info.id };
+      })
   );
   registerMcpTool(
     server,
     coordinator,
     "thread_tail",
-    "Read the last N messages from a thread. Use this for quick context when unnecessary full transcript output would waste tokens.",
+    "Read the last N messages by full thread ID or unique 8-character hexadecimal suffix. Returns the canonical threadId. Use this for quick context when unnecessary full transcript output would waste tokens.",
     gatedSchema({
-      threadId: z.string().min(1),
+      threadId: z
+        .string()
+        .min(1)
+        .describe("Full thread ID or an 8-character hexadecimal suffix."),
       limit: z.number().int().min(1).max(50).optional()
     }),
     async (input) =>
-      withBootstrap(input, async () =>
-        readThreadTail(workspaceRoot, input.threadId, { limit: input.limit })
-      )
+      withResolvedThread(input, workspaceRoot, async (threadId) => ({
+        ...(await readThreadTail(workspaceRoot, threadId, {
+          limit: input.limit
+        })),
+        threadId
+      }))
   );
+}
+
+async function withResolvedThread<Result>(
+  input: { threadId: string; bootstrapConfirmed?: boolean },
+  workspaceRoot: string,
+  read: (threadId: string) => Promise<Result>
+) {
+  if (input.bootstrapConfirmed !== true) {
+    return withBootstrap(input, async () => undefined);
+  }
+
+  const resolution = await resolveThreadId(workspaceRoot, input.threadId);
+  if (!resolution.ok) {
+    return toolError(
+      resolution.error.code,
+      resolution.error.message,
+      resolution.error.details
+    );
+  }
+
+  return withBootstrap(input, async () => read(resolution.threadId));
 }

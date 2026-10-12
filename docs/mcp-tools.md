@@ -140,6 +140,14 @@ Structured reads treat profile metadata as line-based fields. Additional manual 
 | `thread_read_since` | Read messages added after a stored `lastMessageId`. |
 | `thread_tail` | Read the last N messages. |
 
+### Thread ID resolution
+
+`thread_read`, `thread_read_since`, `thread_info`, and `thread_tail` accept a full thread ID or a unique hexadecimal suffix of exactly eight characters. Full IDs match exactly and take priority. Suffix lookup compares the final segment after the last hyphen and accepts uppercase or lowercase hexadecimal characters.
+
+Resolution scans thread directories in the current workspace, including open and closed threads. A candidate must be a directory with a regular `CHAT.md` file. Symbolic-link directories and symbolic-link `CHAT.md` files are excluded. The resolver does not use the derived thread index. Successful results include the canonical ID in `result.threadId`; `thread_info` also preserves its existing `id` field. This ID is present on `cursor_not_found` results as well.
+
+The read tools return `isError: true` with `thread_not_found` when there is no match, `ambiguous_thread_id` when a suffix matches multiple threads, or `invalid_thread_id` when the input contains path separators or traversal segments. Ambiguity details include sorted canonical IDs in `error.details.candidates`. `message_post` and `message_attach_artifact` continue to require full IDs.
+
 ## Message and artifact tools
 
 | Tool | Use |

@@ -183,6 +183,8 @@ See [MCP tools](docs/mcp-tools.md) for the client contract and [MCP protocol mig
 8. Store `lastMessageId` and use `thread_read_since` when checking for updates.
 9. Close finished threads by adding a `SUMMARY.md` executive summary.
 
+Thread read tools accept a full thread ID or a unique 8-character hexadecimal suffix from the current workspace. Responses include the canonical thread ID. Write tools continue to require full IDs.
+
 ## Documentation
 
 - [Harness Engineering](docs/harness-engineering.md)
