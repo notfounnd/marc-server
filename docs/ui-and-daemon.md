@@ -69,6 +69,8 @@ Notifications use the local Neobrutalism Toast component backed by Base UI. The 
 
 The three-column workspace layout remains application-owned. Sidebar modes, independent column scrolling, the content footer, Markdown rendering, and reference autocomplete are mARC behaviors rather than library-provided navigation patterns.
 
+Markdown rendering displays raw HTML source as escaped text, preserving source line breaks and allowing long lines to wrap without interpreting the HTML.
+
 ## Threads
 
 Open threads are the active working set. Closed threads are determined by `SUMMARY.md` and remain accessible through archive views.

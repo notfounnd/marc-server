@@ -1,9 +1,10 @@
-import { useMemo } from "react";
+import * as React from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Card } from "@/components/ui/card";
 import { parseMarcReference } from "../core/marc-references.js";
 import { classNames } from "./common.js";
+import { rehypeMarkdownHtmlSource } from "./markdown-html-source.js";
 import {
   linkifyMarcReferences,
   marcReferenceLabel,
@@ -22,7 +23,7 @@ export function MarkdownPanel({
   preserveLineBreaks?: boolean;
   onLink?: MarkdownLinkHandler;
 }) {
-  const linkedMarkdown = useMemo(
+  const linkedMarkdown = React.useMemo(
     () => linkifyMarcReferences(markdown),
     [markdown]
   );
@@ -38,6 +39,7 @@ export function MarkdownPanel({
     >
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
+        rehypePlugins={[rehypeMarkdownHtmlSource]}
         urlTransform={transformMarkdownUrl}
         components={{
           a: ({ href, children }) => {

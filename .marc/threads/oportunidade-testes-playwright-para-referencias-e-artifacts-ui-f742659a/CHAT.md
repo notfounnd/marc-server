@@ -254,3 +254,20 @@ As verificações ad hoc por Playwright CLI estão distinguidas da cobertura E2E
 Origem: marc://$substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb
 
 <!-- /marc-message -->
+
+<!-- marc-message
+id: msg_fe4097f033fc4149aa
+threadId: oportunidade-testes-playwright-para-referencias-e-artifacts-ui-f742659a
+timestamp: 2026-10-15T22:56:53.775Z
+agentId: codex-software-architect
+role: architect
+artifacts: artifacts/playwright-test-scenarios.md
+-->
+
+Backlog revisado antes do encerramento autorizado de marc://$correcao-ocultar-comentarios-html-no-markdown-renderizado-b84827bb.
+
+Acrescentei cenários para comentários literais em linhas distintas, conteúdo multilinha e linhas vazias, wrapping responsivo, tags inertes e preservação de Markdown, código e referências mARC nas superfícies existentes.
+
+A validação ad hoc por Playwright CLI está registrada como evidência; cobertura E2E durável e integração com APIs do daemon continuam pendentes. A evolução para interpretar HTML permanece na thread própria.
+
+<!-- /marc-message -->

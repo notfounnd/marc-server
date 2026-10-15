@@ -258,6 +258,19 @@ Priority: high
 
 Coverage note: ad hoc Playwright CLI checks covered types, expiration, hover/focus pause, stacking, keyboard, stable long-message layouts, and the real Keyboard shortcuts sheet during the source thread. These checks do not constitute durable automated E2E coverage; all scenarios remain pending. Timer and overlay assertions must account for entry/exit transitions. Daemon auto-idle analysis belongs to its separate thread and is not part of this browser backlog.
 
+## Literal HTML Source Line Breaks
+
+Source thread: marc://$correcao-ocultar-comentarios-html-no-markdown-renderizado-b84827bb
+Priority: medium
+
+- [ ] Open workspace rules containing the two adjacent Custom Rules HTML comments; verify both remain visible as literal text and the second begins on a new line, including when the first wraps.
+- [ ] Render multiline comments and comments separated by blank lines in workspace rules, thread messages, summaries, and artifact viewers; verify source line spacing is preserved.
+- [ ] At 1280 px and 420 px widths, verify long literal HTML source wraps without horizontal overflow or changes to ordinary Markdown paragraph spacing.
+- [ ] Render literal tags and a script fixture; verify no HTML element is created from that source and no script executes.
+- [ ] Verify inline, fenced, and indented code remain literal, while headings, lists, tables, links, and mARC references retain their existing behavior.
+
+Coverage note: ad hoc Playwright CLI validation exercised the real WorkspaceOverview, ThreadView, and ArtifactViewerModal with application CSS in an isolated Vite fixture. Durable browser tests and integration with daemon APIs remain pending. Rendering HTML is a separate proposal in marc://$evolucao-avaliar-convivencia-de-markdown-com-html-renderizado-ce4a7cbe.
+
 ## Maintenance Notes
 
 - This backlog should grow as UI features are added.

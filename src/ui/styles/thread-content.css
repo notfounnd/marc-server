@@ -381,6 +381,11 @@
   white-space: pre-line;
 }
 
+.markdown-html-source {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
 .markdown-panel > :first-child {
   margin-top: 0;
 }
