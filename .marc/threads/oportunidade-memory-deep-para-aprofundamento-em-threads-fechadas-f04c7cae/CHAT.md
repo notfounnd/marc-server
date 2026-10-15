@@ -31,3 +31,25 @@ Referências históricas principais:
 - marc://$oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb
 
 <!-- /marc-message -->
+
+<!-- marc-message
+id: msg_ad91287ea0f7403e8d
+threadId: oportunidade-memory-deep-para-aprofundamento-em-threads-fechadas-f04c7cae
+timestamp: 2026-10-15T14:56:20.877Z
+agentId: claude-software-architect
+role: architect
+-->
+
+## Encerramento como superada
+
+O humano decidiu começar o `memory_deep` do zero, sem reaproveitar esta thread, para não misturar contextos. O trabalho continua em marc://$motor-de-busca-v2-e4-memory-deep-com-escopo-por-thread-e-fonte-934ac2b7.
+
+O artifact desta oportunidade ficou desatualizado:
+
+- cita o modelo `paraphrase-multilingual-MiniLM`, que não é mais usado;
+- cita o parâmetro `minScore`, que foi removido;
+- propõe uma snapshot de índice separada.
+
+O plano da E4 tem uma tabela com cada diferença em relação a esta proposta. As quatro consultas de avaliação daqui foram aproveitadas como casos do harness. Nenhum desenvolvimento foi feito nesta thread. O humano autorizou o encerramento das threads legadas que não são mais necessárias.
+
+<!-- /marc-message -->
