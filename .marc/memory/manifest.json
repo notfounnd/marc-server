@@ -1,12 +1,12 @@
 {
   "schemaVersion": 6,
-  "builtAt": "2026-10-12T17:14:59.077Z",
-  "generation": "20261012171458084_59902dec",
+  "builtAt": "2026-10-15T15:02:24.386Z",
+  "generation": "20261015150223832_a5073520",
   "embeddingProvider": {
     "id": "transformers-js-local-e5",
     "name": "Transformers.js local multilingual E5 retrieval",
     "model": "Xenova/multilingual-e5-small",
-    "version": "transformers-js-4.2.0",
+    "version": "transformers-js-4.3.1",
     "dimensions": 384,
     "distance": "cosine",
     "quantized": true,
@@ -177,6 +177,40 @@
         "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81:source:apresentacao-dos-agentes:passage:001",
         "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81:source:validacao:passage:001",
         "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81:source:limites-e-continuidade:passage:001"
+      ]
+    },
+    {
+      "threadId": "estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab",
+      "title": "Estudo - Modelo contextual maior para interpretacao e reranking da memory",
+      "closedAt": "2026-10-15T14:57:40.567Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab\\SUMMARY.md",
+      "relativeSummaryPath": "threads/estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab/SUMMARY.md",
+      "reference": "marc://$estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab",
+      "sha256": "77373e5aa47edd8484a9cc41c6e6c4d16fb031047e815f5e1729928531145ee7",
+      "mtimeMs": 1792076260577.4712,
+      "recordIds": [
+        "estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab:identity",
+        "estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab:source:objetivo-e-contexto:passage:001",
+        "estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab:source:resultados-dos-estudos:passage:001",
+        "estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab:source:entrega-implementada:passage:001",
+        "estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab:source:rota-do-motor-de-busca-v2:passage:001",
+        "estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab:source:continuidade:passage:001"
+      ]
+    },
+    {
+      "threadId": "estudo-profundidade-adaptativa-e-simplificacao-do-deep-search-4f477d9f",
+      "title": "Estudo - Profundidade adaptativa e simplificacao do Deep Search",
+      "closedAt": "2026-10-15T14:57:21.976Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\estudo-profundidade-adaptativa-e-simplificacao-do-deep-search-4f477d9f\\SUMMARY.md",
+      "relativeSummaryPath": "threads/estudo-profundidade-adaptativa-e-simplificacao-do-deep-search-4f477d9f/SUMMARY.md",
+      "reference": "marc://$estudo-profundidade-adaptativa-e-simplificacao-do-deep-search-4f477d9f",
+      "sha256": "0f26d695b6809b74261a10156e4ba02d38febfa2ec22e847ea3d4ee79762630c",
+      "mtimeMs": 1792076241986.273,
+      "recordIds": [
+        "estudo-profundidade-adaptativa-e-simplificacao-do-deep-search-4f477d9f:identity",
+        "estudo-profundidade-adaptativa-e-simplificacao-do-deep-search-4f477d9f:source:contexto:passage:001",
+        "estudo-profundidade-adaptativa-e-simplificacao-do-deep-search-4f477d9f:source:decisao-que-respondeu-ao-estudo:passage:001",
+        "estudo-profundidade-adaptativa-e-simplificacao-do-deep-search-4f477d9f:source:continuidade:passage:001"
       ]
     },
     {
@@ -548,6 +582,21 @@
         "oportunidade-mecanismo-de-busca-sobre-o-conhecimento-do-projeto-b64903bd:source:implementation:passage:001",
         "oportunidade-mecanismo-de-busca-sobre-o-conhecimento-do-projeto-b64903bd:source:validation:passage:001",
         "oportunidade-mecanismo-de-busca-sobre-o-conhecimento-do-projeto-b64903bd:source:follow-ups:passage:001"
+      ]
+    },
+    {
+      "threadId": "oportunidade-memory-deep-para-aprofundamento-em-threads-fechadas-f04c7cae",
+      "title": "Oportunidade - memory_deep para aprofundamento em threads fechadas",
+      "closedAt": "2026-10-15T14:57:22.277Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-memory-deep-para-aprofundamento-em-threads-fechadas-f04c7cae\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-memory-deep-para-aprofundamento-em-threads-fechadas-f04c7cae/SUMMARY.md",
+      "reference": "marc://$oportunidade-memory-deep-para-aprofundamento-em-threads-fechadas-f04c7cae",
+      "sha256": "10c62f46377a57a014e453febe9fcfe5f36f989b929210794580674a4308f8d1",
+      "mtimeMs": 1792076242285.9602,
+      "recordIds": [
+        "oportunidade-memory-deep-para-aprofundamento-em-threads-fechadas-f04c7cae:identity",
+        "oportunidade-memory-deep-para-aprofundamento-em-threads-fechadas-f04c7cae:source:o-que-continua-valido:passage:001",
+        "oportunidade-memory-deep-para-aprofundamento-em-threads-fechadas-f04c7cae:source:o-que-ficou-desatualizado:passage:001"
       ]
     },
     {

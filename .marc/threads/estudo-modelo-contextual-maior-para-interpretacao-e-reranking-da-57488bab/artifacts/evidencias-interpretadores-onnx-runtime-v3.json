@@ -1,0 +1,3849 @@
+{
+  "schema": 2,
+  "runtime": {
+    "transformers": "4.3.1",
+    "onnxruntimeNode": "1.30.0",
+    "loadingStrategy": "offline-local-v3"
+  },
+  "generation": {
+    "generation": "20261012171458084_59902dec",
+    "manifestSha256": "5bd9ff94b34cd7afca843d91504ef85d1ac54048513420266a1be554ef9227c3",
+    "rowCount": 338
+  },
+  "parameters": {
+    "device": "cpu",
+    "dtype": "q4",
+    "intraOpNumThreads": 2,
+    "interOpNumThreads": 2,
+    "do_sample": false,
+    "max_new_tokens": 4
+  },
+  "sourceRoot": "C:/Users/junior/AppData/Local/Temp/marc-interpreter-eval-57488bab-20261013",
+  "sources": [
+    {
+      "file": "evaluate-baseline-v3.json",
+      "sha256": "43ce91a4610e3f166d523fe8ad95bc316fdacb90e7a80a90155db9b8d362a8c2"
+    },
+    {
+      "file": "evaluate-lfm12-v3.json",
+      "sha256": "d3afca793e05c7e032602c2cf8e687fa48d064335010014f92b5066679cedb2d"
+    },
+    {
+      "file": "evaluate-qwen08b-v3.json",
+      "sha256": "e343995d6efb4825b06155d639f285295c396345a11b440b40d7530927592aef"
+    }
+  ],
+  "models": {
+    "baseline": {
+      "model": {
+        "assets": [
+          "config.json",
+          "onnx/model_q4.onnx",
+          "onnx/model_q4.onnx_data",
+          "tokenizer.json",
+          "tokenizer_config.json"
+        ],
+        "id": "onnx-community/LFM2.5-350M-ONNX",
+        "revision": null,
+        "selectedTextGraphs": []
+      },
+      "memory": {
+        "afterRssBytes": 556982272,
+        "beforeRssBytes": 70717440,
+        "peakRssBytes": 624803840,
+        "peakRssSource": "process.resourceUsage+sampled"
+      },
+      "workerMs": 85159.3401
+    },
+    "lfm12": {
+      "model": {
+        "assets": [
+          "config.json",
+          "onnx/model_q4.onnx",
+          "onnx/model_q4.onnx_data",
+          "tokenizer.json",
+          "tokenizer_config.json"
+        ],
+        "id": "LiquidAI/LFM2.5-1.2B-Instruct-ONNX",
+        "revision": "10f72e70abf67ac0fd7ebf15bc5854726891d864",
+        "selectedTextGraphs": []
+      },
+      "memory": {
+        "afterRssBytes": 1110097920,
+        "beforeRssBytes": 70782976,
+        "peakRssBytes": 1401712640,
+        "peakRssSource": "process.resourceUsage+sampled"
+      },
+      "workerMs": 322182.7185
+    },
+    "qwen08b": {
+      "model": {
+        "assets": [
+          "config.json",
+          "onnx/decoder_model_merged_q4.onnx",
+          "onnx/decoder_model_merged_q4.onnx_data",
+          "onnx/embed_tokens_q4.onnx",
+          "onnx/embed_tokens_q4.onnx_data",
+          "tokenizer.json",
+          "tokenizer_config.json"
+        ],
+        "id": "onnx-community/Qwen3.5-0.8B-ONNX-OPT",
+        "revision": "969350d5f4647ec9ac277110f8974c65d8c10e4b",
+        "selectedTextGraphs": [
+          "embed_tokens",
+          "decoder_model_merged"
+        ]
+      },
+      "memory": {
+        "afterRssBytes": 1144348672,
+        "beforeRssBytes": 70205440,
+        "peakRssBytes": 1206177792,
+        "peakRssSource": "process.resourceUsage+sampled"
+      },
+      "workerMs": 153469.2115
+    }
+  },
+  "cases": [
+    {
+      "id": "1D",
+      "query": "separar INSTRUCTIONS.md gerenciado do RULES.md customizavel no bootstrap",
+      "mode": "auto",
+      "variants": [
+        "separar INSTRUCTIONS.md gerenciado do RULES.md customizavel no bootstrap",
+        "separar INSTRUCTIONS.md gerenciada do RULES.md customizavel no bootstrap"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            2315.7186
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "separar INSTRUCTIONS.md gerenciado do RULES.md customizavel no bootstrap",
+          "suggestedQuery": "separar INSTRUCTIONS.md gerenciada do RULES.md customizavel no bootstrap",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            7576.5303
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "separar INSTRUCTIONS.md gerenciado do RULES.md customizavel no bootstrap",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            3169.5546999999997
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "separar INSTRUCTIONS.md gerenciado do RULES.md customizavel no bootstrap",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "1I",
+      "query": "onde fica o protocolo operacional estavel e onde ficam as regras comportamentais do workspace?",
+      "mode": "auto",
+      "variants": [
+        "onde fica o protocolo operacional estavel e onde ficam as regras comportamentais do workspace?",
+        "node fica o protocolo operacional estavel e node fica as regras comportamentais do workspace?"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            2286.1663
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "onde fica o protocolo operacional estavel e onde ficam as regras comportamentais do workspace?",
+          "suggestedQuery": "node fica o protocolo operacional estavel e node fica as regras comportamentais do workspace?",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            5629.5833999999995
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "onde fica o protocolo operacional estavel e onde ficam as regras comportamentais do workspace?",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            3261.2127
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "onde fica o protocolo operacional estavel e onde ficam as regras comportamentais do workspace?",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "1P",
+      "query": "agentes estao editando o arquivo de instrucoes geradas e misturando custom rules, qual decisao historica evita isso?",
+      "mode": "auto",
+      "variants": [
+        "agentes estao editando o arquivo de instrucoes geradas e misturando custom rules, qual decisao historica evita isso?",
+        "agentes estado evitando o arquivos de instrucoes geradas e misturando custom rules, qual decisao historicas evitar isso?"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            1731.6705000000002
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "agentes estao editando o arquivo de instrucoes geradas e misturando custom rules, qual decisao historica evita isso?",
+          "suggestedQuery": "agentes estado evitando o arquivos de instrucoes geradas e misturando custom rules, qual decisao historicas evitar isso?",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            7829.930400000001
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "agentes estao editando o arquivo de instrucoes geradas e misturando custom rules, qual decisao historica evita isso?",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            3897.7176999999992
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "agentes estao editando o arquivo de instrucoes geradas e misturando custom rules, qual decisao historica evita isso?",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "2D",
+      "query": "rebuild incremental da memory com batches limitados",
+      "mode": "auto",
+      "variants": [
+        "rebuild incremental da memory com batches limitados"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "rebuild incremental da memory com batches limitados",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "rebuild incremental da memory com batches limitados",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "rebuild incremental da memory com batches limitados",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "2I",
+      "query": "como evitar reprocessar summaries inalterados e o pico de RAM do ONNX?",
+      "mode": "auto",
+      "variants": [
+        "como evitar reprocessar summaries inalterados e o pico de RAM do ONNX?",
+        "como evitar reprocessar summaries inalterado e o pico de RAM do ONNX?"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            1552.8604999999998
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": true,
+          "effectiveQuery": "como evitar reprocessar summaries inalterado e o pico de RAM do ONNX?",
+          "suggestedQuery": "como evitar reprocessar summaries inalterado e o pico de RAM do ONNX?",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            6817.512199999997
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "como evitar reprocessar summaries inalterados e o pico de RAM do ONNX?",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            3684.754999999999
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "como evitar reprocessar summaries inalterados e o pico de RAM do ONNX?",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "2P",
+      "query": "a reconstrucao tentou alocar 2,67 GiB; qual solucao foi adotada mantendo o full explicito?",
+      "mode": "auto",
+      "variants": [
+        "a reconstrucao tentou alocar 2,67 GiB; qual solucao foi adotada mantendo o full explicito?",
+        "a reconstrucao tentou alocar 2,67 GiB; qual solucao foi adotada mantendo o full explicita?"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            2709.9508000000005
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "a reconstrucao tentou alocar 2,67 GiB; qual solucao foi adotada mantendo o full explicito?",
+          "suggestedQuery": "a reconstrucao tentou alocar 2,67 GiB; qual solucao foi adotada mantendo o full explicita?",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            7647.986300000004
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "a reconstrucao tentou alocar 2,67 GiB; qual solucao foi adotada mantendo o full explicito?",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            4123.786900000001
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "a reconstrucao tentou alocar 2,67 GiB; qual solucao foi adotada mantendo o full explicito?",
+          "suggestedQuery": "a reconstrucao tentou alocar 2,67 GiB; qual solucao foi adotada mantendo o full explicita?",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "3D",
+      "query": "indicador visual de memory no card da workspace",
+      "mode": "auto",
+      "variants": [
+        "indicador visual de memory no card da workspace"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "indicador visual de memory no card da workspace",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "indicador visual de memory no card da workspace",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "indicador visual de memory no card da workspace",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "3I",
+      "query": "qual icone mostra indice pronto, stale, erro ou rebuild?",
+      "mode": "auto",
+      "variants": [
+        "qual icone mostra indice pronto, stale, erro ou rebuild?",
+        "qual icone mostra indice pronta, stale, erros ou rebuild?"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            2144.312
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "qual icone mostra indice pronto, stale, erro ou rebuild?",
+          "suggestedQuery": "qual icone mostra indice pronta, stale, erros ou rebuild?",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            6477.543099999995
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "qual icone mostra indice pronto, stale, erro ou rebuild?",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            2977.3714
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "qual icone mostra indice pronto, stale, erro ou rebuild?",
+          "suggestedQuery": "qual icone mostra indice pronta, stale, erros ou rebuild?",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "3P",
+      "query": "preciso enxergar no card se a base de conhecimento esta saudavel sem abrir as configuracoes",
+      "mode": "auto",
+      "variants": [
+        "preciso enxergar no card se a base de conhecimento esta saudavel sem abrir as configuracoes",
+        "precisa enxergar no card se a base de conhecimento nesta saudavel sem abrir as configuracoes"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            1924.5211
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "preciso enxergar no card se a base de conhecimento esta saudavel sem abrir as configuracoes",
+          "suggestedQuery": "precisa enxergar no card se a base de conhecimento nesta saudavel sem abrir as configuracoes",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            7585.226000000002
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "preciso enxergar no card se a base de conhecimento esta saudavel sem abrir as configuracoes",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            3359.5759
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "preciso enxergar no card se a base de conhecimento esta saudavel sem abrir as configuracoes",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "4D",
+      "query": "esquemas de visualizacao das colunas da UI para Threads, Marckers e arquivo",
+      "mode": "auto",
+      "variants": [
+        "esquemas de visualizacao das colunas da UI para Threads, Marckers e arquivo",
+        "esquemas de visualizacao das colunas da UI para Thread, Marckers e arquivos"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            1583.8518000000004
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "esquemas de visualizacao das colunas da UI para Threads, Marckers e arquivo",
+          "suggestedQuery": "esquemas de visualizacao das colunas da UI para Thread, Marckers e arquivos",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            7005.364799999996
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "esquemas de visualizacao das colunas da UI para Threads, Marckers e arquivo",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            3693.8768999999993
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "esquemas de visualizacao das colunas da UI para Threads, Marckers e arquivo",
+          "suggestedQuery": "esquemas de visualizacao das colunas da UI para Thread, Marckers e arquivos",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "4I",
+      "query": "como funcionam os modos exclusivos e a rolagem propria nas tres colunas?",
+      "mode": "auto",
+      "variants": [
+        "como funcionam os modos exclusivos e a rolagem propria nas tres colunas?",
+        "como funcional os modo exclusivo e a rolagem propria nas tres colunas?"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            1490.008099999999
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "como funcionam os modos exclusivos e a rolagem propria nas tres colunas?",
+          "suggestedQuery": "como funcional os modo exclusivo e a rolagem propria nas tres colunas?",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            9997.124800000005
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "como funcionam os modos exclusivos e a rolagem propria nas tres colunas?",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            3540.058199999996
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "como funcionam os modos exclusivos e a rolagem propria nas tres colunas?",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "4P",
+      "query": "ao abrir agentes ou arquivo, somente o conteudo ativo e o botao de fechar devem permanecer na coluna central",
+      "mode": "auto",
+      "variants": [
+        "ao abrir agentes ou arquivo, somente o conteudo ativo e o botao de fechar devem permanecer na coluna central",
+        "ao abrir agentes ou arquivos, somente o conteudo ativo e o botao de fechar deve permanece na colunas central"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            2519.0244999999995
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "ao abrir agentes ou arquivo, somente o conteudo ativo e o botao de fechar devem permanecer na coluna central",
+          "suggestedQuery": "ao abrir agentes ou arquivos, somente o conteudo ativo e o botao de fechar deve permanece na colunas central",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            8431.456399999995
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "ao abrir agentes ou arquivo, somente o conteudo ativo e o botao de fechar devem permanecer na coluna central",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            3652.2416999999987
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "ao abrir agentes ou arquivo, somente o conteudo ativo e o botao de fechar devem permanecer na coluna central",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "5D",
+      "query": "gramatica marc:// para referencias internas de artifacts e mensagens",
+      "mode": "auto",
+      "variants": [
+        "gramatica marc:// para referencias internas de artifacts e mensagens"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "gramatica marc:// para referencias internas de artifacts e mensagens",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "gramatica marc:// para referencias internas de artifacts e mensagens",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "gramatica marc:// para referencias internas de artifacts e mensagens",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "5I",
+      "query": "como navegar para um artifact vinculado a uma mensagem de outra thread?",
+      "mode": "auto",
+      "variants": [
+        "como navegar para um artifact vinculado a uma mensagem de outra thread?",
+        "como navega para um artifacts vinculado a uma mensagem de outra thread?"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            1813.2186999999976
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "como navegar para um artifact vinculado a uma mensagem de outra thread?",
+          "suggestedQuery": "como navega para um artifacts vinculado a uma mensagem de outra thread?",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            5227.859400000001
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "como navegar para um artifact vinculado a uma mensagem de outra thread?",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            3791.3196000000025
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "como navegar para um artifact vinculado a uma mensagem de outra thread?",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "5P",
+      "query": "quero copiar um endereco canonico que abra agente, thread, mensagem ou anexo dentro da UI",
+      "mode": "auto",
+      "variants": [
+        "quero copiar um endereco canonico que abra agente, thread, mensagem ou anexo dentro da UI",
+        "query copia um endereco canonicos que abre agentes, thread, mensagem ou anexos dentro da UI"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            2138.417700000002
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "quero copiar um endereco canonico que abra agente, thread, mensagem ou anexo dentro da UI",
+          "suggestedQuery": "query copia um endereco canonicos que abre agentes, thread, mensagem ou anexos dentro da UI",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            6525.7111
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "quero copiar um endereco canonico que abra agente, thread, mensagem ou anexo dentro da UI",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            3266.0959000000003
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "quero copiar um endereco canonico que abra agente, thread, mensagem ou anexo dentro da UI",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "6D",
+      "query": "remover aliases legados do MCP e manter nomes canonicos como thread_create",
+      "mode": "auto",
+      "variants": [
+        "remover aliases legados do MCP e manter nomes canonicos como thread_create",
+        "remover aliases legados do MCP e manter nome canonicos como thread_create"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            1681.7351000000017
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "remover aliases legados do MCP e manter nomes canonicos como thread_create",
+          "suggestedQuery": "remover aliases legados do MCP e manter nome canonicos como thread_create",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            7215.917600000001
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "remover aliases legados do MCP e manter nomes canonicos como thread_create",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            2863.8020000000033
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "remover aliases legados do MCP e manter nomes canonicos como thread_create",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "6I",
+      "query": "por que create_thread e read_thread deixaram de ser expostos?",
+      "mode": "auto",
+      "variants": [
+        "por que create_thread e read_thread deixaram de ser expostos?"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "por que create_thread e read_thread deixaram de ser expostos?",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "por que create_thread e read_thread deixaram de ser expostos?",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "por que create_thread e read_thread deixaram de ser expostos?",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "6P",
+      "query": "a lista de ferramentas esta duplicada e gasta contexto com comandos equivalentes",
+      "mode": "auto",
+      "variants": [
+        "a lista de ferramentas esta duplicada e gasta contexto com comandos equivalentes",
+        "a list de ferramentas nesta duplicada e pasta contexto com comandos equivalentes"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            1624.6781999999985
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "a lista de ferramentas esta duplicada e gasta contexto com comandos equivalentes",
+          "suggestedQuery": "a list de ferramentas nesta duplicada e pasta contexto com comandos equivalentes",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            6776.9956999999995
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "a lista de ferramentas esta duplicada e gasta contexto com comandos equivalentes",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            3611.857600000003
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "a lista de ferramentas esta duplicada e gasta contexto com comandos equivalentes",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "7D",
+      "query": "tuning de recall e ranking da memory para token da interface",
+      "mode": "auto",
+      "variants": [
+        "tuning de recall e ranking da memory para token da interface"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "tuning de recall e ranking da memory para token da interface",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "tuning de recall e ranking da memory para token da interface",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "tuning de recall e ranking da memory para token da interface",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "7I",
+      "query": "como fazer uma decisao historica especifica superar threads genericas semanticamente proximas?",
+      "mode": "auto",
+      "variants": [
+        "como fazer uma decisao historica especifica superar threads genericas semanticamente proximas?",
+        "como fazem uma decisao historicas especifica superar thread genericas semanticamente proximas?"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            1722.1898
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "como fazer uma decisao historica especifica superar threads genericas semanticamente proximas?",
+          "suggestedQuery": "como fazem uma decisao historicas especifica superar thread genericas semanticamente proximas?",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            5740.9764
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "como fazer uma decisao historica especifica superar threads genericas semanticamente proximas?",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            3432.4112999999998
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "como fazer uma decisao historica especifica superar threads genericas semanticamente proximas?",
+          "suggestedQuery": "como fazem uma decisao historicas especifica superar thread genericas semanticamente proximas?",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "7P",
+      "query": "a busca acha a decisao correta, mas coloca resultados genericos de UI antes dela",
+      "mode": "auto",
+      "variants": [
+        "a busca acha a decisao correta, mas coloca resultados genericos de UI antes dela",
+        "a busca acha a decisao correta, mas coloca resultado genericos de UI antes pela"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            1505.3371000000006
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "a busca acha a decisao correta, mas coloca resultados genericos de UI antes dela",
+          "suggestedQuery": "a busca acha a decisao correta, mas coloca resultado genericos de UI antes pela",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            5707.694300000003
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "a busca acha a decisao correta, mas coloca resultados genericos de UI antes dela",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            3545.236100000002
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "a busca acha a decisao correta, mas coloca resultados genericos de UI antes dela",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "8D",
+      "query": "status health e rebuild do thread-index em background",
+      "mode": "auto",
+      "variants": [
+        "status health e rebuild do thread-index em background"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "status health e rebuild do thread-index em background",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "status health e rebuild do thread-index em background",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "status health e rebuild do thread-index em background",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "8I",
+      "query": "como a UI serve um snapshot stale enquanto o indice reconstrói?",
+      "mode": "auto",
+      "variants": [
+        "como a UI serve um snapshot stale enquanto o indice reconstrói?",
+        "como a UI server um snapshot stale enquanto o indice reconstrói?"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            1225.2678000000014
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "como a UI serve um snapshot stale enquanto o indice reconstrói?",
+          "suggestedQuery": "como a UI server um snapshot stale enquanto o indice reconstrói?",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            5664.1734
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "como a UI serve um snapshot stale enquanto o indice reconstrói?",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            3474.2814
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "como a UI serve um snapshot stale enquanto o indice reconstrói?",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "8P",
+      "query": "a listagem nao pode travar durante uma reconstrucao pesada e ainda precisa indicar degradacao",
+      "mode": "auto",
+      "variants": [
+        "a listagem nao pode travar durante uma reconstrucao pesada e ainda precisa indicar degradacao",
+        "a listagem nao code tratar durante uma reconstrucao pesada e ainda precisa indicar degradacao"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            1575.1452000000063
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "a listagem nao pode travar durante uma reconstrucao pesada e ainda precisa indicar degradacao",
+          "suggestedQuery": "a listagem nao code tratar durante uma reconstrucao pesada e ainda precisa indicar degradacao",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            6129.6756999999925
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "a listagem nao pode travar durante uma reconstrucao pesada e ainda precisa indicar degradacao",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            3584.6172000000006
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "a listagem nao pode travar durante uma reconstrucao pesada e ainda precisa indicar degradacao",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "9D",
+      "query": "workspace_audit para Custom Rules com Trigger, Do instead, Evidence e Severity",
+      "mode": "auto",
+      "variants": [
+        "workspace_audit para Custom Rules com Trigger, Do instead, Evidence e Severity"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "workspace_audit para Custom Rules com Trigger, Do instead, Evidence e Severity",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "workspace_audit para Custom Rules com Trigger, Do instead, Evidence e Severity",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "workspace_audit para Custom Rules com Trigger, Do instead, Evidence e Severity",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "9I",
+      "query": "qual ferramenta verifica referencias, artifacts, mensagens e regras antes de fechar uma thread?",
+      "mode": "auto",
+      "variants": [
+        "qual ferramenta verifica referencias, artifacts, mensagens e regras antes de fechar uma thread?",
+        "qual ferramentas verifica referencias, artifacts, mensagens e regras antes de fechar uma thread?"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            1522.034400000004
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "qual ferramenta verifica referencias, artifacts, mensagens e regras antes de fechar uma thread?",
+          "suggestedQuery": "qual ferramentas verifica referencias, artifacts, mensagens e regras antes de fechar uma thread?",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            7192.911399999997
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "qual ferramenta verifica referencias, artifacts, mensagens e regras antes de fechar uma thread?",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            3539.411500000002
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "qual ferramenta verifica referencias, artifacts, mensagens e regras antes de fechar uma thread?",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "9P",
+      "query": "agentes nao aplicam as regras do workspace nem anexam artefatos corretamente; que suporte local foi criado?",
+      "mode": "auto",
+      "variants": [
+        "agentes nao aplicam as regras do workspace nem anexam artefatos corretamente; que suporte local foi criado?",
+        "agentes nao aplicam as regras do workspace nem anexar artefatos corretamente; que suporte local foi criado?"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            1897.6680999999953
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": true,
+          "effectiveQuery": "agentes nao aplicam as regras do workspace nem anexar artefatos corretamente; que suporte local foi criado?",
+          "suggestedQuery": "agentes nao aplicam as regras do workspace nem anexar artefatos corretamente; que suporte local foi criado?",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            7865.5288
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": true,
+          "effectiveQuery": "agentes nao aplicam as regras do workspace nem anexar artefatos corretamente; que suporte local foi criado?",
+          "suggestedQuery": "agentes nao aplicam as regras do workspace nem anexar artefatos corretamente; que suporte local foi criado?",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            3713.152199999997
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "agentes nao aplicam as regras do workspace nem anexam artefatos corretamente; que suporte local foi criado?",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "10D",
+      "query": "ordenar threads mais novas no topo por closedAt e createdAt",
+      "mode": "auto",
+      "variants": [
+        "ordenar threads mais novas no topo por closedAt e createdAt",
+        "ordenar thread mais nova no topo por closedAt e createdAt"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            1570.9910000000018
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "ordenar threads mais novas no topo por closedAt e createdAt",
+          "suggestedQuery": "ordenar thread mais nova no topo por closedAt e createdAt",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            5955.614900000015
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "ordenar threads mais novas no topo por closedAt e createdAt",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            2839.8061000000016
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "ordenar threads mais novas no topo por closedAt e createdAt",
+          "suggestedQuery": "ordenar thread mais nova no topo por closedAt e createdAt",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "10I",
+      "query": "qual regra ordena threads abertas e encerradas na listagem?",
+      "mode": "auto",
+      "variants": [
+        "qual regra ordena threads abertas e encerradas na listagem?",
+        "qual regras ordenar thread abertas e encerrada na listagem?"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            1414.308100000002
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "qual regra ordena threads abertas e encerradas na listagem?",
+          "suggestedQuery": "qual regras ordenar thread abertas e encerrada na listagem?",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            6808.8076
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "qual regra ordena threads abertas e encerradas na listagem?",
+          "suggestedQuery": "qual regras ordenar thread abertas e encerrada na listagem?",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            2754.827799999999
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "qual regra ordena threads abertas e encerradas na listagem?",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "10P",
+      "query": "trabalhos recentes aparecem enterrados e a UI nao deveria reordenar no cliente",
+      "mode": "auto",
+      "variants": [
+        "trabalhos recentes aparecem enterrados e a UI nao deveria reordenar no cliente",
+        "trabalho recente aparecer enterrados e a UI nao deveria reordenar no cliente"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            1424.2481000000043
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "trabalhos recentes aparecem enterrados e a UI nao deveria reordenar no cliente",
+          "suggestedQuery": "trabalho recente aparecer enterrados e a UI nao deveria reordenar no cliente",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            7972.838300000003
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "trabalhos recentes aparecem enterrados e a UI nao deveria reordenar no cliente",
+          "suggestedQuery": "trabalho recente aparecer enterrados e a UI nao deveria reordenar no cliente",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            3042.240399999995
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "trabalhos recentes aparecem enterrados e a UI nao deveria reordenar no cliente",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "C1",
+      "query": "como evitar reprocessar summaries inalterados e o pico de RAM do ONNX?",
+      "mode": "literal",
+      "variants": [
+        "como evitar reprocessar summaries inalterados e o pico de RAM do ONNX?",
+        "como evitar reprocessar summaries inalterado e o pico de RAM do ONNX?"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "como evitar reprocessar summaries inalterados e o pico de RAM do ONNX?",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "como evitar reprocessar summaries inalterados e o pico de RAM do ONNX?",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "como evitar reprocessar summaries inalterados e o pico de RAM do ONNX?",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "C2",
+      "query": "agentes nao aplicam as regras do workspace nem anexam artefatos corretamente; que suporte local foi criado?",
+      "mode": "literal",
+      "variants": [
+        "agentes nao aplicam as regras do workspace nem anexam artefatos corretamente; que suporte local foi criado?",
+        "agentes nao aplicam as regras do workspace nem anexar artefatos corretamente; que suporte local foi criado?"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "agentes nao aplicam as regras do workspace nem anexam artefatos corretamente; que suporte local foi criado?",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "agentes nao aplicam as regras do workspace nem anexam artefatos corretamente; que suporte local foi criado?",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "agentes nao aplicam as regras do workspace nem anexam artefatos corretamente; que suporte local foi criado?",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "C3",
+      "query": "toogle",
+      "mode": "auto",
+      "variants": [
+        "toogle",
+        "toggle"
+      ],
+      "expectedIndex": 1,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            1104.9470000000001
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "toogle",
+          "suggestedQuery": "toggle",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            5321.652600000001
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "toogle",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            2451.723299999998
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "toogle",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "C4",
+      "query": "toogle",
+      "mode": "literal",
+      "variants": [
+        "toogle",
+        "toggle"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "toogle",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "toogle",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "toogle",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "C5",
+      "query": "brutalismp",
+      "mode": "auto",
+      "variants": [
+        "brutalismp",
+        "brutalism"
+      ],
+      "expectedIndex": 1,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            1100.2271000000037
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": true,
+          "correctionApplied": true,
+          "effectiveQuery": "brutalism",
+          "suggestedQuery": "brutalism",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            5575.974699999992
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "brutalismp",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            2644.686699999991
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "brutalismp",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "C6",
+      "query": "interface com brutalism",
+      "mode": "auto",
+      "variants": [
+        "interface com brutalism"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "interface com brutalism",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "interface com brutalism",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "interface com brutalism",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "C7",
+      "query": "diagnóstico de fusão nuclear no reator tokamak",
+      "mode": "literal",
+      "variants": [
+        "diagnóstico de fusão nuclear no reator tokamak",
+        "diagnósticos de fusão nuclear no reator tokamak"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "diagnóstico de fusão nuclear no reator tokamak",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "diagnóstico de fusão nuclear no reator tokamak",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "diagnóstico de fusão nuclear no reator tokamak",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "C8",
+      "query": "manejo de irrigação por gotejamento em soja",
+      "mode": "literal",
+      "variants": [
+        "manejo de irrigação por gotejamento em soja"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "manejo de irrigação por gotejamento em soja",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "manejo de irrigação por gotejamento em soja",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "no-call",
+          "raw": [],
+          "attemptMs": [],
+          "selectedIndex": null,
+          "outcomeCorrect": null,
+          "correctionApplied": false,
+          "effectiveQuery": "manejo de irrigação por gotejamento em soja",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "P01-en-toogle",
+      "query": "toogle",
+      "mode": "auto",
+      "variants": [
+        "toogle",
+        "toggle"
+      ],
+      "expectedIndex": 1,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            1012.1320000000051
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "toogle",
+          "suggestedQuery": "toggle",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            5173.979299999977
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "toogle",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            2596.0504999999976
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "toogle",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "P02-en-brutalismp",
+      "query": "brutalismp",
+      "mode": "auto",
+      "variants": [
+        "brutalismp",
+        "brutalism"
+      ],
+      "expectedIndex": 1,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            1178.6470999999947
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": true,
+          "correctionApplied": true,
+          "effectiveQuery": "brutalism",
+          "suggestedQuery": "brutalism",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            5900.333499999979
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "brutalismp",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            2579.0302999999985
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "brutalismp",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "P03-en-recieve-context",
+      "query": "recieve the manifest",
+      "mode": "auto",
+      "variants": [
+        "recieve the manifest",
+        "receive the manifest"
+      ],
+      "expectedIndex": 1,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            1196.5982000000004
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": true,
+          "correctionApplied": true,
+          "effectiveQuery": "receive the manifest",
+          "suggestedQuery": "receive the manifest",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            6315.890299999999
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "recieve the manifest",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            2256.0718999999954
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "recieve the manifest",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "P04-en-seperate-context",
+      "query": "seperate models from cache",
+      "mode": "auto",
+      "variants": [
+        "seperate models from cache",
+        "separate models from cache"
+      ],
+      "expectedIndex": 1,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            1120.6163000000015
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": true,
+          "correctionApplied": true,
+          "effectiveQuery": "separate models from cache",
+          "suggestedQuery": "separate models from cache",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            6148.141499999998
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": true,
+          "correctionApplied": true,
+          "effectiveQuery": "separate models from cache",
+          "suggestedQuery": "separate models from cache",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            2183.6921
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "seperate models from cache",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "P09-es-interpetacion",
+      "query": "interpetación",
+      "mode": "auto",
+      "variants": [
+        "interpetación",
+        "interpretación"
+      ],
+      "expectedIndex": 1,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            1347.1331000000064
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": true,
+          "correctionApplied": true,
+          "effectiveQuery": "interpretación",
+          "suggestedQuery": "interpretación",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            7733.237800000003
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": true,
+          "correctionApplied": true,
+          "effectiveQuery": "interpretación",
+          "suggestedQuery": "interpretación",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            2077.9294999999984
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": true,
+          "correctionApplied": true,
+          "effectiveQuery": "interpretación",
+          "suggestedQuery": "interpretación",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "P10-es-configuracion-context",
+      "query": "configuracón del índice vectorial",
+      "mode": "auto",
+      "variants": [
+        "configuracón del índice vectorial",
+        "configuración del índice vectorial"
+      ],
+      "expectedIndex": 1,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            1187.3178000000044
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": true,
+          "correctionApplied": true,
+          "effectiveQuery": "configuración del índice vectorial",
+          "suggestedQuery": "configuración del índice vectorial",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            6874.957699999999
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "configuracón del índice vectorial",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            2431.173800000004
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "configuracón del índice vectorial",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "P11-es-reconstrucion-context",
+      "query": "reconstrución del índice",
+      "mode": "auto",
+      "variants": [
+        "reconstrución del índice",
+        "reconstrucción del índice"
+      ],
+      "expectedIndex": 1,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            1635.2474000000002
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": true,
+          "correctionApplied": true,
+          "effectiveQuery": "reconstrucción del índice",
+          "suggestedQuery": "reconstrucción del índice",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            7231.626599999989
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "reconstrución del índice",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            2422.3303000000014
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "reconstrución del índice",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "P12-es-aplicacon",
+      "query": "aplicacón",
+      "mode": "auto",
+      "variants": [
+        "aplicacón",
+        "aplicación"
+      ],
+      "expectedIndex": 1,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            1826.741399999999
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": true,
+          "correctionApplied": true,
+          "effectiveQuery": "aplicación",
+          "suggestedQuery": "aplicación",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            7003.013500000001
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "aplicacón",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            2459.598199999993
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "aplicacón",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "P17-pt-interpetacao",
+      "query": "interpetação",
+      "mode": "auto",
+      "variants": [
+        "interpetação",
+        "interpretação"
+      ],
+      "expectedIndex": 1,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            2060.5423999999985
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": true,
+          "correctionApplied": true,
+          "effectiveQuery": "interpretação",
+          "suggestedQuery": "interpretação",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            5889.779500000004
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": true,
+          "correctionApplied": true,
+          "effectiveQuery": "interpretação",
+          "suggestedQuery": "interpretação",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            2574.871100000004
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "interpetação",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "P18-pt-configuracao-context",
+      "query": "configuraçãop do índice de memória",
+      "mode": "auto",
+      "variants": [
+        "configuraçãop do índice de memória",
+        "configuração do índice de memória"
+      ],
+      "expectedIndex": 1,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            1213.8479000000007
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": true,
+          "correctionApplied": true,
+          "effectiveQuery": "configuração do índice de memória",
+          "suggestedQuery": "configuração do índice de memória",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            5862.206299999991
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "configuraçãop do índice de memória",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            2240.843499999988
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "configuraçãop do índice de memória",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "P19-pt-reconstrucao-context",
+      "query": "reconstrçuão incremental",
+      "mode": "auto",
+      "variants": [
+        "reconstrçuão incremental",
+        "reconstrução incremental"
+      ],
+      "expectedIndex": 1,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            2199.1596999999965
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": true,
+          "correctionApplied": true,
+          "effectiveQuery": "reconstrução incremental",
+          "suggestedQuery": "reconstrução incremental",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            5475.515600000013
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "reconstrçuão incremental",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            2291.367299999998
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": true,
+          "correctionApplied": true,
+          "effectiveQuery": "reconstrução incremental",
+          "suggestedQuery": "reconstrução incremental",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "P20-pt-permissao-context",
+      "query": "permisão para reconstruir a memória",
+      "mode": "auto",
+      "variants": [
+        "permisão para reconstruir a memória",
+        "permissão para reconstruir a memória"
+      ],
+      "expectedIndex": 1,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            2750.221899999997
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": true,
+          "correctionApplied": true,
+          "effectiveQuery": "permissão para reconstruir a memória",
+          "suggestedQuery": "permissão para reconstruir a memória",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            5881.157200000016
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "permisão para reconstruir a memória",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            2438.8669999999984
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": false,
+          "correctionApplied": false,
+          "effectiveQuery": "permisão para reconstruir a memória",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "P05-en-grammar",
+      "query": "The workers are running the local rebuild.",
+      "mode": "auto",
+      "variants": [
+        "The workers are running the local rebuild.",
+        "The worker is running the local rebuild."
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            2477.983800000002
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": true,
+          "effectiveQuery": "The worker is running the local rebuild.",
+          "suggestedQuery": "The worker is running the local rebuild.",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            6352.069499999983
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "The workers are running the local rebuild.",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            3850.138799999986
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "The workers are running the local rebuild.",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "P06-en-negated-command",
+      "query": "do not rebuild the production cache",
+      "mode": "auto",
+      "variants": [
+        "do not rebuild the production cache",
+        "rebuild the production cache"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            1812.1815999999963
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": true,
+          "effectiveQuery": "rebuild the production cache",
+          "suggestedQuery": "rebuild the production cache",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            5767.593500000017
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "do not rebuild the production cache",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            3701.520900000003
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "do not rebuild the production cache",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "P07-en-invoice-involve",
+      "query": "invoice",
+      "mode": "auto",
+      "variants": [
+        "invoice",
+        "involve"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            1860.3004000000074
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": true,
+          "effectiveQuery": "involve",
+          "suggestedQuery": "involve",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            6327.752700000012
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "invoice",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            2564.6714999999967
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "invoice",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "P08-en-number",
+      "query": "set the ONNX intra-op thread limit to 4",
+      "mode": "auto",
+      "variants": [
+        "set the ONNX intra-op thread limit to 4",
+        "set the ONNX intra-op thread limit to 8"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            2131.7474999999977
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": true,
+          "effectiveQuery": "set the ONNX intra-op thread limit to 8",
+          "suggestedQuery": "set the ONNX intra-op thread limit to 8",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            7378.895699999994
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "set the ONNX intra-op thread limit to 4",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            3868.6540999999997
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "set the ONNX intra-op thread limit to 4",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "P13-es-negacion",
+      "query": "no elimines el manifiesto de producción",
+      "mode": "auto",
+      "variants": [
+        "no elimines el manifiesto de producción",
+        "elimines el manifiesto de producción"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            2229.7122999999992
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": true,
+          "effectiveQuery": "elimines el manifiesto de producción",
+          "suggestedQuery": "elimines el manifiesto de producción",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            6553.367900000012
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "no elimines el manifiesto de producción",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            3702.8426000000036
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "no elimines el manifiesto de producción",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "P14-es-number",
+      "query": "reconstruir exactamente 4 índices",
+      "mode": "auto",
+      "variants": [
+        "reconstruir exactamente 4 índices",
+        "reconstruir exactamente 8 índices"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            1240.0589999999938
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": true,
+          "effectiveQuery": "reconstruir exactamente 8 índices",
+          "suggestedQuery": "reconstruir exactamente 8 índices",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            5844.101000000024
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "reconstruir exactamente 4 índices",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            2618.113799999992
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "reconstruir exactamente 4 índices",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "P15-es-identifier",
+      "query": "buscar workspace_ref: WS-041",
+      "mode": "auto",
+      "variants": [
+        "buscar workspace_ref: WS-041",
+        "buscar workspace_ref: WS-014"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            1007.4014000000025
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": true,
+          "effectiveQuery": "buscar workspace_ref: WS-014",
+          "suggestedQuery": "buscar workspace_ref: WS-014",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            5941.901200000022
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "buscar workspace_ref: WS-041",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            3153.7439000000013
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "buscar workspace_ref: WS-041",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "P16-es-technical-neighbor",
+      "query": "diagnóstico",
+      "mode": "auto",
+      "variants": [
+        "diagnóstico",
+        "pronóstico"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            1058.9222000000009
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": true,
+          "effectiveQuery": "pronóstico",
+          "suggestedQuery": "pronóstico",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            5996.472400000028
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": true,
+          "effectiveQuery": "pronóstico",
+          "suggestedQuery": "pronóstico",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            3108.0580999999947
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "diagnóstico",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "P21-pt-onde-node",
+      "query": "onde fica o protocolo operacional estavel e onde ficam as regras comportamentais do workspace?",
+      "mode": "auto",
+      "variants": [
+        "onde fica o protocolo operacional estavel e onde ficam as regras comportamentais do workspace?",
+        "node fica o protocolo operacional estavel e onde ficam as regras comportamentais do workspace?"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            1230.8405000000057
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": true,
+          "effectiveQuery": "node fica o protocolo operacional estavel e onde ficam as regras comportamentais do workspace?",
+          "suggestedQuery": "node fica o protocolo operacional estavel e onde ficam as regras comportamentais do workspace?",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            5935.143099999987
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "onde fica o protocolo operacional estavel e onde ficam as regras comportamentais do workspace?",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            3674.5547999999835
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "onde fica o protocolo operacional estavel e onde ficam as regras comportamentais do workspace?",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "P22-pt-editando-evitando",
+      "query": "agentes estao editando o arquivo de instrucoes geradas e misturando custom rules, qual decisao historica evita isso?",
+      "mode": "auto",
+      "variants": [
+        "agentes estao editando o arquivo de instrucoes geradas e misturando custom rules, qual decisao historica evita isso?",
+        "agentes estao evitando o arquivo de instrucoes geradas e misturando custom rules, qual decisao historica evita isso?"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            1305.053899999999
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": true,
+          "effectiveQuery": "agentes estao evitando o arquivo de instrucoes geradas e misturando custom rules, qual decisao historica evita isso?",
+          "suggestedQuery": "agentes estao evitando o arquivo de instrucoes geradas e misturando custom rules, qual decisao historica evita isso?",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            7139.085800000001
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "agentes estao editando o arquivo de instrucoes geradas e misturando custom rules, qual decisao historica evita isso?",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            2948.97080000001
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "agentes estao editando o arquivo de instrucoes geradas e misturando custom rules, qual decisao historica evita isso?",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "P23-pt-inalterados-inalterado",
+      "query": "como evitar reprocessar summaries inalterados e o pico de RAM do ONNX?",
+      "mode": "auto",
+      "variants": [
+        "como evitar reprocessar summaries inalterados e o pico de RAM do ONNX?",
+        "como evitar reprocessar summaries inalterado e o pico de RAM do ONNX?"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            2526.8103999999876
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": true,
+          "effectiveQuery": "como evitar reprocessar summaries inalterado e o pico de RAM do ONNX?",
+          "suggestedQuery": "como evitar reprocessar summaries inalterado e o pico de RAM do ONNX?",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            5689.858899999992
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "como evitar reprocessar summaries inalterados e o pico de RAM do ONNX?",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            3005.6400999999896
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "como evitar reprocessar summaries inalterados e o pico de RAM do ONNX?",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    },
+    {
+      "id": "P24-pt-accent-only",
+      "query": "decisao",
+      "mode": "auto",
+      "variants": [
+        "decisao",
+        "decisão"
+      ],
+      "expectedIndex": 0,
+      "results": {
+        "baseline": {
+          "status": "decision",
+          "raw": [
+            "1"
+          ],
+          "attemptMs": [
+            2097.380799999999
+          ],
+          "selectedIndex": 1,
+          "outcomeCorrect": false,
+          "correctionApplied": true,
+          "effectiveQuery": "decisão",
+          "suggestedQuery": "decisão",
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "lfm12": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            4692.879500000039
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "decisao",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        },
+        "qwen08b": {
+          "status": "decision",
+          "raw": [
+            "0"
+          ],
+          "attemptMs": [
+            2620.9881999999925
+          ],
+          "selectedIndex": 0,
+          "outcomeCorrect": true,
+          "correctionApplied": false,
+          "effectiveQuery": "decisao",
+          "suggestedQuery": null,
+          "errors": 0,
+          "invalid": 0,
+          "retries": 0
+        }
+      }
+    }
+  ]
+}

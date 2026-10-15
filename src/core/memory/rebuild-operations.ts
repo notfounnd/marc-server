@@ -13,6 +13,7 @@ import {
   materializeThreadSummarySources,
   scanThreadSummarySources
 } from "./summaries.js";
+import { memoryProvidersMatch } from "./status.js";
 import type {
   EmbeddingProvider,
   MemoryManifest,
@@ -51,6 +52,11 @@ export async function reconcileMemory(
     manifest.retrievalContract !== "field-aware-hybrid-v2"
   )
     throw new Error("Memory schema changed. Run a full rebuild.");
+
+  if (!memoryProvidersMatch(manifest, options.provider))
+    throw new Error(
+      "Embedding provider is incompatible with the memory manifest. Run a full rebuild."
+    );
 
   const sources = await materializedSources(info, options);
   const changedThreadIds = changedSourceIds(sources, manifest);

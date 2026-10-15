@@ -1,0 +1,150 @@
+{
+  "snapshot": {
+    "generation": "20261012171458084_59902dec",
+    "manifestSha256": "5bd9ff94b34cd7afca843d91504ef85d1ac54048513420266a1be554ef9227c3",
+    "rowCount": 338
+  },
+  "parameters": {
+    "queryMode": "literal",
+    "depth": 0,
+    "limit": 50
+  },
+  "queries": [
+    {
+      "key": "original2I",
+      "id": "2I",
+      "query": "como evitar reprocessar summaries inalterados e o pico de RAM do ONNX?",
+      "kind": "original+lfm12",
+      "expected": "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682",
+      "expectedRank": 1,
+      "count": 1,
+      "top": [
+        {
+          "id": "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682",
+          "score": 0.9999999993289765
+        }
+      ],
+      "interpretation": {
+        "correctionApplied": false,
+        "effectiveQuery": "como evitar reprocessar summaries inalterados e o pico de RAM do ONNX?",
+        "mode": "literal",
+        "originalQuery": "como evitar reprocessar summaries inalterados e o pico de RAM do ONNX?"
+      }
+    },
+    {
+      "key": "effective2I",
+      "id": "2I",
+      "kind": "baseline",
+      "query": "como evitar reprocessar summaries inalterado e o pico de RAM do ONNX?",
+      "expected": "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682",
+      "expectedRank": 1,
+      "count": 1,
+      "ready": true,
+      "top": [
+        {
+          "id": "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682",
+          "score": 0.9999999993518394
+        }
+      ],
+      "interpretation": {
+        "correctionApplied": false,
+        "effectiveQuery": "como evitar reprocessar summaries inalterado e o pico de RAM do ONNX?",
+        "mode": "literal",
+        "originalQuery": "como evitar reprocessar summaries inalterado e o pico de RAM do ONNX?"
+      }
+    },
+    {
+      "key": "original9P",
+      "id": "9P",
+      "kind": "original",
+      "query": "agentes nao aplicam as regras do workspace nem anexam artefatos corretamente; que suporte local foi criado?",
+      "expected": "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb",
+      "expectedRank": 1,
+      "count": 2,
+      "ready": true,
+      "top": [
+        {
+          "id": "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb",
+          "score": 0.9496525330877785
+        },
+        {
+          "id": "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894",
+          "score": 0.6703486935171314
+        }
+      ],
+      "interpretation": {
+        "correctionApplied": false,
+        "effectiveQuery": "agentes nao aplicam as regras do workspace nem anexam artefatos corretamente; que suporte local foi criado?",
+        "mode": "literal",
+        "originalQuery": "agentes nao aplicam as regras do workspace nem anexam artefatos corretamente; que suporte local foi criado?"
+      }
+    },
+    {
+      "key": "effective9P",
+      "id": "9P",
+      "kind": "both",
+      "query": "agentes nao aplicam as regras do workspace nem anexar artefatos corretamente; que suporte local foi criado?",
+      "expected": "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb",
+      "expectedRank": 1,
+      "count": 3,
+      "ready": true,
+      "top": [
+        {
+          "id": "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb",
+          "score": 0.9749267334749746
+        },
+        {
+          "id": "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894",
+          "score": 0.6788145087177739
+        },
+        {
+          "id": "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa",
+          "score": 0.5269387235452869
+        }
+      ],
+      "interpretation": {
+        "correctionApplied": false,
+        "effectiveQuery": "agentes nao aplicam as regras do workspace nem anexar artefatos corretamente; que suporte local foi criado?",
+        "mode": "literal",
+        "originalQuery": "agentes nao aplicam as regras do workspace nem anexar artefatos corretamente; que suporte local foi criado?"
+      }
+    },
+    {
+      "key": "originalC5",
+      "id": "C5",
+      "kind": "lfm12",
+      "query": "brutalismp",
+      "expectedRank": 0,
+      "count": 1,
+      "ready": true,
+      "top": [
+        {
+          "id": "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac",
+          "score": 0.94908378015477
+        }
+      ],
+      "interpretation": {
+        "correctionApplied": false,
+        "effectiveQuery": "brutalismp",
+        "mode": "literal",
+        "originalQuery": "brutalismp"
+      }
+    },
+    {
+      "key": "effectiveC5",
+      "id": "C5",
+      "kind": "baseline",
+      "query": "brutalism",
+      "expectedRank": 0,
+      "count": 0,
+      "ready": true,
+      "top": [],
+      "interpretation": {
+        "correctionApplied": false,
+        "effectiveQuery": "brutalism",
+        "mode": "literal",
+        "originalQuery": "brutalism"
+      }
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "oldVersion": "4.2.0",
+  "newVersion": "4.3.1",
+  "sameRowOrder": true,
+  "batchSize": 4,
+  "oldVersusNew": {
+    "count": 338,
+    "minCos": 0.9954012463639351,
+    "maxAbs": 0.014543144963681698,
+    "exact": 0
+  },
+  "oldVersusStored": {
+    "count": 338,
+    "minCos": 1,
+    "maxAbs": 0,
+    "exact": 338
+  },
+  "newVersusStored": {
+    "count": 338,
+    "minCos": 0.9954012463639351,
+    "maxAbs": 0.014543144963681698,
+    "exact": 0
+  },
+  "snapshot": {
+    "generation": "20261012171458084_59902dec",
+    "manifestSha256": "5bd9ff94b34cd7afca843d91504ef85d1ac54048513420266a1be554ef9227c3",
+    "rowCount": 338
+  },
+  "parameters": {
+    "model": "Xenova/multilingual-e5-small",
+    "dtype": "int8",
+    "model_file_name": "model",
+    "pooling": "mean",
+    "normalize": true,
+    "prefix": "passage: ",
+    "localOnly": true,
+    "processes": "separate"
+  }
+}

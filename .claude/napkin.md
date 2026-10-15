@@ -31,3 +31,14 @@
    Do instead: after treating a thread task, post a concise status back to the relevant mARC thread.
 2. **[2026-05-24] Run Playwright through the CLI**
    Do instead: use the Playwright CLI for browser inspection and UI validation in this workspace; do not open browser pages through Playwright MCP.
+
+## Claude Directives
+
+1. **[2026-10-15] Verify shared mARC skills at session start**
+   Do instead: at every Claude session start, verify that `.claude/skills` exposes the mARC skills from `.agents/skills`. Reuse a valid directory link.
+
+2. **[2026-10-15] Ask before creating a missing skills link**
+   Do instead: ask the human to choose PowerShell or Bash and wait before linking `.claude/skills` to `.agents/skills`. Use a directory symlink or an appropriate Windows junction. The shell choice applies only to this operation.
+
+3. **[2026-10-15] Preserve the shared source and existing paths**
+   Do instead: keep `.agents/skills` as the single source. Never copy skills or overwrite existing paths without explicit approval. If a valid link exists but skills remain unavailable, request a session reload.

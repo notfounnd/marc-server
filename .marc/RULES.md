@@ -100,10 +100,10 @@
    - Evidence: identify the CLI validation performed or state why browser validation was not applicable.
    - Severity: critical
 
-5. **Use native apply_patch for manual edits**
+5. **Use the client's native edit tool for manual edits**
    - Trigger: manually editing project files.
-   - Do instead: use the native `apply_patch` tool rather than shell-based file writes.
-   - Evidence: keep manual source edits in scoped patches.
+   - Do instead: use the client's native file-editing tool (for example, `apply_patch` in Codex or `Edit`/`Write` in Claude Code) rather than shell-based file writes such as `sed`, heredocs, or redirection.
+   - Evidence: keep manual source edits in scoped native edits.
    - Severity: critical
 
 6. **Require explicit requests for client-specific hooks**

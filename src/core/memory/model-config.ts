@@ -9,7 +9,7 @@ import type {
 
 export type MemoryInferenceRole = "embedding" | "interpretation" | "reranking";
 
-export const MEMORY_MODEL_VERSION = "transformers-js-4.2.0";
+export const MEMORY_MODEL_VERSION = "transformers-js-4.3.1";
 export const E5_MODEL_ID = "Xenova/multilingual-e5-small";
 export const E5_MODEL_FILE = "model_int8.onnx";
 export const MMARCO_MODEL_ID = "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1";
