@@ -112,6 +112,8 @@ Keyboard behavior:
 
 The content column footer exposes a keyboard icon link that opens the global keyboard shortcuts sheet.
 
+The same footer displays the version of the loaded UI bundle. Vite injects the `version` field from the project `package.json`; this value does not identify the daemon process and does not require a daemon request.
+
 ## Artifacts
 
 Artifacts are Markdown files attached to messages. The UI can open them in a modal, and the thread artifact menu can list artifacts posted across the thread.

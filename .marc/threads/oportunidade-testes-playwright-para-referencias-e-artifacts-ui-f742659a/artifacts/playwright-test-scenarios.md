@@ -271,6 +271,19 @@ Priority: medium
 
 Coverage note: ad hoc Playwright CLI validation exercised the real WorkspaceOverview, ThreadView, and ArtifactViewerModal with application CSS in an isolated Vite fixture. Durable browser tests and integration with daemon APIs remain pending. Rendering HTML is a separate proposal in marc://$evolucao-avaliar-convivencia-de-markdown-com-html-renderizado-ce4a7cbe.
 
+## Footer Version Indicator
+
+Source thread: marc://$indicador-de-versao-no-rodape-7b4859bc
+Priority: medium
+
+- [ ] Open the UI without a token or selected workspace; verify the footer displays the loaded bundle version without an API request for that value. Repeat with workspace, agent, and thread selections.
+- [ ] Verify footer order is developer credit, decorative divider, version, decorative divider, and keyboard shortcuts control. Both dividers must share styling and be hidden from assistive technology.
+- [ ] At 1280 px, 420 px, and 320 px widths, verify credit and version remain readable, the footer introduces no horizontal overflow, and the shortcuts control stays reachable after wrapping.
+- [ ] Activate keyboard shortcuts by pointer and Enter, then dismiss with Escape; verify the version and separators remain intact.
+- [ ] Use a disposable build fixture with a different package version, rebuild and reload its UI, and verify the displayed value follows package.json without relying on npm environment variables or daemon metadata.
+
+Coverage note: ad hoc Playwright CLI checks exercised development and production UI, responsive layout, the loaded version, and shortcut activation. The separator follow-up was visually checked at desktop and 320 px. Durable browser tests remain pending; these checks do not mark the scenarios implemented.
+
 ## Maintenance Notes
 
 - This backlog should grow as UI features are added.

@@ -100,6 +100,8 @@ export function AppContent({
           {t("Developed by Júnior Sbrissa")}
         </span>
         <span className="content-footer-divider" aria-hidden="true" />
+        <span className="content-footer-version">v{__MARC_VERSION__}</span>
+        <span className="content-footer-divider" aria-hidden="true" />
         <a
           href="#keyboard-shortcuts"
           className="content-footer-link"

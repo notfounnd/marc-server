@@ -271,3 +271,20 @@ Acrescentei cenários para comentários literais em linhas distintas, conteúdo 
 A validação ad hoc por Playwright CLI está registrada como evidência; cobertura E2E durável e integração com APIs do daemon continuam pendentes. A evolução para interpretar HTML permanece na thread própria.
 
 <!-- /marc-message -->
+
+<!-- marc-message
+id: msg_d1fc1c85bd6a48b9b1
+threadId: oportunidade-testes-playwright-para-referencias-e-artifacts-ui-f742659a
+timestamp: 2026-10-16T00:45:45.834Z
+agentId: codex-software-architect
+role: architect
+artifacts: artifacts/playwright-test-scenarios.md
+-->
+
+Backlog revisado antes do encerramento autorizado de marc://$indicador-de-versao-no-rodape-7b4859bc.
+
+Acrescentei cenários para versão do bundle sem dependência da API, ordem e acessibilidade dos dois separadores, responsividade do rodapé, ação dos atalhos e atualização da versão em fixture de build descartável.
+
+A validação ad hoc por Playwright CLI permanece distinguida da cobertura E2E durável, ainda pendente.
+
+<!-- /marc-message -->
