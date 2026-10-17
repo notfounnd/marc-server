@@ -30,6 +30,7 @@
     "lint:fix": "eslint src/**/*.{ts,tsx} test/**/*.ts eslint.config.js --fix",
     "memory:quality": "tsx scripts/memory-quality-v4.ts",
     "memory:benchmark": "tsx scripts/memory-model-benchmark.ts",
+    "memory:eval": "tsx scripts/memory-eval/cli.ts",
     "format:check": "prettier --check .",
     "format:fix": "prettier --write .",
     "code:check": "pnpm run lint:check && pnpm run format:check",

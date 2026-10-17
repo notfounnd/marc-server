@@ -61,6 +61,7 @@ type MemoryDeepHit = {
   sourceType: MemorySourceType;
   authority: MemoryAuthority;
   threadId?: string;
+  passageId: string;          // identidade individual da passagem (E1)
   reference: string;          // mesma tabela da E3
   sourcePath: string;
   lineStart: number;
@@ -119,25 +120,43 @@ As linhas são as da seção de origem (limite registrado na E1). A ferramenta n
 
 ## Avaliação
 
-Os aprovadores acrescentam ao `marc.json` as 4 consultas da proposta original como casos com `style: "deep"`. A E4 adiciona esse estilo ao tipo `EvalCaseStyle` e aceita o efeito no `validate`. Também entram 10 casos novos com escopo por thread, com julgamento por grupo.
+Os aprovadores acrescentam ao `marc.json` as 4 consultas da proposta original e 10 casos novos com escopo por thread, todos com `style: "deep"`. A E4 adiciona esse estilo ao tipo `EvalCaseStyle` e aceita o efeito no `validate`. Pelo menos 6 dos 10 casos novos têm a resposta numa seção específica de uma thread em que outras passagens tratam do mesmo assunto só de forma incidental. São esses casos que distinguem encontrar o trecho certo de apenas acertar a thread.
+
+**Por que julgar por trecho:** numa consulta restrita à thread certa, qualquer passagem devolvida pertence a um grupo relevante. Uma métrica por grupo seria satisfeita mesmo com trechos inúteis. Por isso, a avaliação da E4 julga **cada trecho**:
+
+- `EvalCase` ganha o campo opcional `passageJudgments?: Record<string, RelevanceGrade>`, com chave igual ao `passageId` da E1 (`<sourcePath>#<16 hex do passageSha256>`). A escala é a da E0, aplicada à pergunta "este trecho responde à consulta?". As linhas da seção **não** entram na chave, porque passagens da mesma seção compartilham o mesmo intervalo;
+- como o `passageId` depende do texto indexado, um julgamento só vale para aquele conteúdo. Se uma mudança de normalização ou de segmentação alterar o texto, o id muda, a passagem volta a ficar sem julgamento, e a cobertura da E0 exige julgá-la de novo. Isso vincula cada julgamento à versão do corpus avaliado;
+- o `validate` rejeita caso `deep` sem `passageJudgments` e chave fora do formato. A existência de cada `passageId` é conferida na captura, que lista os ids que não existem mais;
+- os casos `deep` também usam o campo `evidence` da E3, com a citação literal do trecho que responde. Ao escrever o caso, os aprovadores já marcam essa citação;
+- o `worksheet` ganha o modo `--passages`, que mostra o texto completo dos 5 primeiros trechos de cada variante `deep` ainda sem julgamento, em ordem alfabética de `passageId` e sem indicar a variante. Os dois aprovadores julgam separadamente, e o `merge-judgments` grava os trechos como grava as threads, com kappa;
+- a cobertura completa da E0 vale aqui: nenhum dos 5 primeiros trechos de uma variante comparada pode ficar sem julgamento.
 
 A variante `DEEP` do harness mede:
 
-- se um grupo de grau ≥ 2 aparece entre as 5 primeiras passagens;
+- **Success@5:** pelo menos um trecho de grau ≥ 2 entre os 5 primeiros;
+- **MRR por trecho** e precisão@5 por trecho, para diagnóstico;
 - a proporção de resultados dentro do escopo, que precisa ser 100%.
+
+A variante `DEEP_COSINE` ordena as passagens do escopo só pelo cosseno, sem reranker, e serve de referência no relatório.
 
 ## Tarefas do desenvolvedor
 
 | Tarefa | Entrega | Testes |
 |---|---|---|
 | T1 | `deep.ts`, tipos, MCP e CLI | Escopo por thread completo e por sufixo; thread aberta e inexistente; filtro de tipos; limites; `nextActions` por autoridade em tabela declarada; linhas da seção conferidas no arquivo |
-| T2 | Variante `DEEP`, casos e avaliação | Harness |
+| T2 | Variantes `DEEP` e `DEEP_COSINE`, `passageJudgments`, `worksheet --passages`, Success@5 e avaliação | Harness: chave de trecho igual ao `passageId`; duas passagens da mesma seção com graus diferentes, sem colisão; devolver só a passagem incidental não satisfaz Success@5; texto alterado gera id novo e volta a ficar sem julgamento; `validate` rejeita `deep` sem `passageJudgments` e chave fora do formato; `--passages` só mostra trechos sem julgamento e sem variante de origem; Success@5 e MRR com valores calculados à mão |
+| — | **Julgamento dos trechos e decisão dos aprovadores, publicada na thread** | — |
 | T3 | Skill e docs | Teste existente da skill atualizado |
 
 ## Critérios de aceite
 
 1. 100% dos resultados dentro do escopo pedido, em teste e no harness.
-2. Grupo de grau ≥ 2 entre as 5 primeiras passagens em pelo menos 3 das 4 consultas originais. Os casos novos são reportados, sem meta.
+2. **Utilidade dos trechos:** Success@5 por trecho em pelo menos **12 dos 14** casos `deep` (as 4 consultas originais e os 10 novos), sem nenhuma variante em estado `incomplete`. Se falhar, cada caso que falhou é classificado e tratado pela tabela abaixo, e o critério é reavaliado uma única vez:
+
+   | Classificação | Condição | Ação |
+   |---|---|---|
+   | `ordering` | Alguma passagem indexada do escopo contém a citação de `evidence` (regra `contém` da E3), mas ficou abaixo da 5ª posição | Remover o pré-filtro por cosseno de 60 passagens e reranquear todas as passagens do escopo |
+   | `segmentation` | Nenhuma passagem indexada contém a citação inteira (`evidence_unindexable` da E3) | Registrar o limite como regra de normalização da E1 e levar ao humano (D10) |
 3. Sem `threadId`, nenhuma passagem de grupo não admitido aparece. Coberto por teste.
 4. Mediana de latência ≤ 5 s nas consultas com escopo, na máquina de referência.
 5. `pnpm validate`, `pnpm build` e `pnpm test` passam, com as regras de estilo e de teste respeitadas.
@@ -152,3 +171,8 @@ A variante `DEEP` do harness mede:
 
 - desenvolvedor e configuração confirmados pelo humano;
 - veredito conjunto dos aprovadores sobre este plano, depois da aceitação da E3.
+
+## Histórico de revisões
+
+- **Revisão 2 (2026-10-15):** incorpora a revisão de marc://@codex-software-architect. A avaliação passa a julgar cada trecho devolvido, e não só o grupo, e os 14 casos `deep` ganham critério de aceite (Success@5 em pelo menos 12 de 14), com tratamento declarado para falhas de ordenação e de segmentação. Arquitetura sem mudança.
+- **Revisão 3 (2026-10-15):** responde ao parecer de marc://@codex-software-architect sobre a revisão 2. A chave de `passageJudgments` passa a ser o `passageId` da E1, baseado no conteúdo, no lugar de caminho mais intervalo de linhas. O julgamento fica vinculado ao texto avaliado, e o hit ganha o campo `passageId`.

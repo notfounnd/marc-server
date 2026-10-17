@@ -70,8 +70,11 @@ Campos adicionados a `MemoryVectorRecord`:
 | `layer` | 0 para summary; 1 para artifact, rules e document; 2 para chat |
 | `sourcePath` | Caminho relativo à raiz do workspace (`info.rootPath`), com `/` |
 | `authority` | summary → `decision`; rules → `rule`; artifact → `artifact`; document → conforme a configuração; chat → `conversation` |
-| `lineStart`, `lineEnd` | Linhas da seção de origem no arquivo, contadas a partir de 1. Passagens herdam as linhas da seção |
+| `lineStart`, `lineEnd` | Linhas da seção de origem no arquivo, contadas a partir de 1. Passagens herdam as linhas da seção. É um **localizador** para navegação, não identifica a passagem |
 | `sourceSha256` | SHA-256 do arquivo de origem |
+| `passageOrdinal` | Posição da passagem dentro da seção, a partir de 0, na ordem devolvida por `splitPassages` |
+| `passageSha256` | SHA-256 do texto da passagem exatamente como foi indexado |
+| `passageId` | **Identidade individual** da passagem: `<sourcePath>#<16 primeiros hex de passageSha256>`. Duas passagens diferentes da mesma seção têm ids diferentes. Duas passagens com texto idêntico no mesmo arquivo compartilham o id, o que é correto, porque têm a mesma relevância para qualquer consulta. Se o texto indexado mudar, o id muda, e o julgamento antigo deixa de valer |
 | `messageId`, `agentId` | Só no chat |
 | `artifactFileName` | Só no artifact |
 
@@ -182,7 +185,7 @@ O harness ganha a opção `--all-layers` na captura. Ela troca `INDEXED_LAYERS` 
 | Tarefa | Entrega | Testes |
 |---|---|---|
 | T1 | `markdown-text.ts`; `summaries.ts` passa a usá-lo | `test/core-memory-markdown-text.test.ts` com a tabela da seção 3 e casos de cada regra |
-| T2 | Tipos e proveniência, manifest v7, colunas, filtro de camada e campos novos no hit | Testes existentes atualizados; manifest v6 resulta em `incompatible`; registros de summary com `layer: 0`, `sourcePath` e linhas corretos; filtro de camada nos dois stores |
+| T2 | Tipos e proveniência, manifest v7, colunas, filtro de camada e campos novos no hit | Testes existentes atualizados; manifest v6 resulta em `incompatible`; registros de summary com `layer: 0`, `sourcePath` e linhas corretos; filtro de camada nos dois stores; seção declarada com duas passagens de textos diferentes gera `passageId` distintos e `passageOrdinal` 0 e 1; o mesmo texto em seções diferentes do mesmo arquivo gera o mesmo `passageId`; `passageSha256` confere com o texto indexado |
 | T3 | Registro de leitores, leitores de artifact, rules, document e chat, e `documentSources` | `test/core-memory-sources.test.ts` com um workspace temporário: thread aberta ignorada; só `.md` em artifacts; chat com `messageId` e `agentId`; ids `@rules` e `@document/...`; cada rejeição da seção 4 como cenário declarado; link simbólico não seguido |
 | T4 | `--all-layers` no harness, ADR 0010, docs, capturas e comparação | Sem teste novo além dos do harness; evidência na entrega |
 
@@ -196,12 +199,12 @@ O índice `docs/adrs/README.md` recebe a entrada nova.
 
 ## Critérios de aceite
 
-Os critérios comparam a captura nova com o baseline da E0 pelo `compare`, nos dois corpora:
+Os critérios comparam a captura nova com o baseline da E0 pelo `compare`, nos dois corpora. Antes da comparação, os aprovadores fazem o julgamento incremental da E0 (`worksheet --variants`) para os pares novos da captura da E1. O `compare` só emite veredito sem nenhuma variante em estado `incomplete`.
 
 1. **Top1-alvo e MRR:** não inferiores ao baseline (δ da E0).
-2. **Exposição incidental e abstenção correta nos negativos:** sem resultado classificado como piora.
+2. **Exposição incidental e abstenção correta nos negativos:** não inferiores ao baseline (δ da E0). Resultado inconclusivo reprova o critério, conforme a regra de decisão da E0, inclusive a rodada única de ampliação.
 3. **Diagnóstico:** o relatório mostra a atribuição de 3P, 6I e 9I antes e depois.
-4. **Proveniência:** todo registro tem os campos da seção 1. Um teste lê `lineStart` e `lineEnd` no arquivo e encontra o título da seção.
+4. **Proveniência:** todo registro tem os campos da seção 1. Um teste lê `lineStart` e `lineEnd` no arquivo e encontra o título da seção. Outro teste prova que passagens diferentes da mesma seção têm `passageId` distintos.
 5. **Produção:** `.marc/memory/**` sem alteração. Hash do manifest igual antes e depois.
 6. **Validação:** `pnpm validate`, `pnpm build` e `pnpm test` passam. As regras de estilo e de teste foram respeitadas.
 7. **Documentação:** docs e ADR atualizados.
@@ -219,7 +222,7 @@ Os critérios comparam a captura nova com o baseline da E0 pelo `compare`, nos d
 
 ## Riscos
 
-- **Proveniência por seção:** `splitPassages` não devolve deslocamentos, então as linhas de uma passagem são as da seção. A E4 deixa isso explícito no resultado.
+- **Proveniência por seção:** `splitPassages` não devolve deslocamentos, então as linhas de uma passagem são as da seção. A E4 deixa isso explícito no resultado. A identificação individual não depende das linhas: vem de `passageId`, calculado sobre o conteúdo. É esse id que a E3 e a E4 usam para julgar trechos e verificar evidência.
 - **Blocos de código:** manter `bash` e `text` pode trazer ruído. O recuo por regra cobre esse risco.
 - **Volume das camadas 1 e 2:** artifacts grandes, como os da thread `57488bab`, podem aumentar muito o rebuild. A medição da seção 6 alimenta a E3.
 
@@ -227,3 +230,8 @@ Os critérios comparam a captura nova com o baseline da E0 pelo `compare`, nos d
 
 - Desenvolvedor definido pelo humano e configuração confirmada.
 - Veredito conjunto dos aprovadores sobre este plano, depois da aprovação da E0.
+
+## Histórico de revisões
+
+- **Revisão 2 (2026-10-15):** incorpora a revisão de marc://@codex-software-architect. O critério 2 passa de "sem piora classificada" para não inferioridade, e a comparação passa a exigir o julgamento incremental dos pares novos. Arquitetura sem mudança.
+- **Revisão 3 (2026-10-15):** responde ao parecer de marc://@codex-software-architect sobre a revisão 2. A proveniência ganha `passageOrdinal`, `passageSha256` e `passageId`, a identidade individual da passagem baseada no conteúdo. As linhas da seção continuam só como localizador. Contrato compartilhado com a verificação de evidência da E3 e com os julgamentos por trecho da E4.

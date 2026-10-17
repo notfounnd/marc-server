@@ -1,0 +1,829 @@
+{
+  "schemaVersion": 1,
+  "corpus": "ledgerline-en",
+  "cases": [
+    {
+      "id": "L01",
+      "family": "account-linking-flow-for-bank-connections-0b7d6e31",
+      "style": "direct",
+      "query": "linking bank accounts without keeping credentials in the ledger",
+      "queryMode": "auto",
+      "judgments": {
+        "account-linking-flow-for-bank-connections-0b7d6e31": 3,
+        "csv-importer-bank-export-parsing-3a1f0c21": 0,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "ofx-importer-statement-header-parsing-c71e0b94": 1,
+        "retry-policy-for-bank-connector-timeouts-4b3a9f20": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "L02",
+      "family": "backup-export-of-local-database-3e0a7d92",
+      "style": "implicit",
+      "query": "I want to keep a copy of my data on a USB disk without exposing the key",
+      "queryMode": "auto",
+      "judgments": {
+        "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+        "backup-export-of-local-database-3e0a7d92": 3,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "encryption-at-rest-config-key-41c7f0ae": 2,
+        "encryption-at-rest-passphrase-derived-key-c39e5d62": 2,
+        "http-api-static-token-auth-d2f7a041": 0,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "key-rotation-procedure-for-encrypted-store-a85f3e27": 1,
+        "settings-file-migration-to-toml-e94b1d26": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "L03",
+      "family": "bank-connector-plugin-interface-decision-5d2e8a17",
+      "style": "indirect",
+      "query": "should third parties be able to ship their own bank connectors yet",
+      "queryMode": "auto",
+      "judgments": {
+        "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+        "bank-connector-plugin-interface-decision-5d2e8a17": 3,
+        "csv-importer-bank-export-parsing-3a1f0c21": 0,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+        "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "retry-policy-for-bank-connector-timeouts-4b3a9f20": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "L04",
+      "family": "benchmark-sqlite-storage-for-transactions-e07d5c18",
+      "style": "direct",
+      "query": "SQLite read latency with half a million transactions",
+      "queryMode": "auto",
+      "judgments": {
+        "benchmark-sqlite-storage-for-transactions-e07d5c18": 3,
+        "categorization-rule-tester-command-6b5c9e04": 0,
+        "categorization-rules-priority-ordering-0d4f9b13": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 1,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+        "encryption-at-rest-config-key-41c7f0ae": 0,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "web-ui-transactions-paged-list-6a0b7f15": 0,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "L05",
+      "family": "categorization-rule-tester-command-6b5c9e04",
+      "style": "implicit",
+      "query": "preview which category a rule would give before running a real import",
+      "queryMode": "auto",
+      "judgments": {
+        "backup-export-of-local-database-3e0a7d92": 0,
+        "categorization-rule-tester-command-6b5c9e04": 3,
+        "categorization-rules-priority-ordering-0d4f9b13": 1,
+        "categorization-rules-regex-first-version-5c8e1a77": 1,
+        "csv-importer-bank-export-parsing-3a1f0c21": 0,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "ofx-importer-currency-handling-2f5d8a6c": 0,
+        "ofx-importer-statement-header-parsing-c71e0b94": 0
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "L06",
+      "family": "categorization-rules-priority-ordering-0d4f9b13",
+      "style": "indirect",
+      "query": "how does the categorizer decide when two patterns match the same purchase",
+      "queryMode": "auto",
+      "judgments": {
+        "categorization-rule-tester-command-6b5c9e04": 2,
+        "categorization-rules-priority-ordering-0d4f9b13": 3,
+        "categorization-rules-regex-first-version-5c8e1a77": 2,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+        "ofx-importer-statement-header-parsing-c71e0b94": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "L07",
+      "family": "categorization-rules-regex-first-version-5c8e1a77",
+      "style": "direct",
+      "query": "regex based categories matched against transaction descriptions",
+      "queryMode": "auto",
+      "judgments": {
+        "categorization-rule-tester-command-6b5c9e04": 1,
+        "categorization-rules-priority-ordering-0d4f9b13": 2,
+        "categorization-rules-regex-first-version-5c8e1a77": 3,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+        "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "ofx-importer-statement-header-parsing-c71e0b94": 0,
+        "web-ui-transactions-paged-list-6a0b7f15": 0,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "L08",
+      "family": "cli-command-structure-and-exit-codes-3c9e0a52",
+      "style": "indirect",
+      "query": "what exit status should scripts expect when the daemon cannot be reached",
+      "queryMode": "auto",
+      "judgments": {
+        "categorization-rule-tester-command-6b5c9e04": 1,
+        "cli-command-structure-and-exit-codes-3c9e0a52": 3,
+        "daemon-startup-health-check-c0e6b915": 1,
+        "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+        "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "retry-policy-for-bank-connector-timeouts-4b3a9f20": 0,
+        "settings-file-migration-to-toml-e94b1d26": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "L09",
+      "family": "csv-importer-bank-export-parsing-3a1f0c21",
+      "style": "direct",
+      "query": "importing semicolon separated bank statements",
+      "queryMode": "auto",
+      "judgments": {
+        "backup-export-of-local-database-3e0a7d92": 0,
+        "csv-importer-bank-export-parsing-3a1f0c21": 3,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 2,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 1,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "ofx-importer-currency-handling-2f5d8a6c": 0,
+        "ofx-importer-statement-header-parsing-c71e0b94": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "L10",
+      "family": "csv-importer-column-mapping-and-header-detection-7b92e4d0",
+      "style": "implicit",
+      "query": "my bank prints a heading row before the column names and the import breaks",
+      "queryMode": "auto",
+      "judgments": {
+        "csv-importer-bank-export-parsing-3a1f0c21": 2,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 3,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "ofx-importer-currency-handling-2f5d8a6c": 0,
+        "ofx-importer-statement-header-parsing-c71e0b94": 1,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "L11",
+      "family": "daemon-startup-health-check-c0e6b915",
+      "style": "indirect",
+      "query": "daemon should refuse to boot if storage is full or the db is held by another process",
+      "queryMode": "auto",
+      "judgments": {
+        "backup-export-of-local-database-3e0a7d92": 0,
+        "bank-connector-plugin-interface-decision-5d2e8a17": 0,
+        "daemon-startup-health-check-c0e6b915": 3,
+        "encryption-at-rest-config-key-41c7f0ae": 0,
+        "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+        "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "settings-file-migration-to-toml-e94b1d26": 1,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "L12",
+      "family": "daily-balance-snapshot-job-5e9c3b84",
+      "style": "implicit",
+      "query": "the balance chart takes forever to draw for an account opened a decade ago",
+      "queryMode": "auto",
+      "judgments": {
+        "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+        "categorization-rules-regex-first-version-5c8e1a77": 0,
+        "csv-importer-bank-export-parsing-3a1f0c21": 0,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 3,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "web-ui-transactions-paged-list-6a0b7f15": 0,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 1
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "L13",
+      "family": "duplicate-transaction-detection-by-fingerprint-f16a2d09",
+      "style": "direct",
+      "query": "detecting duplicate transactions across overlapping statements",
+      "queryMode": "auto",
+      "judgments": {
+        "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+        "categorization-rule-tester-command-6b5c9e04": 0,
+        "categorization-rules-priority-ordering-0d4f9b13": 0,
+        "categorization-rules-regex-first-version-5c8e1a77": 0,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 3,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "ofx-importer-statement-header-parsing-c71e0b94": 2,
+        "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "web-ui-transactions-paged-list-6a0b7f15": 0,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "L14",
+      "family": "encryption-at-rest-config-key-41c7f0ae",
+      "style": "indirect",
+      "query": "where was the database encryption key kept in the first design",
+      "queryMode": "auto",
+      "judgments": {
+        "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+        "backup-export-of-local-database-3e0a7d92": 1,
+        "daemon-startup-health-check-c0e6b915": 0,
+        "encryption-at-rest-config-key-41c7f0ae": 3,
+        "encryption-at-rest-passphrase-derived-key-c39e5d62": 3,
+        "http-api-static-token-auth-d2f7a041": 0,
+        "key-rotation-procedure-for-encrypted-store-a85f3e27": 1,
+        "settings-file-migration-to-toml-e94b1d26": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "L15",
+      "family": "encryption-at-rest-passphrase-derived-key-c39e5d62",
+      "style": "implicit",
+      "query": "if someone copies my laptop files can they open the ledger",
+      "queryMode": "auto",
+      "judgments": {
+        "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+        "backup-export-of-local-database-3e0a7d92": 2,
+        "categorization-rule-tester-command-6b5c9e04": 0,
+        "csv-importer-bank-export-parsing-3a1f0c21": 0,
+        "encryption-at-rest-config-key-41c7f0ae": 2,
+        "encryption-at-rest-passphrase-derived-key-c39e5d62": 3,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "ofx-importer-currency-handling-2f5d8a6c": 0,
+        "ofx-importer-statement-header-parsing-c71e0b94": 0,
+        "settings-file-migration-to-toml-e94b1d26": 0
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "L16",
+      "family": "http-api-scoped-tokens-per-client-9e1c6b38",
+      "style": "indirect",
+      "query": "give every script a separate credential limited to what it needs",
+      "queryMode": "auto",
+      "judgments": {
+        "backup-export-of-local-database-3e0a7d92": 0,
+        "categorization-rules-priority-ordering-0d4f9b13": 0,
+        "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+        "encryption-at-rest-config-key-41c7f0ae": 0,
+        "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+        "http-api-scoped-tokens-per-client-9e1c6b38": 3,
+        "http-api-static-token-auth-d2f7a041": 2,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "L17",
+      "family": "http-api-static-token-auth-d2f7a041",
+      "style": "direct",
+      "query": "single shared token for the local api",
+      "queryMode": "auto",
+      "judgments": {
+        "backup-export-of-local-database-3e0a7d92": 0,
+        "encryption-at-rest-config-key-41c7f0ae": 0,
+        "http-api-scoped-tokens-per-client-9e1c6b38": 2,
+        "http-api-static-token-auth-d2f7a041": 3,
+        "local-api-json-error-envelope-8d4b1f67": 0,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "settings-file-migration-to-toml-e94b1d26": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "web-ui-transactions-paged-list-6a0b7f15": 0
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "L18",
+      "family": "import-batch-size-limits-and-progress-events-1d8f2a73",
+      "style": "implicit",
+      "query": "importing a huge statement freezes the interface and eats all memory",
+      "queryMode": "auto",
+      "judgments": {
+        "backup-export-of-local-database-3e0a7d92": 0,
+        "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+        "csv-importer-bank-export-parsing-3a1f0c21": 2,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 3,
+        "local-api-json-error-envelope-8d4b1f67": 0,
+        "ofx-importer-currency-handling-2f5d8a6c": 0,
+        "ofx-importer-statement-header-parsing-c71e0b94": 0,
+        "settings-file-migration-to-toml-e94b1d26": 0
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "L19",
+      "family": "key-rotation-procedure-for-encrypted-store-a85f3e27",
+      "style": "indirect",
+      "query": "how often is the data encryption key replaced and how is it done",
+      "queryMode": "auto",
+      "judgments": {
+        "backup-export-of-local-database-3e0a7d92": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
+        "encryption-at-rest-config-key-41c7f0ae": 1,
+        "encryption-at-rest-passphrase-derived-key-c39e5d62": 1,
+        "http-api-static-token-auth-d2f7a041": 0,
+        "key-rotation-procedure-for-encrypted-store-a85f3e27": 3,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "settings-file-migration-to-toml-e94b1d26": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "L20",
+      "family": "local-api-json-error-envelope-8d4b1f67",
+      "style": "direct",
+      "query": "consistent json errors from the local api",
+      "queryMode": "auto",
+      "judgments": {
+        "daemon-startup-health-check-c0e6b915": 1,
+        "encryption-at-rest-config-key-41c7f0ae": 0,
+        "http-api-scoped-tokens-per-client-9e1c6b38": 1,
+        "http-api-static-token-auth-d2f7a041": 0,
+        "local-api-json-error-envelope-8d4b1f67": 3,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "settings-file-migration-to-toml-e94b1d26": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "web-ui-transactions-paged-list-6a0b7f15": 0
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "L21",
+      "family": "logging-redaction-of-account-numbers-a2c8f750",
+      "style": "implicit",
+      "query": "a support bundle showed my complete bank account number in the logs",
+      "queryMode": "auto",
+      "judgments": {
+        "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+        "csv-importer-bank-export-parsing-3a1f0c21": 0,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "local-api-json-error-envelope-8d4b1f67": 2,
+        "logging-redaction-of-account-numbers-a2c8f750": 3,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "L22",
+      "family": "ofx-importer-currency-handling-2f5d8a6c",
+      "style": "indirect",
+      "query": "what happens to amounts with more decimals than the currency supports",
+      "queryMode": "auto",
+      "judgments": {
+        "categorization-rules-priority-ordering-0d4f9b13": 0,
+        "csv-importer-bank-export-parsing-3a1f0c21": 2,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 1,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+        "encryption-at-rest-config-key-41c7f0ae": 0,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "ofx-importer-currency-handling-2f5d8a6c": 3,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "L23",
+      "family": "ofx-importer-statement-header-parsing-c71e0b94",
+      "style": "implicit",
+      "query": "the statement file belongs to a different account than the one I linked",
+      "queryMode": "auto",
+      "judgments": {
+        "account-linking-flow-for-bank-connections-0b7d6e31": 1,
+        "categorization-rules-priority-ordering-0d4f9b13": 0,
+        "csv-importer-bank-export-parsing-3a1f0c21": 0,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+        "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "ofx-importer-currency-handling-2f5d8a6c": 0,
+        "ofx-importer-statement-header-parsing-c71e0b94": 3,
+        "sync-scheduler-fixed-interval-e2a6c590": 0
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "L24",
+      "family": "retry-policy-for-bank-connector-timeouts-4b3a9f20",
+      "style": "indirect",
+      "query": "how many retries before a bank connection is shown as stale",
+      "queryMode": "auto",
+      "judgments": {
+        "account-linking-flow-for-bank-connections-0b7d6e31": 1,
+        "bank-connector-plugin-interface-decision-5d2e8a17": 0,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "retry-policy-for-bank-connector-timeouts-4b3a9f20": 3,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 1,
+        "sync-scheduler-fixed-interval-e2a6c590": 1
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "L25",
+      "family": "settings-file-migration-to-toml-e94b1d26",
+      "style": "direct",
+      "query": "switch settings from json to toml",
+      "queryMode": "auto",
+      "judgments": {
+        "backup-export-of-local-database-3e0a7d92": 0,
+        "categorization-rule-tester-command-6b5c9e04": 0,
+        "categorization-rules-priority-ordering-0d4f9b13": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
+        "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+        "http-api-static-token-auth-d2f7a041": 0,
+        "local-api-json-error-envelope-8d4b1f67": 0,
+        "settings-file-migration-to-toml-e94b1d26": 3,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "ui-dark-mode-toggle-persistence-7f3a0c48": 0
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "L26",
+      "family": "sync-scheduler-exponential-backoff-88f1d2b4",
+      "style": "indirect",
+      "query": "how long does the sync job wait after repeated bank failures",
+      "queryMode": "auto",
+      "judgments": {
+        "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+        "bank-connector-plugin-interface-decision-5d2e8a17": 0,
+        "csv-importer-bank-export-parsing-3a1f0c21": 0,
+        "daemon-startup-health-check-c0e6b915": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+        "retry-policy-for-bank-connector-timeouts-4b3a9f20": 2,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 3,
+        "sync-scheduler-fixed-interval-e2a6c590": 2,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "L27",
+      "family": "sync-scheduler-fixed-interval-e2a6c590",
+      "style": "implicit",
+      "query": "can two refresh cycles modify one account simultaneously",
+      "queryMode": "auto",
+      "judgments": {
+        "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+        "categorization-rules-priority-ordering-0d4f9b13": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+        "encryption-at-rest-config-key-41c7f0ae": 0,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "settings-file-migration-to-toml-e94b1d26": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 3,
+        "sync-scheduler-fixed-interval-e2a6c590": 3,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "L28",
+      "family": "ui-dark-mode-toggle-persistence-7f3a0c48",
+      "style": "implicit",
+      "query": "the theme goes back to light every time I restart",
+      "queryMode": "auto",
+      "judgments": {
+        "daemon-startup-health-check-c0e6b915": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
+        "encryption-at-rest-config-key-41c7f0ae": 0,
+        "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+        "local-api-json-error-envelope-8d4b1f67": 0,
+        "settings-file-migration-to-toml-e94b1d26": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "ui-dark-mode-toggle-persistence-7f3a0c48": 3,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "L29",
+      "family": "web-ui-transactions-paged-list-6a0b7f15",
+      "style": "direct",
+      "query": "transactions list with fifty rows per page",
+      "queryMode": "auto",
+      "judgments": {
+        "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+        "categorization-rules-priority-ordering-0d4f9b13": 0,
+        "categorization-rules-regex-first-version-5c8e1a77": 0,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "web-ui-transactions-paged-list-6a0b7f15": 3,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 2
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "L30",
+      "family": "web-ui-transactions-virtual-scrolling-b4e8c293",
+      "style": "indirect",
+      "query": "render only visible rows so long histories scroll smoothly",
+      "queryMode": "auto",
+      "judgments": {
+        "csv-importer-bank-export-parsing-3a1f0c21": 0,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "local-api-json-error-envelope-8d4b1f67": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+        "web-ui-transactions-paged-list-6a0b7f15": 2,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 3
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "LN01",
+      "family": "negative:LN01",
+      "style": "negative",
+      "query": "sourdough starter feeding schedule",
+      "queryMode": "auto",
+      "judgments": {
+        "categorization-rules-priority-ordering-0d4f9b13": 0,
+        "categorization-rules-regex-first-version-5c8e1a77": 0,
+        "csv-importer-bank-export-parsing-3a1f0c21": 0,
+        "daemon-startup-health-check-c0e6b915": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+        "web-ui-transactions-paged-list-6a0b7f15": 0
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "LN02",
+      "family": "negative:LN02",
+      "style": "negative",
+      "query": "how to tune a guitar to drop d",
+      "queryMode": "auto",
+      "judgments": {
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+        "encryption-at-rest-config-key-41c7f0ae": 0,
+        "http-api-static-token-auth-d2f7a041": 0,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "LN03",
+      "family": "negative:LN03",
+      "style": "negative",
+      "query": "best hiking trails in the alps",
+      "queryMode": "auto",
+      "judgments": {
+        "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+        "categorization-rule-tester-command-6b5c9e04": 0,
+        "categorization-rules-priority-ordering-0d4f9b13": 0,
+        "categorization-rules-regex-first-version-5c8e1a77": 0,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+        "encryption-at-rest-config-key-41c7f0ae": 0,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "settings-file-migration-to-toml-e94b1d26": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "LN04",
+      "family": "negative:LN04",
+      "style": "negative",
+      "query": "stock trading bot with real time market data",
+      "queryMode": "auto",
+      "judgments": {
+        "csv-importer-bank-export-parsing-3a1f0c21": 0,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
+        "encryption-at-rest-config-key-41c7f0ae": 0,
+        "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+        "http-api-static-token-auth-d2f7a041": 0,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "settings-file-migration-to-toml-e94b1d26": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "web-ui-transactions-paged-list-6a0b7f15": 0,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "LN05",
+      "family": "negative:LN05",
+      "style": "negative",
+      "query": "push notifications for the mobile companion app",
+      "queryMode": "auto",
+      "judgments": {
+        "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+        "bank-connector-plugin-interface-decision-5d2e8a17": 0,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+        "http-api-static-token-auth-d2f7a041": 0,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "retry-policy-for-bank-connector-timeouts-4b3a9f20": 0,
+        "settings-file-migration-to-toml-e94b1d26": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "ui-dark-mode-toggle-persistence-7f3a0c48": 0
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "LN06",
+      "family": "negative:LN06",
+      "style": "negative",
+      "query": "yearly tax report export for filing",
+      "queryMode": "auto",
+      "judgments": {
+        "backup-export-of-local-database-3e0a7d92": 0,
+        "categorization-rule-tester-command-6b5c9e04": 0,
+        "categorization-rules-regex-first-version-5c8e1a77": 0,
+        "csv-importer-bank-export-parsing-3a1f0c21": 0,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "ofx-importer-statement-header-parsing-c71e0b94": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "LT01",
+      "family": "duplicate-transaction-detection-by-fingerprint-f16a2d09",
+      "style": "typo",
+      "query": "duplicte transaction fingerprint",
+      "queryMode": "auto",
+      "expectedInterpretation": {
+        "effectiveQuery": "duplicate transaction fingerprint"
+      },
+      "judgments": {
+        "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+        "categorization-rule-tester-command-6b5c9e04": 0,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 3,
+        "encryption-at-rest-config-key-41c7f0ae": 0,
+        "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+        "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "web-ui-transactions-paged-list-6a0b7f15": 0,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "LT02",
+      "family": "sync-scheduler-exponential-backoff-88f1d2b4",
+      "style": "typo",
+      "query": "exponental backoff for failing banks",
+      "queryMode": "auto",
+      "expectedInterpretation": {
+        "effectiveQuery": "exponential backoff for failing banks"
+      },
+      "judgments": {
+        "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+        "backup-export-of-local-database-3e0a7d92": 0,
+        "csv-importer-bank-export-parsing-3a1f0c21": 0,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "retry-policy-for-bank-connector-timeouts-4b3a9f20": 1,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 3,
+        "sync-scheduler-fixed-interval-e2a6c590": 2,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "LT03",
+      "family": "encryption-at-rest-passphrase-derived-key-c39e5d62",
+      "style": "typo",
+      "query": "pasphrase derived encryption key",
+      "queryMode": "auto",
+      "expectedInterpretation": {
+        "effectiveQuery": "passphrase derived encryption key"
+      },
+      "judgments": {
+        "backup-export-of-local-database-3e0a7d92": 1,
+        "csv-importer-bank-export-parsing-3a1f0c21": 0,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+        "encryption-at-rest-config-key-41c7f0ae": 2,
+        "encryption-at-rest-passphrase-derived-key-c39e5d62": 3,
+        "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+        "ofx-importer-statement-header-parsing-c71e0b94": 0,
+        "settings-file-migration-to-toml-e94b1d26": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0
+      },
+      "origin": "approvers-a2-2026-10-15"
+    },
+    {
+      "id": "LT04",
+      "family": "logging-redaction-of-account-numbers-a2c8f750",
+      "style": "typo",
+      "query": "redaction of acount numbers in logs",
+      "queryMode": "auto",
+      "expectedInterpretation": {
+        "effectiveQuery": "redaction of account numbers in logs"
+      },
+      "judgments": {
+        "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+        "categorization-rules-regex-first-version-5c8e1a77": 0,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+        "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+        "local-api-json-error-envelope-8d4b1f67": 2,
+        "logging-redaction-of-account-numbers-a2c8f750": 3,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0
+      },
+      "origin": "approvers-a2-2026-10-15"
+    }
+  ]
+}

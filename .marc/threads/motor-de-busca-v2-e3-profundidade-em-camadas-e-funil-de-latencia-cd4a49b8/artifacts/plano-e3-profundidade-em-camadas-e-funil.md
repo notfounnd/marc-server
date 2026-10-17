@@ -65,9 +65,11 @@ O leitor de artifact da E1 passa a resolver o `messageId`: é a primeira mensage
 O core ganha a opção `adaptive?: boolean` em `MemoryRecallOptions`, com padrão `false`. Com `adaptive: true`:
 
 1. busca em depth 0;
-2. se nenhum resultado estiver nas faixas alta ou média, repete em depth 1;
+2. se nenhum resultado estiver na faixa **alta**, repete em depth 1;
 3. depois em depth 2, pela mesma regra;
 4. cada passo reusa a consulta efetiva da primeira interpretação, em modo literal.
+
+**Por que só a faixa alta encerra a busca:** a faixa média tem meta de precisão de 0,60, ou seja, até 40% dos resultados dela podem ser irrelevantes. Parar a busca por causa de um resultado médio no `SUMMARY.md` impediria encontrar a resposta real num artifact ou no chat. A regra anterior (parar em alta ou média) continua no harness como a variante de referência `ADAPTIVE_HM`, avaliada offline sem custo.
 
 A resposta ganha `layersSearched: MemoryLayer[]` para diagnóstico. A rota HTTP da UI usa `adaptive: true`. O MCP não expõe a opção: os agentes escolhem `depth` de forma explícita.
 
@@ -78,7 +80,17 @@ A resposta ganha `layersSearched: MemoryLayer[]` para diagnóstico. A rota HTTP 
 3. Para cada finalista, o reranker avalia até 12 passagens por ordem de cosseno (`MAX_RERANK_PASSAGES_PER_GROUP = 12`), mais o identity quando houver.
 4. O modelo completo pontua só os finalistas. Quem não é finalista não é admitido.
 
-A seleção de passagens muda de 3 para 12, então a distribuição das features também muda. Por isso, o modelo completo e os cortes são **reajustados** com o mesmo procedimento do `fit` da E2.
+A seleção de passagens muda de 3 para 12, então a distribuição das features também muda. Por isso, o modelo completo e os cortes são **reajustados** com o mesmo procedimento do `fit` da E2, incluindo a validação aninhada.
+
+**O trecho útil chega ao reranker?** Mais passagens reduzem o risco de descartar a evidência, mas não provam que ela sobreviveu. A thread estar entre os finalistas também não prova isso. Por isso, a E3 mede as duas coisas:
+
+- **recall de grupos:** grupos de grau ≥ 2 entre os finalistas;
+- **sobrevivência da evidência:** entre os grupos de grau ≥ 2 que viraram finalistas, a proporção em que alguma das 12 passagens selecionadas é uma das passagens que contêm a citação de `evidence`, identificadas pelo `passageId` registrado na captura. Selecionar outra passagem da mesma seção, sem a citação, **não** conta como sobrevivência;
+- **variante `ALL_PASSAGES`:** igual ao funil, mas o reranker avalia todas as passagens de cada finalista. Ela mostra quanto se perde com o limite de 12.
+
+Para isso, a captura da E3 grava o score do reranker de **todas** as passagens dos grupos de grau ≥ 2 e dos 20 finalistas de cada caso. O tempo da captura entra no relatório.
+
+O relatório lista cada perda de evidência, com o caso, o grupo, o número de passagens do grupo e o efeito no resultado final: a posição do grupo em `FUNNEL_K20` comparada à posição em `ALL_PASSAGES`.
 
 ### 4. Calibração entre camadas
 
@@ -97,15 +109,29 @@ As features continuam as da E2, calculadas sobre toda a evidência das camadas p
 
 ## Passo dos aprovadores: casos de camada
 
-Antes da T2, os aprovadores escrevem pelo menos 15 casos por corpus em que a resposta está só em artifact, chat, `RULES.md` ou documento, e julgam os grupos com a escala da E0. No `ledgerline-en`, as 4 threads preparadas na E0 entram nesse conjunto.
+A T1 acrescenta ao dataset da E0:
+
+- os estilos `layer` e `adaptive-trap` em `EvalCaseStyle`;
+- o campo opcional `evidence?: { sourcePath: string; quote: string }[]` em `EvalCase`. A `quote` é uma citação literal, de 5 a 40 palavras, do trecho que responde à consulta. A evidência é reconhecida pelo **conteúdo**, e não pelas linhas, porque as passagens herdam o intervalo da seção (E1) e esse intervalo não distingue uma passagem da outra;
+- a regra de comparação: `contém(passagem, quote)` aplica `markdownToIndexText` (E1) aos dois textos, junta espaços em branco e compara em minúsculas;
+- três regras novas no `validate`: casos `layer` e `adaptive-trap` sem `evidence` são rejeitados; a `quote` precisa ter de 5 a 40 palavras; a `quote` precisa aparecer no arquivo de `sourcePath`;
+- uma checagem na captura: cada `quote` precisa estar contida inteira em pelo menos uma passagem indexada do `sourcePath`. Se ficar dividida entre duas passagens, a captura lista o caso como `evidence_unindexable`, e o caso fica `incomplete` até os aprovadores escolherem uma citação menor. O `passageId` (E1) das passagens que contêm a citação fica registrado na captura.
+
+Antes da T2, os aprovadores escrevem e julgam com a escala da E0:
+
+- **casos de camada (`layer`):** pelo menos 15 por corpus em que a resposta está só em artifact, chat, `RULES.md` ou documento, com o trecho marcado em `evidence`. No `ledgerline-en`, as 4 threads preparadas na E0 entram nesse conjunto. No `marc`, pelo menos 4 desses casos têm a evidência em threads longas, com 100 ou mais passagens indexadas, como a `57488bab`, porque é nelas que o limite de 12 passagens mais arrisca descartar o trecho útil;
+- **casos armadilha (`adaptive-trap`):** pelo menos 8 por corpus. Em cada um, o `SUMMARY.md` de uma thread traz um resultado plausível, mas que não responde à consulta (grau ≤ 1), e a resposta real (grau 3) está só no artifact ou no chat de **outra** thread, marcada em `evidence`. Esses casos testam justamente a parada antecipada da expansão adaptativa.
 
 ## Avaliação e decisão (passo dos aprovadores)
+
+Antes da decisão, os aprovadores fazem o julgamento incremental da E0 (`worksheet --variants`) para os pares novos de todas as variantes. "Não inferior" segue a regra de decisão da E0: inconclusivo reprova, com uma rodada única de ampliação antes do recuo.
 
 | Hipótese | Critério de aceite | Se falhar |
 |---|---|---|
 | H4, recall | Recall de grupos de grau ≥ 2 entre os finalistas, comparado a todos os candidatos: limite inferior do IC da diferença > −0,02 | Reranquear até 12 passagens de todos os candidatos enquanto o corpus for pequeno |
+| H4, evidência | As duas condições juntas: sobrevivência da evidência ≥ 0,90 nos casos `layer` e `adaptive-trap`; Top1-alvo de `FUNNEL_K20` não inferior ao de `ALL_PASSAGES` | Seleção passa a ser a união das 12 passagens de maior cosseno com as passagens que casaram no canal FTS, até 24 por grupo, e o critério é reavaliado uma vez. Se ainda falhar, os aprovadores levam o trade-off com a latência ao humano (D10) |
 | H4, latência | Na máquina de referência do humano, em depth 0 e com `adaptive`: mediana ≤ 5 s e p95 ≤ 10 s | Os aprovadores registram a medição e consultam o humano (D10), porque é um trade-off de produto |
-| H5 | `ADAPTIVE` contra `DEPTH0` da E2: Top1-alvo não inferior; recall dos casos implícitos e de camada não classificado como piora; exposição incidental e admissões em negativos não classificadas como piora; `layersSearched` idêntico em duas execuções da mesma captura | Busca única em depth 0, sem expansão. As camadas ficam acessíveis só pelo MCP e pela E4 |
+| H5 | `ADAPTIVE` contra `DEPTH0` da E2: Top1-alvo, recall dos casos `implicit` e `layer`, exposição incidental e abstenção correta nos negativos, todos não inferiores; nos casos `adaptive-trap`, a busca para antes da camada que contém a evidência em no máximo 1 caso por corpus, e o relatório compara Top1-alvo e Top3-alvo de `ADAPTIVE` com os de `DEPTH2` nesses casos, para mostrar o efeito da parada na relevância final; `layersSearched` idêntico em duas execuções da mesma captura. `ADAPTIVE_HM` é reportada nos mesmos itens, só como referência | Se só a latência falhar por causa da expansão, os aprovadores levam ao humano (D10) os números de `ADAPTIVE` e `ADAPTIVE_HM`, sem trocar a regra automaticamente, porque `ADAPTIVE_HM` falha nas armadilhas por construção. Nos demais casos: busca única em depth 0, sem expansão, com as camadas acessíveis só pelo MCP e pela E4 |
 | Camadas | Critério da seção 4 | Recuo da seção 4 |
 | Rebuild | Rebuild completo do `marc` ≤ 15 min na máquina de referência | Os aprovadores levam a medição ao humano |
 
@@ -128,11 +154,11 @@ A decisão é publicada na thread antes da T3.
 
 | Tarefa | Entrega | Testes |
 |---|---|---|
-| T1 | Camadas ligadas, `messageId` do artifact, grupos, contrato do hit, depth de 0 a 2 no core, MCP, CLI e HTTP, e captura por depth no harness | Mapeamento de depth para camadas; `reference` por tipo, em tabela declarada; depth 3 rejeitado; artifact sem mensagem |
-| — | **Casos de camada escritos pelos aprovadores** | — |
-| T2 | Variantes `DEPTH0`, `DEPTH1`, `DEPTH2`, `ADAPTIVE`, `FUNNEL_K20` e `ALL_CANDIDATES` no harness, mais o reajuste | Determinismo do funil; finalistas por modelo barato |
+| T1 | Camadas ligadas, `messageId` do artifact, grupos, contrato do hit, depth de 0 a 2 no core, MCP, CLI e HTTP; captura por depth no harness, com os scores de todas as passagens dos grupos de grau ≥ 2 e dos finalistas; estilos `layer` e `adaptive-trap` e campo `evidence` no dataset | Mapeamento de depth para camadas; `reference` por tipo, em tabela declarada; depth 3 rejeitado; artifact sem mensagem; `validate` rejeita `layer` e `adaptive-trap` sem `evidence`, `quote` fora de 5 a 40 palavras e `quote` ausente do arquivo; captura marca `evidence_unindexable` quando a citação fica dividida entre passagens |
+| — | **Casos `layer` e `adaptive-trap` escritos e julgados pelos aprovadores** | — |
+| T2 | Variantes `DEPTH0`, `DEPTH1`, `DEPTH2`, `ADAPTIVE`, `ADAPTIVE_HM`, `FUNNEL_K20`, `ALL_PASSAGES` e `ALL_CANDIDATES` no harness; métricas de sobrevivência da evidência e de parada antecipada nas armadilhas; reajuste | Determinismo do funil; finalistas por modelo barato; sobrevivência da evidência por `passageId`, com o cenário declarado de uma seção com duas passagens em que selecionar só a que não contém a citação produz falha de sobrevivência; `ADAPTIVE` continua com resultado médio e para com resultado alto |
 | — | **Decisão dos aprovadores, publicada na thread** | — |
-| T3 | Funil e expansão adaptativa em produção, com as constantes reajustadas | `layersSearched`; parada na primeira camada com alta ou média; não finalista nunca admitido |
+| T3 | Funil e expansão adaptativa em produção, com as constantes reajustadas | `layersSearched`; parada na primeira camada com resultado alto; resultado médio não interrompe a expansão; não finalista nunca admitido |
 | T4 | Retirada do Deep da UI, grupos sem thread e snapshot v7 | Testes de UI atualizados (`ui-memory-search-depth.test.ts` removido ou reescrito); Playwright CLI: busca única, resultado de `RULES.md` exibido com caminho, ausência do botão e da seção de settings |
 | T5 | ADR 0012 e docs | — |
 
@@ -155,3 +181,8 @@ A decisão é publicada na thread antes da T3.
 
 - desenvolvedor e configuração confirmados pelo humano;
 - veredito conjunto dos aprovadores sobre este plano, depois da aceitação da E2.
+
+## Histórico de revisões
+
+- **Revisão 2 (2026-10-15):** incorpora a revisão de marc://@codex-software-architect. A expansão adaptativa só para com resultado na faixa alta, e casos armadilha testam a parada antecipada; o funil passa a medir a sobrevivência da evidência contra `ALL_PASSAGES`, além do recall de grupos; critérios de H5 exigem não inferioridade; julgamento incremental antes da decisão. Arquitetura sem mudança.
+- **Revisão 3 (2026-10-15):** responde ao parecer de marc://@codex-software-architect sobre a revisão 2. A evidência passa a ser uma citação literal reconhecida pelo conteúdo, e a sobrevivência passa a ser verificada pelo `passageId` da E1, e não pela interseção com as linhas da seção.

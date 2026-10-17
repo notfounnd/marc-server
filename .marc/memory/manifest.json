@@ -1,7 +1,7 @@
 {
   "schemaVersion": 6,
-  "builtAt": "2026-10-15T15:02:24.386Z",
-  "generation": "20261015150223832_a5073520",
+  "builtAt": "2026-10-17T21:48:02.015Z",
+  "generation": "20261017214800713_500e3276",
   "embeddingProvider": {
     "id": "transformers-js-local-e5",
     "name": "Transformers.js local multilingual E5 retrieval",
@@ -144,6 +144,22 @@
       ]
     },
     {
+      "threadId": "correcao-ocultar-comentarios-html-no-markdown-renderizado-b84827bb",
+      "title": "Correção - Ocultar comentários HTML no Markdown renderizado",
+      "closedAt": "2026-10-15T22:57:21.056Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\correcao-ocultar-comentarios-html-no-markdown-renderizado-b84827bb\\SUMMARY.md",
+      "relativeSummaryPath": "threads/correcao-ocultar-comentarios-html-no-markdown-renderizado-b84827bb/SUMMARY.md",
+      "reference": "marc://$correcao-ocultar-comentarios-html-no-markdown-renderizado-b84827bb",
+      "sha256": "65c6e89be2836453b1530eaba291121ba280016f3f9584e96f6012bfafdfb04a",
+      "mtimeMs": 1792105041061.4202,
+      "recordIds": [
+        "correcao-ocultar-comentarios-html-no-markdown-renderizado-b84827bb:identity",
+        "correcao-ocultar-comentarios-html-no-markdown-renderizado-b84827bb:source:decisao-e-entrega:passage:001",
+        "correcao-ocultar-comentarios-html-no-markdown-renderizado-b84827bb:source:validacao-e-aprovacao:passage:001",
+        "correcao-ocultar-comentarios-html-no-markdown-renderizado-b84827bb:source:continuidade-e-limites:passage:001"
+      ]
+    },
+    {
       "threadId": "corrigir-corrida-de-startup-no-teste-de-auto-idle-do-daemon-504e1898",
       "title": "Corrigir corrida de startup no teste de auto-idle do daemon",
       "closedAt": "2026-10-10T05:46:49.398Z",
@@ -211,6 +227,39 @@
         "estudo-profundidade-adaptativa-e-simplificacao-do-deep-search-4f477d9f:source:contexto:passage:001",
         "estudo-profundidade-adaptativa-e-simplificacao-do-deep-search-4f477d9f:source:decisao-que-respondeu-ao-estudo:passage:001",
         "estudo-profundidade-adaptativa-e-simplificacao-do-deep-search-4f477d9f:source:continuidade:passage:001"
+      ]
+    },
+    {
+      "threadId": "indicador-de-versao-no-rodape-7b4859bc",
+      "title": "Indicador de versão no rodapé",
+      "closedAt": "2026-10-16T00:46:23.189Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\indicador-de-versao-no-rodape-7b4859bc\\SUMMARY.md",
+      "relativeSummaryPath": "threads/indicador-de-versao-no-rodape-7b4859bc/SUMMARY.md",
+      "reference": "marc://$indicador-de-versao-no-rodape-7b4859bc",
+      "sha256": "01558fb65a9fb92124b4f79972b0c5fe35770d36d85c405e9219f806b2d77dc0",
+      "mtimeMs": 1792111583217.3667,
+      "recordIds": [
+        "indicador-de-versao-no-rodape-7b4859bc:identity",
+        "indicador-de-versao-no-rodape-7b4859bc:source:decisao-e-entrega:passage:001",
+        "indicador-de-versao-no-rodape-7b4859bc:source:validacao-e-aprovacao:passage:001",
+        "indicador-de-versao-no-rodape-7b4859bc:source:limites-e-continuidade:passage:001"
+      ]
+    },
+    {
+      "threadId": "motor-de-busca-v2-e0-base-de-avaliacao-e-diagnostico-causal-bc45139b",
+      "title": "Motor de busca v2 - E0 Base de avaliação e diagnóstico causal",
+      "closedAt": "2026-10-17T20:35:07.050Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\motor-de-busca-v2-e0-base-de-avaliacao-e-diagnostico-causal-bc45139b\\SUMMARY.md",
+      "relativeSummaryPath": "threads/motor-de-busca-v2-e0-base-de-avaliacao-e-diagnostico-causal-bc45139b/SUMMARY.md",
+      "reference": "marc://$motor-de-busca-v2-e0-base-de-avaliacao-e-diagnostico-causal-bc45139b",
+      "sha256": "77eaee9010ef426233991d6cff4e89fbc8b8210a59f023358c979f0a32051b4b",
+      "mtimeMs": 1792269307059.9224,
+      "recordIds": [
+        "motor-de-busca-v2-e0-base-de-avaliacao-e-diagnostico-causal-bc45139b:identity",
+        "motor-de-busca-v2-e0-base-de-avaliacao-e-diagnostico-causal-bc45139b:source:entrega:passage:001",
+        "motor-de-busca-v2-e0-base-de-avaliacao-e-diagnostico-causal-bc45139b:source:decisoes-durante-a-execucao:passage:001",
+        "motor-de-busca-v2-e0-base-de-avaliacao-e-diagnostico-causal-bc45139b:source:baseline-m0-de-17-10-2026:passage:001",
+        "motor-de-busca-v2-e0-base-de-avaliacao-e-diagnostico-causal-bc45139b:source:continuidade:passage:001"
       ]
     },
     {

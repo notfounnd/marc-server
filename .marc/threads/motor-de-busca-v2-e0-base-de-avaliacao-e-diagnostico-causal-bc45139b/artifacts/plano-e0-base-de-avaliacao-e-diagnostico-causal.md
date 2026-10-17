@@ -164,7 +164,7 @@ Comando: `pnpm memory:eval capture --corpus marc|ledgerline-en [--resume]`.
 1. Cria um diretório com `fs.mkdtemp(path.join(os.tmpdir(), "marc-memory-eval-"))`.
 2. Chama `initWorkspace(tempRoot)`.
 3. Copia para `<tempRoot>/.marc/`:
-   - no corpus `marc`: `.marc/threads/` e `.marc/RULES.md` do repositório;
+   - no corpus `marc`: só as threads listadas em `scripts/memory-eval/datasets/marc.corpus.json` (o corpus congelado da E0, com as 56 threads fechadas em 2026-10-15) e o `.marc/RULES.md` do repositório. Threads fechadas depois não entram, para que as capturas da E1 à E4 comparem o mesmo corpus;
    - no corpus `ledgerline-en`: o conteúdo do fixture.
 4. Executa o rebuild completo de produção (`rebuildMemoryInWorkspace`) com `LocalEmbeddingProvider`, `LocalRerankingProvider` e `LocalQueryInterpretationProvider` do workspace temporário.
 5. Remove o diretório temporário em `finally`.
@@ -185,11 +185,12 @@ No corpus `marc`, a captura confirma que os `recordIds` do manifest temporário 
    - canais de produção (`searchVector` de identity e passage e `searchLexical`) com `candidateLimitForDepth(0)`, registrando posição, score e `recordId`. Os campos lexicais seguem a regra de `lexicalFieldsForQuery` (`src/core/memory/operations.ts:259-268`): `title` e `summary`, mais `titlePrefix` quando a consulta tem um único termo. A regra é replicada no harness porque a função não é exportada, e um teste compara as duas com as mesmas entradas;
    - **matriz completa do reranker:** score de todas as linhas de identity e passage de todas as threads do corpus, usando `semanticRerankingDocument` como texto.
 3. Recall de produção em modo `literal` com a consulta efetiva, `limit: 50` e `depth: 0`, para a checagem de equivalência.
-4. **Latência de ponta a ponta:** `recallMemoryInWorkspace` no modo do caso, `limit: 5`, `depth: 0`. São 1 aquecimento e 3 medições com `performance.now()`.
+4. **Latência de ponta a ponta (revisão 6):** fica fora da captura de conteúdo e roda numa passada própria, `memory:eval latency --corpus <c>`, sobre uma captura completa. A passada usa `recallMemoryInWorkspace` no modo do caso, com `limit: 5` e `depth: 0`, e faz 1 aquecimento e 3 medições com `performance.now()`. O resultado vai para `latency.json`, ao lado de `capture.json`, com `captureId`, data, memória total e memória livre no início e após cada caso.
 
 **Saída:** `.marc/cache/memory-eval/<corpus>/<captureId>/capture.json`. O `captureId` são os 12 primeiros caracteres hex do fingerprint, que é o SHA-256 de:
 
-- o JSON do dataset;
+- o `queryFingerprint` do dataset: SHA-256 do JSON da lista de casos ordenada por `id`, contendo só `id`, `query`, `queryMode` e `expectedInterpretation`. `judgments` e `origin` ficam de fora, porque os julgamentos são gravados depois da captura (seção 5) e não alteram o que foi capturado. Os julgamentos são sempre lidos do dataset atual no `replay`, no `report` e no `compare`;
+- o `corpusDigest`: SHA-256 do conteúdo copiado para o workspace temporário, com os arquivos ordenados por caminho relativo;
 - os ids e as variantes dos três modelos ativos (`activeMemoryModelSelection()`);
 - a versão do `package.json`;
 - o hash agregado dos arquivos `src/core/memory/*.ts`, ordenados pelo caminho.
@@ -236,14 +237,21 @@ export const rankingVariants: Record<string, RankingVariant> = {
 
 Só `ORACLE_ADMISSION` lê `judgments`. Uma variante candidata a produção não pode lê-los, e um teste garante isso para `M0` e `D0`.
 
-**Checagem de equivalência:** o replay de `M0` precisa reproduzir o recall de produção capturado no passo 3 da captura. Exige-se a mesma sequência de `threadId` admitidos e a diferença absoluta de score de no máximo `1e-6` em todos os casos. Se algum caso falhar, o relatório marca `equivalence: failed` e lista os casos.
+**Checagem de equivalência (revisão 7):** o reranker é fp16, e o score de um par depende do comprimento com padding do lote em que ele é pontuado. A matriz e a chamada de produção usam lotes diferentes, então os scores não podem coincidir exatamente. A checagem tem duas partes:
+
+- **Exatidão do caminho (CA1a):** o caminho do replay, quando recebe os scores do reranker no layout da chamada de produção, reproduz a elegibilidade de produção com diferença de no máximo `1e-9` e a mesma sequência de threads, em todos os casos. A evidência vem de uma verificação com o modelo vivo, fora do harness, anexada à entrega.
+- **Fidelidade da matriz (CA1b):** o replay de `M0` com os scores da matriz admite a mesma sequência de `threadId` que o recall de produção em todos os casos. A diferença de score não reprova. O relatório registra, por caso, a diferença máxima, e por corpus, a mediana, o p95 e o máximo. Se a sequência divergir em algum caso, o relatório marca `equivalence: failed` e lista os casos.
+
+Todas as variantes usam os scores da matriz. Assim, M0 e as variantes são comparados sobre a mesma fonte de score.
 
 ### 5. Julgamento
 
 Comandos:
 
-- `pnpm memory:eval worksheet --capture <captureId> --corpus <corpus>`
+- `pnpm memory:eval worksheet --capture <captureId> --corpus <corpus> [--variants <v1,v2,...>]`
 - `pnpm memory:eval merge-judgments --corpus <corpus> --inputs <a.json>,<b.json>`
+
+**Julgamento incremental das variantes:** com `--variants`, o pool de cada caso passa a incluir também todo o alcance das métricas de decisão de cada variante indicada, conforme a tabela `metricReach` (seção 6). Isso inclui toda a lista admitida, e não só as 10 primeiras. A planilha mostra **somente os pares ainda sem julgamento**. A planilha não informa de qual variante veio cada thread. É esse modo que a E1, a E2, a E3 e a E4 usam antes de cada decisão: os aprovadores julgam o que as variantes novas trouxeram, com o mesmo rigor e o mesmo `merge-judgments` usados no baseline.
 
 **Pool de cada caso:** a união de
 
@@ -291,9 +299,21 @@ Arquivo `scripts/memory-eval/metrics.ts`. Cada métrica é calculada por corpus,
 - sugestão indevida;
 - sugestão ausente.
 
-**Latência:** mediana e p95 por corpus, a partir das medições da captura.
+**Latência:** mediana e p95 por corpus, a partir de `latency.json`, com a memória livre mínima registrada durante a medição. Sem `latency.json` com o mesmo `captureId`, o `report` falha com uma mensagem clara.
 
-**Threads não julgadas:** as métricas usam a lista condensada, em que threads sem julgamento são removidas antes do cálculo. O relatório também mostra a contagem de admitidos não julgados por variante. Se essa contagem passar de 0 em `M0`, o pool está incompleto e o caso volta ao julgamento.
+**Threads não julgadas:** remover threads sem julgamento antes do cálculo favorece a variante que traz resultados desconhecidos. Exemplo: uma variante devolve uma thread não julgada em 1º lugar e a resposta correta em 2º. Sem a não julgada, ela ganharia um acerto em 1º lugar que o usuário não veria. Por isso:
+
+- **métricas de decisão** exigem cobertura completa: **todo resultado que participa de uma métrica de decisão** precisa estar julgado, em **cada variante comparada**, inclusive `M0`. O alcance de cada métrica é declarado numa tabela `metricReach` em `metrics.ts`, e é essa tabela que o `report`, o `compare` e o `worksheet --variants` consultam:
+
+  | Métricas | Alcance que precisa estar julgado |
+  |---|---|
+  | Top1-alvo, Top1-relevante, Top3-alvo, MRR, nDCG@10, precisão de admissão, recall de admissão, exposição incidental e abstenção correta | **Toda a lista admitida** da variante, e não só as 10 primeiras. Precisão de admissão e exposição incidental usam todos os admitidos; uma thread não julgada em 11º altera essas métricas |
+  | Recall@10 e MRR da lista completa (diagnóstico) | As 10 primeiras da lista completa |
+  | Métricas novas das etapas seguintes | A etapa declara o alcance na tabela antes de rodar a comparação. Exemplos: os 20 finalistas do funil (E3) e os 5 primeiros trechos por `passageId` (E4) |
+
+  O `D0` admite todos os candidatos e só serve para diagnóstico. Por isso, a exigência para ele é o alcance da lista completa;
+- o `report` e o `compare` verificam essa cobertura por variante. Se faltar julgamento, a variante recebe o estado `incomplete`, com a lista de pares pendentes, e **nenhum veredito é emitido** para ela. Os pares pendentes vão para o julgamento incremental (seção 5);
+- a **lista condensada**, sem as threads não julgadas, continua no relatório só como diagnóstico, marcada como tal, e nunca entra em critério de aceite.
 
 ### 7. Estatística
 
@@ -314,6 +334,14 @@ Arquivo `scripts/memory-eval/statistics.ts`, sem dependências novas:
 | inconclusivo | nenhum dos anteriores |
 
 As margens são δ = 0,05 para proporções e δ = 0,03 para MRR e nDCG@10.
+
+**Regra de decisão para todo o programa:**
+
+- um critério que exige "não inferior" só é atendido com o limite inferior do IC acima de −δ. **Inconclusivo reprova o critério**; a ausência de piora demonstrada nunca é aceita como aprovação;
+- quando o resultado for inconclusivo, os aprovadores podem fazer **uma única rodada de ampliação** do recorte afetado. Ela acrescenta casos novos daquele estilo, seguindo as mesmas regras de autoria, até dobrar o tamanho do recorte. Depois disso, a comparação é rodada de novo;
+- se continuar inconclusivo, aplica-se o recuo da hipótese, definido no plano da etapa.
+
+Como a comparação é pareada, uma variante que muda poucos casos tem um intervalo estreito e consegue provar não inferioridade. O inconclusivo tende a aparecer quando a variante muda muitos casos, e é justamente aí que mais evidência é necessária.
 
 ### 8. Atribuição da perda e admissão perfeita
 
@@ -355,7 +383,7 @@ O comando gera `report.json` e `report.md` em `.marc/cache/memory-eval/<corpus>/
 - atribuição dos folds;
 - tamanho do corpus comparado ao limite de candidatos por canal.
 
-**Comparação entre capturas:** `pnpm memory:eval compare --corpus <corpus> --baseline <captureId>:<variant> --candidate <captureId>:<variant>`. O comando pareia os casos por `id`, exige o mesmo hash de dataset nas duas capturas e aplica as mesmas métricas e a mesma estatística da seção 7. A E1 usa esse comando, porque a mudança de representação altera o índice e exige uma captura nova.
+**Comparação entre capturas:** `pnpm memory:eval compare --corpus <corpus> --baseline <captureId>:<variant> --candidate <captureId>:<variant>`. O comando pareia os casos por `id`, exige o mesmo `queryFingerprint` e o mesmo `corpusDigest` nas duas capturas e aplica as mesmas métricas e a mesma estatística da seção 7. A E1 usa esse comando, porque a mudança de representação altera o índice e exige uma captura nova.
 
 ## Tarefas do desenvolvedor
 
@@ -364,10 +392,10 @@ As tarefas rodam em sequência, um handoff por vez, com `OK_BOOTSTRAP` e autoriz
 | Tarefa | Entrega | Testes |
 |---|---|---|
 | T1 | `dataset.ts`, `validate` no `cli.ts`, checagem de sobreposição e migração dos 52 casos para `marc.json` | `test/memory-eval-dataset.test.ts`: cada regra de rejeição com um fixture declarado; os 52 casos carregam sem erro; a sobreposição de 4 palavras é detectada |
-| T2 | `recording-providers.ts`, `cached-providers.ts`, `corpus.ts` e `capture.ts` com checkpoint e fingerprint | `test/memory-eval-capture.test.ts` com provedores falsos determinísticos e um workspace temporário de 3 threads: a captura grava canais, matriz e latência; `--resume` não repete casos; o cache lança erro em chave ausente |
+| T2 | `recording-providers.ts`, `cached-providers.ts`, `corpus.ts` e `capture.ts` com checkpoint e fingerprint | `test/memory-eval-capture.test.ts` com provedores falsos determinísticos e um workspace temporário de 3 threads: a captura grava canais, matriz e latência; `--resume` não repete casos; o cache lança erro em chave ausente; mudar só `judgments` mantém o `captureId`, e mudar `query` o altera |
 | T3 | `variants.ts` e `replay.ts` com a checagem de equivalência | `test/memory-eval-replay.test.ts`: `M0` replay é igual ao recall de produção com provedores falsos; `D0` admite todos; `ORACLE_ADMISSION` admite exatamente grau ≥ 2; `M0` e `D0` não leem `judgments` |
-| T4 | `metrics.ts`, `statistics.ts`, `folds.ts`, `attribution.ts`, `report.ts` e o comando `compare` | `test/memory-eval-metrics.test.ts` e `test/memory-eval-statistics.test.ts` com valores esperados calculados à mão: nDCG, MRR, lista condensada, bootstrap com semente fixa (resultado estável), McNemar com tabela conhecida, kappa com matriz conhecida, folds determinísticos, pareamento do `compare`; `test/memory-eval-attribution.test.ts` com um caso por categoria |
-| T5 | `judgments.ts` com `worksheet` e `merge-judgments` | `test/memory-eval-judgments.test.ts`: pool montado com as cinco fontes; ordem alfabética; merge grava só concordâncias; consenso resolve divergências |
+| T4 | `metrics.ts`, `statistics.ts`, `folds.ts`, `attribution.ts`, `report.ts` e o comando `compare` | `test/memory-eval-metrics.test.ts` e `test/memory-eval-statistics.test.ts` com valores esperados calculados à mão: nDCG, MRR, lista condensada como diagnóstico, bootstrap com semente fixa (resultado estável), McNemar com tabela conhecida, kappa com matriz conhecida, folds determinísticos, pareamento do `compare`; estado `incomplete` sem veredito quando há não julgado no alcance de `metricReach` de uma variante, inclusive uma thread admitida em 11º lugar; cenário declarado em que a variante devolve uma thread não julgada em 1º e o alvo em 2º: antes do julgamento, a variante fica `incomplete` e não recebe acerto Top1; depois de a thread receber grau 0, o Top1-alvo do caso é 0; inconclusivo nunca classificado como não inferior; `test/memory-eval-attribution.test.ts` com um caso por categoria |
+| T5 | `judgments.ts` com `worksheet` e `merge-judgments` | `test/memory-eval-judgments.test.ts`: pool montado com as cinco fontes; ordem alfabética; com `--variants`, só pares sem julgamento e sem indicação da variante de origem; merge grava só concordâncias; consenso resolve divergências |
 | T6 | Corpus `ledgerline-en` conforme a seção 2 | `test/memory-eval-corpus-fixture.test.ts`: 30 fechadas e 3 abertas; cabeçalhos válidos; contagens de palavras, mensagens e artifacts dentro dos limites |
 | T7 | Execução das capturas dos dois corpora, relatório baseline e atualização de `docs/memory.md` | Sem teste novo; evidência na entrega |
 
@@ -389,10 +417,12 @@ A T7 só começa depois que os dois datasets passam no `validate`.
 
 ## Critérios de aceite da etapa
 
-1. **CA1, equivalência:** o replay de `M0` reproduz o recall de produção em 100% dos casos dos dois corpora.
+1. **CA1, equivalência (revisão 7):**
+   - CA1a passa em 100% dos casos dos dois corpora.
+   - CA1b também passa em 100%. Se houver desvio, cada caso divergente é explicado, e as métricas de decisão de M0 são iguais às de `PRODUCTION_RECALL`, ou cada diferença é listada com a causa.
 2. **CA2, offline:** o replay, as métricas e o relatório rodam sem instanciar provedores locais, o que é provado pelo teste da T3.
 3. **CA3, dataset:** os dois datasets passam no `validate`, e o `marc.json` tem pelo menos 52 casos migrados mais os casos de A1.
-4. **CA4, julgamentos:** nenhum admitido não julgado em `M0`; kappa e divergências registrados.
+4. **CA4, julgamentos:** nenhuma variante do baseline em estado `incomplete` nos dois corpora. Em `M0`, isso significa toda a lista admitida e as 10 primeiras da lista completa julgadas. Em `D0`, as 10 primeiras da lista completa. Kappa e divergências registrados.
 5. **CA5, relatório completo:** contém todos os itens da seção 9 para os dois corpora.
 6. **CA6, produção intacta:** nenhuma mudança em `src/**`. O hash de `.marc/memory/manifest.json` é igual antes e depois da T7.
 7. **CA7, validação:** `pnpm validate`, `pnpm build` e `pnpm test` passam. As regras de estilo de código e de teste foram respeitadas.
@@ -416,8 +446,30 @@ A T7 só começa depois que os dois datasets passam no `validate`.
 
 ## Pendências antes do dispatch
 
-- **Escolha do desenvolvedor pelo humano:** marc://@codex-dev ou marc://@claude-dev. O perfil `claude-dev` ainda não tem o reasoning confirmado.
-- **Revisão deste plano por marc://@codex-software-architect,** com veredito conjunto dos aprovadores.
+Resolvidas em 2026-10-15:
+
+- **Desenvolvedor:** marc://@claude-dev, modelo Haiku 5.5, reasoning xhigh, confirmados pelo humano.
+- **Veredito conjunto:** revisão 3 aprovada pelos dois aprovadores.
+
+## Histórico de revisões
+
+- **Revisão 2 (2026-10-15):** incorpora a revisão de marc://@codex-software-architect. Julgamento incremental das variantes, cobertura completa exigida para métricas de decisão (lista condensada só como diagnóstico) e regra de que inconclusivo reprova critério de não inferioridade, com uma rodada de ampliação antes do recuo. Arquitetura sem mudança.
+- **Revisão 3 (2026-10-15):** responde ao parecer de marc://@codex-software-architect sobre a revisão 2. A cobertura deixa de ser "top 10" e passa a ser o alcance real de cada métrica de decisão, declarado na tabela `metricReach`. Isso inclui toda a lista admitida. O julgamento incremental passa a seguir o mesmo alcance.
+- **Revisão 4 (2026-10-15), na preparação do dispatch:** o fingerprint da captura usava o JSON inteiro do dataset, inclusive `judgments`. Como os julgamentos são gravados depois da captura, isso invalidaria a captura que os originou. O fingerprint passa a usar o `queryFingerprint` (só `id`, `query`, `queryMode` e `expectedInterpretation`), e o `compare` exige o mesmo `queryFingerprint`. É correção de consistência interna, sem efeito em arquitetura ou critérios.
+- **Revisão 5 (2026-10-15), na revisão da T2:** o corpus `marc` cresce a cada thread fechada, e isso confundiria as comparações entre etapas. O corpus passa a ser fixado em `scripts/memory-eval/datasets/marc.corpus.json`, com as 56 threads fechadas. A captura copia só essas threads, o `corpusDigest` do conteúdo copiado entra no fingerprint, e o `compare` exige o mesmo `queryFingerprint` e o mesmo `corpusDigest`. Uma thread fixada que deixe de existir vira issue `pinned-thread-missing` no `validate`.
+- **Revisão 6 (2026-10-16), na T7:** duas capturas reais foram interrompidas por falta de memória da máquina, que é compartilhada com outros trabalhos. O conteúdo capturado é determinístico e continua válido depois de uma interrupção. A latência não continua válida: o `--resume` reaproveita os tempos gravados, medidos sob pressão. A latência sai da captura e passa para uma passada própria (`latency`), rodada numa janela em que a máquina está quieta. Ela grava a memória livre durante a medição, para que as condições possam ser auditadas. Protocolo, métricas e critérios não mudam.
+- **Revisão 7 (2026-10-16), na T7:** o CA1 falhou por score em 5 de 40 casos no `ledgerline-en` e em 45 de 114 no `marc`.
+  - **Diagnóstico:** o reranker `model_O4.onnx` é fp16, e o score de um par depende do comprimento com padding do lote. O resultado é determinístico para cada formato e não depende dos outros documentos do lote. A produção e o replay reproduzem exatamente o próprio layout: a diferença entre eles é toda explicada pelo score do reranker, com resíduo 0.
+  - **Mudança:** o CA1 passa a ter duas partes. O CA1a cobre a exatidão do caminho, com o score do layout de produção. O CA1b cobre a fidelidade da matriz, com a mesma sequência de threads, e a diferença de score é registrada sem reprovar.
+  - **Rejeitado:** alimentar o M0 com scores do layout de produção. Isso faria o M0 e as variantes usarem fontes de score diferentes e enviesaria as comparações.
+  - **Achado para a E2:** a elegibilidade de produção varia com o comprimento de candidatos sem relação com a consulta. A variação bruta chega a 2,2e-3 (`ledgerline-en`, L08). O máximo de 0,036 no `marc` (9I) não é ruído bruto: é uma inversão de quase-empate propagada pelo limite monotônico (`applyMonotonicConfidence`).
+  - **Resultado:** o CA1a passou em 100% dos casos dos dois corpora, com delta 0. O CA1b passou em 40 de 40 no `ledgerline-en` e em 113 de 114 no `marc`. O critério declarado falhou no caso 9I: as posições 9 e 10 se inverteram num quase-empate.
+  - **Decisão dos aprovadores:** o desvio é aceito com uma condição de impacto. O `report` passa a ter a pseudovariante `PRODUCTION_RECALL`, que lê o recall de produção capturado. Para a E0 ser aceita, as métricas de decisão de M0 precisam ser iguais às de `PRODUCTION_RECALL` nos dois corpora, ou cada diferença precisa ser listada com a causa. A taxa observada de inversão de cauda, 1 em 154 casos, entra nos riscos da E2.
+- **Revisão 8 (2026-10-17), na T7:** o humano decidiu que a latência não é medida em máquina quieta, e sim com a carga típica de uso: navegador, editor, terminais, mensageiro e dois agentes de código abertos e sem uso.
+  - **Motivo:** no uso real, o marc disputa a máquina com esses programas. Uma máquina vazia daria um número que nenhum usuário vê.
+  - **Condição registrada:** 15,7 GiB de RAM, cerca de 5,8 GiB livres no início e CPU ociosa em torno de 5%, ligada na tomada. O `latency.json` grava a memória livre de cada caso.
+  - **Regra:** as comparações de latência das etapas seguintes repetem essa condição. A medição não vale como prova para máquinas de 8 GB.
+  - Protocolo, métricas e critérios não mudam.
 
 ## Relação com as outras etapas
 

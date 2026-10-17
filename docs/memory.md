@@ -215,6 +215,77 @@ The matrix runs the `baseline`, `retriever-base`, `reranker-bge`, and `base-bge`
 
 The matrix is intentionally exhaustive and CPU-intensive. Its duration does not represent normal recall latency. Long runs can use `--detach`, and an interrupted matrix can use `--resume` to preserve completed profiles.
 
+### Evaluation harness (memory:eval)
+
+The evaluation harness is an opt-in offline suite that scores retrieval against curated, judged cases. It is separate from `memory:quality` and `memory:benchmark`. It does not change `.marc/memory/`: capture reads the production manifest only to check record ids, and every output is written under `.marc/cache/memory-eval/`.
+
+Run the commands in this order with `pnpm memory:eval <command> --corpus <name>`: `validate`, `capture`, `worksheet` (the raters judge the pooled pairs), `merge-judgments`, `latency`, then `report` and `compare`. `replay` is optional for `report`, which runs the replay internally; run `replay` on its own only to inspect one variant. `compare` pairs two captures of the same corpus with the same `queryFingerprint` and the same `corpusDigest`, and refuses any other pair.
+
+Outputs:
+
+- Each capture writes to `.marc/cache/memory-eval/<corpus>/<captureId>/`: `capture.json` (the replay input), `cases/` and `checkpoint.json` (resume state), `latency.json`, `replay-<variants>.json`, `worksheet.md` with `worksheet-template.json`, `report.json`, and `report.md`. `compare` writes `compare-*.json` to the candidate's folder.
+- Merge reports (`merge-<timestamp>.json`) are written to `.marc/cache/memory-eval/<corpus>/`.
+- Judgments are not stored in the capture folder. Committed judgments are written to `scripts/memory-eval/datasets/<corpus>.json`. Rater files and the consensus file are inputs kept next to the capture.
+
+Two corpora are available:
+
+- `marc`: 114 curated cases over a pinned set of 56 closed threads. Captures record the `corpusDigest` of the pinned threads.
+- `ledgerline-en`: a fictional English corpus of 40 cases over 30 closed threads, used as a second, independent check of the harness.
+
+Aggregation:
+
+- Ratios are computed over sums: each metric is the sum of numerators divided by the sum of denominators, not the mean of per-case ratios.
+- `mrr` is computed over the admitted list. `fullMrr10`, the full-list diagnostic, is limited to the top 10.
+- Each metric has a `metricReach`: `admittedList` (judged over the admitted threads), `fullTop10` (judged over the top 10 of the full candidate list), or `diagnosticOnly` (reported, never decided on).
+
+Decision vocabulary:
+
+- The report compares D0 and ORACLE_ADMISSION against M0, metric by metric. Each row gives the difference (candidate minus M0), a 95% paired bootstrap interval, the margin, a term, and the Non-inferior column.
+- The interval comes from 10,000 bootstrap resamples of the families, with seed 20261015 and nearest-rank 2.5th and 97.5th percentiles.
+- The margin is 0.05 for proportions and 0.03 for ranking metrics (`mrr`, `ndcg10`, `fullMrr10`).
+- The term is chosen in this order:
+  - `melhora` (improves): the whole interval is above 0.
+  - `piora` (worsens): the whole interval is below 0.
+  - `não inferior` (non-inferior): the interval contains 0, and its lower bound is above minus the margin.
+  - `inconclusivo` (inconclusive): the interval contains 0, and its lower bound is at or below minus the margin.
+- The Non-inferior column is true when the lower bound is above minus the margin. It does not depend on the term, so a `piora` can still be non-inferior when the loss stays inside the margin. An `inconclusivo` result is never non-inferior, so it fails a non-inferiority criterion.
+- `PRODUCTION_RECALL` appears beside M0 in its own section. It is never a decision comparison.
+
+Attribution:
+
+- Attribution classifies, for the M0 list at depth 0, every thread of grade 3 in a positive case. Each thread gets exactly one category, checked in this order:
+  - `success`: the thread is the first admitted thread.
+  - `candidate_recall`: the thread reached no channel, or it is not in the list.
+  - `admission`: the thread is in the list but was not admitted.
+  - `ordering`: the thread was admitted but is not first.
+- The passage-selection suspect is a mark, not a category. It applies only to `admission` and `ordering` threads. It is set when the thread's best matrix score beats the best of its selected passages (at most three per thread) and would rank the thread first among the best scores of all threads. A tie does not rank first.
+
+Equivalence:
+
+- CA1a checks the exact path. Fed the production-layout reranker scores, the replay reproduces the production eligibility within 1e-9, with the same thread sequence. Both corpora pass it.
+- CA1b checks only the admitted thread sequence against production. The reranker runs in fp16, and its scores depend on the padded length of the batch, so the matrix layout and the production layout can differ slightly. Score deltas are reported as median, p95, and max, but they do not gate.
+- In `marc`, case 9I swaps two threads with the same grade (1). No metric changes, because the relevance threshold is grade 2 and a swap of equal grades does not change the discounted gain.
+- M0 and `PRODUCTION_RECALL` give identical values on every metric of the admitted list. Their differences in `fullRecall10` and `fullMrr10` are structural: the production search returns only the admitted list, while M0 measures the top 10 of the full candidate list. This is not a regression.
+
+Latency:
+
+- Latency is measured by its own command, after the capture. Each case gets one warm-up recall and three timed samples. The free memory reported by `os.freemem` is recorded at the start and after each case.
+- A capture resumed with `--resume` does not measure latency.
+- The measurement of 17 October 2026 ran under typical desktop load: browser, editor, terminals, a messenger, and two code agents open and idle. The machine had 15.7 GiB of RAM, about 5.8 GiB free at the start, and idle CPU around 5%. The harness readings at the start of each run showed 14 to 17% CPU load. Future comparisons must repeat the same load condition. These numbers do not describe a minimum hardware target and do not apply to 8 GB machines.
+- The first case lowers free memory by about 1.8 GiB. That drop estimates what the process takes with the models loaded.
+
+Judgments:
+
+- Two independent raters judged the pooled pairs. The first-round quadratic kappa was 0.683 on `ledgerline-en` and 0.395 on `marc`. The `marc` value is below the 0.6 threshold and is flagged as `kappa_below_threshold`.
+- The rating scale was revised with reference examples before the consensus round.
+- Disagreements were resolved by joint adjudication and recorded with `merge-judgments --consensus`. Reports keep the first-round kappa.
+
+Baseline, measured on 17 October 2026. This is a historical measurement, not a guarantee or a current validation:
+
+- `marc`, 114 cases: Top-1 target 0.67 for M0 and 0.94 for `ORACLE_ADMISSION`, the judged-admission upper bound. Full top-10 recall 0.917. Among the grade-3 threads, 67 succeed, 0 are candidate-recall losses, 32 are admission losses, and 14 are ordering losses. Median latency 18.2 s, p95 20.3 s.
+- `ledgerline-en`, 40 cases: Top-1 target 0.882. Median latency 5.7 s, p95 6.2 s.
+- The loss lies in admission and ordering, not in candidate recall.
+
 ## MCP tools
 
 | Tool | Use |

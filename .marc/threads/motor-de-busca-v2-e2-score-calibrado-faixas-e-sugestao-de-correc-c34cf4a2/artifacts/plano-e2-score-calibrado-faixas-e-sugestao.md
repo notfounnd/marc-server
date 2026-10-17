@@ -8,6 +8,8 @@ A E2 troca a elegibilidade relativa atual por um score absoluto e calibrado. Ess
 - **H2:** ajuste da escala por projeto no rebuild, com consultas sintéticas;
 - **H6:** verificação das faixas no segundo corpus;
 - **H3:** decisão da sugestão de correção, que pode retirar o LFM do pacote;
+- **H7:** juiz de admissão como segundo estágio do score, com Qwen3-Reranker-0.6B ou Kev-0.6B (revisão 3);
+- **H8:** alternativa D da H3, a interpretação por escolha tipada, com Laya, Kev ou o LFM lendo logits (revisão 3);
 - **D2:** faixas alta, média e baixa, com abstenção, iguais na UI e no MCP;
 - **D6:** o acerto literal nunca admite um resultado sozinho.
 
@@ -60,14 +62,23 @@ Nenhuma feature depende da posição relativa entre candidatos. Esse é o defeit
 **Ajuste**, no comando `pnpm memory:eval fit` (novo `scripts/memory-eval/fit.ts`):
 
 - **rótulos:** par (caso, thread) com grau ≥ 2 vale 1; grau 0 ou 1 vale 0; pares não julgados ficam fora; todos os pares de casos negativos valem 0;
-- **algoritmo:** gradiente descendente projetado (pesos negativos são cortados em 0), features padronizadas e pesos devolvidos à escala original, 2.000 iterações, taxa 0,1, regularização L2 com λ escolhido entre {0,01; 0,1; 1} pela menor log-loss média nos 5 folds agrupados da E0;
-- **saída:** os pesos finais, ajustados com todos os folds, e as predições fora do fold de cada par, usadas na avaliação.
+- **algoritmo:** gradiente descendente projetado (pesos negativos são cortados em 0), features padronizadas e pesos devolvidos à escala original, 2.000 iterações, taxa 0,1, regularização L2 com λ escolhido entre {0,01; 0,1; 1};
+- **procedimento de ajuste** (função única `fitProcedure(trainFolds)`, usada nos dois níveis abaixo):
+  1. com os folds de treino recebidos, faz uma validação cruzada interna agrupada por família, em que cada fold de treino fica de fora uma vez;
+  2. escolhe λ pela menor log-loss média nas predições internas fora do fold;
+  3. escolhe os cortes das faixas (seção 3) sobre essas mesmas predições internas;
+  4. reajusta os pesos com todos os folds de treino e o λ escolhido;
+  5. devolve pesos, λ e cortes.
+- **validação aninhada:** para cada um dos 5 folds da E0, o `fit` chama `fitProcedure` com os outros 4 e aplica os pesos e os cortes devolvidos ao fold que ficou de fora. Isso gera a **predição externa** e a **faixa externa** de cada par. Nenhum dado do fold externo participa da escolha de λ, dos pesos ou dos cortes que o avaliam;
+- **saída:**
+  - as predições e as faixas externas de cada par, que são **as únicas usadas nos critérios de aceite**;
+  - os pesos, λ e cortes de produção, obtidos chamando `fitProcedure` com os 5 folds.
 
 O ajuste usa só o corpus `marc`. O `ledgerline-en` fica como validação externa, sem reajuste.
 
 ### 3. Faixas e admissão
 
-Os cortes saem das predições fora do fold. Cada corte é o menor valor de `p` em que a precisão (grau ≥ 2) dos pares com score maior ou igual atinge a meta:
+Os cortes são escolhidos dentro do `fitProcedure`, sobre as predições internas fora do fold, e nunca sobre os dados usados para avaliá-los. Cada corte é o menor valor de `p` em que a precisão (grau ≥ 2) dos pares com score maior ou igual atinge a meta:
 
 | Faixa | Meta de precisão |
 |---|---|
@@ -111,6 +122,12 @@ As três alternativas implementam a mesma interface em `src/core/memory/suggesti
 
 Para a avaliação, a captura passa a incluir os canais do texto do candidato determinístico de cada caso.
 
+A revisão 3 acrescenta a alternativa D, `typed`, que é a H8. Opções, limites e variantes estão no artifact adendo-e2-juiz-e-interpretacao-tipada.md, que é a especificação detalhada de H7 e H8.
+
+### 5b. Juiz de admissão (H7)
+
+O H7 é um segundo estágio depois da pré-admissão do H1: `p2 = σ(v0 + v1·logit(p) + v2·judge)`, com pesos não negativos, ajustado dentro do mesmo `fitProcedure` aninhado. O ramo de recuo do H1, o documento julgado (`buildJudgeDocument`), a captura (canal judge) e o isolamento dos folds estão especificados no adendo.
+
 ### 6. Contrato único (D2)
 
 - **`MemoryRecallHit`:** ganha `band: "high" | "medium" | "low"`. O campo `score` passa a ser `p` calibrado, entre 0 e 1.
@@ -123,17 +140,18 @@ Para a avaliação, a captura passa a incluir os canais do texto do candidato de
 
 ## Avaliação e decisão (passo dos aprovadores)
 
-Depois da T1, os aprovadores rodam o harness e aplicam os critérios abaixo. A decisão é publicada na thread como mensagem própria, antes da T2.
+Depois da T1, os aprovadores fazem o julgamento incremental da E0 (`worksheet --variants`) para os pares novos de todas as variantes da tabela, rodam o harness e aplicam os critérios abaixo. Os critérios de H1 e H2 usam só as predições e faixas externas da validação aninhada. "Não inferior" segue a regra de decisão da E0: inconclusivo reprova, com uma rodada única de ampliação antes do recuo. A decisão é publicada na thread como mensagem própria, antes da T2.
 
 | Hipótese | Critério de aceite | Se falhar |
 |---|---|---|
-| H1 | Nas predições fora do fold do `marc`: Top1-alvo não inferior a `M0`; recall de admissão não classificado como piora; alvos de 3P e 6I admitidos; abstenção correta nos negativos não classificada como piora | Recuo: manter a elegibilidade atual (seção "Recuo de H1") |
-| H2 | Para N1 e para N2: no `marc`, a precisão de cada faixa difere no máximo 0,10 da obtida com rótulos reais, e pelo menos 80% dos pares admitidos caem na mesma faixa. Aceita-se a variante que passar; se as duas passarem, a de menor diferença máxima de precisão | Calibração padrão para todos os projetos |
-| H6 | No `ledgerline-en`, com a calibração escolhida em H2: a precisão de cada faixa fica a no máximo 0,10 da meta | Ajustar só os cortes por corpus (recuo do registro). Se ainda falhar, registrar o limite e consultar o humano (D10) |
-| H3 | Contra A, em todos os casos dos dois corpora: acertos de correção e sugestão nos casos `typo` ≥ os de A; correções e sugestões indevidas < as de A | Ordem de escolha: C; se falhar, B; se falhar, A |
-| Latência | Mediana da E2 ≤ 1,2 × mediana de `M0` na captura | Os aprovadores registram a causa; a E3 trata no funil |
+| H1 | Nas predições externas do `marc`: Top1-alvo, recall de admissão e abstenção correta nos negativos não inferiores a `M0`; alvos de 3P e 6I admitidos | Recuo: manter a elegibilidade atual (seção "Recuo de H1") |
+| H2 | Para N1 e para N2: no `marc`, a precisão de cada faixa difere no máximo 0,10 da precisão das faixas externas obtidas com rótulos reais, e pelo menos 80% dos pares admitidos caem na mesma faixa. Aceita-se a variante que passar; se as duas passarem, a de menor diferença máxima de precisão | Calibração padrão para todos os projetos |
+| H6 | No `ledgerline-en`, com a calibração escolhida em H2: a precisão de cada faixa fica a no máximo 0,10 da meta | Ajustar só os cortes por corpus (recuo do registro), com a validação aninhada aplicada dentro do `ledgerline-en` (5 folds agrupados por família, mesma semente) e precisão medida só nos folds externos. Nesse caso, o `ledgerline-en` deixa de ser validação externa intocada, e o relatório registra isso; a generalização para um terceiro projeto passa a ser um limite declarado ao humano. Se ainda falhar, registrar o limite e consultar o humano (D10) |
+| H3 e H8 | Para B, C e cada D, contra A, em todos os casos dos dois corpora: acertos de correção e de sugestão ≥ os de A; cada contador de erro indevido ≤ o de A; soma dos erros indevidos < a de A (revisão 3) | Escolha entre as que passarem: menor soma de erros, depois maior soma de acertos, depois menos modelos distintos na cadeia (o reuso conta uma vez), depois a ordem B, C, D_LFM, D_KEV, D_LAYA. Se nenhuma passar, fica a A. É decidida depois da H7 |
+| H7 | Nas predições externas do `marc`, contra a base (H1_CALIBRATED ou H1_FALLBACK): Top1-alvo, recall de admissão e abstenção correta não inferiores; e precisão de admissão com "melhora" ou exposição incidental com o intervalo inteiro abaixo de 0. No `ledgerline-en`, sem reajuste, a precisão de cada faixa fica a no máximo 0,10 da meta | Sem juiz. Se os dois juízes passarem, fica o de maior ganho em precisão de admissão; em empate, o de menor delta de RSS |
+| Latência | Mediana da E2 ≤ 1,2 × mediana de `M0` na captura | Os aprovadores registram a causa; a E3 trata no funil. Para H7 e H8, a latência e a memória (RSS de base, pico e delta, com medido e estimado separados) não reprovam. O humano aprova o custo antes da adoção em produção |
 
-**Recuo de H1:** a ordem e a admissão de `M0` continuam. A faixa de cada thread admitida é dada pela `eligibility` com cortes escolhidos pelas mesmas metas de precisão, calculados em todos os dados, com essa limitação registrada.
+**Recuo de H1:** a ordem e a admissão de `M0` continuam. A faixa de cada thread admitida é dada pela `eligibility`, com cortes escolhidos pelas mesmas metas de precisão e pela mesma validação aninhada: a precisão por faixa reportada vem dos folds externos, e os cortes de produção vêm dos 5 folds.
 
 ## Escopo de escrita autorizado
 
@@ -146,7 +164,8 @@ Depois da T1, os aprovadores rodam o harness e aplicam os critérios abaixo. A d
 | `src/core/memory/query-interpretation*.ts`, `local-query-interpreter.ts`, `model-config.ts`, `inference-*.ts`, `maintenance.ts` | Somente na T4 e somente se B ou C for escolhida |
 | `src/mcp/memory-tools.ts`, `src/daemon/memory-routes.ts`, `src/cli.ts` | Contrato |
 | `src/ui/memory-search*.ts*`, `src/ui/use-memory-search.ts` e `public/locales/en_US/translation.json` | Faixas na UI |
-| `scripts/memory-eval/**` | Variantes, `fit` e avaliação de H2, H3 e H6 |
+| `scripts/memory-eval/**` | Variantes, `fit` e avaliação de H2, H3, H6, H7 e H8 |
+| `src/core/memory/scoring/judge.ts` e `src/core/memory/local-judge.ts` (novos), `model-config.ts`, `inference-manager.ts` e `maintenance.ts` | Somente na T2b, se a H7 for aceita, e na T4, se uma alternativa D for escolhida |
 | `scripts/memory-quality-v4.ts`, `scripts/memory-quality-selection.ts`, `scripts/memory-model-benchmark*.ts` e os testes `test/memory-quality-v4-selection.test.ts` e `test/memory-model-benchmark-runner.test.ts` | Remoção na T6. Esses scripts dependem da elegibilidade antiga e foram substituídos pelo `memory:eval` |
 | `package.json` | Remover `memory:quality`, `memory:benchmark` e `test:benchmark` na T6 |
 | `test/**` | Testes |
@@ -162,8 +181,10 @@ Depois da T1, os aprovadores rodam o harness e aplicam os critérios abaixo. A d
 
 | Tarefa | Entrega | Testes |
 |---|---|---|
-| T1 | `scoring/features.ts`; variantes `H1_CALIBRATED`, `H1_FALLBACK`, `H2_N1`, `H2_N2` e `H3_A`, `H3_B`, `H3_C` no harness; comando `fit`; extensão da captura | Features com entradas declaradas; ajuste determinístico com semente; não negatividade dos pesos; cortes por meta de precisão com dados conhecidos; propriedade de D6 |
+| T1 | `scoring/features.ts`; variantes `H1_CALIBRATED`, `H1_FALLBACK`, `H2_N1`, `H2_N2` e `H3_A`, `H3_B`, `H3_C` no harness; comando `fit`; extensão da captura | Features com entradas declaradas; ajuste determinístico com semente; não negatividade dos pesos; cortes por meta de precisão com dados conhecidos; propriedade de D6; validação aninhada: um teste com um fold externo marcado prova que nenhum par dele chega ao `fitProcedure` que o avalia |
+| T1b, junto com a T1 | `buildJudgeDocument`; canais judge e choice; variantes H7_JUDGE_QWEN e H7_JUDGE_KEV, com os ramos _FALLBACK, e H3_D_LAYA, H3_D_KEV e H3_D_LFM; segundo estágio no `fitProcedure`; passada `--judge` do latency | Os testes listados no adendo |
 | — | **Decisão dos aprovadores, publicada na thread** | — |
+| T2b, só se a H7 for aceita e o humano aprovar o custo | Juiz em produção: `scoring/judge.ts`, papel judge no model-config, download pelo `memory_prepare` e status | Contrato do juiz com um provedor falso; inventário com o papel judge |
 | T2 | `scoring/calibration.ts` com os pesos e cortes emitidos pelo `fit`, aplicados com Edit; `scoring/rank.ts`; integração em `operations.ts`; contrato D2 no core, MCP, HTTP e CLI; remoção dos módulos antigos se H1 for aceita | Contrato do hit com `band`; `abstained`; MCP com no máximo 5; teste que compara os ids dos modelos da calibração com `activeMemoryModelSelection()` |
 | T3 | Calibração por projeto no rebuild, se H2 for aceita | Determinismo por geração; `a > 0`; ausência do arquivo leva à calibração padrão; status informa a origem |
 | T4 | Alternativa escolhida em H3. Se for B ou C, remoção do LFM, com a lista fechada de arquivos entregue pelos aprovadores no handoff | Testes de interpretação reescritos para a alternativa; inventário de modelos sem o papel `interpreter` |
@@ -172,7 +193,7 @@ Depois da T1, os aprovadores rodam o harness e aplicam os critérios abaixo. A d
 
 ## Critérios de aceite da etapa
 
-1. As decisões de H1, H2, H3 e H6 estão registradas na thread com a evidência do harness.
+1. As decisões de H1, H2, H3, H6, H7 e H8 estão registradas na thread com a evidência do harness.
 2. A implementação corresponde exatamente à alternativa decidida.
 3. A propriedade de D6 é coberta por teste.
 4. O contrato é o mesmo na UI e no MCP. A UI foi validada com Playwright CLI.
@@ -191,3 +212,14 @@ Depois da T1, os aprovadores rodam o harness e aplicam os critérios abaixo. A d
 
 - desenvolvedor e configuração confirmados pelo humano;
 - veredito conjunto dos aprovadores sobre este plano, depois da aprovação da E1.
+
+## Histórico de revisões
+
+- **Revisão 2 (2026-10-15):** incorpora a revisão de marc://@codex-software-architect. Validação aninhada separa a escolha de λ, pesos e cortes dos dados que aprovam o resultado; critérios de H1 passam a exigir não inferioridade em vez de "sem piora classificada"; o recuo de H6 declara que o `ledgerline-en` perde o papel de validação externa se orientar cortes; julgamento incremental antes da decisão. Arquitetura sem mudança.
+- **Revisão 3 (2026-10-17):** incorpora o adendo adendo-e2-juiz-e-interpretacao-tipada.md (msg_01ee9c5ca7a847b38d), revisado conforme o parecer de marc://@codex-software-architect (msg_e6821b4bae8e4e2b93 e a resposta msg_b9812ba7a604410892) e confirmado por ele (msg_0aa24982cc7b42f5ae). O humano aprovou nesta data.
+  - **Origem:** a E0 mostrou a perda do M0 na admissão e na ordenação, e o humano autorizou um estudo de modelos no padrão "System One" (Jev), com modelos locais e abertos.
+  - **Acrescenta:** H7 (juiz de admissão) e H8 (alternativa D da H3), com as tarefas T1b e T2b.
+  - **Altera:** o critério da H3, que agora exige que nenhum erro aumente e que a soma dos erros diminua, porque A teve zero correções indevidas na E0. Altera também a regra de escolha da H3, que passa a ser por qualidade e não mais pela ordem fixa C → B → A.
+  - **Prioridade do humano:** qualidade primeiro. A latência e a memória são medidas e não reprovam, mas o humano aprova o custo antes da adoção.
+  - **Regras:** nenhum ajuste fino com os julgamentos da E0 e nenhuma dependência nova.
+  - H1, H2, H6, D2 e D6 não mudam.

@@ -1,0 +1,2564 @@
+{
+  "schemaVersion": 1,
+  "corpus": "marc",
+  "cases": [
+    {
+      "id": "1D",
+      "family": "oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486",
+      "style": "direct",
+      "query": "separar INSTRUCTIONS.md gerenciado do RULES.md customizavel no bootstrap",
+      "queryMode": "auto",
+      "judgments": {
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983": 1,
+        "bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82": 1,
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 2,
+        "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684": 0,
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 1,
+        "oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686": 2,
+        "oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b": 0,
+        "oportunidade-organizar-agentes-registrados-no-rules-md-734062bc": 2,
+        "oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486": 3,
+        "oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be": 1,
+        "padronizar-mensagens-marc-em-bullets-concisos-6143a9b5": 1
+      },
+      "origin": "baseline-2026-08-04"
+    },
+    {
+      "id": "1I",
+      "family": "oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486",
+      "style": "indirect",
+      "query": "onde fica o protocolo operacional estavel e onde ficam as regras comportamentais do workspace?",
+      "queryMode": "auto",
+      "judgments": {
+        "bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82": 1,
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 1,
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 1,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 1,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-indicador-visual-de-memory-na-interface-174c48b6": 0,
+        "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb": 1,
+        "oportunidade-organizar-agentes-registrados-no-rules-md-734062bc": 2,
+        "oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486": 3,
+        "oportunidade-revisao-en-us-do-projeto-c14150b8": 0,
+        "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9": 0
+      },
+      "origin": "baseline-2026-08-04"
+    },
+    {
+      "id": "1P",
+      "family": "oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486",
+      "style": "implicit",
+      "query": "agentes estao editando o arquivo de instrucoes geradas e misturando custom rules, qual decisao historica evita isso?",
+      "queryMode": "auto",
+      "judgments": {
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983": 1,
+        "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7": 0,
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 2,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 1,
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac": 0,
+        "oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b": 1,
+        "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb": 1,
+        "oportunidade-organizar-agentes-registrados-no-rules-md-734062bc": 2,
+        "oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486": 3,
+        "oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be": 1
+      },
+      "origin": "baseline-2026-08-04"
+    },
+    {
+      "id": "2D",
+      "family": "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682",
+      "style": "direct",
+      "query": "rebuild incremental da memory com batches limitados",
+      "queryMode": "auto",
+      "judgments": {
+        "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c": 2,
+        "estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab": 1,
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac": 1,
+        "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac": 0,
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99": 1,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 1,
+        "oportunidade-indicador-visual-de-memory-na-interface-174c48b6": 0,
+        "oportunidade-provider-de-memory-aquecido-com-ttl-curto-d540c6b4": 0,
+        "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682": 3,
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7": 1
+      },
+      "origin": "baseline-2026-08-04"
+    },
+    {
+      "id": "2I",
+      "family": "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682",
+      "style": "indirect",
+      "query": "como evitar reprocessar summaries inalterados e o pico de RAM do ONNX?",
+      "queryMode": "auto",
+      "judgments": {
+        "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c": 1,
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac": 0,
+        "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac": 0,
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99": 1,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 1,
+        "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa": 1,
+        "oportunidade-provider-de-memory-aquecido-com-ttl-curto-d540c6b4": 1,
+        "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682": 3,
+        "oportunidade-reforcar-gatilhos-de-ativacao-da-skill-marc-ops-934c4896": 1,
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7": 1
+      },
+      "origin": "baseline-2026-08-04"
+    },
+    {
+      "id": "2P",
+      "family": "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682",
+      "style": "implicit",
+      "query": "a reconstrucao tentou alocar 2,67 GiB; qual solucao foi adotada mantendo o full explicito?",
+      "queryMode": "auto",
+      "judgments": {
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983": 0,
+        "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c": 1,
+        "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684": 0,
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 0,
+        "estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac": 0,
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 1,
+        "oportunidade-migracao-de-cabecalhos-de-summaries-com-previas-3c4dda95": 0,
+        "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682": 3,
+        "oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787": 0
+      },
+      "origin": "baseline-2026-08-04"
+    },
+    {
+      "id": "3D",
+      "family": "oportunidade-indicador-visual-de-memory-na-interface-174c48b6",
+      "style": "direct",
+      "query": "indicador visual de memory no card da workspace",
+      "queryMode": "auto",
+      "judgments": {
+        "bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82": 0,
+        "bug-workspace-audit-ignora-referencias-marc-em-inline-code-72461180": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac": 1,
+        "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac": 0,
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99": 2,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-indicador-visual-de-memory-na-interface-174c48b6": 3,
+        "oportunidade-mecanismo-de-busca-sobre-o-conhecimento-do-projeto-b64903bd": 1,
+        "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa": 1,
+        "oportunidade-provider-de-memory-aquecido-com-ttl-curto-d540c6b4": 0
+      },
+      "origin": "baseline-2026-08-04"
+    },
+    {
+      "id": "3I",
+      "family": "oportunidade-indicador-visual-de-memory-na-interface-174c48b6",
+      "style": "indirect",
+      "query": "qual icone mostra indice pronto, stale, erro ou rebuild?",
+      "queryMode": "auto",
+      "judgments": {
+        "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c": 0,
+        "bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82": 0,
+        "bug-workspace-audit-ignora-referencias-marc-em-inline-code-72461180": 0,
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99": 2,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-indicador-visual-de-memory-na-interface-174c48b6": 3,
+        "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa": 1,
+        "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682": 0,
+        "oportunidade-revisao-de-arquitetura-do-projeto-fe4a1cb2": 0,
+        "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186": 1
+      },
+      "origin": "baseline-2026-08-04"
+    },
+    {
+      "id": "3P",
+      "family": "oportunidade-indicador-visual-de-memory-na-interface-174c48b6",
+      "style": "implicit",
+      "query": "preciso enxergar no card se a base de conhecimento esta saudavel sem abrir as configuracoes",
+      "queryMode": "auto",
+      "judgments": {
+        "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684": 0,
+        "corrigir-corrida-de-startup-no-teste-de-auto-idle-do-daemon-504e1898": 0,
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac": 1,
+        "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac": 0,
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99": 2,
+        "oportunidade-indicador-visual-de-memory-na-interface-174c48b6": 3,
+        "oportunidade-mecanismo-de-busca-sobre-o-conhecimento-do-projeto-b64903bd": 1,
+        "oportunidade-provider-de-memory-aquecido-com-ttl-curto-d540c6b4": 0,
+        "oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486": 0,
+        "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9": 0
+      },
+      "origin": "baseline-2026-08-04"
+    },
+    {
+      "id": "4D",
+      "family": "oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b",
+      "style": "direct",
+      "query": "esquemas de visualizacao das colunas da UI para Threads, Marckers e arquivo",
+      "queryMode": "auto",
+      "judgments": {
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 1,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-autocomplete-de-referencias-no-composer-2341bc9f": 1,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-encerramento-de-threads-por-summary-e-indice-json-ce47939a": 1,
+        "oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b": 3,
+        "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1": 1,
+        "oportunidade-mecanismo-de-busca-sobre-o-conhecimento-do-projeto-b64903bd": 1,
+        "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4": 0,
+        "oportunidade-revisao-en-us-do-projeto-c14150b8": 0,
+        "oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb": 1
+      },
+      "origin": "baseline-2026-08-04"
+    },
+    {
+      "id": "4I",
+      "family": "oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b",
+      "style": "indirect",
+      "query": "como funcionam os modos exclusivos e a rolagem propria nas tres colunas?",
+      "queryMode": "auto",
+      "judgments": {
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684": 0,
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1": 1,
+        "oportunidade-autocomplete-de-referencias-no-composer-2341bc9f": 1,
+        "oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b": 3,
+        "oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b": 0,
+        "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb": 0,
+        "oportunidade-mecanismo-de-busca-sobre-o-conhecimento-do-projeto-b64903bd": 1,
+        "oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd": 0,
+        "oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be": 0,
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb": 0
+      },
+      "origin": "baseline-2026-08-04"
+    },
+    {
+      "id": "4P",
+      "family": "oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b",
+      "style": "implicit",
+      "query": "ao abrir agentes ou arquivo, somente o conteudo ativo e o botao de fechar devem permanecer na coluna central",
+      "queryMode": "auto",
+      "judgments": {
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983": 0,
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 1,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-autocomplete-de-referencias-no-composer-2341bc9f": 0,
+        "oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b": 3,
+        "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1": 1,
+        "oportunidade-migracao-de-cabecalhos-de-summaries-com-previas-3c4dda95": 0,
+        "oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd": 0,
+        "oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486": 0,
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7": 0
+      },
+      "origin": "baseline-2026-08-04"
+    },
+    {
+      "id": "5D",
+      "family": "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4",
+      "style": "direct",
+      "query": "gramatica marc:// para referencias internas de artifacts e mensagens",
+      "queryMode": "auto",
+      "judgments": {
+        "bug-workspace-audit-ignora-referencias-marc-em-inline-code-72461180": 2,
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1": 0,
+        "oportunidade-autocomplete-de-referencias-no-composer-2341bc9f": 2,
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1": 0,
+        "oportunidade-indicador-visual-de-memory-na-interface-174c48b6": 0,
+        "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb": 1,
+        "oportunidade-migracao-de-cabecalhos-de-summaries-com-previas-3c4dda95": 0,
+        "oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd": 1,
+        "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa": 1,
+        "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4": 3,
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7": 0,
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb": 0
+      },
+      "origin": "baseline-2026-08-04"
+    },
+    {
+      "id": "5I",
+      "family": "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4",
+      "style": "indirect",
+      "query": "como navegar para um artifact vinculado a uma mensagem de outra thread?",
+      "queryMode": "auto",
+      "judgments": {
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-autocomplete-de-referencias-no-composer-2341bc9f": 2,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-memory-deep-para-aprofundamento-em-threads-fechadas-f04c7cae": 0,
+        "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9": 0,
+        "oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd": 1,
+        "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4": 3,
+        "oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787": 0,
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7": 0,
+        "oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb": 1
+      },
+      "origin": "baseline-2026-08-04"
+    },
+    {
+      "id": "5P",
+      "family": "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4",
+      "style": "implicit",
+      "query": "quero copiar um endereco canonico que abra agente, thread, mensagem ou anexo dentro da UI",
+      "queryMode": "auto",
+      "judgments": {
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-autocomplete-de-referencias-no-composer-2341bc9f": 2,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-encerramento-de-threads-por-summary-e-indice-json-ce47939a": 0,
+        "oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b": 0,
+        "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9": 0,
+        "oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd": 0,
+        "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa": 2,
+        "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4": 3,
+        "remover-comandos-legados-do-mcp-reduzir-sobrecarga-de-contexto-034ad1bf": 0
+      },
+      "origin": "baseline-2026-08-04"
+    },
+    {
+      "id": "6D",
+      "family": "remover-comandos-legados-do-mcp-reduzir-sobrecarga-de-contexto-034ad1bf",
+      "style": "direct",
+      "query": "remover aliases legados do MCP e manter nomes canonicos como thread_create",
+      "queryMode": "auto",
+      "judgments": {
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa": 1,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb": 0,
+        "oportunidade-migracao-de-cabecalhos-de-summaries-com-previas-3c4dda95": 0,
+        "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186": 0,
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7": 1,
+        "remover-comandos-legados-do-mcp-reduzir-sobrecarga-de-contexto-034ad1bf": 3
+      },
+      "origin": "baseline-2026-08-04"
+    },
+    {
+      "id": "6I",
+      "family": "remover-comandos-legados-do-mcp-reduzir-sobrecarga-de-contexto-034ad1bf",
+      "style": "indirect",
+      "query": "por que create_thread e read_thread deixaram de ser expostos?",
+      "queryMode": "auto",
+      "judgments": {
+        "estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa": 1,
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99": 0,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-migracao-de-cabecalhos-de-summaries-com-previas-3c4dda95": 0,
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3": 0,
+        "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9": 0,
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7": 0,
+        "remover-comandos-legados-do-mcp-reduzir-sobrecarga-de-contexto-034ad1bf": 3
+      },
+      "origin": "baseline-2026-08-04"
+    },
+    {
+      "id": "6P",
+      "family": "remover-comandos-legados-do-mcp-reduzir-sobrecarga-de-contexto-034ad1bf",
+      "style": "implicit",
+      "query": "a lista de ferramentas esta duplicada e gasta contexto com comandos equivalentes",
+      "queryMode": "auto",
+      "judgments": {
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 0,
+        "estudo-profundidade-adaptativa-e-simplificacao-do-deep-search-4f477d9f": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac": 0,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1": 0,
+        "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb": 0,
+        "oportunidade-mecanismo-de-busca-sobre-o-conhecimento-do-projeto-b64903bd": 0,
+        "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9": 0,
+        "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186": 0,
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7": 0,
+        "remover-comandos-legados-do-mcp-reduzir-sobrecarga-de-contexto-034ad1bf": 3
+      },
+      "origin": "baseline-2026-08-04"
+    },
+    {
+      "id": "7D",
+      "family": "oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb",
+      "style": "direct",
+      "query": "tuning de recall e ranking da memory para token da interface",
+      "queryMode": "auto",
+      "judgments": {
+        "estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab": 1,
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac": 2,
+        "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac": 2,
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 2,
+        "oportunidade-indicador-visual-de-memory-na-interface-174c48b6": 1,
+        "oportunidade-mecanismo-de-busca-sobre-o-conhecimento-do-projeto-b64903bd": 1,
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3": 1,
+        "oportunidade-provider-de-memory-aquecido-com-ttl-curto-d540c6b4": 0,
+        "oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb": 3
+      },
+      "origin": "baseline-2026-08-04"
+    },
+    {
+      "id": "7I",
+      "family": "oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb",
+      "style": "indirect",
+      "query": "como fazer uma decisao historica especifica superar threads genericas semanticamente proximas?",
+      "queryMode": "auto",
+      "judgments": {
+        "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c": 0,
+        "estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab": 1,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac": 0,
+        "oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa": 0,
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99": 0,
+        "oportunidade-migracao-de-cabecalhos-de-summaries-com-previas-3c4dda95": 0,
+        "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9": 0,
+        "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9": 0,
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7": 0,
+        "oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb": 3
+      },
+      "origin": "baseline-2026-08-04"
+    },
+    {
+      "id": "7P",
+      "family": "oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb",
+      "style": "implicit",
+      "query": "a busca acha a decisao correta, mas coloca resultados genericos de UI antes dela",
+      "queryMode": "auto",
+      "judgments": {
+        "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c": 0,
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 0,
+        "estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab": 1,
+        "estudo-profundidade-adaptativa-e-simplificacao-do-deep-search-4f477d9f": 1,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac": 1,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-documentacao-do-projeto-e-readme-encantador-e54fb794": 0,
+        "oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b": 0,
+        "oportunidade-mecanismo-de-busca-sobre-o-conhecimento-do-projeto-b64903bd": 1,
+        "oportunidade-revisao-en-us-do-projeto-c14150b8": 0,
+        "oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb": 3
+      },
+      "origin": "baseline-2026-08-04"
+    },
+    {
+      "id": "8D",
+      "family": "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186",
+      "style": "direct",
+      "query": "status health e rebuild do thread-index em background",
+      "queryMode": "auto",
+      "judgments": {
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac": 1,
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99": 1,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 1,
+        "oportunidade-encerramento-de-threads-por-summary-e-indice-json-ce47939a": 2,
+        "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa": 1,
+        "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682": 0,
+        "oportunidade-revisao-de-arquitetura-do-projeto-fe4a1cb2": 1,
+        "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186": 3,
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7": 1
+      },
+      "origin": "baseline-2026-08-04"
+    },
+    {
+      "id": "8I",
+      "family": "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186",
+      "style": "indirect",
+      "query": "como a UI serve um snapshot stale enquanto o indice reconstrói?",
+      "queryMode": "auto",
+      "judgments": {
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac": 0,
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99": 1,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 2,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-encerramento-de-threads-por-summary-e-indice-json-ce47939a": 1,
+        "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1": 0,
+        "oportunidade-indicador-visual-de-memory-na-interface-174c48b6": 0,
+        "oportunidade-mecanismo-de-busca-sobre-o-conhecimento-do-projeto-b64903bd": 0,
+        "oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd": 0,
+        "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682": 0,
+        "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186": 3
+      },
+      "origin": "baseline-2026-08-04"
+    },
+    {
+      "id": "8P",
+      "family": "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186",
+      "style": "implicit",
+      "query": "a listagem nao pode travar durante uma reconstrucao pesada e ainda precisa indicar degradacao",
+      "queryMode": "auto",
+      "judgments": {
+        "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7": 0,
+        "bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99": 1,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 1,
+        "oportunidade-encerramento-de-threads-por-summary-e-indice-json-ce47939a": 1,
+        "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682": 0,
+        "oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486": 0,
+        "oportunidade-reforcar-gatilhos-de-ativacao-da-skill-marc-ops-934c4896": 0,
+        "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186": 3,
+        "padronizar-mensagens-marc-em-bullets-concisos-6143a9b5": 0
+      },
+      "origin": "baseline-2026-08-04"
+    },
+    {
+      "id": "9D",
+      "family": "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb",
+      "style": "direct",
+      "query": "workspace_audit para Custom Rules com Trigger, Do instead, Evidence e Severity",
+      "queryMode": "auto",
+      "judgments": {
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "bug-workspace-audit-ignora-referencias-marc-em-inline-code-72461180": 1,
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b": 0,
+        "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb": 3,
+        "oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486": 1,
+        "oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be": 2,
+        "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9": 0
+      },
+      "origin": "baseline-2026-08-04"
+    },
+    {
+      "id": "9I",
+      "family": "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb",
+      "style": "indirect",
+      "query": "qual ferramenta verifica referencias, artifacts, mensagens e regras antes de fechar uma thread?",
+      "queryMode": "auto",
+      "judgments": {
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 1,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 1,
+        "oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1": 1,
+        "oportunidade-autocomplete-de-referencias-no-composer-2341bc9f": 0,
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac": 1,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 1,
+        "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb": 3,
+        "oportunidade-memory-deep-para-aprofundamento-em-threads-fechadas-f04c7cae": 0,
+        "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9": 0,
+        "oportunidade-organizar-css-da-ui-por-dominio-aa4c94ba": 0,
+        "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa": 1,
+        "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4": 0,
+        "oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787": 1,
+        "oportunidade-revisao-en-us-do-projeto-c14150b8": 0,
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7": 1,
+        "oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb": 1,
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb": 1
+      },
+      "origin": "baseline-2026-08-04"
+    },
+    {
+      "id": "9P",
+      "family": "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb",
+      "style": "implicit",
+      "query": "agentes nao aplicam as regras do workspace nem anexam artefatos corretamente; que suporte local foi criado?",
+      "queryMode": "auto",
+      "judgments": {
+        "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7": 0,
+        "bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82": 1,
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 1,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b": 0,
+        "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb": 3,
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3": 0,
+        "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa": 0,
+        "oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486": 1,
+        "oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be": 1
+      },
+      "origin": "baseline-2026-08-04"
+    },
+    {
+      "id": "10D",
+      "family": "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9",
+      "style": "direct",
+      "query": "ordenar threads mais novas no topo por closedAt e createdAt",
+      "queryMode": "auto",
+      "judgments": {
+        "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c": 0,
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 0,
+        "estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-autocomplete-de-referencias-no-composer-2341bc9f": 3,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-encerramento-de-threads-por-summary-e-indice-json-ce47939a": 1,
+        "oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b": 0,
+        "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9": 3,
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7": 0
+      },
+      "origin": "baseline-2026-08-04"
+    },
+    {
+      "id": "10I",
+      "family": "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9",
+      "style": "indirect",
+      "query": "qual regra ordena threads abertas e encerradas na listagem?",
+      "queryMode": "auto",
+      "judgments": {
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983": 0,
+        "oportunidade-autocomplete-de-referencias-no-composer-2341bc9f": 3,
+        "oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa": 0,
+        "oportunidade-encerramento-de-threads-por-summary-e-indice-json-ce47939a": 2,
+        "oportunidade-memory-deep-para-aprofundamento-em-threads-fechadas-f04c7cae": 0,
+        "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9": 3,
+        "oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f": 0,
+        "oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486": 0,
+        "oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787": 0,
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7": 0
+      },
+      "origin": "baseline-2026-08-04"
+    },
+    {
+      "id": "10P",
+      "family": "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9",
+      "style": "implicit",
+      "query": "trabalhos recentes aparecem enterrados e a UI nao deveria reordenar no cliente",
+      "queryMode": "auto",
+      "judgments": {
+        "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7": 0,
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99": 0,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-indicador-visual-de-memory-na-interface-174c48b6": 0,
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3": 0,
+        "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9": 3,
+        "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682": 0
+      },
+      "origin": "baseline-2026-08-04"
+    },
+    {
+      "id": "Q01",
+      "family": "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1",
+      "style": "direct",
+      "query": "brutal",
+      "queryMode": "auto",
+      "judgments": {
+        "bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1": 0,
+        "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac": 1,
+        "oportunidade-documentacao-do-projeto-e-readme-encantador-e54fb794": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 1,
+        "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1": 3,
+        "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb": 0,
+        "oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be": 0,
+        "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9": 0,
+        "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186": 0,
+        "padronizar-mensagens-marc-em-bullets-concisos-6143a9b5": 0
+      },
+      "origin": "memory-quality-v4"
+    },
+    {
+      "id": "Q02",
+      "family": "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1",
+      "style": "typo",
+      "query": "brutalismp",
+      "queryMode": "auto",
+      "expectedInterpretation": {
+        "effectiveQuery": "brutalism"
+      },
+      "judgments": {
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac": 1,
+        "oportunidade-documentacao-do-projeto-e-readme-encantador-e54fb794": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 1,
+        "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1": 3,
+        "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb": 0,
+        "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa": 1,
+        "oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be": 0,
+        "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9": 0,
+        "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186": 0,
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb": 2
+      },
+      "origin": "memory-quality-v4"
+    },
+    {
+      "id": "Q03",
+      "family": "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1",
+      "style": "direct",
+      "query": "brutalism",
+      "queryMode": "auto",
+      "expectedInterpretation": {
+        "effectiveQuery": "brutalism"
+      },
+      "judgments": {
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac": 1,
+        "oportunidade-documentacao-do-projeto-e-readme-encantador-e54fb794": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 1,
+        "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1": 3,
+        "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb": 0,
+        "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa": 1,
+        "oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be": 0,
+        "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9": 0,
+        "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186": 0,
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb": 2
+      },
+      "origin": "memory-quality-v4"
+    },
+    {
+      "id": "Q04",
+      "family": "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1",
+      "style": "direct",
+      "query": "interface com brutalism",
+      "queryMode": "auto",
+      "expectedInterpretation": {
+        "effectiveQuery": "interface com brutalism"
+      },
+      "judgments": {
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac": 0,
+        "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac": 1,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 1,
+        "oportunidade-encerramento-de-threads-por-summary-e-indice-json-ce47939a": 0,
+        "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1": 3,
+        "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa": 1,
+        "oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be": 0,
+        "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186": 0,
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb": 2
+      },
+      "origin": "memory-quality-v4"
+    },
+    {
+      "id": "Q05",
+      "family": "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1",
+      "style": "typo",
+      "query": "interace com brutalism",
+      "queryMode": "auto",
+      "expectedInterpretation": {
+        "effectiveQuery": "interface com brutalism"
+      },
+      "judgments": {
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac": 0,
+        "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac": 1,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 1,
+        "oportunidade-encerramento-de-threads-por-summary-e-indice-json-ce47939a": 0,
+        "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1": 3,
+        "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa": 1,
+        "oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be": 0,
+        "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186": 0,
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb": 2
+      },
+      "origin": "memory-quality-v4"
+    },
+    {
+      "id": "Q06",
+      "family": "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa",
+      "style": "direct",
+      "query": "toggle",
+      "queryMode": "auto",
+      "expectedInterpretation": {
+        "effectiveQuery": "toggle"
+      },
+      "judgments": {
+        "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c": 0,
+        "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684": 0,
+        "corrigir-corrida-de-startup-no-teste-de-auto-idle-do-daemon-504e1898": 0,
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 0,
+        "estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab": 0,
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 1,
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3": 0,
+        "oportunidade-organizar-agentes-registrados-no-rules-md-734062bc": 0,
+        "oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd": 0,
+        "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa": 3,
+        "oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486": 0,
+        "oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be": 0,
+        "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9": 2,
+        "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186": 0,
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb": 0
+      },
+      "origin": "memory-quality-v4"
+    },
+    {
+      "id": "Q07",
+      "family": "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa",
+      "style": "typo",
+      "query": "toogle",
+      "queryMode": "auto",
+      "expectedInterpretation": {
+        "effectiveQuery": "toogle",
+        "suggestedQuery": "toggle"
+      },
+      "judgments": {
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983": 0,
+        "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c": 0,
+        "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7": 0,
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1": 0,
+        "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac": 1,
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99": 0,
+        "oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 1,
+        "oportunidade-leitura-incremental-de-threads-por-cursor-3c45fa83": 0,
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3": 0,
+        "oportunidade-organizar-agentes-registrados-no-rules-md-734062bc": 0,
+        "oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f": 0,
+        "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa": 3,
+        "oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be": 0,
+        "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9": 2,
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb": 0
+      },
+      "origin": "memory-quality-v4"
+    },
+    {
+      "id": "Q08",
+      "family": "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3",
+      "style": "direct",
+      "query": "interface token rotation security",
+      "queryMode": "auto",
+      "expectedInterpretation": {
+        "effectiveQuery": "interface token rotation security"
+      },
+      "judgments": {
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983": 0,
+        "corrigir-corrida-de-startup-no-teste-de-auto-idle-do-daemon-504e1898": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac": 1,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b": 0,
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3": 3,
+        "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9": 0,
+        "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4": 0,
+        "oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb": 1,
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb": 0
+      },
+      "origin": "memory-quality-v4"
+    },
+    {
+      "id": "Q09",
+      "family": "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9",
+      "style": "direct",
+      "query": "structured workspace settings json",
+      "queryMode": "auto",
+      "expectedInterpretation": {
+        "effectiveQuery": "structured workspace settings json"
+      },
+      "judgments": {
+        "bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82": 0,
+        "bug-workspace-audit-ignora-referencias-marc-em-inline-code-72461180": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 1,
+        "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac": 1,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-organizar-agentes-registrados-no-rules-md-734062bc": 0,
+        "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa": 2,
+        "oportunidade-provider-de-memory-aquecido-com-ttl-curto-d540c6b4": 1,
+        "oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486": 0,
+        "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9": 3,
+        "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186": 0
+      },
+      "origin": "memory-quality-v4"
+    },
+    {
+      "id": "Q10",
+      "family": "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3",
+      "style": "direct",
+      "query": "seguranca da rotacao de token da interface",
+      "queryMode": "auto",
+      "expectedInterpretation": {
+        "effectiveQuery": "seguranca da rotacao de token da interface"
+      },
+      "judgments": {
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983": 0,
+        "corrigir-corrida-de-startup-no-teste-de-auto-idle-do-daemon-504e1898": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac": 1,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-indicador-visual-de-memory-na-interface-174c48b6": 0,
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3": 3,
+        "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9": 0,
+        "oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb": 1,
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb": 0
+      },
+      "origin": "memory-quality-v4"
+    },
+    {
+      "id": "Q11",
+      "family": "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3",
+      "style": "typo",
+      "query": "seguranca da rotacao de toke da interface",
+      "queryMode": "auto",
+      "expectedInterpretation": {
+        "effectiveQuery": "seguranca da rotacao de token da interface"
+      },
+      "judgments": {
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983": 0,
+        "corrigir-corrida-de-startup-no-teste-de-auto-idle-do-daemon-504e1898": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac": 1,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-indicador-visual-de-memory-na-interface-174c48b6": 0,
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3": 3,
+        "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9": 0,
+        "oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb": 1,
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb": 0
+      },
+      "origin": "memory-quality-v4"
+    },
+    {
+      "id": "Q12",
+      "family": "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9",
+      "style": "typo",
+      "query": "structured worksapce settings json",
+      "queryMode": "auto",
+      "expectedInterpretation": {
+        "effectiveQuery": "structured workspace settings json"
+      },
+      "judgments": {
+        "bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82": 0,
+        "bug-workspace-audit-ignora-referencias-marc-em-inline-code-72461180": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 1,
+        "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac": 1,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-organizar-agentes-registrados-no-rules-md-734062bc": 0,
+        "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa": 2,
+        "oportunidade-provider-de-memory-aquecido-com-ttl-curto-d540c6b4": 1,
+        "oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486": 0,
+        "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9": 3,
+        "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186": 0
+      },
+      "origin": "memory-quality-v4"
+    },
+    {
+      "id": "Q13",
+      "family": "negative:Q13",
+      "style": "negative",
+      "query": "invoice tax reconciliation for international payments",
+      "queryMode": "auto",
+      "expectedInterpretation": {
+        "effectiveQuery": "invoice tax reconciliation for international payments"
+      },
+      "judgments": {
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983": 0,
+        "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa": 0,
+        "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac": 0,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb": 0,
+        "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9": 0,
+        "oportunidade-organizar-agentes-registrados-no-rules-md-734062bc": 0,
+        "oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f": 0,
+        "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682": 0,
+        "oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787": 0,
+        "padronizar-mensagens-marc-em-bullets-concisos-6143a9b5": 0,
+        "remover-comandos-legados-do-mcp-reduzir-sobrecarga-de-contexto-034ad1bf": 0
+      },
+      "origin": "memory-quality-v4"
+    },
+    {
+      "id": "Q14",
+      "family": "negative:Q14",
+      "style": "negative",
+      "query": "kubernetes autoscaling policy for production clusters",
+      "queryMode": "auto",
+      "expectedInterpretation": {
+        "effectiveQuery": "kubernetes autoscaling policy for production clusters"
+      },
+      "judgments": {
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983": 0,
+        "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684": 0,
+        "corrigir-corrida-de-startup-no-teste-de-auto-idle-do-daemon-504e1898": 0,
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb": 0,
+        "oportunidade-migracao-de-cabecalhos-de-summaries-com-previas-3c4dda95": 0,
+        "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9": 0,
+        "oportunidade-organizar-agentes-registrados-no-rules-md-734062bc": 0,
+        "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682": 0,
+        "oportunidade-reforcar-gatilhos-de-ativacao-da-skill-marc-ops-934c4896": 0
+      },
+      "origin": "memory-quality-v4"
+    },
+    {
+      "id": "C1",
+      "family": "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682",
+      "style": "indirect",
+      "query": "como evitar reprocessar summaries inalterados e o pico de RAM do ONNX?",
+      "queryMode": "literal",
+      "judgments": {
+        "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c": 1,
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac": 0,
+        "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac": 0,
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99": 1,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 1,
+        "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa": 1,
+        "oportunidade-provider-de-memory-aquecido-com-ttl-curto-d540c6b4": 1,
+        "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682": 3,
+        "oportunidade-reforcar-gatilhos-de-ativacao-da-skill-marc-ops-934c4896": 1,
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7": 1
+      },
+      "origin": "baseline-controls"
+    },
+    {
+      "id": "C2",
+      "family": "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb",
+      "style": "implicit",
+      "query": "agentes nao aplicam as regras do workspace nem anexam artefatos corretamente; que suporte local foi criado?",
+      "queryMode": "literal",
+      "judgments": {
+        "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7": 0,
+        "bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82": 1,
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "bug-workspace-audit-ignora-referencias-marc-em-inline-code-72461180": 2,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 1,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b": 0,
+        "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb": 3,
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3": 0,
+        "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa": 0,
+        "oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be": 1
+      },
+      "origin": "baseline-controls"
+    },
+    {
+      "id": "C3",
+      "family": "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa",
+      "style": "typo",
+      "query": "toogle",
+      "queryMode": "auto",
+      "expectedInterpretation": {
+        "effectiveQuery": "toogle",
+        "suggestedQuery": "toggle"
+      },
+      "judgments": {
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983": 0,
+        "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c": 0,
+        "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7": 0,
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1": 0,
+        "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac": 1,
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99": 0,
+        "oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 1,
+        "oportunidade-leitura-incremental-de-threads-por-cursor-3c45fa83": 0,
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3": 0,
+        "oportunidade-organizar-agentes-registrados-no-rules-md-734062bc": 0,
+        "oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f": 0,
+        "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa": 3,
+        "oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be": 0,
+        "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9": 2,
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb": 0
+      },
+      "origin": "baseline-controls"
+    },
+    {
+      "id": "C4",
+      "family": "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa",
+      "style": "typo",
+      "query": "toogle",
+      "queryMode": "literal",
+      "expectedInterpretation": {
+        "effectiveQuery": "toogle"
+      },
+      "judgments": {
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983": 0,
+        "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c": 0,
+        "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7": 0,
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1": 0,
+        "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac": 1,
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99": 0,
+        "oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 1,
+        "oportunidade-leitura-incremental-de-threads-por-cursor-3c45fa83": 0,
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3": 0,
+        "oportunidade-organizar-agentes-registrados-no-rules-md-734062bc": 0,
+        "oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f": 0,
+        "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa": 3,
+        "oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be": 0,
+        "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9": 2,
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb": 0
+      },
+      "origin": "baseline-controls"
+    },
+    {
+      "id": "C5",
+      "family": "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1",
+      "style": "typo",
+      "query": "brutalismp",
+      "queryMode": "auto",
+      "expectedInterpretation": {
+        "effectiveQuery": "brutalism",
+        "suggestedQuery": "brutalism"
+      },
+      "judgments": {
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac": 1,
+        "oportunidade-documentacao-do-projeto-e-readme-encantador-e54fb794": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 1,
+        "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1": 3,
+        "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb": 0,
+        "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa": 1,
+        "oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be": 0,
+        "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9": 0,
+        "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186": 0,
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb": 2
+      },
+      "origin": "baseline-controls"
+    },
+    {
+      "id": "C6",
+      "family": "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1",
+      "style": "direct",
+      "query": "interface com brutalism",
+      "queryMode": "auto",
+      "expectedInterpretation": {
+        "effectiveQuery": "interface com brutalism"
+      },
+      "judgments": {
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac": 0,
+        "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac": 1,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 1,
+        "oportunidade-encerramento-de-threads-por-summary-e-indice-json-ce47939a": 0,
+        "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1": 3,
+        "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa": 1,
+        "oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be": 0,
+        "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186": 0,
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb": 2
+      },
+      "origin": "baseline-controls"
+    },
+    {
+      "id": "C7",
+      "family": "negative:C7",
+      "style": "negative",
+      "query": "diagnóstico de fusão nuclear no reator tokamak",
+      "queryMode": "literal",
+      "judgments": {
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983": 0,
+        "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c": 0,
+        "corrigir-corrida-de-startup-no-teste-de-auto-idle-do-daemon-504e1898": 0,
+        "estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1": 0,
+        "oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa": 0,
+        "oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b": 0,
+        "oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b": 0,
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3": 0,
+        "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9": 0,
+        "oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787": 0,
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb": 0
+      },
+      "origin": "baseline-controls"
+    },
+    {
+      "id": "C8",
+      "family": "negative:C8",
+      "style": "negative",
+      "query": "manejo de irrigação por gotejamento em soja",
+      "queryMode": "literal",
+      "judgments": {
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983": 0,
+        "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686": 0,
+        "oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c": 0,
+        "oportunidade-documentacao-do-projeto-e-readme-encantador-e54fb794": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1": 0,
+        "oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b": 0,
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3": 0,
+        "oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f": 0,
+        "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682": 0,
+        "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9": 0
+      },
+      "origin": "baseline-controls"
+    },
+    {
+      "id": "A01",
+      "family": "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983",
+      "style": "implicit",
+      "query": "o chat da thread virou um diário de cada passo do agente, como separar a coordenação interna do que vale registrar?",
+      "queryMode": "auto",
+      "judgments": {
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983": 3,
+        "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7": 0,
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684": 0,
+        "estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 3,
+        "oportunidade-migracao-de-cabecalhos-de-summaries-com-previas-3c4dda95": 0,
+        "oportunidade-organizar-agentes-registrados-no-rules-md-734062bc": 0,
+        "oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f": 0,
+        "oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd": 1,
+        "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4": 0,
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A02",
+      "family": "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c",
+      "style": "indirect",
+      "query": "rebuild incremental quebrou com erro de tipo em campo nulo no lancedb",
+      "queryMode": "auto",
+      "judgments": {
+        "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c": 3,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac": 0,
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-indicador-visual-de-memory-na-interface-174c48b6": 0,
+        "oportunidade-migracao-de-cabecalhos-de-summaries-com-previas-3c4dda95": 0,
+        "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa": 0,
+        "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682": 1,
+        "oportunidade-revisao-de-arquitetura-do-projeto-fe4a1cb2": 0,
+        "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A03",
+      "family": "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7",
+      "style": "implicit",
+      "query": "registrei um agente que já existia e a ferramenta respondeu como se fosse um cadastro novo",
+      "queryMode": "auto",
+      "judgments": {
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983": 0,
+        "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7": 3,
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684": 0,
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 1,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 1,
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb": 0,
+        "oportunidade-migracao-de-cabecalhos-de-summaries-com-previas-3c4dda95": 0,
+        "oportunidade-organizar-agentes-registrados-no-rules-md-734062bc": 1,
+        "remover-comandos-legados-do-mcp-reduzir-sobrecarga-de-contexto-034ad1bf": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A04",
+      "family": "bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82",
+      "style": "indirect",
+      "query": "agente refaz o bootstrap e uma investigação ampla mesmo já tendo contexto válido",
+      "queryMode": "auto",
+      "judgments": {
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983": 0,
+        "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7": 0,
+        "bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82": 3,
+        "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684": 0,
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 2,
+        "oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686": 1,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb": 1,
+        "oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486": 1
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A05",
+      "family": "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a",
+      "style": "implicit",
+      "query": "comentei pela interface e o arquivo de regras ganhou uma entrada que ninguém pediu",
+      "queryMode": "auto",
+      "judgments": {
+        "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7": 2,
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 3,
+        "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-documentacao-do-projeto-e-readme-encantador-e54fb794": 0,
+        "oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b": 0,
+        "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1": 0,
+        "oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b": 0,
+        "oportunidade-indicador-visual-de-memory-na-interface-174c48b6": 0,
+        "oportunidade-migracao-de-cabecalhos-de-summaries-com-previas-3c4dda95": 0,
+        "oportunidade-organizar-agentes-registrados-no-rules-md-734062bc": 3,
+        "oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486": 0,
+        "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A06",
+      "family": "bug-workspace-audit-ignora-referencias-marc-em-inline-code-72461180",
+      "style": "indirect",
+      "query": "a auditoria não acusa link marc escrito entre crases",
+      "queryMode": "auto",
+      "judgments": {
+        "bug-workspace-audit-ignora-referencias-marc-em-inline-code-72461180": 3,
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b": 0,
+        "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb": 1,
+        "oportunidade-migracao-de-cabecalhos-de-summaries-com-previas-3c4dda95": 0,
+        "oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f": 0,
+        "oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be": 0,
+        "oportunidade-revisao-de-arquitetura-do-projeto-fe4a1cb2": 1,
+        "padronizar-mensagens-marc-em-bullets-concisos-6143a9b5": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A07",
+      "family": "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684",
+      "style": "indirect",
+      "query": "tirar a dependência de fornecedor de modelo e de ids fixos de perfis no fluxo de agentes",
+      "queryMode": "auto",
+      "judgments": {
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983": 1,
+        "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7": 0,
+        "bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82": 0,
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684": 3,
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 2,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 2,
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac": 0,
+        "oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa": 0,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b": 0,
+        "oportunidade-migracao-de-cabecalhos-de-summaries-com-previas-3c4dda95": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A08",
+      "family": "corrigir-corrida-de-startup-no-teste-de-auto-idle-do-daemon-504e1898",
+      "style": "implicit",
+      "query": "teste do daemon falha às vezes porque ele se desliga antes de responder à primeira requisição",
+      "queryMode": "auto",
+      "judgments": {
+        "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c": 0,
+        "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7": 0,
+        "corrigir-corrida-de-startup-no-teste-de-auto-idle-do-daemon-504e1898": 3,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99": 0,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c": 1,
+        "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1": 0,
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3": 0,
+        "oportunidade-provider-de-memory-aquecido-com-ttl-curto-d540c6b4": 0,
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb": 3
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A09",
+      "family": "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81",
+      "style": "indirect",
+      "query": "onde ficou documentado qual reasoning usar para principal e desenvolvedor e o limite de agentes em paralelo",
+      "queryMode": "auto",
+      "judgments": {
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983": 0,
+        "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7": 0,
+        "bug-workspace-audit-ignora-referencias-marc-em-inline-code-72461180": 0,
+        "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684": 3,
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 3,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 1,
+        "oportunidade-mecanismo-de-busca-sobre-o-conhecimento-do-projeto-b64903bd": 0,
+        "oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787": 0,
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A10",
+      "family": "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894",
+      "style": "implicit",
+      "query": "as instruções de entrada e os helpers do MCP diziam coisas diferentes das regras do workspace",
+      "queryMode": "auto",
+      "judgments": {
+        "bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82": 2,
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 3,
+        "oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686": 1,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb": 1,
+        "oportunidade-organizar-agentes-registrados-no-rules-md-734062bc": 0,
+        "oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486": 2,
+        "oportunidade-revisao-de-arquitetura-do-projeto-fe4a1cb2": 0,
+        "padronizar-mensagens-marc-em-bullets-concisos-6143a9b5": 1,
+        "remover-comandos-legados-do-mcp-reduzir-sobrecarga-de-contexto-034ad1bf": 1
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A11",
+      "family": "oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1",
+      "style": "indirect",
+      "query": "mostrar a lista de atalhos num painel deslizante igual ao das configurações",
+      "queryMode": "auto",
+      "judgments": {
+        "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c": 0,
+        "oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1": 3,
+        "oportunidade-autocomplete-de-referencias-no-composer-2341bc9f": 2,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 1,
+        "oportunidade-documentacao-do-projeto-e-readme-encantador-e54fb794": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b": 1,
+        "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1": 2,
+        "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa": 2,
+        "oportunidade-revisao-de-arquitetura-do-projeto-fe4a1cb2": 0,
+        "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9": 0,
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A12",
+      "family": "oportunidade-autocomplete-de-referencias-no-composer-2341bc9f",
+      "style": "implicit",
+      "query": "ao digitar arroba no campo de mensagem eu queria sugestões de agentes e threads",
+      "queryMode": "auto",
+      "judgments": {
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983": 0,
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-autocomplete-de-referencias-no-composer-2341bc9f": 3,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b": 0,
+        "oportunidade-organizar-agentes-registrados-no-rules-md-734062bc": 1,
+        "oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f": 0,
+        "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4": 2,
+        "padronizar-mensagens-marc-em-bullets-concisos-6143a9b5": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A13",
+      "family": "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac",
+      "style": "indirect",
+      "query": "vetores comprimidos para recuperar o histórico documentado gastando menos tokens",
+      "queryMode": "auto",
+      "judgments": {
+        "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c": 0,
+        "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684": 0,
+        "estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab": 1,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac": 3,
+        "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac": 0,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-migracao-de-cabecalhos-de-summaries-com-previas-3c4dda95": 0,
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3": 0,
+        "oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787": 0,
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7": 0,
+        "oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb": 1,
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A14",
+      "family": "oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686",
+      "style": "implicit",
+      "query": "agente novo chamava as ferramentas sem ter lido as instruções do workspace antes",
+      "queryMode": "auto",
+      "judgments": {
+        "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7": 0,
+        "bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82": 2,
+        "bug-workspace-audit-ignora-referencias-marc-em-inline-code-72461180": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 1,
+        "oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686": 3,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486": 2,
+        "padronizar-mensagens-marc-em-bullets-concisos-6143a9b5": 1,
+        "remover-comandos-legados-do-mcp-reduzir-sobrecarga-de-contexto-034ad1bf": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A15",
+      "family": "oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa",
+      "style": "indirect",
+      "query": "consultar uma thread informando só os oito caracteres finais do identificador",
+      "queryMode": "auto",
+      "judgments": {
+        "estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac": 0,
+        "oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa": 3,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-documentacao-do-projeto-e-readme-encantador-e54fb794": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-encerramento-de-threads-por-summary-e-indice-json-ce47939a": 0,
+        "oportunidade-leitura-incremental-de-threads-por-cursor-3c45fa83": 1,
+        "oportunidade-migracao-de-cabecalhos-de-summaries-com-previas-3c4dda95": 0,
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A16",
+      "family": "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac",
+      "style": "implicit",
+      "query": "a pesquisa por um termo que existe nos resumos voltava vazia com a configuração padrão",
+      "queryMode": "auto",
+      "judgments": {
+        "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c": 0,
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684": 0,
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 0,
+        "estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab": 1,
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac": 0,
+        "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac": 3,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 2,
+        "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb": 0,
+        "oportunidade-memory-deep-para-aprofundamento-em-threads-fechadas-f04c7cae": 0,
+        "oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd": 0,
+        "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9": 0,
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A17",
+      "family": "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99",
+      "style": "indirect",
+      "query": "impedir dois rebuilds da memória ao mesmo tempo vindos da UI, do MCP e da CLI",
+      "queryMode": "auto",
+      "judgments": {
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac": 0,
+        "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac": 0,
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99": 3,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 1,
+        "oportunidade-indicador-visual-de-memory-na-interface-174c48b6": 0,
+        "oportunidade-mecanismo-de-busca-sobre-o-conhecimento-do-projeto-b64903bd": 0,
+        "oportunidade-provider-de-memory-aquecido-com-ttl-curto-d540c6b4": 1,
+        "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682": 3,
+        "oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787": 0,
+        "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A18",
+      "family": "oportunidade-criacao-de-threads-pela-ui-0845d0bb",
+      "style": "implicit",
+      "query": "queria abrir uma conversa nova direto pelo navegador sem pedir para o agente",
+      "queryMode": "auto",
+      "judgments": {
+        "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7": 0,
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "bug-workspace-audit-ignora-referencias-marc-em-inline-code-72461180": 0,
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-autocomplete-de-referencias-no-composer-2341bc9f": 0,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 3,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-migracao-de-cabecalhos-de-summaries-com-previas-3c4dda95": 0,
+        "oportunidade-organizar-agentes-registrados-no-rules-md-734062bc": 0,
+        "oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A19",
+      "family": "oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c",
+      "style": "indirect",
+      "query": "rodar o daemon em segundo plano depois de instalar o pacote globalmente",
+      "queryMode": "auto",
+      "judgments": {
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "corrigir-corrida-de-startup-no-teste-de-auto-idle-do-daemon-504e1898": 1,
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99": 0,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c": 3,
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3": 0,
+        "oportunidade-provider-de-memory-aquecido-com-ttl-curto-d540c6b4": 0,
+        "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682": 0,
+        "oportunidade-revisao-de-arquitetura-do-projeto-fe4a1cb2": 0,
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A20",
+      "family": "oportunidade-documentacao-do-projeto-e-readme-encantador-e54fb794",
+      "style": "implicit",
+      "query": "quem chega ao projeto pela primeira vez acha a página inicial do repositório confusa",
+      "queryMode": "auto",
+      "judgments": {
+        "bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82": 0,
+        "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684": 0,
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-documentacao-do-projeto-e-readme-encantador-e54fb794": 3,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b": 0,
+        "oportunidade-mecanismo-de-busca-sobre-o-conhecimento-do-projeto-b64903bd": 0,
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3": 0,
+        "oportunidade-revisao-de-arquitetura-do-projeto-fe4a1cb2": 0,
+        "oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787": 1,
+        "oportunidade-revisao-en-us-do-projeto-c14150b8": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A21",
+      "family": "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba",
+      "style": "indirect",
+      "query": "palavra literal pode trazer candidato mas sozinha não deveria virar resultado",
+      "queryMode": "auto",
+      "judgments": {
+        "estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab": 2,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa": 0,
+        "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac": 3,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 3,
+        "oportunidade-mecanismo-de-busca-sobre-o-conhecimento-do-projeto-b64903bd": 0,
+        "oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f": 0,
+        "oportunidade-revisao-en-us-do-projeto-c14150b8": 0,
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7": 0,
+        "oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb": 2
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A22",
+      "family": "oportunidade-encerramento-de-threads-por-summary-e-indice-json-ce47939a",
+      "style": "implicit",
+      "query": "o que faz uma thread aparecer como fechada e como ela volta a ficar aberta",
+      "queryMode": "auto",
+      "judgments": {
+        "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c": 1,
+        "oportunidade-autocomplete-de-referencias-no-composer-2341bc9f": 0,
+        "oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa": 0,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-encerramento-de-threads-por-summary-e-indice-json-ce47939a": 3,
+        "oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b": 0,
+        "oportunidade-memory-deep-para-aprofundamento-em-threads-fechadas-f04c7cae": 0,
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3": 0,
+        "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9": 0,
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7": 2
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A23",
+      "family": "oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b",
+      "style": "indirect",
+      "query": "mudança só no changelog disparou a bateria inteira de testes e build",
+      "queryMode": "auto",
+      "judgments": {
+        "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c": 0,
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684": 0,
+        "corrigir-corrida-de-startup-no-teste-de-auto-idle-do-daemon-504e1898": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99": 0,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b": 3,
+        "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682": 0,
+        "oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787": 0,
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A24",
+      "family": "oportunidade-leitura-incremental-de-threads-por-cursor-3c45fa83",
+      "style": "implicit",
+      "query": "ler a conversa inteira de novo só para ver as mensagens novas gasta muito token",
+      "queryMode": "auto",
+      "judgments": {
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983": 0,
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 2,
+        "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac": 0,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b": 0,
+        "oportunidade-leitura-incremental-de-threads-por-cursor-3c45fa83": 3,
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3": 0,
+        "oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd": 0,
+        "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682": 0,
+        "remover-comandos-legados-do-mcp-reduzir-sobrecarga-de-contexto-034ad1bf": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A25",
+      "family": "oportunidade-mecanismo-de-busca-sobre-o-conhecimento-do-projeto-b64903bd",
+      "style": "indirect",
+      "query": "consultar decisões antigas do projeto por pergunta em vez de abrir thread por thread",
+      "queryMode": "auto",
+      "judgments": {
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-autocomplete-de-referencias-no-composer-2341bc9f": 0,
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac": 3,
+        "oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa": 0,
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99": 0,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-documentacao-do-projeto-e-readme-encantador-e54fb794": 0,
+        "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb": 0,
+        "oportunidade-mecanismo-de-busca-sobre-o-conhecimento-do-projeto-b64903bd": 3,
+        "oportunidade-migracao-de-cabecalhos-de-summaries-com-previas-3c4dda95": 0,
+        "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9": 0,
+        "oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb": 2
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A26",
+      "family": "oportunidade-memory-deep-para-aprofundamento-em-threads-fechadas-f04c7cae",
+      "style": "implicit",
+      "query": "preciso achar o trecho exato de uma discussão dentro do chat de uma thread já encerrada",
+      "queryMode": "auto",
+      "judgments": {
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab": 2,
+        "oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1": 0,
+        "oportunidade-autocomplete-de-referencias-no-composer-2341bc9f": 0,
+        "oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa": 0,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-encerramento-de-threads-por-summary-e-indice-json-ce47939a": 0,
+        "oportunidade-memory-deep-para-aprofundamento-em-threads-fechadas-f04c7cae": 3,
+        "oportunidade-migracao-de-cabecalhos-de-summaries-com-previas-3c4dda95": 0,
+        "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9": 0,
+        "oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd": 0,
+        "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4": 0,
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A27",
+      "family": "oportunidade-migracao-de-cabecalhos-de-summaries-com-previas-3c4dda95",
+      "style": "indirect",
+      "query": "converter o topo dos resumos antigos para o formato novo mostrando o resultado antes de aplicar",
+      "queryMode": "auto",
+      "judgments": {
+        "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-autocomplete-de-referencias-no-composer-2341bc9f": 0,
+        "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1": 0,
+        "oportunidade-indicador-visual-de-memory-na-interface-174c48b6": 0,
+        "oportunidade-migracao-de-cabecalhos-de-summaries-com-previas-3c4dda95": 3,
+        "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9": 0,
+        "oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f": 0,
+        "oportunidade-revisao-en-us-do-projeto-c14150b8": 0,
+        "oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A28",
+      "family": "oportunidade-organizar-agentes-registrados-no-rules-md-734062bc",
+      "style": "implicit",
+      "query": "registrar agente estava jogando links no meio das regras customizadas",
+      "queryMode": "auto",
+      "judgments": {
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983": 0,
+        "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7": 1,
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 3,
+        "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b": 0,
+        "oportunidade-organizar-agentes-registrados-no-rules-md-734062bc": 3,
+        "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4": 0,
+        "oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A29",
+      "family": "oportunidade-organizar-css-da-ui-por-dominio-aa4c94ba",
+      "style": "indirect",
+      "query": "dividir a folha de estilos da interface por área funcional",
+      "queryMode": "auto",
+      "judgments": {
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684": 0,
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 0,
+        "oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1": 0,
+        "oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b": 0,
+        "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1": 1,
+        "oportunidade-indicador-visual-de-memory-na-interface-174c48b6": 0,
+        "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb": 0,
+        "oportunidade-organizar-agentes-registrados-no-rules-md-734062bc": 0,
+        "oportunidade-organizar-css-da-ui-por-dominio-aa4c94ba": 3,
+        "oportunidade-revisao-de-arquitetura-do-projeto-fe4a1cb2": 0,
+        "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A30",
+      "family": "oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f",
+      "style": "implicit",
+      "query": "daemon e servidor MCP gravando no mesmo arquivo de conversa ao mesmo tempo podem corromper o conteúdo?",
+      "queryMode": "auto",
+      "judgments": {
+        "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c": 0,
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "corrigir-corrida-de-startup-no-teste-de-auto-idle-do-daemon-504e1898": 0,
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99": 1,
+        "oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c": 0,
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3": 1,
+        "oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f": 3,
+        "oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787": 0,
+        "oportunidade-revisao-en-us-do-projeto-c14150b8": 0,
+        "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186": 0,
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7": 2
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A31",
+      "family": "oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd",
+      "style": "indirect",
+      "query": "transformar texto longo em anexo markdown direto pelo painel da interface",
+      "queryMode": "auto",
+      "judgments": {
+        "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7": 0,
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1": 1,
+        "oportunidade-autocomplete-de-referencias-no-composer-2341bc9f": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd": 3,
+        "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa": 0,
+        "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4": 1,
+        "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9": 0,
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7": 0,
+        "remover-comandos-legados-do-mcp-reduzir-sobrecarga-de-contexto-034ad1bf": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A32",
+      "family": "oportunidade-provider-de-memory-aquecido-com-ttl-curto-d540c6b4",
+      "style": "implicit",
+      "query": "cada busca seguida recarrega o modelo de embedding do zero",
+      "queryMode": "auto",
+      "judgments": {
+        "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c": 0,
+        "estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab": 0,
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac": 0,
+        "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac": 0,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-mecanismo-de-busca-sobre-o-conhecimento-do-projeto-b64903bd": 1,
+        "oportunidade-memory-deep-para-aprofundamento-em-threads-fechadas-f04c7cae": 0,
+        "oportunidade-provider-de-memory-aquecido-com-ttl-curto-d540c6b4": 3,
+        "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A33",
+      "family": "oportunidade-reforcar-gatilhos-de-ativacao-da-skill-marc-ops-934c4896",
+      "style": "indirect",
+      "query": "melhorar a descrição da skill para ela ser acionada nos momentos certos",
+      "queryMode": "auto",
+      "judgments": {
+        "bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82": 2,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 1,
+        "oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1": 0,
+        "oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb": 2,
+        "oportunidade-mecanismo-de-busca-sobre-o-conhecimento-do-projeto-b64903bd": 0,
+        "oportunidade-provider-de-memory-aquecido-com-ttl-curto-d540c6b4": 0,
+        "oportunidade-reforcar-gatilhos-de-ativacao-da-skill-marc-ops-934c4896": 3,
+        "oportunidade-revisao-de-arquitetura-do-projeto-fe4a1cb2": 0,
+        "padronizar-mensagens-marc-em-bullets-concisos-6143a9b5": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A34",
+      "family": "oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be",
+      "style": "implicit",
+      "query": "a auditoria reclama que as regras livres não seguem o formato com gatilho e evidência",
+      "queryMode": "auto",
+      "judgments": {
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983": 0,
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684": 0,
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b": 0,
+        "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb": 3,
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3": 0,
+        "oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be": 3
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A35",
+      "family": "oportunidade-revisao-de-arquitetura-do-projeto-fe4a1cb2",
+      "style": "indirect",
+      "query": "avaliar fronteiras entre core, daemon, MCP e interface e arquivos grandes demais",
+      "queryMode": "auto",
+      "judgments": {
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "corrigir-corrida-de-startup-no-teste-de-auto-idle-do-daemon-504e1898": 0,
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 0,
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99": 0,
+        "oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c": 0,
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3": 2,
+        "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682": 0,
+        "oportunidade-revisao-de-arquitetura-do-projeto-fe4a1cb2": 3,
+        "oportunidade-revisao-en-us-do-projeto-c14150b8": 2,
+        "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186": 0,
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A36",
+      "family": "oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787",
+      "style": "implicit",
+      "query": "o SDK instalado não suporta a revisão mais nova do protocolo",
+      "queryMode": "auto",
+      "judgments": {
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983": 0,
+        "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c": 0,
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb": 0,
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3": 0,
+        "oportunidade-organizar-agentes-registrados-no-rules-md-734062bc": 0,
+        "oportunidade-organizar-css-da-ui-por-dominio-aa4c94ba": 0,
+        "oportunidade-revisao-de-arquitetura-do-projeto-fe4a1cb2": 0,
+        "oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787": 3,
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7": 0,
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A37",
+      "family": "oportunidade-revisao-en-us-do-projeto-c14150b8",
+      "style": "indirect",
+      "query": "achar textos em português espalhados pelo código e pelas mensagens de erro",
+      "queryMode": "auto",
+      "judgments": {
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983": 0,
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-documentacao-do-projeto-e-readme-encantador-e54fb794": 1,
+        "oportunidade-migracao-de-cabecalhos-de-summaries-com-previas-3c4dda95": 0,
+        "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9": 0,
+        "oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f": 0,
+        "oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd": 0,
+        "oportunidade-revisao-de-arquitetura-do-projeto-fe4a1cb2": 0,
+        "oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787": 0,
+        "oportunidade-revisao-en-us-do-projeto-c14150b8": 3,
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A38",
+      "family": "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7",
+      "style": "implicit",
+      "query": "o agente não tinha como gravar o resumo final e fechar a conversa pelo MCP",
+      "queryMode": "auto",
+      "judgments": {
+        "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7": 0,
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-migracao-de-cabecalhos-de-summaries-com-previas-3c4dda95": 1,
+        "oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787": 1,
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7": 3,
+        "remover-comandos-legados-do-mcp-reduzir-sobrecarga-de-contexto-034ad1bf": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A39",
+      "family": "padronizar-mensagens-marc-em-bullets-concisos-6143a9b5",
+      "style": "indirect",
+      "query": "mensagens das threads amontoadas em parágrafo, preferir itens curtos por categoria",
+      "queryMode": "auto",
+      "judgments": {
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-leitura-incremental-de-threads-por-cursor-3c45fa83": 0,
+        "oportunidade-memory-deep-para-aprofundamento-em-threads-fechadas-f04c7cae": 0,
+        "oportunidade-migracao-de-cabecalhos-de-summaries-com-previas-3c4dda95": 0,
+        "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9": 0,
+        "oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd": 1,
+        "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4": 0,
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7": 2,
+        "padronizar-mensagens-marc-em-bullets-concisos-6143a9b5": 3,
+        "remover-comandos-legados-do-mcp-reduzir-sobrecarga-de-contexto-034ad1bf": 1
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "A40",
+      "family": "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb",
+      "style": "implicit",
+      "query": "os avisos flutuantes da interface destoam do resto do visual",
+      "queryMode": "auto",
+      "judgments": {
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983": 0,
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "estudo-profundidade-adaptativa-e-simplificacao-do-deep-search-4f477d9f": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac": 0,
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b": 0,
+        "oportunidade-indicador-visual-de-memory-na-interface-174c48b6": 0,
+        "oportunidade-provider-de-memory-aquecido-com-ttl-curto-d540c6b4": 0,
+        "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9": 0,
+        "oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb": 0,
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb": 3
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "N01",
+      "family": "negative:N01",
+      "style": "negative",
+      "query": "receita de pão de fermentação natural",
+      "queryMode": "auto",
+      "judgments": {
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983": 0,
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac": 0,
+        "oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-encerramento-de-threads-por-summary-e-indice-json-ce47939a": 0,
+        "oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b": 0,
+        "oportunidade-migracao-de-cabecalhos-de-summaries-com-previas-3c4dda95": 0,
+        "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9": 0,
+        "oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd": 0,
+        "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4": 0,
+        "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9": 0,
+        "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "N02",
+      "family": "negative:N02",
+      "style": "negative",
+      "query": "regra de impedimento no futebol",
+      "queryMode": "auto",
+      "judgments": {
+        "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c": 0,
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1": 0,
+        "oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686": 0,
+        "oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa": 0,
+        "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac": 0,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b": 0,
+        "oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b": 0,
+        "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9": 0,
+        "oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486": 0,
+        "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4": 0,
+        "oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "N03",
+      "family": "negative:N03",
+      "style": "negative",
+      "query": "como podar roseiras no inverno",
+      "queryMode": "auto",
+      "judgments": {
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983": 0,
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "corrigir-corrida-de-startup-no-teste-de-auto-idle-do-daemon-504e1898": 0,
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 0,
+        "oportunidade-autocomplete-de-referencias-no-composer-2341bc9f": 0,
+        "oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c": 0,
+        "oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b": 0,
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3": 0,
+        "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9": 0,
+        "oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f": 0,
+        "oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd": 0,
+        "oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486": 0,
+        "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "N04",
+      "family": "negative:N04",
+      "style": "negative",
+      "query": "melhor época para visitar a patagônia",
+      "queryMode": "auto",
+      "judgments": {
+        "bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82": 0,
+        "corrigir-corrida-de-startup-no-teste-de-auto-idle-do-daemon-504e1898": 0,
+        "estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab": 0,
+        "oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1": 0,
+        "oportunidade-autocomplete-de-referencias-no-composer-2341bc9f": 0,
+        "oportunidade-documentacao-do-projeto-e-readme-encantador-e54fb794": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb": 0,
+        "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9": 0,
+        "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa": 0,
+        "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4": 0,
+        "oportunidade-revisao-de-arquitetura-do-projeto-fe4a1cb2": 0,
+        "padronizar-mensagens-marc-em-bullets-concisos-6143a9b5": 0,
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "N05",
+      "family": "negative:N05",
+      "style": "negative",
+      "query": "tratamento de ferrugem na lataria do carro",
+      "queryMode": "auto",
+      "judgments": {
+        "bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82": 0,
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c": 0,
+        "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9": 0,
+        "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa": 0,
+        "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9": 0,
+        "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186": 0,
+        "padronizar-mensagens-marc-em-bullets-concisos-6143a9b5": 0,
+        "remover-comandos-legados-do-mcp-reduzir-sobrecarga-de-contexto-034ad1bf": 0,
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "N06",
+      "family": "negative:N06",
+      "style": "negative",
+      "query": "configurar replicação de postgres com patroni",
+      "queryMode": "auto",
+      "judgments": {
+        "bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82": 0,
+        "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684": 0,
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-autocomplete-de-referencias-no-composer-2341bc9f": 0,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd": 0,
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7": 0,
+        "padronizar-mensagens-marc-em-bullets-concisos-6143a9b5": 0,
+        "remover-comandos-legados-do-mcp-reduzir-sobrecarga-de-contexto-034ad1bf": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "N07",
+      "family": "negative:N07",
+      "style": "negative",
+      "query": "pipeline de deploy no kubernetes com helm charts",
+      "queryMode": "auto",
+      "judgments": {
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983": 0,
+        "bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82": 0,
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684": 0,
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-encerramento-de-threads-por-summary-e-indice-json-ce47939a": 0,
+        "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1": 0,
+        "oportunidade-migracao-de-cabecalhos-de-summaries-com-previas-3c4dda95": 0,
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3": 0,
+        "oportunidade-provider-de-memory-aquecido-com-ttl-curto-d540c6b4": 0,
+        "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "N08",
+      "family": "negative:N08",
+      "style": "negative",
+      "query": "integração de pagamento com stripe e webhooks",
+      "queryMode": "auto",
+      "judgments": {
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983": 0,
+        "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684": 0,
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1": 0,
+        "oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b": 0,
+        "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb": 0,
+        "oportunidade-migracao-de-cabecalhos-de-summaries-com-previas-3c4dda95": 0,
+        "oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486": 0,
+        "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9": 0,
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "N09",
+      "family": "negative:N09",
+      "style": "negative",
+      "query": "shaders em webgl para renderizar jogos no navegador",
+      "queryMode": "auto",
+      "judgments": {
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1": 0,
+        "oportunidade-autocomplete-de-referencias-no-composer-2341bc9f": 0,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b": 0,
+        "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1": 0,
+        "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9": 0,
+        "oportunidade-organizar-agentes-registrados-no-rules-md-734062bc": 0,
+        "oportunidade-organizar-css-da-ui-por-dominio-aa4c94ba": 0,
+        "oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd": 0,
+        "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4": 0,
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "N10",
+      "family": "negative:N10",
+      "style": "negative",
+      "query": "migrar aplicativo android de java para kotlin",
+      "queryMode": "auto",
+      "judgments": {
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1": 0,
+        "oportunidade-autocomplete-de-referencias-no-composer-2341bc9f": 0,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b": 0,
+        "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1": 0,
+        "oportunidade-migracao-de-cabecalhos-de-summaries-com-previas-3c4dda95": 0,
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3": 0,
+        "oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd": 0,
+        "oportunidade-revisao-de-arquitetura-do-projeto-fe4a1cb2": 0,
+        "oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787": 0,
+        "oportunidade-revisao-en-us-do-projeto-c14150b8": 0,
+        "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9": 0,
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7": 0,
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "T01",
+      "family": "oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686",
+      "style": "typo",
+      "query": "bootstarp obrigatorio antes das ferramentas",
+      "queryMode": "auto",
+      "expectedInterpretation": {
+        "effectiveQuery": "bootstrap obrigatorio antes das ferramentas"
+      },
+      "judgments": {
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983": 1,
+        "bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82": 2,
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684": 1,
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 1,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 1,
+        "oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686": 3,
+        "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9": 0,
+        "oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486": 2,
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "T02",
+      "family": "oportunidade-autocomplete-de-referencias-no-composer-2341bc9f",
+      "style": "typo",
+      "query": "autocomplet de referencias",
+      "queryMode": "auto",
+      "expectedInterpretation": {
+        "effectiveQuery": "autocomplete de referencias"
+      },
+      "judgments": {
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684": 0,
+        "estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab": 0,
+        "oportunidade-autocomplete-de-referencias-no-composer-2341bc9f": 3,
+        "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1": 1,
+        "oportunidade-migracao-de-cabecalhos-de-summaries-com-previas-3c4dda95": 0,
+        "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682": 0,
+        "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4": 2,
+        "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9": 0,
+        "oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb": 1,
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "T03",
+      "family": "oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f",
+      "style": "typo",
+      "query": "concorrencia de escrita no markdwon",
+      "queryMode": "auto",
+      "expectedInterpretation": {
+        "effectiveQuery": "concorrencia de escrita no markdown"
+      },
+      "judgments": {
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983": 0,
+        "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-documentacao-do-projeto-e-readme-encantador-e54fb794": 1,
+        "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1": 0,
+        "oportunidade-migracao-de-cabecalhos-de-summaries-com-previas-3c4dda95": 0,
+        "oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f": 3,
+        "oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd": 0,
+        "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4": 0,
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7": 2,
+        "padronizar-mensagens-marc-em-bullets-concisos-6143a9b5": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "T04",
+      "family": "oportunidade-leitura-incremental-de-threads-por-cursor-3c45fa83",
+      "style": "typo",
+      "query": "leitura incremental por curosr",
+      "queryMode": "auto",
+      "expectedInterpretation": {
+        "effectiveQuery": "leitura incremental por cursor"
+      },
+      "judgments": {
+        "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c": 0,
+        "oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa": 1,
+        "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-encerramento-de-threads-por-summary-e-indice-json-ce47939a": 0,
+        "oportunidade-leitura-incremental-de-threads-por-cursor-3c45fa83": 3,
+        "oportunidade-provider-de-memory-aquecido-com-ttl-curto-d540c6b4": 0,
+        "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682": 0,
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7": 0,
+        "oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "T05",
+      "family": "oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c",
+      "style": "typo",
+      "query": "daemon detahced em segundo plano",
+      "queryMode": "auto",
+      "expectedInterpretation": {
+        "effectiveQuery": "daemon detached em segundo plano"
+      },
+      "judgments": {
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "corrigir-corrida-de-startup-no-teste-de-auto-idle-do-daemon-504e1898": 1,
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99": 0,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c": 3,
+        "oportunidade-indicador-visual-de-memory-na-interface-174c48b6": 0,
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3": 0,
+        "oportunidade-provider-de-memory-aquecido-com-ttl-curto-d540c6b4": 0,
+        "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186": 0,
+        "oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb": 0,
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "T06",
+      "family": "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba",
+      "style": "typo",
+      "query": "elegibilidade semantcia dos candidatos",
+      "queryMode": "auto",
+      "expectedInterpretation": {
+        "effectiveQuery": "elegibilidade semantica dos candidatos"
+      },
+      "judgments": {
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 0,
+        "estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab": 2,
+        "estudo-profundidade-adaptativa-e-simplificacao-do-deep-search-4f477d9f": 1,
+        "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac": 0,
+        "oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa": 0,
+        "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac": 3,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 3,
+        "oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b": 0,
+        "oportunidade-mecanismo-de-busca-sobre-o-conhecimento-do-projeto-b64903bd": 0,
+        "oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb": 1
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "T07",
+      "family": "oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1",
+      "style": "typo",
+      "query": "atalhos de tecaldo no painel lateral",
+      "queryMode": "auto",
+      "expectedInterpretation": {
+        "effectiveQuery": "atalhos de teclado no painel lateral"
+      },
+      "judgments": {
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 0,
+        "oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1": 3,
+        "oportunidade-autocomplete-de-referencias-no-composer-2341bc9f": 2,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b": 1,
+        "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1": 1,
+        "oportunidade-revisao-en-us-do-projeto-c14150b8": 0,
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "T08",
+      "family": "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c",
+      "style": "typo",
+      "query": "rebuild incremetnal falhou no schema",
+      "queryMode": "auto",
+      "expectedInterpretation": {
+        "effectiveQuery": "rebuild incremental falhou no schema"
+      },
+      "judgments": {
+        "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c": 3,
+        "bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82": 0,
+        "estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab": 0,
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99": 0,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-leitura-incremental-de-threads-por-cursor-3c45fa83": 0,
+        "oportunidade-migracao-de-cabecalhos-de-summaries-com-previas-3c4dda95": 0,
+        "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa": 0,
+        "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682": 1,
+        "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "O01",
+      "family": "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7",
+      "style": "overcorrection-control",
+      "query": "agente nao avisa que o perfil ja existia",
+      "queryMode": "auto",
+      "expectedInterpretation": {
+        "effectiveQuery": "agente nao avisa que o perfil ja existia"
+      },
+      "judgments": {
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983": 0,
+        "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7": 3,
+        "bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82": 0,
+        "bug-workspace-audit-ignora-referencias-marc-em-inline-code-72461180": 0,
+        "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684": 0,
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 1,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 1,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b": 0,
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3": 0,
+        "oportunidade-organizar-agentes-registrados-no-rules-md-734062bc": 1
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "O02",
+      "family": "corrigir-corrida-de-startup-no-teste-de-auto-idle-do-daemon-504e1898",
+      "style": "overcorrection-control",
+      "query": "por que o daemon cai as vezes no teste quando fica ocioso",
+      "queryMode": "auto",
+      "expectedInterpretation": {
+        "effectiveQuery": "por que o daemon cai as vezes no teste quando fica ocioso"
+      },
+      "judgments": {
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "corrigir-corrida-de-startup-no-teste-de-auto-idle-do-daemon-504e1898": 3,
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99": 0,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c": 1,
+        "oportunidade-indicador-visual-de-memory-na-interface-174c48b6": 0,
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3": 0,
+        "oportunidade-provider-de-memory-aquecido-com-ttl-curto-d540c6b4": 0,
+        "oportunidade-revisao-de-arquitetura-do-projeto-fe4a1cb2": 0,
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb": 3
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "O03",
+      "family": "oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd",
+      "style": "overcorrection-control",
+      "query": "mensagem longa vira artifact pela ui",
+      "queryMode": "auto",
+      "expectedInterpretation": {
+        "effectiveQuery": "mensagem longa vira artifact pela ui"
+      },
+      "judgments": {
+        "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c": 0,
+        "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a": 0,
+        "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81": 0,
+        "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894": 0,
+        "oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1": 1,
+        "oportunidade-criacao-de-threads-pela-ui-0845d0bb": 0,
+        "oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd": 3,
+        "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4": 1,
+        "oportunidade-revisao-en-us-do-projeto-c14150b8": 0,
+        "oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb": 0,
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb": 0
+      },
+      "origin": "approvers-a1-2026-10-15"
+    },
+    {
+      "id": "O04",
+      "family": "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb",
+      "style": "overcorrection-control",
+      "query": "trocar sonner pelo toast neobrutalism",
+      "queryMode": "auto",
+      "expectedInterpretation": {
+        "effectiveQuery": "trocar sonner pelo toast neobrutalism"
+      },
+      "judgments": {
+        "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983": 1,
+        "corrigir-corrida-de-startup-no-teste-de-auto-idle-do-daemon-504e1898": 1,
+        "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99": 0,
+        "oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c": 0,
+        "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba": 0,
+        "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1": 2,
+        "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3": 0,
+        "oportunidade-provider-de-memory-aquecido-com-ttl-curto-d540c6b4": 0,
+        "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682": 0,
+        "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb": 3
+      },
+      "origin": "approvers-a1-2026-10-15"
+    }
+  ]
+}
