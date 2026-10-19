@@ -12,6 +12,7 @@ import type {
   MemoryVectorRecord
 } from "../src/core/memory/types.js";
 import { FakeRerankingProvider } from "./memory-test-helpers.js";
+import { summaryProvenanceFixture } from "./memory-provenance-fixtures.js";
 
 test("hybrid ranking never admits a lexical-only weak candidate", async () => {
   const reranker = new FakeRerankingProvider(() => [0.01]);
@@ -55,6 +56,38 @@ test("hybrid ranking uses title evidence only after semantic eligibility", async
   );
 });
 
+test("semantic recall hits carry the provenance of the matched record", async () => {
+  const rerankScores: Array<[string, number]> = [
+    ["target", 0.8],
+    ["incidental", 0.82]
+  ];
+  const reranker = new FakeRerankingProvider((_query, documents) =>
+    documents.map(
+      (document) =>
+        rerankScores.find(([threadId]) => document.includes(threadId))?.[1] ?? 0
+    )
+  );
+  const channels: MemorySearchChannels = {
+    identities: [
+      vectorHit("incidental", "identity", 0.9),
+      vectorHit("target", "identity", 0.89)
+    ],
+    passages: [
+      vectorHit("incidental", "passage", 0.89),
+      vectorHit("target", "passage", 0.88)
+    ],
+    lexical: [lexicalHit("target", "title", 9, 0.89)]
+  };
+
+  const ranked = await rankHybridMemoryHits("brutalism", channels, reranker);
+  const [hit] = semanticRecallHits(ranked);
+
+  assert.equal(hit?.threadId, "target");
+  assert.equal(hit?.sourceType, "summary");
+  assert.equal(hit?.sourcePath, ".marc/threads/target/SUMMARY.md");
+  assert.equal(hit?.authority, "decision");
+});
+
 function vectorHit(
   threadId: string,
   kind: MemoryRecordKind,
@@ -78,6 +111,7 @@ function lexicalHit(
 }
 
 function record(threadId: string, kind: MemoryRecordKind): MemoryVectorRecord {
+  const text = `${threadId} ${kind}`;
   return {
     recordId: `${threadId}:${kind}`,
     threadId,
@@ -87,7 +121,8 @@ function record(threadId: string, kind: MemoryRecordKind): MemoryVectorRecord {
     reference: `marc://$${threadId}`,
     kind,
     sectionTitle: kind === "passage" ? "Result" : undefined,
-    text: `${threadId} ${kind}`,
-    embeddingText: `${threadId} ${kind}`
+    text,
+    embeddingText: text,
+    ...summaryProvenanceFixture(threadId, text)
   };
 }

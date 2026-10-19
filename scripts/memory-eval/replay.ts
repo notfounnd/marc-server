@@ -1,15 +1,16 @@
 import type {
   MemoryLexicalSearchHit,
   MemorySearchChannels,
-  MemorySearchHit,
-  MemoryVectorRecord
+  MemorySearchHit
 } from "../../src/core/memory/types.js";
 import type {
   CaptureFile,
   CapturedCase,
   CapturedChannels,
-  CapturedProductionRecall
+  CapturedProductionRecall,
+  CapturedRecord
 } from "./capture-types.js";
+import { asSearchRecord } from "./capture-types.js";
 import { CachedEmbeddingProvider, CachedRerankingProvider } from "./cached-providers.js";
 import type { EvalDataset, RelevanceGrade } from "./dataset.js";
 import {
@@ -121,7 +122,7 @@ export async function replayCapture(input: ReplayInput): Promise<ReplayResult> {
 export async function replayCase(input: {
   captured: CapturedCase;
   judgments: Record<string, RelevanceGrade>;
-  records: ReadonlyMap<string, MemoryVectorRecord>;
+  records: ReadonlyMap<string, CapturedRecord>;
   variantIds: string[];
   providers: ReplayProviders;
 }): Promise<CaseReplay> {
@@ -245,7 +246,7 @@ export function summarizeEquivalence(cases: readonly CaseReplay[]): {
 function channelsOf(
   captured: CapturedCase,
   query: string,
-  records: ReadonlyMap<string, MemoryVectorRecord>
+  records: ReadonlyMap<string, CapturedRecord>
 ): MemorySearchChannels {
   const channels: CapturedChannels | undefined = captured.channels[query];
   if (channels === undefined)
@@ -260,7 +261,7 @@ function channelsOf(
     lexical: channels.lexical.map(
       (hit): MemoryLexicalSearchHit => ({
         field: hit.field,
-        record: recordOf(records, hit.recordId),
+        record: asSearchRecord(recordOf(records, hit.recordId)),
         score: hit.score,
         vectorScore: hit.vectorScore
       })
@@ -271,23 +272,23 @@ function channelsOf(
 function memoryHit(
   recordId: string,
   score: number,
-  records: ReadonlyMap<string, MemoryVectorRecord>
+  records: ReadonlyMap<string, CapturedRecord>
 ): MemorySearchHit {
-  return { record: recordOf(records, recordId), score };
+  return { record: asSearchRecord(recordOf(records, recordId)), score };
 }
 
 function recordOf(
-  records: ReadonlyMap<string, MemoryVectorRecord>,
+  records: ReadonlyMap<string, CapturedRecord>,
   recordId: string
-): MemoryVectorRecord {
+): CapturedRecord {
   const record = records.get(recordId);
   if (record === undefined) throw new Error(`Capture has no record ${recordId}.`);
   return record;
 }
 
 function recordsById(
-  records: readonly MemoryVectorRecord[]
-): Map<string, MemoryVectorRecord> {
+  records: readonly CapturedRecord[]
+): Map<string, CapturedRecord> {
   return new Map(records.map((record) => [record.recordId, record]));
 }
 

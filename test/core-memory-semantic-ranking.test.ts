@@ -10,6 +10,7 @@ import type {
   MemoryVectorRecord
 } from "../src/core/memory/types.js";
 import { FakeRerankingProvider } from "./memory-test-helpers.js";
+import { summaryProvenanceFixture } from "./memory-provenance-fixtures.js";
 
 test("semantic ranking reranks passages and consolidates their threads", async () => {
   const reranker = new FakeRerankingProvider((_query, documents) =>
@@ -218,6 +219,7 @@ function record(
     kind,
     sectionTitle: kind === "passage" ? "Result" : undefined,
     text,
-    embeddingText: text
+    embeddingText: text,
+    ...summaryProvenanceFixture(threadId, text)
   };
 }

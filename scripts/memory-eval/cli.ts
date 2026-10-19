@@ -16,10 +16,16 @@ import {
   REPORT_VARIANTS,
   buildReport,
   readRaterPairs,
-  renderMarkdown
+  renderMarkdown,
+  reportFileNames
 } from "./report.js";
 import { compareCaptures } from "./compare.js";
-import { measureCaptureLatency, readLatencyFile } from "./latency.js";
+import { measureAllLayers } from "./layers.js";
+import {
+  measureCaptureLatency,
+  readLatencyFile,
+  type LatencyFile
+} from "./latency.js";
 import {
   buildWorksheet,
   commitMerge,
@@ -246,6 +252,27 @@ async function captureCommand(options: CommandOptions): Promise<number> {
   }
   const pinned = await readPinnedCorpus(registration.pinnedPath);
   const modelInfo = await getWorkspaceInfo(REPOSITORY_ROOT);
+  if (options.get("all-layers") === "true") {
+    const layers = await measureAllLayers({
+      dataset,
+      source: {
+        threadsRoot: registration.threadsPath,
+        threadIds: pinned.threadIds,
+        rulesPath: registration.rulesPath
+      },
+      outputRoot: path.join(REPOSITORY_ROOT, ".marc", "cache", "memory-eval"),
+      repositoryRoot: REPOSITORY_ROOT,
+      createProviders: () => createLocalProviders(modelInfo),
+      log: (line) => process.stderr.write(`${line}\n`)
+    });
+    for (const run of layers.runs) {
+      console.log(
+        `captureId=${layers.captureId} layers=[${run.indexedLayers.join(",")}] records=${run.records} rebuildMs=${run.rebuildMs.toFixed(0)} byLayer=${JSON.stringify(run.byLayer)}`
+      );
+    }
+    console.log(`file=${layers.layersPath}`);
+    return 0;
+  }
   const result = await captureMemoryEval({
     dataset,
     source: {
@@ -357,11 +384,15 @@ async function reportCommand(options: CommandOptions): Promise<number> {
     console.error("The dataset queries differ from the capture. Capture again before reporting.");
     return 1;
   }
-  const latency = await readLatencyFile(captureDirectoryOf(corpusName, captureId), captureId).catch((error: unknown) => {
-    console.error(error instanceof Error ? error.message : String(error));
-    return undefined;
-  });
-  if (latency === undefined) return 1;
+  const withoutLatency = options.get("without-latency") === "true";
+  let latency: LatencyFile | undefined;
+  if (!withoutLatency) {
+    latency = await readLatencyFile(captureDirectoryOf(corpusName, captureId), captureId).catch((error: unknown) => {
+      console.error(error instanceof Error ? error.message : String(error));
+      return undefined;
+    });
+    if (latency === undefined) return 1;
+  }
   const replay = await replayCapture({ capture, dataset, variantIds: [...REPORT_VARIANTS, PRODUCTION_RECALL_ID] });
   const ratersArgument = options.get("raters");
   const raters = ratersArgument === undefined
@@ -369,10 +400,11 @@ async function reportCommand(options: CommandOptions): Promise<number> {
     : await readRaterPairs(...splitPair(ratersArgument));
   const report = await buildReport({ capture, dataset, replay, latency, raters });
   const directory = captureDirectoryOf(corpusName, captureId);
-  await writeFileAtomically(path.join(directory, "report.json"), JSON.stringify(report, null, 2));
-  await writeFileAtomically(path.join(directory, "report.md"), renderMarkdown(report));
+  const names = reportFileNames(withoutLatency);
+  await writeFileAtomically(path.join(directory, names.json), JSON.stringify(report, null, 2));
+  await writeFileAtomically(path.join(directory, names.markdown), renderMarkdown(report));
   console.log(
-    `captureId=${captureId} equivalence=${report.equivalence.status} M0=${report.variants.M0?.status ?? "n/a"} report=${path.join(directory, "report.md")}`
+    `captureId=${captureId} equivalence=${report.equivalence.status} M0=${report.variants.M0?.status ?? "n/a"} report=${path.join(directory, names.markdown)}`
   );
   return 0;
 }

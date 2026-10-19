@@ -39,8 +39,8 @@ const oldVersionManifest: MemoryManifest = {
   },
   generation: "generation-old-runtime",
   records: [],
-  retrievalContract: "field-aware-hybrid-v2",
-  schemaVersion: 6
+  retrievalContract: "source-layers-v1",
+  schemaVersion: 7
 };
 
 const currentVersionManifest: MemoryManifest = {

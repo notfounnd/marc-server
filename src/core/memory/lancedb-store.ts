@@ -12,6 +12,7 @@ import {
   lanceDbRow,
   LEGACY_TABLE_NAME,
   LEXICAL_COLUMNS,
+  layerPredicate,
   type LanceDbSearchRow,
   memoryVectorRecordFromStored,
   memoryVectorRowFromStored,
@@ -19,18 +20,20 @@ import {
   recordIdFromRow,
   recordIdPredicate,
   REQUIRED_LEXICAL_INDEXES,
-  sqlString,
+  searchPredicate,
   tableName
 } from "./lancedb-store-support.js";
 import { MEMORY_MANIFEST_FILE, memoryRootPath } from "./storage-paths.js";
-import type {
-  MemoryLexicalField,
-  MemoryLexicalSearchHit,
-  MemorySearchHit,
-  MemoryStorePurgeResult,
-  MemoryVectorRecord,
-  MemoryVectorRow,
-  MemoryVectorStore
+import {
+  DEFAULT_SEARCH_LAYERS,
+  type MemoryLayer,
+  type MemoryLexicalField,
+  type MemoryLexicalSearchHit,
+  type MemorySearchHit,
+  type MemoryStorePurgeResult,
+  type MemoryVectorRecord,
+  type MemoryVectorRow,
+  type MemoryVectorStore
 } from "./types.js";
 import { cosineSimilarity } from "./vector-math.js";
 
@@ -127,13 +130,18 @@ export class LanceDbMemoryVectorStore implements MemoryVectorStore {
     options: {
       generation?: string;
       kind?: "identity" | "passage";
+      layers?: readonly MemoryLayer[];
       limit: number;
     }
   ): Promise<MemorySearchHit[]> {
+    const layers = options.layers ?? DEFAULT_SEARCH_LAYERS;
+    if (!layers.length) return [];
     const db = await connectLanceDb(info);
     const table = await db.openTable(tableName(options.generation));
-    const query = table.vectorSearch(vector).distanceType("cosine");
-    if (options.kind) query.where(`kind = ${sqlString(options.kind)}`);
+    const query = table
+      .vectorSearch(vector)
+      .distanceType("cosine")
+      .where(searchPredicate({ kind: options.kind, layers }));
     const rows = (await query.limit(options.limit).toArray()) as Array<
       MemoryVectorRecord & { _distance?: number }
     >;
@@ -150,9 +158,12 @@ export class LanceDbMemoryVectorStore implements MemoryVectorStore {
     options: {
       field: MemoryLexicalField;
       generation?: string;
+      layers?: readonly MemoryLayer[];
       limit: number;
     }
   ): Promise<MemoryLexicalSearchHit[]> {
+    const layers = options.layers ?? DEFAULT_SEARCH_LAYERS;
+    if (!layers.length) return [];
     const db = await connectLanceDb(info);
     const table = await db.openTable(tableName(options.generation));
     const lancedb = await lanceDbModule();
@@ -162,6 +173,7 @@ export class LanceDbMemoryVectorStore implements MemoryVectorStore {
     });
     const rows = (await table
       .query()
+      .where(layerPredicate(layers))
       .fullTextSearch(query)
       .limit(options.limit)
       .toArray()) as LanceDbSearchRow[];

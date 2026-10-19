@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { summaryProvenanceFixture } from "./memory-provenance-fixtures.js";
 import {
   buildMemoryQueryCandidates,
   buildMemoryQueryVariants,
@@ -234,6 +235,7 @@ function memoryRow(title: string, text: string): MemoryVectorRow {
     text,
     threadId: "thread",
     title,
-    vector: [1, 0, 0]
+    vector: [1, 0, 0],
+    ...summaryProvenanceFixture("thread", text)
   };
 }

@@ -14,11 +14,12 @@ import {
 } from "../../src/core/memory/operations.js";
 import { semanticRerankingDocument } from "../../src/core/memory/semantic-ranking.js";
 import { LanceDbMemoryVectorStore } from "../../src/core/memory/store.js";
-import type {
-  MemoryManifest,
-  MemoryOperationOptions,
-  MemoryVectorRecord,
-  MemoryVectorRow
+import {
+  MEMORY_SCHEMA_VERSION,
+  type MemoryManifest,
+  type MemoryOperationOptions,
+  type MemoryVectorRecord,
+  type MemoryVectorRow
 } from "../../src/core/memory/types.js";
 import {
   corpusContentDigest,
@@ -48,7 +49,9 @@ import type {
   CaptureContext,
   CaptureProviders,
   CapturedCase,
-  CapturedChannels
+  CapturedChannels,
+  ProductionCheckMode,
+  ProductionCheckRecord
 } from "./capture-types.js";
 import {
   RecordingEmbeddingProvider,
@@ -73,7 +76,7 @@ export type CaptureOptions = {
   repositoryRoot: string;
   /** Builds the providers used in one capture. Real runs pass the Local* providers. */
   createProviders: () => CaptureProviders;
-  /** Production manifest whose record ids must match the temporary rebuild. Read-only. */
+  /** Production manifest checked against the temporary rebuild. Read-only. */
   productionManifestPath?: string;
   resume: boolean;
   log: (line: string) => void;
@@ -200,6 +203,7 @@ async function captureWithProviders(
       interpreter: providers.interpreter.describe()
     },
     matrixRecordCount: context.matrixRecords.length,
+    productionCheck: context.productionCheck,
     records: context.rows.map(recordWithoutVector),
     cases: captured
   });
@@ -230,7 +234,7 @@ export async function openCaptureContext(input: {
   if (!attempt.acquired)
     throw new Error("Another memory operation is already running.");
   const manifest = attempt.manifest;
-  await assertProductionRecordIds(
+  const productionCheck = await assertProductionCheck(
     manifest,
     input.productionManifestPath,
     input.threadIds
@@ -252,7 +256,8 @@ export async function openCaptureContext(input: {
     matrixRecords,
     matrixDocuments: matrixRecords.map((record) =>
       semanticRerankingDocument(record)
-    )
+    ),
+    productionCheck
   };
 }
 
@@ -301,35 +306,125 @@ async function captureCase(
   };
 }
 
+/** Production check modes, in order. The first predicate that matches the production schema version wins. */
+const PRODUCTION_CHECK_MODES: ReadonlyArray<{
+  mode: ProductionCheckMode;
+  matches: (productionSchemaVersion: number) => boolean;
+}> = [
+  {
+    mode: "record-ids",
+    matches: (version) => version === MEMORY_SCHEMA_VERSION
+  },
+  { mode: "thread-ids", matches: () => true }
+];
+
+type ProductionComparison = (
+  manifest: MemoryManifest,
+  production: MemoryManifest,
+  pinned: ReadonlySet<string>
+) => string[];
+
+/** One comparison per mode. Each returns mismatch descriptions; an empty list means a match. */
+const PRODUCTION_COMPARISONS: Record<ProductionCheckMode, ProductionComparison> = {
+  "record-ids": compareRecordIds,
+  "thread-ids": compareThreadIds
+};
+
 /**
- * Fails when the record ids of the pinned threads in the temporary rebuild are
- * not exactly those of the production manifest. Read-only.
+ * Compares the temporary rebuild with the production manifest, read-only. The
+ * mode follows the production schema version: record ids when it matches the
+ * code, pinned thread ids otherwise. Returns the check recorded in capture.json.
  */
-async function assertProductionRecordIds(
+async function assertProductionCheck(
   manifest: MemoryManifest,
   productionManifestPath: string | undefined,
   threadIds: readonly string[]
-): Promise<void> {
-  if (productionManifestPath === undefined) return;
+): Promise<ProductionCheckRecord | undefined> {
+  if (productionManifestPath === undefined) return undefined;
   const production = JSON.parse(
     await fs.readFile(productionManifestPath, "utf8")
   ) as MemoryManifest;
-  const pinned = new Set(threadIds);
-  const expected = recordIdSet(production, pinned);
-  const actual = recordIdSet(manifest, pinned);
-  const missing = [...expected].filter((id) => !actual.has(id));
-  const unexpected = [...actual].filter((id) => !expected.has(id));
-  if (missing.length === 0 && unexpected.length === 0) return;
-  throw new Error(
-    `Temporary memory manifest diverges from production: ${missing.length} record ids missing (e.g. ${missing.slice(0, 3).join(", ")}); ${unexpected.length} unexpected (e.g. ${unexpected.slice(0, 3).join(", ")}).`
+  const mode = productionCheckMode(production.schemaVersion);
+  const problems = PRODUCTION_COMPARISONS[mode](
+    manifest,
+    production,
+    new Set(threadIds)
   );
+  if (problems.length > 0)
+    throw new Error(
+      `Temporary memory manifest diverges from production (${mode}): ${problems.join("; ")}.`
+    );
+  return {
+    mode,
+    productionSchemaVersion: production.schemaVersion,
+    codeSchemaVersion: MEMORY_SCHEMA_VERSION
+  };
 }
 
-function recordIdSet(manifest: MemoryManifest, threadIds: Set<string>): Set<string> {
+function productionCheckMode(productionSchemaVersion: number): ProductionCheckMode {
+  const entry = PRODUCTION_CHECK_MODES.find((candidate) =>
+    candidate.matches(productionSchemaVersion)
+  );
+  return entry?.mode ?? "thread-ids";
+}
+
+function compareRecordIds(
+  manifest: MemoryManifest,
+  production: MemoryManifest,
+  pinned: ReadonlySet<string>
+): string[] {
+  const expected = recordIdSet(production, pinned);
+  const actual = recordIdSet(manifest, pinned);
+  return differences([
+    [
+      "record ids missing from the temporary manifest",
+      [...expected].filter((id) => !actual.has(id))
+    ],
+    [
+      "unexpected record ids in the temporary manifest",
+      [...actual].filter((id) => !expected.has(id))
+    ]
+  ]);
+}
+
+function compareThreadIds(
+  manifest: MemoryManifest,
+  production: MemoryManifest,
+  pinned: ReadonlySet<string>
+): string[] {
+  const productionThreads = threadIdSet(production);
+  const temporaryThreads = threadIdSet(manifest);
+  return differences([
+    [
+      "pinned threads missing from production",
+      [...pinned].filter((id) => !productionThreads.has(id))
+    ],
+    [
+      "pinned threads missing from the temporary manifest",
+      [...pinned].filter((id) => !temporaryThreads.has(id))
+    ],
+    [
+      "threads unexpected in the temporary manifest",
+      [...temporaryThreads].filter((id) => !pinned.has(id))
+    ]
+  ]);
+}
+
+function differences(categories: Array<[string, string[]]>): string[] {
+  return categories
+    .filter(([, ids]) => ids.length > 0)
+    .map(([label, ids]) => `${ids.length} ${label} (e.g. ${ids.slice(0, 3).join(", ")})`);
+}
+
+function recordIdSet(manifest: MemoryManifest, threadIds: ReadonlySet<string>): Set<string> {
   const records = manifest.records.filter((record) =>
     threadIds.has(record.threadId)
   );
   return new Set(records.flatMap((record) => record.recordIds));
+}
+
+function threadIdSet(manifest: MemoryManifest): Set<string> {
+  return new Set(manifest.records.map((record) => record.threadId));
 }
 
 export async function disposeProviders(providers: CaptureProviders): Promise<void> {

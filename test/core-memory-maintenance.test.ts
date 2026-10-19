@@ -239,7 +239,7 @@ async function writeModelFile(
 
 function memoryManifest(generation: string): MemoryManifest {
   return {
-    schemaVersion: 6,
+    schemaVersion: 7,
     builtAt: "2026-10-08T00:00:00.000Z",
     generation,
     embeddingProvider: {
@@ -252,7 +252,7 @@ function memoryManifest(generation: string): MemoryManifest {
       quantized: false,
       runtime: "local"
     },
-    retrievalContract: "field-aware-hybrid-v2",
+    retrievalContract: "source-layers-v1",
     records: []
   };
 }

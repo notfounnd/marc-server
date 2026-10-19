@@ -62,6 +62,41 @@ export type CapturedCase = {
   productionRecall: CapturedProductionRecall;
 };
 
+/** Provenance fields added by the source layers. Captures from E0 do not carry them. */
+export type MemoryProvenanceKey =
+  | "sourceType"
+  | "layer"
+  | "sourcePath"
+  | "authority"
+  | "lineStart"
+  | "lineEnd"
+  | "sourceSha256"
+  | "passageOrdinal"
+  | "passageSha256"
+  | "passageId";
+
+/** A record as stored in capture.json: provenance is optional, so E0 captures stay readable. */
+export type CapturedRecord = Omit<MemoryVectorRecord, MemoryProvenanceKey> &
+  Partial<Pick<MemoryVectorRecord, MemoryProvenanceKey>>;
+
+/**
+ * Reads a captured record as a search record. E0 captures carry no provenance,
+ * and the ranking and the reranker documents read only identity and text fields,
+ * so the cast does not change any score.
+ */
+export function asSearchRecord(record: CapturedRecord): MemoryVectorRecord {
+  return record as MemoryVectorRecord;
+}
+
+export type ProductionCheckMode = "record-ids" | "thread-ids";
+
+/** How the temporary rebuild was compared with the production manifest. Optional in capture.json. */
+export type ProductionCheckRecord = {
+  mode: ProductionCheckMode;
+  productionSchemaVersion: number;
+  codeSchemaVersion: number;
+};
+
 /** Content of capture.json: the replay input. Records are stored once, without vectors. */
 export type CaptureFile = {
   schemaVersion: number;
@@ -76,7 +111,8 @@ export type CaptureFile = {
     interpreter: QueryInterpretationProviderMetadata;
   };
   matrixRecordCount: number;
-  records: MemoryVectorRecord[];
+  productionCheck?: ProductionCheckRecord;
+  records: CapturedRecord[];
   cases: CapturedCase[];
 };
 
@@ -89,4 +125,5 @@ export type CaptureContext = {
   rows: MemoryVectorRow[];
   matrixRecords: MemoryVectorRecord[];
   matrixDocuments: string[];
+  productionCheck?: ProductionCheckRecord;
 };

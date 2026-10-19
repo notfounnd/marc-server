@@ -1,6 +1,8 @@
 import fs from "node:fs/promises";
+import path from "node:path";
 import { safeJoin } from "../paths.js";
 import type {
+  WorkspaceDocumentSource,
   WorkspaceInfo,
   WorkspaceSettings,
   WorkspaceSettingsInput
@@ -22,7 +24,8 @@ const DEFAULT_SETTINGS: WorkspaceSettings = {
   memory: {
     autoRebuild: true,
     embeddingBatchSize: DEFAULT_MEMORY_EMBEDDING_BATCH_SIZE,
-    searchRetryDepth: DEFAULT_MEMORY_SEARCH_RETRY_DEPTH
+    searchRetryDepth: DEFAULT_MEMORY_SEARCH_RETRY_DEPTH,
+    documentSources: []
   }
 };
 
@@ -31,6 +34,7 @@ type WorkspaceSettingsFile = Partial<{
     autoRebuild: boolean;
     embeddingBatchSize: number;
     searchRetryDepth: number;
+    documentSources: unknown;
   }>;
 }>;
 
@@ -84,7 +88,8 @@ function mergeWorkspaceSettings(
           ? input.memory.autoRebuild
           : current.memory.autoRebuild,
       embeddingBatchSize: nextEmbeddingBatchSize(current, input),
-      searchRetryDepth: nextSearchRetryDepth(current, input)
+      searchRetryDepth: nextSearchRetryDepth(current, input),
+      documentSources: current.memory.documentSources
     }
   };
 }
@@ -141,7 +146,8 @@ function normalizeWorkspaceSettings(value: unknown): WorkspaceSettings {
         : DEFAULT_SETTINGS.memory.embeddingBatchSize,
       searchRetryDepth: isMemorySearchRetryDepth(memory.searchRetryDepth)
         ? memory.searchRetryDepth
-        : DEFAULT_SETTINGS.memory.searchRetryDepth
+        : DEFAULT_SETTINGS.memory.searchRetryDepth,
+      documentSources: normalizeDocumentSources(memory.documentSources)
     }
   };
 }
@@ -151,9 +157,51 @@ function defaultSettings(): WorkspaceSettings {
     memory: {
       autoRebuild: DEFAULT_SETTINGS.memory.autoRebuild,
       embeddingBatchSize: DEFAULT_SETTINGS.memory.embeddingBatchSize,
-      searchRetryDepth: DEFAULT_SETTINGS.memory.searchRetryDepth
+      searchRetryDepth: DEFAULT_SETTINGS.memory.searchRetryDepth,
+      documentSources: []
     }
   };
+}
+
+// Lexical checks only, so a malformed settings file never throws. An entry
+// that fails any check is dropped; a non-array value becomes [].
+function normalizeDocumentSources(value: unknown): WorkspaceDocumentSource[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((entry: unknown) => documentSourceEntry(entry));
+}
+
+function documentSourceEntry(value: unknown): WorkspaceDocumentSource[] {
+  if (!isRecord(value)) return [];
+  const documentPath = value.path;
+  if (typeof documentPath !== "string" || !documentPath.trim()) return [];
+  const authority = documentAuthority(value.authority);
+  if (!authority) return [];
+  if (!isWorkspaceRelativePath(documentPath)) return [];
+  return [{ path: documentPath, authority }];
+}
+
+function documentAuthority(
+  value: unknown
+): WorkspaceDocumentSource["authority"] | undefined {
+  if (value === "normative" || value === "reference") return value;
+  return undefined;
+}
+
+function isWorkspaceRelativePath(documentPath: string): boolean {
+  if (isAbsoluteOrDriveOrUnc(documentPath)) return false;
+  const normalized = path.normalize(documentPath);
+  if (normalized.startsWith("..")) return false;
+  const segments = normalized.split(/[\\/]+/);
+  if (segments[0] === ".marc") return false;
+  return !segments.includes("node_modules");
+}
+
+function isAbsoluteOrDriveOrUnc(documentPath: string): boolean {
+  return (
+    path.isAbsolute(documentPath) ||
+    /^[A-Za-z]:/.test(documentPath) ||
+    /^[\\/]{2}/.test(documentPath)
+  );
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

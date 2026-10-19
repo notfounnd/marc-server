@@ -51,8 +51,8 @@ export type ReportInput = {
   capture: CaptureFile;
   dataset: EvalDataset;
   replay: ReplayResult;
-  /** latency.json of the same captureId. Latency is not part of the capture. */
-  latency: LatencyFile;
+  /** latency.json of the same captureId. Latency is not part of the capture. Absent with --without-latency. */
+  latency?: LatencyFile;
   raters?: RaterPairs;
 };
 
@@ -73,6 +73,28 @@ function latencyOf(file: LatencyFile): ReportLatency {
     measuredAt: file.measuredAt,
     minFreeMemoryBytes: Math.min(...freeMemory)
   };
+}
+
+function latencySection(file: LatencyFile | undefined): ReportLatency | null {
+  if (file === undefined) return null;
+  return latencyOf(file);
+}
+
+/** Output names. Without latency the report never overwrites the approved report.json and report.md. */
+export const REPORT_FILE_NAMES = {
+  withLatency: { json: "report.json", markdown: "report.md" },
+  withoutLatency: {
+    json: "report-no-latency.json",
+    markdown: "report-no-latency.md"
+  }
+} as const;
+
+export function reportFileNames(withoutLatency: boolean): {
+  json: string;
+  markdown: string;
+} {
+  if (withoutLatency) return REPORT_FILE_NAMES.withoutLatency;
+  return REPORT_FILE_NAMES.withLatency;
 }
 
 export type Report = {
@@ -108,7 +130,7 @@ export type Report = {
     oracleTop1Total: number | null;
   };
   interpretation: Array<{ id: InterpretationId; num: number; den: number; value: number | null }>;
-  latency: ReportLatency;
+  latency: ReportLatency | null;
   productionRecall: ProductionRecallComparison;
   kappa: { sources: [string, string] | null; pairs: number; divergences: number; value: number | null };
   folds: Array<{ fold: number; families: string[]; cases: number }>;
@@ -173,7 +195,7 @@ export async function buildReport(input: ReportInput): Promise<Report> {
     comparisons,
     attribution: attributionOf(input, evaluations),
     interpretation: interpretationOf(capture, dataset),
-    latency: latencyOf(input.latency),
+    latency: latencySection(input.latency),
     productionRecall: {
       m0Status: requireEvaluation(m0).status,
       productionStatus: production.status,
@@ -197,6 +219,16 @@ export async function readRaterPairs(pathA: string, pathB: string): Promise<Rate
   }
   const divergences = pairs.filter(([left, right]) => left !== right).length;
   return { sources: [pathA, pathB], pairs, divergences };
+}
+
+function latencyLines(latency: ReportLatency | null): string[] {
+  if (latency === null) return ["Latency: not measured", ""];
+  return [
+    table(["Samples", "Median", "p95", "Min free memory (MB)"], [[String(latency.samples), fmt(latency.medianMs), fmt(latency.p95Ms), fmt(latency.minFreeMemoryBytes / 1024 ** 2)]]),
+    "",
+    `Measured at ${latency.measuredAt}, from latency.json.`,
+    ""
+  ];
 }
 
 export function renderMarkdown(report: Report): string {
@@ -254,13 +286,7 @@ export function renderMarkdown(report: Report): string {
   );
   lines.push("## Interpretation", "");
   lines.push(table(["Metric", "Count", "Denominator", "Value"], report.interpretation.map((row) => [row.id, String(row.num), String(row.den), fmt(row.value)])), "");
-  lines.push("## Latency (milliseconds)", "");
-  lines.push(
-    table(["Samples", "Median", "p95", "Min free memory (MB)"], [[String(report.latency.samples), fmt(report.latency.medianMs), fmt(report.latency.p95Ms), fmt(report.latency.minFreeMemoryBytes / 1024 ** 2)]]),
-    "",
-    `Measured at ${report.latency.measuredAt}, from latency.json.`,
-    ""
-  );
+  lines.push("## Latency (milliseconds)", "", ...latencyLines(report.latency));
   lines.push("## Judgment agreement", "");
   lines.push(
     report.kappa.sources === null

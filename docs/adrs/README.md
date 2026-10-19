@@ -15,3 +15,4 @@ Architecture Decision Records (ADR) are intentionally short. They explain the de
 - [0007 - RULES.md uses a managed baseline and Custom Rules boundary](0007-rules-managed-baseline-and-custom-rules.md)
 - [0008 - Localization is scoped to the browser UI](0008-ui-only-localization-boundary.md)
 - [0009 - Markdown writes use cooperative locks and atomic file replacement](0009-cooperative-locks-and-atomic-markdown-writes.md)
+- [0010 - Memory source layers share one index per generation](0010-memory-source-layers.md)

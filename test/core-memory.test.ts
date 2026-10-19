@@ -138,8 +138,8 @@ test("rebuild creates a current manifest and status detects stale summaries", as
   });
 
   assert.equal(current.status, "ready");
-  assert.equal(manifest?.schemaVersion, 6);
-  assert.equal(manifest?.retrievalContract, "field-aware-hybrid-v2");
+  assert.equal(manifest?.schemaVersion, 7);
+  assert.equal(manifest?.retrievalContract, "source-layers-v1");
   assert.equal(current.stale, false);
   assert.equal(current.summaryCount, 1);
   assert.equal(stale.status, "stale");

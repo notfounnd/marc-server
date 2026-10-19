@@ -170,6 +170,8 @@ test("compares temporary record ids with the production manifest, read-only", as
     productionManifestPath: matchingPath
   });
   assert.equal(accepted.result.executedCases, 3);
+  const acceptedCapture = await readCaptureFile(accepted.result.captureDir);
+  assert.equal(acceptedCapture.productionCheck?.mode, "thread-ids");
   await assert.rejects(
     runCapture({
       threadsRoot,

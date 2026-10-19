@@ -1,3 +1,4 @@
+import { MEMORY_RETRIEVAL_CONTRACT, MEMORY_SCHEMA_VERSION } from "./types.js";
 import type {
   EmbeddingProvider,
   MemoryManifest,
@@ -53,8 +54,8 @@ export function memoryProvidersMatch(
   manifest: MemoryManifest,
   provider: EmbeddingProvider
 ): boolean {
-  if (manifest.schemaVersion !== 6) return false;
-  if (manifest.retrievalContract !== "field-aware-hybrid-v2") return false;
+  if (manifest.schemaVersion !== MEMORY_SCHEMA_VERSION) return false;
+  if (manifest.retrievalContract !== MEMORY_RETRIEVAL_CONTRACT) return false;
   const current = provider.describe();
   const stored = manifest.embeddingProvider;
   return (

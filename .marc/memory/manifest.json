@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 6,
-  "builtAt": "2026-10-17T21:48:02.015Z",
-  "generation": "20261017214800713_500e3276",
+  "schemaVersion": 7,
+  "builtAt": "2026-10-19T22:17:08.700Z",
+  "generation": "20261019221708251_a0d4c4e0",
   "embeddingProvider": {
     "id": "transformers-js-local-e5",
     "name": "Transformers.js local multilingual E5 retrieval",
@@ -12,7 +12,7 @@
     "quantized": true,
     "runtime": "local"
   },
-  "retrievalContract": "field-aware-hybrid-v2",
+  "retrievalContract": "source-layers-v1",
   "records": [
     {
       "threadId": "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983",
@@ -31,7 +31,11 @@
         "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983:source:validacao:passage:001",
         "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983:source:limites-e-continuidade:passage:001",
         "ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983:source:referencias:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/ajustar-a-politica-de-registros-do-loop-para-separar-orquestraca-004a9983/SUMMARY.md"
     },
     {
       "threadId": "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c",
@@ -49,7 +53,11 @@
         "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c:source:validacao-e-revisao:passage:001",
         "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c:source:limites-e-acompanhamento:passage:001",
         "ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c:source:encerramento:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/ajuste-falha-de-schema-no-rebuild-incremental-da-memoria-94409c8c/SUMMARY.md"
     },
     {
       "threadId": "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7",
@@ -69,7 +77,11 @@
         "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7:source:validacao:passage:001",
         "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7:source:observacoes:passage:001",
         "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7:source:referencias:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7/SUMMARY.md"
     },
     {
       "threadId": "bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82",
@@ -86,7 +98,11 @@
         "bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82:source:o-que-foi-tratado:passage:001",
         "bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82:source:validacao:passage:001",
         "bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82:source:continuidade:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/bug-agente-repete-bootstrap-e-investigacao-redundante-em-fluxo-m-58458a82/SUMMARY.md"
     },
     {
       "threadId": "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a",
@@ -105,7 +121,11 @@
         "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a:source:validacao:passage:001",
         "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a:source:documentacao:passage:001",
         "bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a:source:referencias:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/bug-comentario-pela-ui-adiciona-usuario-ao-rules-md-274b7c9a/SUMMARY.md"
     },
     {
       "threadId": "bug-workspace-audit-ignora-referencias-marc-em-inline-code-72461180",
@@ -122,7 +142,11 @@
         "bug-workspace-audit-ignora-referencias-marc-em-inline-code-72461180:source:o-que-foi-tratado:passage:001",
         "bug-workspace-audit-ignora-referencias-marc-em-inline-code-72461180:source:validacao:passage:001",
         "bug-workspace-audit-ignora-referencias-marc-em-inline-code-72461180:source:observacoes:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/bug-workspace-audit-ignora-referencias-marc-em-inline-code-72461180/SUMMARY.md"
     },
     {
       "threadId": "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684",
@@ -141,7 +165,11 @@
         "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684:source:desenvolvimento-e-revisao:passage:001",
         "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684:source:validacao:passage:001",
         "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684:source:limites-e-continuidade:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684/SUMMARY.md"
     },
     {
       "threadId": "correcao-ocultar-comentarios-html-no-markdown-renderizado-b84827bb",
@@ -157,7 +185,11 @@
         "correcao-ocultar-comentarios-html-no-markdown-renderizado-b84827bb:source:decisao-e-entrega:passage:001",
         "correcao-ocultar-comentarios-html-no-markdown-renderizado-b84827bb:source:validacao-e-aprovacao:passage:001",
         "correcao-ocultar-comentarios-html-no-markdown-renderizado-b84827bb:source:continuidade-e-limites:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/correcao-ocultar-comentarios-html-no-markdown-renderizado-b84827bb/SUMMARY.md"
     },
     {
       "threadId": "corrigir-corrida-de-startup-no-teste-de-auto-idle-do-daemon-504e1898",
@@ -173,7 +205,11 @@
         "corrigir-corrida-de-startup-no-teste-de-auto-idle-do-daemon-504e1898:source:causa-e-decisao:passage:001",
         "corrigir-corrida-de-startup-no-teste-de-auto-idle-do-daemon-504e1898:source:entrega:passage:001",
         "corrigir-corrida-de-startup-no-teste-de-auto-idle-do-daemon-504e1898:source:validacao:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/corrigir-corrida-de-startup-no-teste-de-auto-idle-do-daemon-504e1898/SUMMARY.md"
     },
     {
       "threadId": "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81",
@@ -193,7 +229,11 @@
         "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81:source:apresentacao-dos-agentes:passage:001",
         "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81:source:validacao:passage:001",
         "documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81:source:limites-e-continuidade:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/documentar-o-fluxo-de-desenvolvimento-em-loop-e-a-politica-de-mo-92413b81/SUMMARY.md"
     },
     {
       "threadId": "estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab",
@@ -211,7 +251,11 @@
         "estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab:source:entrega-implementada:passage:001",
         "estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab:source:rota-do-motor-de-busca-v2:passage:001",
         "estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab:source:continuidade:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab/SUMMARY.md"
     },
     {
       "threadId": "estudo-profundidade-adaptativa-e-simplificacao-do-deep-search-4f477d9f",
@@ -227,7 +271,11 @@
         "estudo-profundidade-adaptativa-e-simplificacao-do-deep-search-4f477d9f:source:contexto:passage:001",
         "estudo-profundidade-adaptativa-e-simplificacao-do-deep-search-4f477d9f:source:decisao-que-respondeu-ao-estudo:passage:001",
         "estudo-profundidade-adaptativa-e-simplificacao-do-deep-search-4f477d9f:source:continuidade:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/estudo-profundidade-adaptativa-e-simplificacao-do-deep-search-4f477d9f/SUMMARY.md"
     },
     {
       "threadId": "indicador-de-versao-no-rodape-7b4859bc",
@@ -243,7 +291,11 @@
         "indicador-de-versao-no-rodape-7b4859bc:source:decisao-e-entrega:passage:001",
         "indicador-de-versao-no-rodape-7b4859bc:source:validacao-e-aprovacao:passage:001",
         "indicador-de-versao-no-rodape-7b4859bc:source:limites-e-continuidade:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/indicador-de-versao-no-rodape-7b4859bc/SUMMARY.md"
     },
     {
       "threadId": "motor-de-busca-v2-e0-base-de-avaliacao-e-diagnostico-causal-bc45139b",
@@ -260,7 +312,33 @@
         "motor-de-busca-v2-e0-base-de-avaliacao-e-diagnostico-causal-bc45139b:source:decisoes-durante-a-execucao:passage:001",
         "motor-de-busca-v2-e0-base-de-avaliacao-e-diagnostico-causal-bc45139b:source:baseline-m0-de-17-10-2026:passage:001",
         "motor-de-busca-v2-e0-base-de-avaliacao-e-diagnostico-causal-bc45139b:source:continuidade:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/motor-de-busca-v2-e0-base-de-avaliacao-e-diagnostico-causal-bc45139b/SUMMARY.md"
+    },
+    {
+      "threadId": "motor-de-busca-v2-e1-camada-de-fontes-e-representacao-1042e2b3",
+      "title": "Motor de busca v2 - E1 Camada de fontes e representação",
+      "closedAt": "2026-10-19T22:15:54.695Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\motor-de-busca-v2-e1-camada-de-fontes-e-representacao-1042e2b3\\SUMMARY.md",
+      "relativeSummaryPath": "threads/motor-de-busca-v2-e1-camada-de-fontes-e-representacao-1042e2b3/SUMMARY.md",
+      "reference": "marc://$motor-de-busca-v2-e1-camada-de-fontes-e-representacao-1042e2b3",
+      "sha256": "f8586aad0502e8e29b148ff4143b403800bf71d6775b449514496cb246f35231",
+      "mtimeMs": 1792448154700.7139,
+      "recordIds": [
+        "motor-de-busca-v2-e1-camada-de-fontes-e-representacao-1042e2b3:identity",
+        "motor-de-busca-v2-e1-camada-de-fontes-e-representacao-1042e2b3:source:entrega:passage:001",
+        "motor-de-busca-v2-e1-camada-de-fontes-e-representacao-1042e2b3:source:normalizacao-e-recuos:passage:001",
+        "motor-de-busca-v2-e1-camada-de-fontes-e-representacao-1042e2b3:source:validacao:passage:001",
+        "motor-de-busca-v2-e1-camada-de-fontes-e-representacao-1042e2b3:source:validacao:passage:002",
+        "motor-de-busca-v2-e1-camada-de-fontes-e-representacao-1042e2b3:source:limites-e-continuidade:passage:001"
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/motor-de-busca-v2-e1-camada-de-fontes-e-representacao-1042e2b3/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894",
@@ -277,7 +355,11 @@
         "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894:source:validacao-e-aceite:passage:001",
         "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894:source:limites-e-continuidade:passage:001",
         "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894:source:referencias:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1",
@@ -295,7 +377,11 @@
         "oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1:source:execucao-e-revisao-final:passage:001",
         "oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1:source:validacao:passage:001",
         "oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1:source:limites-e-continuidade:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-atalhos-de-teclado-em-sheet-lateral-5845b8a1/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-autocomplete-de-referencias-no-composer-2341bc9f",
@@ -314,7 +400,11 @@
         "oportunidade-autocomplete-de-referencias-no-composer-2341bc9f:source:testes-e-validacao:passage:001",
         "oportunidade-autocomplete-de-referencias-no-composer-2341bc9f:source:documentacao-e-continuidade:passage:001",
         "oportunidade-autocomplete-de-referencias-no-composer-2341bc9f:source:estado-final:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-autocomplete-de-referencias-no-composer-2341bc9f/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac",
@@ -335,7 +425,11 @@
         "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac:source:ajustes-encontrados-durante-validacao-real:passage:001",
         "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac:source:continuidade:passage:001",
         "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac:source:estado-final:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686",
@@ -352,7 +446,11 @@
         "oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686:source:resultado:passage:001",
         "oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686:source:validacao:passage:001",
         "oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686:source:estado-final:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa",
@@ -370,7 +468,11 @@
         "oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa:source:validacao-da-entrega:passage:001",
         "oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa:source:limites-preservados:passage:001",
         "oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa:source:registros-de-entrega-e-revisao:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac",
@@ -389,7 +491,11 @@
         "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac:source:descoberta-posterior:passage:001",
         "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac:source:continuidade:passage:001",
         "oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac:source:estado-final:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99",
@@ -409,7 +515,11 @@
         "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99:source:validacao:passage:001",
         "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99:source:observacoes:passage:001",
         "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99:source:referencias:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-criacao-de-threads-pela-ui-0845d0bb",
@@ -426,7 +536,11 @@
         "oportunidade-criacao-de-threads-pela-ui-0845d0bb:source:validacao-e-revisao:passage:001",
         "oportunidade-criacao-de-threads-pela-ui-0845d0bb:source:limites-e-continuidade:passage:001",
         "oportunidade-criacao-de-threads-pela-ui-0845d0bb:source:registros-detalhados:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-criacao-de-threads-pela-ui-0845d0bb/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c",
@@ -445,7 +559,11 @@
         "oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c:source:testes-e-validacao:passage:001",
         "oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c:source:documentacao-e-continuidade:passage:001",
         "oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c:source:estado-final:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-daemon-detached-e-instalacao-global-via-npm-39436d9c/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-documentacao-do-projeto-e-readme-encantador-e54fb794",
@@ -465,7 +583,11 @@
         "oportunidade-documentacao-do-projeto-e-readme-encantador-e54fb794:source:oportunidades-derivadas:passage:001",
         "oportunidade-documentacao-do-projeto-e-readme-encantador-e54fb794:source:validacao:passage:001",
         "oportunidade-documentacao-do-projeto-e-readme-encantador-e54fb794:source:encerramento:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-documentacao-do-projeto-e-readme-encantador-e54fb794/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba",
@@ -489,7 +611,11 @@
         "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba:source:avaliacao-empirica-e-limites:passage:001",
         "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba:source:evidencias:passage:001",
         "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba:source:encerramento-e-continuidade:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-encerramento-de-threads-por-summary-e-indice-json-ce47939a",
@@ -506,7 +632,11 @@
         "oportunidade-encerramento-de-threads-por-summary-e-indice-json-ce47939a:source:validacao:passage:001",
         "oportunidade-encerramento-de-threads-por-summary-e-indice-json-ce47939a:source:benchmark:passage:001",
         "oportunidade-encerramento-de-threads-por-summary-e-indice-json-ce47939a:source:oportunidades-derivadas:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-encerramento-de-threads-por-summary-e-indice-json-ce47939a/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b",
@@ -524,7 +654,11 @@
         "oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b:source:validacao:passage:001",
         "oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b:source:backlog-playwright:passage:001",
         "oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b:source:pendencias:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1",
@@ -542,7 +676,11 @@
         "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1:source:validacao:passage:001",
         "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1:source:backlog-playwright:passage:001",
         "oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1:source:pendencias:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-estilo-neo-brutalism-para-a-ui-024e05b1/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b",
@@ -561,7 +699,11 @@
         "oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b:source:validacao-e-aceite:passage:001",
         "oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b:source:limites:passage:001",
         "oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b:source:evidencias:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-indicador-visual-de-memory-na-interface-174c48b6",
@@ -578,7 +720,11 @@
         "oportunidade-indicador-visual-de-memory-na-interface-174c48b6:source:o-que-foi-alterado:passage:001",
         "oportunidade-indicador-visual-de-memory-na-interface-174c48b6:source:validacao:passage:001",
         "oportunidade-indicador-visual-de-memory-na-interface-174c48b6:source:continuidade:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-indicador-visual-de-memory-na-interface-174c48b6/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-leitura-incremental-de-threads-por-cursor-3c45fa83",
@@ -595,7 +741,11 @@
         "oportunidade-leitura-incremental-de-threads-por-cursor-3c45fa83:source:entregas:passage:001",
         "oportunidade-leitura-incremental-de-threads-por-cursor-3c45fa83:source:validacao:passage:001",
         "oportunidade-leitura-incremental-de-threads-por-cursor-3c45fa83:source:oportunidades-derivadas:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-leitura-incremental-de-threads-por-cursor-3c45fa83/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb",
@@ -613,7 +763,11 @@
         "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb:source:validation:passage:001",
         "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb:source:notes:passage:001",
         "oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb:source:follow-up:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-marc-audit-para-melhorar-custom-rules-184fd8bb/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-mecanismo-de-busca-sobre-o-conhecimento-do-projeto-b64903bd",
@@ -631,7 +785,11 @@
         "oportunidade-mecanismo-de-busca-sobre-o-conhecimento-do-projeto-b64903bd:source:implementation:passage:001",
         "oportunidade-mecanismo-de-busca-sobre-o-conhecimento-do-projeto-b64903bd:source:validation:passage:001",
         "oportunidade-mecanismo-de-busca-sobre-o-conhecimento-do-projeto-b64903bd:source:follow-ups:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-mecanismo-de-busca-sobre-o-conhecimento-do-projeto-b64903bd/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-memory-deep-para-aprofundamento-em-threads-fechadas-f04c7cae",
@@ -646,7 +804,11 @@
         "oportunidade-memory-deep-para-aprofundamento-em-threads-fechadas-f04c7cae:identity",
         "oportunidade-memory-deep-para-aprofundamento-em-threads-fechadas-f04c7cae:source:o-que-continua-valido:passage:001",
         "oportunidade-memory-deep-para-aprofundamento-em-threads-fechadas-f04c7cae:source:o-que-ficou-desatualizado:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-memory-deep-para-aprofundamento-em-threads-fechadas-f04c7cae/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-migracao-de-cabecalhos-de-summaries-com-previas-3c4dda95",
@@ -662,7 +824,11 @@
         "oportunidade-migracao-de-cabecalhos-de-summaries-com-previas-3c4dda95:source:decisoes-e-entrega:passage:001",
         "oportunidade-migracao-de-cabecalhos-de-summaries-com-previas-3c4dda95:source:validacao-e-revisao:passage:001",
         "oportunidade-migracao-de-cabecalhos-de-summaries-com-previas-3c4dda95:source:registros:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-migracao-de-cabecalhos-de-summaries-com-previas-3c4dda95/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3",
@@ -683,7 +849,11 @@
         "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3:source:decisao:passage:001",
         "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3:source:fronteira-futura:passage:001",
         "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3:source:evidencia-e-validacao:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9",
@@ -700,7 +870,11 @@
         "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9:source:resultado:passage:001",
         "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9:source:validacao:passage:001",
         "oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9:source:estado-final:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-ordenar-threads-mais-novas-no-topo-394a14b9/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-organizar-agentes-registrados-no-rules-md-734062bc",
@@ -718,7 +892,11 @@
         "oportunidade-organizar-agentes-registrados-no-rules-md-734062bc:source:changes:passage:001",
         "oportunidade-organizar-agentes-registrados-no-rules-md-734062bc:source:validation:passage:001",
         "oportunidade-organizar-agentes-registrados-no-rules-md-734062bc:source:notes:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-organizar-agentes-registrados-no-rules-md-734062bc/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-organizar-css-da-ui-por-dominio-aa4c94ba",
@@ -737,7 +915,11 @@
         "oportunidade-organizar-css-da-ui-por-dominio-aa4c94ba:source:testes-e-validacao:passage:001",
         "oportunidade-organizar-css-da-ui-por-dominio-aa4c94ba:source:documentacao-e-continuidade:passage:001",
         "oportunidade-organizar-css-da-ui-por-dominio-aa4c94ba:source:estado-final:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-organizar-css-da-ui-por-dominio-aa4c94ba/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f",
@@ -754,7 +936,11 @@
         "oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f:source:o-que-mudou:passage:001",
         "oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f:source:validacao:passage:001",
         "oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f:source:risco-residual:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd",
@@ -773,7 +959,11 @@
         "oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd:source:melhorias-de-usabilidade:passage:001",
         "oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd:source:validacao:passage:001",
         "oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd:source:estado-final:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-popup-para-postar-artifacts-pela-ui-c04986bd/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa",
@@ -791,7 +981,11 @@
         "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa:source:validacao:passage:001",
         "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa:source:continuidade:passage:001",
         "oportunidade-processamento-em-background-para-gerar-memory-aa4908aa:source:referencias:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-processamento-em-background-para-gerar-memory-aa4908aa/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-provider-de-memory-aquecido-com-ttl-curto-d540c6b4",
@@ -810,7 +1004,11 @@
         "oportunidade-provider-de-memory-aquecido-com-ttl-curto-d540c6b4:source:validacao:passage:001",
         "oportunidade-provider-de-memory-aquecido-com-ttl-curto-d540c6b4:source:limite-observado:passage:001",
         "oportunidade-provider-de-memory-aquecido-com-ttl-curto-d540c6b4:source:estado-final:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-provider-de-memory-aquecido-com-ttl-curto-d540c6b4/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682",
@@ -828,7 +1026,11 @@
         "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682:source:tratativa:passage:001",
         "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682:source:validacao:passage:001",
         "oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682:source:referencias:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486",
@@ -846,7 +1048,11 @@
         "oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486:source:validacao:passage:001",
         "oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486:source:continuidade:passage:001",
         "oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486:source:estado-final:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-reestruturar-instructions-e-rules-para-bootstrap-d34b7486/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4",
@@ -866,7 +1072,11 @@
         "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4:source:testes-e-validacao:passage:001",
         "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4:source:continuidade:passage:001",
         "oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4:source:estado-final:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-referencias-internas-e-mencoes-direcionadas-3c4261b4/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-reforcar-gatilhos-de-ativacao-da-skill-marc-ops-934c4896",
@@ -883,7 +1093,11 @@
         "oportunidade-reforcar-gatilhos-de-ativacao-da-skill-marc-ops-934c4896:source:o-que-foi-tratado:passage:001",
         "oportunidade-reforcar-gatilhos-de-ativacao-da-skill-marc-ops-934c4896:source:validacao:passage:001",
         "oportunidade-reforcar-gatilhos-de-ativacao-da-skill-marc-ops-934c4896:source:continuidade:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-reforcar-gatilhos-de-ativacao-da-skill-marc-ops-934c4896/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be",
@@ -900,7 +1114,11 @@
         "oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be:source:artifact:passage:001",
         "oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be:source:validacao:passage:001",
         "oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be:source:observacoes:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-revisao-de-arquitetura-do-projeto-fe4a1cb2",
@@ -916,7 +1134,11 @@
         "oportunidade-revisao-de-arquitetura-do-projeto-fe4a1cb2:source:resultado:passage:001",
         "oportunidade-revisao-de-arquitetura-do-projeto-fe4a1cb2:source:validacao:passage:001",
         "oportunidade-revisao-de-arquitetura-do-projeto-fe4a1cb2:source:acompanhamento:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-revisao-de-arquitetura-do-projeto-fe4a1cb2/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787",
@@ -935,7 +1157,11 @@
         "oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787:source:validacao-e-aprovacao:passage:001",
         "oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787:source:limites-e-contexto-futuro:passage:001",
         "oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787:source:encerramento:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-revisao-e-atualizacao-do-marc-para-mcp-2026-07-28-3b4a8787/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-revisao-en-us-do-projeto-c14150b8",
@@ -955,7 +1181,11 @@
         "oportunidade-revisao-en-us-do-projeto-c14150b8:source:validacao:passage:001",
         "oportunidade-revisao-en-us-do-projeto-c14150b8:source:documentacao-e-continuidade:passage:001",
         "oportunidade-revisao-en-us-do-projeto-c14150b8:source:estado-final:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-revisao-en-us-do-projeto-c14150b8/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9",
@@ -975,7 +1205,11 @@
         "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9:source:documentacao:passage:001",
         "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9:source:referencias:passage:001",
         "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9:source:continuidade:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186",
@@ -994,7 +1228,11 @@
         "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186:source:validacao:passage:001",
         "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186:source:riscos-e-continuidade:passage:001",
         "oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186:source:referencias:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-status-health-e-rebuild-de-indice-em-background-6340b186/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7",
@@ -1013,7 +1251,11 @@
         "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7:source:correcao-dos-testes-e-validacao:passage:002",
         "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7:source:revisao-e-limites:passage:001",
         "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7:source:registros-e-continuidade:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb",
@@ -1034,7 +1276,11 @@
         "oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb:source:experiencia-de-uso:passage:001",
         "oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb:source:continuidade:passage:001",
         "oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb:source:estado-final:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb/SUMMARY.md"
     },
     {
       "threadId": "padronizar-mensagens-marc-em-bullets-concisos-6143a9b5",
@@ -1051,7 +1297,11 @@
         "padronizar-mensagens-marc-em-bullets-concisos-6143a9b5:source:o-que-foi-tratado:passage:001",
         "padronizar-mensagens-marc-em-bullets-concisos-6143a9b5:source:validacao-registrada:passage:001",
         "padronizar-mensagens-marc-em-bullets-concisos-6143a9b5:source:continuidade:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/padronizar-mensagens-marc-em-bullets-concisos-6143a9b5/SUMMARY.md"
     },
     {
       "threadId": "remover-comandos-legados-do-mcp-reduzir-sobrecarga-de-contexto-034ad1bf",
@@ -1068,7 +1318,11 @@
         "remover-comandos-legados-do-mcp-reduzir-sobrecarga-de-contexto-034ad1bf:source:o-que-foi-tratado:passage:001",
         "remover-comandos-legados-do-mcp-reduzir-sobrecarga-de-contexto-034ad1bf:source:validacao-registrada:passage:001",
         "remover-comandos-legados-do-mcp-reduzir-sobrecarga-de-contexto-034ad1bf:source:continuidade:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/remover-comandos-legados-do-mcp-reduzir-sobrecarga-de-contexto-034ad1bf/SUMMARY.md"
     },
     {
       "threadId": "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb",
@@ -1084,7 +1338,11 @@
         "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb:source:entrega-e-decisoes:passage:001",
         "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb:source:validacao-e-limites:passage:001",
         "substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb:source:continuidade:passage:001"
-      ]
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/substituir-componente-sonner-pelo-componente-toast-da-lib-neobru-594973bb/SUMMARY.md"
     }
   ]
 }

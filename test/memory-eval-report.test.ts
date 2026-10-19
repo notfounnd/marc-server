@@ -5,6 +5,7 @@ import {
   DECISION_METRICS,
   renderMarkdown,
   REPORT_VARIANTS,
+  reportFileNames,
   type Report
 } from "../scripts/memory-eval/report.js";
 import { replayCapture } from "../scripts/memory-eval/replay.js";
@@ -57,7 +58,37 @@ test("report carries the identification, the equivalence and complete verdicts",
   assert.equal(report.variants.D0?.status, "complete");
   assert.equal(report.variants.ORACLE_ADMISSION?.status, "complete");
   assert.equal(report.corpusSize.threads, 3);
+  assert.ok(report.latency);
   assert.equal(report.latency.samples, 9);
+});
+
+test("a report without latency says so and takes its own file names", async (t: TestContext) => {
+  const threadsRoot = await fixtureThreadsRoot(t);
+  const captured = await runCapture({
+    threadsRoot,
+    outputRoot: await tempDirectory(t),
+    fakes: createFakes()
+  });
+  const capture = await readCaptureFile(captured.result.captureDir);
+  const replay = await replayCapture({
+    capture,
+    dataset: judgedDataset,
+    variantIds: [...REPORT_VARIANTS, PRODUCTION_RECALL_ID]
+  });
+  const report = await buildReport({ capture, dataset: judgedDataset, replay });
+  const markdown = renderMarkdown(report);
+
+  assert.equal(report.latency, null);
+  assert.match(markdown, /^Latency: not measured$/m);
+  assert.doesNotMatch(markdown, /Measured at/);
+  assert.deepEqual(reportFileNames(true), {
+    json: "report-no-latency.json",
+    markdown: "report-no-latency.md"
+  });
+  assert.deepEqual(reportFileNames(false), {
+    json: "report.json",
+    markdown: "report.md"
+  });
 });
 
 test("report counts one attribution row per grade 3 thread of a positive case", async (t: TestContext) => {

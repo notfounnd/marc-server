@@ -1,6 +1,9 @@
 import { semanticRerankingDocument } from "../../src/core/memory/semantic-ranking.js";
-import type { MemoryVectorRecord } from "../../src/core/memory/types.js";
-import type { CapturedChannels } from "./capture-types.js";
+import {
+  asSearchRecord,
+  type CapturedChannels,
+  type CapturedRecord
+} from "./capture-types.js";
 import { rerankPairKey } from "./recording-providers.js";
 import { TARGET_GRADE } from "./metrics.js";
 import type { RelevanceGrade } from "./dataset.js";
@@ -17,7 +20,7 @@ export type AttributionInput = {
   query: string;
   channels: CapturedChannels;
   rerankScores: Record<string, number>;
-  records: ReadonlyMap<string, MemoryVectorRecord>;
+  records: ReadonlyMap<string, CapturedRecord>;
   judgments: Record<string, RelevanceGrade>;
   results: VariantResult[];
 };
@@ -126,7 +129,7 @@ function bestMatrixScorePerThread(input: AttributionInput): Map<string, number> 
 function scoreOf(input: AttributionInput, recordId: string): number {
   const record = input.records.get(recordId);
   if (record === undefined) throw new Error(`Capture has no record ${recordId}.`);
-  const key = rerankPairKey(input.query, semanticRerankingDocument(record));
+  const key = rerankPairKey(input.query, semanticRerankingDocument(asSearchRecord(record)));
   const score = input.rerankScores[key];
   if (score === undefined) throw new Error(`Capture has no matrix score for record ${recordId}.`);
   return score;
@@ -134,7 +137,7 @@ function scoreOf(input: AttributionInput, recordId: string): number {
 
 function channelThreadIds(
   channels: CapturedChannels,
-  records: ReadonlyMap<string, MemoryVectorRecord>
+  records: ReadonlyMap<string, CapturedRecord>
 ): Set<string> {
   const recordIds = [
     ...channels.identities,

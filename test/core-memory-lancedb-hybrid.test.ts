@@ -17,6 +17,7 @@ import {
   tempWorkspace,
   writeSummary
 } from "./memory-test-helpers.js";
+import { summaryProvenanceFixture } from "./memory-provenance-fixtures.js";
 
 test("LanceDB lexical indexes keep title, summary, and prefix evidence distinct", async () => {
   const info = await tempWorkspace();
@@ -136,12 +137,12 @@ test("incremental LanceDB rebuild accepts null optional fields after a round tri
     tableName(activeManifest.generation)
   );
   const schema = await activeTable.schema();
-  const textFields = schema.fields.filter((field) => field.name !== "vector");
-  assert.equal(textFields.length, 14);
-  for (const field of textFields) {
-    assert.equal(field.type.toString(), "Utf8");
-    assert.equal(field.nullable, true);
-  }
+  const columnFields = schema.fields.filter((field) => field.name !== "vector");
+  const types = columnFields.map((field) => field.type.toString());
+  assert.equal(types.filter((type) => type === "Utf8").length, 23);
+  assert.equal(types.filter((type) => type === "Int32").length, 4);
+  assert.equal(types.length, 27);
+  for (const field of columnFields) assert.equal(field.nullable, true);
   const vectorField = schema.fields.find((field) => field.name === "vector");
   assert.ok(vectorField);
   assert.equal(vectorField.nullable, true);
@@ -306,6 +307,7 @@ function record(
     kind,
     sectionTitle: kind === "passage" ? "Result" : undefined,
     text,
-    embeddingText: text
+    embeddingText: text,
+    ...summaryProvenanceFixture(threadId, text)
   };
 }

@@ -3,6 +3,7 @@ import { safeJoin } from "../paths.js";
 import type { WorkspaceInfo } from "../types.js";
 import { memoryRootPath } from "./storage-paths.js";
 import type {
+  MemoryLayer,
   MemoryLexicalField,
   MemoryVectorRecord,
   MemoryVectorRow
@@ -25,12 +26,15 @@ type LanceDbTable = Awaited<ReturnType<LanceDbConnection["openTable"]>>;
 
 type LanceDbStoredRow = Omit<
   MemoryVectorRecord,
-  "closedAt" | "sectionTitle"
+  "closedAt" | "sectionTitle" | "messageId" | "agentId" | "artifactFileName"
 > & {
+  agentId: string | null;
+  artifactFileName: string | null;
   closedAt: string | null;
   lexicalSummary: string;
   lexicalTitle: string;
   lexicalTitlePrefix: string;
+  messageId: string | null;
   sectionTitle: string | null;
   vector: number[];
 };
@@ -85,10 +89,13 @@ export function lanceDbRow(
   const lexical = record.kind === "identity";
   return {
     ...record,
+    agentId: record.agentId ?? null,
+    artifactFileName: record.artifactFileName ?? null,
     closedAt: record.closedAt ?? null,
     lexicalSummary: record.text,
     lexicalTitle: lexical ? record.title : "",
     lexicalTitlePrefix: lexical ? titlePrefixes(record.title) : "",
+    messageId: record.messageId ?? null,
     sectionTitle: record.sectionTitle ?? null,
     vector
   };
@@ -117,10 +124,23 @@ export async function lanceDbArrowTable(
     "embeddingText",
     "lexicalSummary",
     "lexicalTitle",
-    "lexicalTitlePrefix"
+    "lexicalTitlePrefix",
+    "sourceType",
+    "sourcePath",
+    "authority",
+    "sourceSha256",
+    "passageSha256",
+    "passageId",
+    "messageId",
+    "agentId",
+    "artifactFileName"
   ];
+  const integerFields = ["layer", "lineStart", "lineEnd", "passageOrdinal"];
   const schema = new arrow.Schema([
     ...textFields.map((name) => new arrow.Field(name, new arrow.Utf8(), true)),
+    ...integerFields.map(
+      (name) => new arrow.Field(name, new arrow.Int32(), true)
+    ),
     new arrow.Field(
       "vector",
       new arrow.FixedSizeList(
@@ -154,7 +174,20 @@ export function memoryVectorRecordFromStored(row: unknown): MemoryVectorRecord {
     kind: stored.kind,
     sectionTitle: stored.sectionTitle ?? undefined,
     text: stored.text,
-    embeddingText: stored.embeddingText
+    embeddingText: stored.embeddingText,
+    sourceType: stored.sourceType,
+    layer: stored.layer,
+    sourcePath: stored.sourcePath,
+    authority: stored.authority,
+    lineStart: stored.lineStart,
+    lineEnd: stored.lineEnd,
+    sourceSha256: stored.sourceSha256,
+    passageOrdinal: stored.passageOrdinal,
+    passageSha256: stored.passageSha256,
+    passageId: stored.passageId,
+    messageId: stored.messageId ?? undefined,
+    agentId: stored.agentId ?? undefined,
+    artifactFileName: stored.artifactFileName ?? undefined
   };
 }
 
@@ -197,6 +230,19 @@ export async function directorySize(root: string): Promise<number> {
 
 export function recordIdPredicate(recordIds: string[]): string {
   return `recordId IN (${recordIds.map(sqlString).join(", ")})`;
+}
+
+export function layerPredicate(layers: readonly MemoryLayer[]): string {
+  return `layer IN (${layers.join(", ")})`;
+}
+
+export function searchPredicate(options: {
+  kind?: "identity" | "passage";
+  layers: readonly MemoryLayer[];
+}): string {
+  const predicates = [layerPredicate(options.layers)];
+  if (options.kind) predicates.push(`kind = ${sqlString(options.kind)}`);
+  return predicates.join(" AND ");
 }
 
 export function sqlString(value: string): string {

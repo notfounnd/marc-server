@@ -140,6 +140,7 @@ test("report refuses a missing or foreign latency.json and reads median and p95 
   const sorted = latency.cases
     .flatMap((item) => item.samples)
     .sort((left, right) => left - right);
+  assert.ok(report.latency);
   assert.equal(report.latency.samples, 9);
   assert.equal(report.latency.medianMs, sorted[4]);
   assert.equal(report.latency.p95Ms, sorted[8]);

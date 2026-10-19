@@ -1,4 +1,13 @@
 import type { WorkspaceInfo } from "../types.js";
+import type {
+  MEMORY_RETRIEVAL_CONTRACT,
+  MEMORY_SCHEMA_VERSION,
+  MemoryAuthority,
+  MemoryLayer,
+  MemorySourceType
+} from "./sources/contract.js";
+
+export * from "./sources/contract.js";
 
 export type MemoryDistance = "cosine";
 export type MemoryRuntime = "local" | "external";
@@ -82,27 +91,6 @@ export type MemoryQueryInterpretation = {
   correctionApplied: boolean;
 };
 
-export type MemoryChunk = {
-  recordId: string;
-  kind: MemoryRecordKind;
-  sectionTitle?: string;
-  text: string;
-  embeddingText: string;
-};
-
-export type ThreadSummarySource = {
-  threadId: string;
-  title: string;
-  closedAt?: string;
-  summaryPath: string;
-  relativeSummaryPath: string;
-  reference: string;
-  markdown: string;
-  sha256: string;
-  mtimeMs: number;
-  chunks: MemoryChunk[];
-};
-
 export type MemoryVectorRecord = {
   recordId: string;
   threadId: string;
@@ -115,6 +103,19 @@ export type MemoryVectorRecord = {
   sectionTitle?: string;
   text: string;
   embeddingText: string;
+  sourceType: MemorySourceType;
+  layer: MemoryLayer;
+  sourcePath: string;
+  authority: MemoryAuthority;
+  lineStart: number;
+  lineEnd: number;
+  sourceSha256: string;
+  passageOrdinal: number;
+  passageSha256: string;
+  passageId: string;
+  messageId?: string;
+  agentId?: string;
+  artifactFileName?: string;
 };
 
 export type MemoryVectorRow = MemoryVectorRecord & {
@@ -131,14 +132,18 @@ export type MemoryManifestRecord = {
   sha256: string;
   mtimeMs: number;
   recordIds: string[];
+  sourceType: MemorySourceType;
+  layer: MemoryLayer;
+  authority: MemoryAuthority;
+  sourcePath: string;
 };
 
 export type MemoryManifest = {
-  schemaVersion: 6;
+  schemaVersion: typeof MEMORY_SCHEMA_VERSION;
   builtAt: string;
   generation: string;
   embeddingProvider: EmbeddingProviderMetadata;
-  retrievalContract: "field-aware-hybrid-v2";
+  retrievalContract: typeof MEMORY_RETRIEVAL_CONTRACT;
   records: MemoryManifestRecord[];
 };
 
@@ -206,6 +211,9 @@ export type MemoryRecallHit = {
   matchedText: string;
   score: number;
   reason: string;
+  sourceType?: MemorySourceType;
+  sourcePath?: string;
+  authority?: MemoryAuthority;
 };
 
 export type MemoryVectorStore = {
@@ -233,6 +241,7 @@ export type MemoryVectorStore = {
     options: {
       generation?: string;
       kind?: "identity" | "passage";
+      layers?: readonly MemoryLayer[];
       limit: number;
     }
   ): Promise<MemorySearchHit[]>;
@@ -243,6 +252,7 @@ export type MemoryVectorStore = {
     options: {
       field: MemoryLexicalField;
       generation?: string;
+      layers?: readonly MemoryLayer[];
       limit: number;
     }
   ): Promise<MemoryLexicalSearchHit[]>;
@@ -293,6 +303,7 @@ export type MemoryOperationOptions = {
   interpreter?: QueryInterpretationProvider;
   store?: MemoryVectorStore;
   batchSize?: number;
+  indexedLayers?: readonly MemoryLayer[];
 };
 
 export type MemoryRecallOptions = MemoryOperationOptions & {

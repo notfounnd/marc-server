@@ -95,7 +95,10 @@ export function semanticRecallHits(
     reference: hit.evidence.record.reference,
     matchedText: hit.evidence.record.text,
     score: hit.eligibility,
-    reason: semanticMatchReason(hit.evidence.record)
+    reason: semanticMatchReason(hit.evidence.record),
+    sourceType: hit.evidence.record.sourceType,
+    sourcePath: hit.evidence.record.sourcePath,
+    authority: hit.evidence.record.authority
   }));
 }
 

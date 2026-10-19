@@ -7,22 +7,29 @@ import {
 } from "./store.js";
 import {
   DEFAULT_MEMORY_EMBEDDING_BATCH_SIZE,
-  isMemoryEmbeddingBatchSize
+  isMemoryEmbeddingBatchSize,
+  readWorkspaceSettingsInWorkspace
 } from "./settings.js";
-import {
-  materializeThreadSummarySources,
-  scanThreadSummarySources
-} from "./summaries.js";
 import { memoryProvidersMatch } from "./status.js";
+import { chunkOrigin } from "./sources/chunks.js";
+import { sha256Hex } from "./sources/files.js";
+import { INDEXED_LAYERS, readIndexedSources } from "./sources/index.js";
+import { materializeSources } from "./sources/materialize.js";
+import {
+  MEMORY_RETRIEVAL_CONTRACT,
+  MEMORY_SCHEMA_VERSION,
+  MEMORY_SOURCE_LAYERS
+} from "./types.js";
 import type {
   EmbeddingProvider,
+  MemoryChunk,
   MemoryManifest,
   MemoryManifestRecord,
   MemoryOperationOptions,
+  MemorySource,
   MemoryVectorRecord,
   MemoryVectorRow,
-  MemoryVectorStore,
-  ThreadSummarySource
+  MemoryVectorStore
 } from "./types.js";
 
 export async function rebuildAllMemory(
@@ -48,8 +55,8 @@ export async function reconcileMemory(
   const manifest = await readMemoryManifest(info);
   if (
     !manifest ||
-    manifest.schemaVersion !== 6 ||
-    manifest.retrievalContract !== "field-aware-hybrid-v2"
+    manifest.schemaVersion !== MEMORY_SCHEMA_VERSION ||
+    manifest.retrievalContract !== MEMORY_RETRIEVAL_CONTRACT
   )
     throw new Error("Memory schema changed. Run a full rebuild.");
 
@@ -59,9 +66,9 @@ export async function reconcileMemory(
     );
 
   const sources = await materializedSources(info, options);
-  const changedThreadIds = changedSourceIds(sources, manifest);
-  const removedThreadIds = removedSourceIds(sources, manifest);
-  if (!changedThreadIds.size && !removedThreadIds.size) return manifest;
+  const changedPaths = changedSourcePaths(sources, manifest);
+  const removedPaths = removedSourcePaths(sources, manifest);
+  if (!changedPaths.size && !removedPaths.size) return manifest;
 
   if (!store.readRows)
     throw new Error(
@@ -70,10 +77,10 @@ export async function reconcileMemory(
   const currentRows = await store.readRows(info, manifest.generation);
   const preservedRows = currentRows.filter(
     (row) =>
-      !changedThreadIds.has(row.threadId) && !removedThreadIds.has(row.threadId)
+      !changedPaths.has(row.sourcePath) && !removedPaths.has(row.sourcePath)
   );
   const changedRecords = flattenSources(
-    sources.filter((source) => changedThreadIds.has(source.threadId))
+    sources.filter((source) => changedPaths.has(source.sourcePath))
   );
   const changedVectors = await embedRecords(changedRecords, options);
   const rows = [
@@ -86,15 +93,20 @@ export async function reconcileMemory(
 async function materializedSources(
   info: WorkspaceInfo,
   options: MemoryOperationOptions
-): Promise<ThreadSummarySource[]> {
-  const sources = await scanThreadSummarySources(info);
-  return materializeThreadSummarySources(sources, options.reranker);
+): Promise<MemorySource[]> {
+  const settings = await readWorkspaceSettingsInWorkspace(info);
+  const sources = await readIndexedSources(
+    info,
+    settings,
+    options.indexedLayers ?? INDEXED_LAYERS
+  );
+  return materializeSources(sources, options.reranker);
 }
 
 async function publishGeneration(
   info: WorkspaceInfo,
   options: MemoryOperationOptions,
-  sources: ThreadSummarySource[],
+  sources: MemorySource[],
   rows: MemoryVectorRow[]
 ): Promise<MemoryManifest> {
   const store = memoryStore(options.store);
@@ -116,29 +128,45 @@ function memoryStore(store?: MemoryVectorStore): MemoryVectorStore {
   return store ?? new LanceDbMemoryVectorStore();
 }
 
-function changedSourceIds(
-  sources: ThreadSummarySource[],
+function changedSourcePaths(
+  sources: MemorySource[],
   manifest: MemoryManifest
 ): Set<string> {
-  const previousHashes = new Map(
-    manifest.records.map((record) => [record.threadId, record.sha256])
+  const previous = new Map(
+    manifest.records.map((record) => [record.sourcePath, record])
   );
   return new Set(
     sources
-      .filter((source) => previousHashes.get(source.threadId) !== source.sha256)
-      .map((source) => source.threadId)
+      .filter((source) =>
+        isChangedSource(source, previous.get(source.sourcePath))
+      )
+      .map((source) => source.sourcePath)
   );
 }
 
-function removedSourceIds(
-  sources: ThreadSummarySource[],
+// The hash covers only the content. Authority, layer, and source type are
+// stored in every indexed record too, so a change in any of them re-indexes
+// the source. A reference-to-normative switch keeps the same hash.
+function isChangedSource(
+  source: MemorySource,
+  record: MemoryManifestRecord | undefined
+): boolean {
+  if (!record) return true;
+  if (record.sha256 !== source.sha256) return true;
+  if (record.authority !== source.authority) return true;
+  if (record.sourceType !== source.sourceType) return true;
+  return record.layer !== MEMORY_SOURCE_LAYERS[source.sourceType];
+}
+
+function removedSourcePaths(
+  sources: MemorySource[],
   manifest: MemoryManifest
 ): Set<string> {
-  const currentIds = new Set(sources.map((source) => source.threadId));
+  const currentPaths = new Set(sources.map((source) => source.sourcePath));
   return new Set(
     manifest.records
-      .filter((record) => !currentIds.has(record.threadId))
-      .map((record) => record.threadId)
+      .filter((record) => !currentPaths.has(record.sourcePath))
+      .map((record) => record.sourcePath)
   );
 }
 
@@ -209,42 +237,59 @@ async function validateStoredGeneration(
   await store.validateGeneration(info, generation);
 }
 
-function flattenSources(sources: ThreadSummarySource[]): MemoryVectorRecord[] {
+function flattenSources(sources: MemorySource[]): MemoryVectorRecord[] {
   return sources.flatMap((source) =>
-    source.chunks.map((chunk) => ({
-      recordId: chunk.recordId,
-      threadId: source.threadId,
-      title: source.title,
-      closedAt: source.closedAt,
-      summaryPath: source.summaryPath,
-      relativeSummaryPath: source.relativeSummaryPath,
-      reference: source.reference,
-      kind: chunk.kind,
-      sectionTitle: chunk.sectionTitle,
-      text: chunk.text,
-      embeddingText: chunk.embeddingText
-    }))
+    source.chunks.map((chunk) => vectorRecordFromChunk(source, chunk))
   );
+}
+
+function vectorRecordFromChunk(
+  source: MemorySource,
+  chunk: MemoryChunk
+): MemoryVectorRecord {
+  const passageSha256 = sha256Hex(chunk.text);
+  return {
+    recordId: chunk.recordId,
+    threadId: source.threadId,
+    title: source.title,
+    closedAt: source.closedAt,
+    summaryPath: source.summaryPath,
+    relativeSummaryPath: source.relativeSummaryPath,
+    reference: source.reference,
+    kind: chunk.kind,
+    sectionTitle: chunk.sectionTitle,
+    text: chunk.text,
+    embeddingText: chunk.embeddingText,
+    sourceType: source.sourceType,
+    layer: MEMORY_SOURCE_LAYERS[source.sourceType],
+    sourcePath: source.sourcePath,
+    authority: source.authority,
+    lineStart: chunk.lineStart,
+    lineEnd: chunk.lineEnd,
+    sourceSha256: source.sourceSha256,
+    passageOrdinal: chunk.passageOrdinal,
+    passageSha256,
+    passageId: `${source.sourcePath}#${passageSha256.slice(0, 16)}`,
+    ...chunkOrigin(chunk)
+  };
 }
 
 function buildManifest(
   provider: EmbeddingProvider,
-  sources: ThreadSummarySource[],
+  sources: MemorySource[],
   generation: string
 ): MemoryManifest {
   return {
-    schemaVersion: 6,
+    schemaVersion: MEMORY_SCHEMA_VERSION,
     builtAt: new Date().toISOString(),
     generation,
     embeddingProvider: provider.describe(),
-    retrievalContract: "field-aware-hybrid-v2",
+    retrievalContract: MEMORY_RETRIEVAL_CONTRACT,
     records: sources.map(sourceToManifestRecord)
   };
 }
 
-function sourceToManifestRecord(
-  source: ThreadSummarySource
-): MemoryManifestRecord {
+function sourceToManifestRecord(source: MemorySource): MemoryManifestRecord {
   return {
     threadId: source.threadId,
     title: source.title,
@@ -254,7 +299,11 @@ function sourceToManifestRecord(
     reference: source.reference,
     sha256: source.sha256,
     mtimeMs: source.mtimeMs,
-    recordIds: source.chunks.map((chunk) => chunk.recordId)
+    recordIds: source.chunks.map((chunk) => chunk.recordId),
+    sourceType: source.sourceType,
+    layer: MEMORY_SOURCE_LAYERS[source.sourceType],
+    authority: source.authority,
+    sourcePath: source.sourcePath
   };
 }
 

@@ -1,8 +1,12 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { semanticRerankingDocument } from "../../src/core/memory/semantic-ranking.js";
-import type { MemoryVectorRecord } from "../../src/core/memory/types.js";
-import type { CaptureFile, CapturedCase } from "./capture-types.js";
+import {
+  asSearchRecord,
+  type CaptureFile,
+  type CapturedCase,
+  type CapturedRecord
+} from "./capture-types.js";
 import { corpusContentDigest, type CorpusSource } from "./corpus.js";
 import {
   validateDataset,
@@ -293,7 +297,7 @@ export async function writeMergeReport(directory: string, report: MergeReport, n
   return filePath;
 }
 
-function identityTop(captured: CapturedCase, records: ReadonlyMap<string, MemoryVectorRecord>): string[] {
+function identityTop(captured: CapturedCase, records: ReadonlyMap<string, CapturedRecord>): string[] {
   const channels = channelsOf(captured);
   const best = new Map<string, number>();
   for (const hit of channels.identities) {
@@ -303,7 +307,7 @@ function identityTop(captured: CapturedCase, records: ReadonlyMap<string, Memory
   return rankThreads(best).slice(0, IDENTITY_TOP);
 }
 
-function rerankerTop(captured: CapturedCase, records: ReadonlyMap<string, MemoryVectorRecord>): string[] {
+function rerankerTop(captured: CapturedCase, records: ReadonlyMap<string, CapturedRecord>): string[] {
   const best = new Map<string, number>();
   for (const [recordId, score] of matrixScores(captured, records)) {
     const threadId = threadOf(records, recordId);
@@ -313,12 +317,12 @@ function rerankerTop(captured: CapturedCase, records: ReadonlyMap<string, Memory
 }
 
 /** Matrix score of every identity and passage record for the effective query of the case. */
-function matrixScores(captured: CapturedCase, records: ReadonlyMap<string, MemoryVectorRecord>): Map<string, number> {
+function matrixScores(captured: CapturedCase, records: ReadonlyMap<string, CapturedRecord>): Map<string, number> {
   const query = captured.interpretation.effectiveQuery;
   const scores = new Map<string, number>();
   for (const record of records.values()) {
     if (record.kind !== "identity" && record.kind !== "passage") continue;
-    const score = captured.rerankScores[rerankPairKey(query, semanticRerankingDocument(record))];
+    const score = captured.rerankScores[rerankPairKey(query, semanticRerankingDocument(asSearchRecord(record)))];
     if (score === undefined)
       throw new Error(`Capture case ${captured.id} has no matrix score for ${record.recordId}.`);
     scores.set(record.recordId, score);
@@ -329,9 +333,9 @@ function matrixScores(captured: CapturedCase, records: ReadonlyMap<string, Memor
 /** The passage with the best reranker score for the thread; the identity record when the thread has no passage. */
 function bestPassage(
   captured: CapturedCase,
-  records: ReadonlyMap<string, MemoryVectorRecord>,
+  records: ReadonlyMap<string, CapturedRecord>,
   threadId: string
-): MemoryVectorRecord {
+): CapturedRecord {
   const scores = matrixScores(captured, records);
   const passages = [...records.values()].filter((record) => record.threadId === threadId && record.kind === "passage");
   const candidates = passages.length > 0
@@ -349,7 +353,7 @@ function bestPassage(
 async function worksheetThread(
   threadsRoot: string,
   threadId: string,
-  records: ReadonlyMap<string, MemoryVectorRecord>,
+  records: ReadonlyMap<string, CapturedRecord>,
   captured: CapturedCase
 ): Promise<WorksheetThread> {
   const summary = await fs.readFile(path.join(threadsRoot, threadId, "SUMMARY.md"), "utf8");
@@ -448,17 +452,17 @@ function channelsOf(captured: CapturedCase) {
   return channels;
 }
 
-function recordsById(capture: CaptureFile): Map<string, MemoryVectorRecord> {
+function recordsById(capture: CaptureFile): Map<string, CapturedRecord> {
   return new Map(capture.records.map((record) => [record.recordId, record]));
 }
 
-function threadOf(records: ReadonlyMap<string, MemoryVectorRecord>, recordId: string): string {
+function threadOf(records: ReadonlyMap<string, CapturedRecord>, recordId: string): string {
   const record = records.get(recordId);
   if (record === undefined) throw new Error(`Capture has no record ${recordId}.`);
   return record.threadId;
 }
 
-function titleOf(records: ReadonlyMap<string, MemoryVectorRecord>, threadId: string): string {
+function titleOf(records: ReadonlyMap<string, CapturedRecord>, threadId: string): string {
   return [...records.values()].find((record) => record.threadId === threadId)?.title ?? threadId;
 }
 

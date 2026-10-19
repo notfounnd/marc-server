@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { summaryProvenanceFixture } from "./memory-provenance-fixtures.js";
 import {
   rebuildMemoryInWorkspace,
   recallMemoryInWorkspace,
@@ -191,7 +192,11 @@ test("reranker receives a structured title and content document", () => {
       summaryPath: "C:/workspace/.marc/threads/thread-ui/SUMMARY.md",
       text: "The interface uses neo-brutalism.",
       threadId: "thread-ui",
-      title: "Neo-brutalism interface"
+      title: "Neo-brutalism interface",
+      ...summaryProvenanceFixture(
+        "thread-ui",
+        "The interface uses neo-brutalism."
+      )
     }),
     [
       "Title: Neo-brutalism interface",

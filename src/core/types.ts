@@ -257,11 +257,17 @@ export type MemoryIndexHealth = {
   message: string;
 };
 
+export type WorkspaceDocumentSource = {
+  path: string;
+  authority: "normative" | "reference";
+};
+
 export type WorkspaceSettings = {
   memory: {
     autoRebuild: boolean;
     embeddingBatchSize: number;
     searchRetryDepth: number;
+    documentSources: WorkspaceDocumentSource[];
   };
 };
 

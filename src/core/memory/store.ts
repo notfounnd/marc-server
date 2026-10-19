@@ -3,7 +3,9 @@ import path from "node:path";
 import { writeFileAtomically } from "../write-coordination.js";
 import type { WorkspaceInfo } from "../types.js";
 import { memoryManifestPath } from "./storage-paths.js";
+import { DEFAULT_SEARCH_LAYERS } from "./types.js";
 import type {
+  MemoryLayer,
   MemoryLexicalSearchHit,
   MemoryManifest,
   MemorySearchHit,
@@ -101,11 +103,14 @@ export class InMemoryMemoryVectorStore implements MemoryVectorStore {
     options: {
       generation?: string;
       kind?: "identity" | "passage";
+      layers?: readonly MemoryLayer[];
       limit: number;
     }
   ): Promise<MemorySearchHit[]> {
+    const layers = options.layers ?? DEFAULT_SEARCH_LAYERS;
     return this.rowsForGeneration(options.generation)
       .filter((record) => !options.kind || record.kind === options.kind)
+      .filter((record) => layers.includes(record.layer))
       .map((record) => ({
         record,
         score: cosineSimilarity(vector, record.vector)

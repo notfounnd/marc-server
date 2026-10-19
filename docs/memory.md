@@ -4,7 +4,7 @@ mARC can maintain a shared semantic memory index for closed thread summaries. Th
 
 ## Source of truth
 
-Only closed-thread `SUMMARY.md` content is indexed. Use `thread_write_summary` to create a summary or revision-check an update; the Markdown file remains the source of truth. When available, the canonical title is read from `CHAT.md` and stored with the summary records, but message bodies are not indexed. Artifacts, docs, rules, and agent profiles are not part of the memory corpus.
+Only closed-thread `SUMMARY.md` content is indexed by default (layer 0). Use `thread_write_summary` to create a summary or revision-check an update; the Markdown file remains the source of truth. When available, the canonical title is read from `CHAT.md` and stored with the summary records, but message bodies are not indexed by default. Agent profiles are never part of the memory corpus.
 
 A summary write commits the source before refreshing derived projections. The result reports thread-index and memory projection state; an unavailable refresh does not undo the saved summary. Automatic memory rebuilds may schedule an incremental reconciliation when eligible. If memory remains pending, run `memory_rebuild` in its default incremental mode. Summary writes do not prepare or download retrieval models.
 
@@ -27,6 +27,20 @@ The source remains:
 ```
 
 If `.marc/memory/` is deleted, it can be rebuilt from the summaries.
+
+### Source layers and provenance
+
+The rebuild reads source layers. Layer 0 holds closed-thread summaries. Layer 1 holds artifacts (top-level `.md` files of closed threads), the workspace rules (`.marc/RULES.md`), and configured documents. Layer 2 holds chat messages (`CHAT.md` of closed threads). Only layer 0 is indexed by default. A rebuild with more layers indexes those sources too; the harness uses that option only to measure cost.
+
+Every record carries its provenance: `sourceType`, `layer`, `sourcePath` (relative to the workspace root, with `/`), `authority` (`decision`, `rule`, `artifact`, `document`, or `conversation`), `lineStart` and `lineEnd`, `sourceSha256` (the hash of the source file bytes), `passageOrdinal`, `passageSha256` (the hash of the indexed text), and `passageId`. Chat records also carry `messageId` and `agentId`, and artifact records carry `artifactFileName`.
+
+`passageId` is `<sourcePath>#<first 16 hex characters of passageSha256>`. It identifies a passage by its content. Two passages of different text in one section get different ids, the same text in one file gets the same id, and a changed text gets a new id, so judgments tied to the old text stop applying. Line numbers are only a locator for navigation: they do not identify a passage, and passages inherit the lines of their section.
+
+Thread records use the thread ID. Other groups use reserved identifiers that the slug function never produces: `@rules` for the rules file and `@document/<sourcePath>` for each document. Repeated headings inside one source get `-2`, `-3`, and so on, so record ids stay unique.
+
+Text normalization turns Markdown into plain text for embedding and lexical search, in this order: HTML comments are removed; fenced blocks keep their body only for `text`, `txt`, `bash`, `sh`, `shell`, `console`, or no language, and are removed otherwise, always without their delimiters (a fence is three or more backticks or tildes, indented up to three spaces, closed by the same character in a run at least as long; a fence that never closes runs to the end of the text, and a heading inside a fence does not start a section); inline code keeps its text; images keep their alt text; links keep their text and URL, and collapse to one when both are equal; line markers (headings, quotes, list items, task boxes) are removed; emphasis markers are removed only when they are not glued to a letter or digit; table separator rows are removed and pipes become spaces; horizontal rules are removed; then `#`, `>`, `*`, hyphens and underscores become spaces, as in E0, so `auto-idle` indexes as `auto idle`, `memory_deep` as `memory deep` and `Suporte a # para` as `Suporte a para`; whitespace collapses. In the E1 measurement, keeping these characters inside the text changed the order of the top threads in case A25 and dropped its top thread below the eligibility threshold, so all of them are split as in E0.
+
+External documents are configured in `.marc/marc.config.json` under `memory.documentSources`, an array of `{ "path": "<relative path>", "authority": "normative" | "reference" }`. The default is `[]`. The settings API and the UI do not edit this list, and updates preserve it. An entry is dropped when it is not an object, when its path is empty or not a string, when its authority is neither value, when its path is absolute (including drive letters and UNC paths), when it leaves the workspace (starts with `..`), when it points into `.marc/`, or when a segment is `node_modules`. A source that is missing or is a link yields nothing, and a file must have the `.md` extension. A directory is read recursively for `.md` files up to four path segments below the source, at most 200 files per source in lexicographic order, without following links and without entering `.marc/` or `node_modules/`. Authority follows a fixed table: `normative` documents are indexed as `rule`, and `reference` documents as `document`.
 
 ## Local retrieval models
 
@@ -89,7 +103,7 @@ When correction is applied, the UI shows the effective query and offers `Search 
 
 ## Rebuild flow
 
-Memory rebuilds operate on closed-thread `SUMMARY.md` files. The core exposes two modes:
+Memory rebuilds read the source layers selected for the index. By default that is layer 0, the closed-thread `SUMMARY.md` files. The core exposes two modes:
 
 - `incremental` is the normal reconciliation path. It embeds only new or changed summary records and removes records whose source summary disappeared.
 - `full` rebuilds the entire derived snapshot. It remains an explicit manual operation for recovery or provider-contract changes.
@@ -102,7 +116,7 @@ marc memory rebuild
 marc memory rebuild --mode full
 ```
 
-Both modes scan `.marc/threads/*/SUMMARY.md`, use manifest hashes to determine their work, write LanceDB data under `.marc/memory/`, and publish a new `manifest.json` only after the derived index operation succeeds. The manifest contract is `schemaVersion: 6` with `retrievalContract: "field-aware-hybrid-v2"`. The corpus separates one thread identity record from sentence-aware content passages of at most 320 mMARCO tokens with a 48-token overlap. Passages retain section context, while title identity is embedded once per thread. LanceDB stores separate full-text indexes for title, summary text, and title prefixes; prefix search is requested only for a single whitespace-delimited query term. Incremental reconciliation requires the current schema and retrieval contract; a missing or incompatible generation requires an explicit full rebuild. Embedding uses sequential bounded batches. `memory.embeddingBatchSize` defaults to `4` records and accepts even values from `2` through `16`.
+Both modes scan the indexed source layers (by default `.marc/threads/*/SUMMARY.md`), use manifest hashes keyed by source path to determine their work, write LanceDB data under `.marc/memory/`, and publish a new `manifest.json` only after the derived index operation succeeds. The manifest contract is `schemaVersion: 7` with `retrievalContract: "source-layers-v1"`. The corpus separates one thread identity record from sentence-aware content passages of at most 320 mMARCO tokens with a 48-token overlap. Passages retain section context, while title identity is embedded once per thread. LanceDB stores separate full-text indexes for title, summary text, and title prefixes; prefix search is requested only for a single whitespace-delimited query term. Incremental reconciliation requires the current schema and retrieval contract; a missing or incompatible generation requires an explicit full rebuild. Embedding uses sequential bounded batches. `memory.embeddingBatchSize` defaults to `4` records and accepts even values from `2` through `16`.
 
 Each generation uses an explicit Arrow schema: text columns are nullable `Utf8`, and vectors are nullable fixed-size lists of `Float32` values sized from the generated vectors. Missing `closedAt` and `sectionTitle` values persist as null and read back as absent; empty strings remain empty. Empty generations skip LanceDB table creation, and the manifest is published after the store operation and any applicable validation succeed.
 
@@ -137,9 +151,9 @@ The manifest records:
 - build timestamp;
 - embedding provider metadata;
 - model, dimensions, distance, and quantization metadata;
-- summary hashes and record IDs.
+- source type and source path of each record, with source hashes and record IDs.
 
-If the embedding contract or passage schema changes, run a full rebuild. The current identity-and-passage format requires manifest schema version `6` and retrieval contract `field-aware-hybrid-v2`. Changing only the query interpreter does not invalidate the vector generation. Vectors from different providers or dimensions are not mixed.
+If the embedding contract or passage schema changes, run a full rebuild. The current format requires manifest schema version `7` and retrieval contract `source-layers-v1`. An index built with schema `6` reports `incompatible` in status, and incremental reconciliation refuses it with `Memory schema changed. Run a full rebuild.`; run one `full` rebuild to migrate. Changing only the query interpreter does not invalidate the vector generation. Vectors from different providers or dimensions are not mixed.
 
 ## UI indicator
 
@@ -183,15 +197,18 @@ The tool returns a compact memory pack:
 - final ranking score;
 - reason for the match, including ranking signals when available;
 - canonical `marc://` thread reference;
+- source type, source path, and authority of the matched record, as optional additive fields;
 - next actions.
 
 Recall embeds the effective query with E5 and retrieves identity records and content passages in separate dense channels. It also queries field-aware FTS over title and summary text; a title-prefix channel is added only for a single whitespace-delimited query term. The mMARCO O4 cross-encoder reranks up to three passages per thread using the canonical title, optional section, and passage text. Semantic eligibility is computed from dense retrieval and reranker evidence before lexical ranking signals are applied. Only semantically eligible threads are returned, but title, summary, and applicable title-prefix matches can reinforce the ordering of those eligible threads. The final limit is applied after thread consolidation.
 
-This ranking is a read-time projection only. It does not change the `SUMMARY.md` source of truth or the committed `.marc/memory/` snapshot format.
+This ranking is a read-time projection only. It does not change the `SUMMARY.md` source of truth or the committed `.marc/memory/` snapshot format. Recall searches only the layers present in the index: layer 0 by default.
 
 When a result is relevant, the agent should read the referenced thread before reopening or contradicting the historical decision.
 
 ## Quality benchmark
+
+`memory:quality` and `memory:benchmark` only run against a schema v6 generation, so they do not work with the current schema 7 index. They are superseded by `memory:eval` and will be removed.
 
 Run the opt-in local quality suite against a schema v6 generation with the required local model caches prepared. A full rebuild is required when migrating an older or incompatible generation:
 
@@ -217,7 +234,7 @@ The matrix is intentionally exhaustive and CPU-intensive. Its duration does not 
 
 ### Evaluation harness (memory:eval)
 
-The evaluation harness is an opt-in offline suite that scores retrieval against curated, judged cases. It is separate from `memory:quality` and `memory:benchmark`. It does not change `.marc/memory/`: capture reads the production manifest only to check record ids, and every output is written under `.marc/cache/memory-eval/`.
+The evaluation harness is an opt-in offline suite that scores retrieval against curated, judged cases. It is separate from `memory:quality` and `memory:benchmark`. It does not change `.marc/memory/`: capture reads the production manifest only to check the rebuild, and every output is written under `.marc/cache/memory-eval/`.
 
 Run the commands in this order with `pnpm memory:eval <command> --corpus <name>`: `validate`, `capture`, `worksheet` (the raters judge the pooled pairs), `merge-judgments`, `latency`, then `report` and `compare`. `replay` is optional for `report`, which runs the replay internally; run `replay` on its own only to inspect one variant. `compare` pairs two captures of the same corpus with the same `queryFingerprint` and the same `corpusDigest`, and refuses any other pair.
 
@@ -285,6 +302,13 @@ Baseline, measured on 17 October 2026. This is a historical measurement, not a g
 - `marc`, 114 cases: Top-1 target 0.67 for M0 and 0.94 for `ORACLE_ADMISSION`, the judged-admission upper bound. Full top-10 recall 0.917. Among the grade-3 threads, 67 succeed, 0 are candidate-recall losses, 32 are admission losses, and 14 are ordering losses. Median latency 18.2 s, p95 20.3 s.
 - `ledgerline-en`, 40 cases: Top-1 target 0.882. Median latency 5.7 s, p95 6.2 s.
 - The loss lies in admission and ordering, not in candidate recall.
+
+Options and production check:
+
+- `capture --all-layers` captures no cases. It rebuilds a temporary workspace twice, once with layer 0 and once with layers 0, 1, and 2, times each rebuild, and counts the records per layer and per source type. It writes `<corpus>/layers-<captureId>.json`, where the id is the fingerprint with every layer indexed. It uses no checkpoint and creates no capture folder. Use it to measure what more layers cost before indexing them.
+- `report --without-latency` builds the report without `latency.json`. It writes `report-no-latency.json` and `report-no-latency.md`, never overwrites `report.json` or `report.md`, and renders `Latency: not measured`. Without the flag, the command still requires `latency.json`.
+- `capture.json` records `productionCheck` when a production manifest is given. Its mode is `record-ids` when the production manifest has the schema version of the code, and `thread-ids` otherwise. The `thread-ids` check requires every pinned thread in the production manifest and exactly the pinned threads in the temporary manifest. The record stores both schema versions. The field is optional, so captures written before it remain readable.
+- The capture id covers every TypeScript file under `src/core/memory/`, including `sources/`. The indexed layers join the fingerprint only when they differ from the default `[0]`. Captures made after the source layers therefore have new ids; captures made before them keep their ids but no longer match the current code.
 
 ## MCP tools
 

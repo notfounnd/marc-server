@@ -10,6 +10,7 @@ import {
 import type { CapturedChannels } from "../scripts/memory-eval/capture-types.js";
 import { rerankPairKey } from "../scripts/memory-eval/recording-providers.js";
 import type { VariantResult } from "../scripts/memory-eval/variants.js";
+import { summaryProvenanceFixture } from "./memory-provenance-fixtures.js";
 
 const QUERY = "consulta";
 const ONE = "thread-one";
@@ -30,7 +31,8 @@ function baseRecord(
     reference: `marc://$${threadId}`,
     kind,
     text,
-    embeddingText: text
+    embeddingText: text,
+    ...summaryProvenanceFixture(threadId, text)
   };
 }
 
