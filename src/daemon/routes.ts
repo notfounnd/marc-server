@@ -1,6 +1,7 @@
 import type http from "node:http";
 import type { URL } from "node:url";
 import type { WorkspaceInfo } from "../core/types.js";
+import type { recallMemory } from "../core/workspace-memory.js";
 import {
   attachArtifactToMessage,
   listAgentProfiles,
@@ -32,6 +33,7 @@ import { postWorkspaceThreadCreation } from "./thread-routes.js";
 
 type RouteContext = {
   events: UiEventBus;
+  memoryRecall: typeof recallMemory;
   request: http.IncomingMessage;
   response: http.ServerResponse;
   store: DaemonStore;

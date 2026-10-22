@@ -194,12 +194,17 @@ export type MemorySearchChannels = {
   lexical: MemoryLexicalSearchHit[];
 };
 
+/** Heuristic confidence band of a recalled hit. It orders the results; it is not a probability. */
+export type MemoryBand = "high" | "medium" | "low";
+
 export type MemoryRecallResult = {
   query: string;
   interpretation: MemoryQueryInterpretation;
   indexStatus: MemoryStatus;
   results: MemoryRecallHit[];
   nextActions: string[];
+  /** True only when the search ran and admitted no thread. Recalls that did not search are false. */
+  abstained: boolean;
 };
 
 export type MemoryRecallHit = {
@@ -214,6 +219,8 @@ export type MemoryRecallHit = {
   sourceType?: MemorySourceType;
   sourcePath?: string;
   authority?: MemoryAuthority;
+  /** Band of the eligibility in score. Its cuts are in scoring/bands.ts. */
+  band: MemoryBand;
 };
 
 export type MemoryVectorStore = {

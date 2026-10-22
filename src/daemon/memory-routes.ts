@@ -22,6 +22,7 @@ type MemoryRouteContext = {
   events: {
     send(event: string, payload: unknown): void;
   };
+  memoryRecall: typeof recallMemory;
   request: http.IncomingMessage;
   response: http.ServerResponse;
   store: DaemonStore;
@@ -64,7 +65,11 @@ export async function postWorkspaceMemoryRecall(
     return;
   }
 
-  json(context.response, 200, await recallMemory(workspace.rootPath, input));
+  json(
+    context.response,
+    200,
+    await context.memoryRecall(workspace.rootPath, input)
+  );
 }
 
 export async function getWorkspaceSettings(

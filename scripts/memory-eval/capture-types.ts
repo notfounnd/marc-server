@@ -114,6 +114,30 @@ export type CaptureFile = {
   productionCheck?: ProductionCheckRecord;
   records: CapturedRecord[];
   cases: CapturedCase[];
+  /**
+   * E2 channels: present only in captures whose fingerprint carries
+   * captureChannels. Older captures leave them out.
+   */
+  syntheticRule?: string;
+  /** Queries the rule asks for; syntheticQueries may hold fewer when the pool is smaller. */
+  syntheticRequested?: number;
+  syntheticQueries?: CapturedSyntheticQuery[];
+  /** Identity vector of each pinned thread, keyed by threadId. */
+  identityVectors?: Record<string, number[]>;
+  /** Directed references between pinned threads, read from the raw SUMMARY.md and CHAT.md. */
+  threadReferences?: Array<[from: string, to: string]>;
+};
+
+/** A synthetic Inverse Cloze query: captured like a case, with its source thread as positive. */
+export type CapturedSyntheticQuery = {
+  id: string;
+  text: string;
+  sourceThreadId: string;
+  sourceRecordId: string;
+  queryVector: number[];
+  channels: CapturedChannels;
+  /** Reranker score of every identity and passage record for this text, keyed by rerankPairKey. */
+  rerankScores: Record<string, number>;
 };
 
 /** State shared by the cases of one capture run inside the temporary workspace. */

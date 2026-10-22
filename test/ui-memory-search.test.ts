@@ -9,10 +9,15 @@ import {
   memorySearchRecallInput,
   memorySearchTooltip,
   readStoredMemorySearchState,
+  splitMemorySearchBands,
   writeStoredMemorySearchState
 } from "../src/ui/memory-search.js";
 import { nextMemorySearchDepth } from "../src/ui/memory-search-depth.js";
-import type { MemoryRecallResult, Thread } from "../src/ui/types.js";
+import type {
+  MemoryBand,
+  MemoryRecallResult,
+  Thread
+} from "../src/ui/types.js";
 
 class FakeStorage {
   private values = new Map<string, string>();
@@ -57,6 +62,7 @@ const recallResult: MemoryRecallResult = {
     status: "ready",
     summaryCount: 1
   },
+  abstained: false,
   nextActions: [],
   query: "token rotation",
   results: [
@@ -66,6 +72,7 @@ const recallResult: MemoryRecallResult = {
       reason: "Matched summary in token rotation.",
       reference:
         "marc://$oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3",
+      band: "low",
       score: 0.82,
       summaryPath:
         "threads/oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3/SUMMARY.md",
@@ -161,7 +168,7 @@ test("stores one compact memory search result per workspace", () => {
   assert.equal(
     JSON.parse(storage.getItem(MEMORY_SEARCH_STORAGE_KEY) ?? "{}")
       .schemaVersion,
-    5
+    6
   );
   assert.equal(saved?.result.results.length, 50);
   assert.equal(saved?.result.results[0].matchedText.length, 360);
@@ -235,6 +242,57 @@ test("uses matched search text as tooltip with title fallback", () => {
     ),
     "Thread title"
   );
+});
+
+test("splits results by band and keeps the order inside each list", () => {
+  const hit = (threadId: string, band: MemoryBand) => ({
+    ...recallResult.results[0],
+    band,
+    threadId
+  });
+  const split = splitMemorySearchBands([
+    hit("a", "high"),
+    hit("b", "low"),
+    hit("c", "medium"),
+    hit("d", "low")
+  ]);
+
+  assert.deepEqual(
+    split.primary.map((item) => item.threadId),
+    ["a", "c"]
+  );
+  assert.deepEqual(
+    split.lessLikely.map((item) => item.threadId),
+    ["b", "d"]
+  );
+});
+
+test("stored snapshots need a band on every hit and an abstained flag", () => {
+  const storage = new FakeStorage();
+  const stored = (result: unknown) =>
+    storage.setItem(
+      MEMORY_SEARCH_STORAGE_KEY,
+      JSON.stringify({
+        configuredDepth: 3,
+        lastExecutedDepth: 0,
+        query: "token rotation",
+        result,
+        savedAt: "2026-10-21T00:00:00.000Z",
+        schemaVersion: 6,
+        workspaceId: "workspace-1"
+      })
+    );
+  const { band: _band, ...hitWithoutBand } = recallResult.results[0];
+
+  stored(recallResult);
+  assert.notEqual(
+    readStoredMemorySearchState(storage, "workspace-1"),
+    undefined
+  );
+  stored({ ...recallResult, results: [hitWithoutBand] });
+  assert.equal(readStoredMemorySearchState(storage, "workspace-1"), undefined);
+  stored({ ...recallResult, abstained: undefined });
+  assert.equal(readStoredMemorySearchState(storage, "workspace-1"), undefined);
 });
 
 test("treats memory search hits as closed thread results", () => {

@@ -20,7 +20,15 @@ export type CaptureFingerprint = {
   corpusDigest: string;
   /** Present only when the layers differ from the default [0]. */
   indexedLayers?: readonly MemoryLayer[];
+  /** Version of the captured channels. Present only in captures that record the E2 channels. */
+  captureChannels?: string;
 };
+
+/** The components that the captureId hashes. A capture.json stores them all. */
+export type FingerprintComponents = Omit<CaptureFingerprint, "captureId" | "fingerprint">;
+
+/** Version written by captures that record the E2 channels (variants, synthetic queries, identity vectors, references). */
+export const E2_CAPTURE_CHANNELS = "e2-v1";
 
 const DEFAULT_INDEXED_LAYERS: readonly MemoryLayer[] = [0];
 
@@ -29,37 +37,52 @@ const DEFAULT_INDEXED_LAYERS: readonly MemoryLayer[] = [0];
  * query fingerprint, the active models, the package version, the memory
  * sources and the digest of the pinned corpus. Judgments and origins are
  * deliberately left out. indexedLayers joins the hash only when it differs
- * from the default [0], so captures of the default layers keep their ids.
+ * from the default [0], and captureChannels only when it is given, so captures
+ * that do not carry those fields keep their ids.
  */
 export async function computeCaptureFingerprint(
   dataset: EvalDataset,
   repositoryRoot: string,
   corpusDigest: string,
-  indexedLayers?: readonly MemoryLayer[]
+  indexedLayers?: readonly MemoryLayer[],
+  captureChannels?: string
 ): Promise<CaptureFingerprint> {
-  const queryFingerprint = sha256Json(queryFingerprintCases(dataset.cases));
-  const models = modelIdentity();
-  const packageVersion = await readPackageVersion(repositoryRoot);
-  const sourceHash = await memorySourceHash(repositoryRoot);
-  const layers = layersPart(indexedLayers);
-  const fingerprint = sha256Json({
-    queryFingerprint,
-    models,
-    packageVersion,
-    sourceHash,
+  const components: FingerprintComponents = {
+    queryFingerprint: sha256Json(queryFingerprintCases(dataset.cases)),
+    models: modelIdentity(),
+    packageVersion: await readPackageVersion(repositoryRoot),
+    sourceHash: await memorySourceHash(repositoryRoot),
     corpusDigest,
-    ...layers
+    ...layersPart(indexedLayers),
+    ...channelsPart(captureChannels)
+  };
+  return fingerprintOf(components);
+}
+
+/**
+ * The fingerprint and captureId of stored components. The stored components of a
+ * capture.json reproduce its captureId through this function.
+ */
+export function fingerprintOf(components: FingerprintComponents): CaptureFingerprint {
+  const fingerprint = sha256Json({
+    queryFingerprint: components.queryFingerprint,
+    models: components.models,
+    packageVersion: components.packageVersion,
+    sourceHash: components.sourceHash,
+    corpusDigest: components.corpusDigest,
+    ...layersPart(components.indexedLayers),
+    ...channelsPart(components.captureChannels)
   });
   return {
     captureId: fingerprint.slice(0, 12),
     fingerprint,
-    queryFingerprint,
-    models,
-    packageVersion,
-    sourceHash,
-    corpusDigest,
-    ...layers
+    ...components
   };
+}
+
+function channelsPart(captureChannels: string | undefined): { captureChannels?: string } {
+  if (captureChannels === undefined) return {};
+  return { captureChannels };
 }
 
 /** Cases as hashed for the query fingerprint: id, query, mode and expected interpretation, sorted by id. */

@@ -9,8 +9,10 @@ import {
 } from "./evaluation.js";
 import { sharedMetrics, type PendingPair } from "./metrics.js";
 import { replayCapture } from "./replay.js";
+import type { ReplayInputs } from "./replay-inputs.js";
 
-export type CompareSide = { capture: CaptureFile; variant: string };
+/** One side of a comparison: its capture, its variant, and the inputs that variant reads. */
+export type CompareSide = { capture: CaptureFile; variant: string; inputs: ReplayInputs };
 
 export type CompareSideSummary = {
   captureId: string;
@@ -82,7 +84,8 @@ async function evaluateSide(
   const replay = await replayCapture({
     capture: side.capture,
     dataset,
-    variantIds: [side.variant]
+    variantIds: [side.variant],
+    ...side.inputs
   });
   return evaluateVariant(side.variant, caseInputsFor(dataset, replay, side.variant));
 }

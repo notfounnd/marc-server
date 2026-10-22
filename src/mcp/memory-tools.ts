@@ -47,7 +47,7 @@ export function registerMemoryTools(
     server,
     coordinator,
     "memory_recall",
-    "Interpret a development intent when requested and recall relevant historical thread summaries before proposing or changing behavior.",
+    "Interpret a development intent when requested and recall relevant historical thread summaries before proposing or changing behavior. Each result has a heuristic confidence band (high, medium or low) that only orders results relative to each other; it is not a probability. abstained is true only when the search ran and admitted no thread.",
     gatedSchema({
       query: z.string().min(1),
       queryMode: z.enum(["auto", "literal"]).optional(),

@@ -78,6 +78,41 @@ export const VARIANT_PLANS: Readonly<Record<string, VariantPlan>> = {
     metricIds: [...ADMITTED_METRICS, ...FULL_LIST_METRICS],
     requireAdmitted: false
   },
+  /** Decision variants of H1: the admitted list must be fully judged, as for M0. */
+  H1_CALIBRATED: {
+    metricIds: [...ADMITTED_METRICS, ...FULL_LIST_METRICS],
+    requireAdmitted: true
+  },
+  H1_FALLBACK: {
+    metricIds: [...ADMITTED_METRICS, ...FULL_LIST_METRICS],
+    requireAdmitted: true
+  },
+  /** H2 variants: the admission of H1_CALIBRATED, with the band taken from p'. */
+  H2_N1: {
+    metricIds: [...ADMITTED_METRICS, ...FULL_LIST_METRICS],
+    requireAdmitted: true
+  },
+  H2_N2: {
+    metricIds: [...ADMITTED_METRICS, ...FULL_LIST_METRICS],
+    requireAdmitted: true
+  },
+  /** H7 variants: the judge chain on the H1 fit, and the fallback chain on M0. */
+  H7_JUDGE_QWEN: {
+    metricIds: [...ADMITTED_METRICS, ...FULL_LIST_METRICS],
+    requireAdmitted: true
+  },
+  H7_JUDGE_KEV: {
+    metricIds: [...ADMITTED_METRICS, ...FULL_LIST_METRICS],
+    requireAdmitted: true
+  },
+  H7_JUDGE_QWEN_FALLBACK: {
+    metricIds: [...ADMITTED_METRICS, ...FULL_LIST_METRICS],
+    requireAdmitted: true
+  },
+  H7_JUDGE_KEV_FALLBACK: {
+    metricIds: [...ADMITTED_METRICS, ...FULL_LIST_METRICS],
+    requireAdmitted: true
+  },
   /** Pseudo-variant: the production order of M0's pool. Not a decision variant; reported beside M0. */
   PRODUCTION_RECALL: {
     metricIds: [...ADMITTED_METRICS, ...FULL_LIST_METRICS, ...DIAGNOSTIC_METRICS],

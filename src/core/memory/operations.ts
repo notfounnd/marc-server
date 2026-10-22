@@ -234,7 +234,7 @@ async function runReadyMemoryRecall(
       })
     )
   ]);
-  const results = dedupeMemoryRecallHits(
+  const admitted = dedupeMemoryRecallHits(
     semanticRecallHits(
       await rankHybridMemoryHits(
         effectiveQuery,
@@ -246,13 +246,15 @@ async function runReadyMemoryRecall(
         options.reranker
       )
     )
-  ).slice(0, limit);
+  );
+  const results = admitted.slice(0, limit);
   return {
     query: options.query,
     interpretation,
     indexStatus: status,
     results,
-    nextActions: nextActionsForRecallResults(results, status)
+    nextActions: nextActionsForRecallResults(results, status),
+    abstained: admitted.length === 0
   };
 }
 

@@ -98,6 +98,8 @@ Summary memory is derived from `SUMMARY.md` only by default. Agents should use `
 
 Each recall hit may carry `sourceType`, `sourcePath`, and `authority`. These fields are optional and additive: clients that ignore unknown fields are unaffected. With the default index every hit is a summary, so `sourceType` is `summary`.
 
+Every recall hit carries a heuristic confidence `band` (`high`, `medium`, or `low`). The band orders results relative to each other; it is not a probability of relevance. The response carries `abstained`, which is `true` only when the search ran and admitted no thread. It reflects admission and does not depend on `limit`. A recall that did not search, such as one on an unready index, reports `abstained: false`.
+
 `memory_recall` defaults to `queryMode: "auto"`. The response reports the original and effective queries. Automatic interpretation selects only from corpus-derived typo candidates and falls back to the original query on any model or protocol failure. Use `queryMode: "literal"` when the original spelling must be preserved.
 
 Recall defaults to `limit: 5` and `depth: 0`. Depth accepts `0` through `3` and expands the candidate limit for each dense and lexical retrieval channel to `100`, `200`, `300`, or `400`; it does not relax semantic eligibility. Lexical matches cannot qualify a thread by themselves, but can reinforce ordering after semantic eligibility is established. `minScore` is not a supported recall input.

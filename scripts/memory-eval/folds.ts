@@ -19,3 +19,22 @@ export function assignFolds(families: readonly string[]): Map<string, number> {
     .sort((left, right) => (left.key < right.key ? -1 : Number(left.key > right.key)));
   return new Map(keyed.map((item, index) => [item.family, index % FOLD_COUNT]));
 }
+
+/**
+ * The outer fold of each case: the fold of its family, as assignFolds gives it
+ * for the families of the whole dataset. The fit and the replay both use it.
+ */
+export function caseFolds(
+  cases: readonly { id: string; family: string }[]
+): Map<string, number> {
+  const folds = assignFolds(cases.map((item) => item.family));
+  return new Map(
+    cases.map((item) => [item.id, foldOf(folds, item.family)] as const)
+  );
+}
+
+function foldOf(folds: ReadonlyMap<string, number>, family: string): number {
+  const fold = folds.get(family);
+  if (fold === undefined) throw new Error(`No fold for family ${family}.`);
+  return fold;
+}

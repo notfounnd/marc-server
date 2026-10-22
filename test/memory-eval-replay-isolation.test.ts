@@ -22,6 +22,23 @@ const SCRIPTS_DIR = fileURLToPath(
   new URL("../scripts/memory-eval/", import.meta.url)
 );
 const LOCAL_PROVIDER_IMPORT = /local-(provider|reranker|query-interpreter)/;
+/** The judge and choice runners load models; the judge and choice commands write their files. */
+const MODEL_RUNNER_IMPORT =
+  /judge-runner|judge-prompts|from "\.\/judge\.js"|@huggingface\/transformers/;
+const REPLAY_AND_FIT_FILES = [
+  "replay.ts",
+  "variants.ts",
+  "fit.ts",
+  "fit-model.ts",
+  "judge-stage.ts",
+  "choice-decision.ts",
+  "candidate-pairs.ts",
+  "calibration.ts",
+  "calibrate.ts",
+  "suggestion.ts",
+  "h3.ts",
+  "references.ts"
+];
 
 /**
  * Compile-time proof that the replay accepts only the cached providers: a fake
@@ -41,10 +58,17 @@ function typeOnlyChecks(): void {
   assert.ok(providers);
 }
 
-test("replay and variants import none of the local providers", async () => {
-  for (const file of ["replay.ts", "variants.ts"]) {
+test("replay, variants and the fit import none of the local providers", async () => {
+  for (const file of REPLAY_AND_FIT_FILES) {
     const source = await fs.readFile(path.join(SCRIPTS_DIR, file), "utf8");
     assert.doesNotMatch(source, LOCAL_PROVIDER_IMPORT);
+  }
+});
+
+test("replay and fit never import the judge runners, the judge command or the transformers library", async () => {
+  for (const file of REPLAY_AND_FIT_FILES) {
+    const source = await fs.readFile(path.join(SCRIPTS_DIR, file), "utf8");
+    assert.doesNotMatch(source, MODEL_RUNNER_IMPORT);
   }
 });
 

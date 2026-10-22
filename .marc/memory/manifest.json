@@ -1,7 +1,7 @@
 {
   "schemaVersion": 7,
-  "builtAt": "2026-10-19T22:17:08.700Z",
-  "generation": "20261019221708251_a0d4c4e0",
+  "builtAt": "2026-10-22T02:56:55.572Z",
+  "generation": "20261022025654947_cbb6ce74",
   "embeddingProvider": {
     "id": "transformers-js-local-e5",
     "name": "Transformers.js local multilingual E5 retrieval",
@@ -339,6 +339,29 @@
       "layer": 0,
       "authority": "decision",
       "sourcePath": ".marc/threads/motor-de-busca-v2-e1-camada-de-fontes-e-representacao-1042e2b3/SUMMARY.md"
+    },
+    {
+      "threadId": "motor-de-busca-v2-e2-score-calibrado-faixas-e-sugestao-de-correc-c34cf4a2",
+      "title": "Motor de busca v2 - E2 Score calibrado, faixas e sugestão de correção",
+      "closedAt": "2026-10-22T02:56:29.818Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\motor-de-busca-v2-e2-score-calibrado-faixas-e-sugestao-de-correc-c34cf4a2\\SUMMARY.md",
+      "relativeSummaryPath": "threads/motor-de-busca-v2-e2-score-calibrado-faixas-e-sugestao-de-correc-c34cf4a2/SUMMARY.md",
+      "reference": "marc://$motor-de-busca-v2-e2-score-calibrado-faixas-e-sugestao-de-correc-c34cf4a2",
+      "sha256": "5040565c5a97e09646a9c4cca2d69b1b3eb4130229bff3b457e05f0ec2d6cf8a",
+      "mtimeMs": 1792637789824.802,
+      "recordIds": [
+        "motor-de-busca-v2-e2-score-calibrado-faixas-e-sugestao-de-correc-c34cf4a2:identity",
+        "motor-de-busca-v2-e2-score-calibrado-faixas-e-sugestao-de-correc-c34cf4a2:source:decisao:passage:001",
+        "motor-de-busca-v2-e2-score-calibrado-faixas-e-sugestao-de-correc-c34cf4a2:source:entrega:passage:001",
+        "motor-de-busca-v2-e2-score-calibrado-faixas-e-sugestao-de-correc-c34cf4a2:source:entrega:passage:002",
+        "motor-de-busca-v2-e2-score-calibrado-faixas-e-sugestao-de-correc-c34cf4a2:source:validacao:passage:001",
+        "motor-de-busca-v2-e2-score-calibrado-faixas-e-sugestao-de-correc-c34cf4a2:source:validacao:passage:002",
+        "motor-de-busca-v2-e2-score-calibrado-faixas-e-sugestao-de-correc-c34cf4a2:source:limites-e-continuidade:passage:001"
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/motor-de-busca-v2-e2-score-calibrado-faixas-e-sugestao-de-correc-c34cf4a2/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894",

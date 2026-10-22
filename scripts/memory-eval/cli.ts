@@ -7,10 +7,70 @@ import { getWorkspaceInfo } from "../../src/core/workspace.js";
 import { LocalEmbeddingProvider } from "../../src/core/memory/local-provider.js";
 import { LocalQueryInterpretationProvider } from "../../src/core/memory/local-query-interpreter.js";
 import { LocalRerankingProvider } from "../../src/core/memory/local-reranker.js";
-import { captureMemoryEval, type CaptureProviders } from "./capture.js";
+import { captureMemoryEval, disposeProviders, type CaptureProviders } from "./capture.js";
 import { queryFingerprintCases, sha256Json } from "./capture-fingerprint.js";
 import type { CaptureFile } from "./capture-types.js";
-import { replayCapture } from "./replay.js";
+import { recordsById, replayCapture } from "./replay.js";
+import {
+  assertCrossCorpus,
+  assertInputsPresent,
+  requirementsOf,
+  usesFoldCalibrations,
+  type ReplayInputs
+} from "./replay-inputs.js";
+import {
+  FIT_FILE,
+  FIT_PREDICTIONS_FILE,
+  buildFit,
+  fitSummaryLines,
+  type FitPredictionsFile
+} from "./fit.js";
+import type { FitResult } from "./fit-model.js";
+import type { CalibrationSet } from "./calibration.js";
+import {
+  calibrateCapture,
+  calibrationFileName,
+  type CalibrationFile,
+  type CalibrationModel
+} from "./calibrate.js";
+import {
+  suggestionFileName,
+  suggestionFileOf,
+  suggestionTableLines
+} from "./h3.js";
+import { FOLD_COUNT, caseFolds } from "./folds.js";
+import {
+  choiceCapture,
+  choiceDecisionsOf,
+  choiceFileName,
+  assertChoiceFileReusable,
+  assertJudgeFileReusable,
+  identityRecordsOf,
+  judgeCapture,
+  judgeFileName,
+  judgeTableOf,
+  type ChoiceFile,
+  type JudgeFile
+} from "./judge.js";
+import {
+  measureChoiceLatency,
+  measureJudgeLatency,
+  modelLatencyFileName
+} from "./latency-models.js";
+import {
+  JUDGE_CACHE_DIR,
+  KEV_IDENTITY,
+  LFM_IDENTITY,
+  PRODUCTION_LFM_CACHE_DIR,
+  QWEN_IDENTITY,
+  type ModelIdentity,
+  loadJudgeRunner,
+  loadKevChoiceRunner,
+  loadLfmChoiceRunner
+} from "./judge-runner.js";
+import { JUDGE_NAMES, type JudgeName } from "./judge-stage.js";
+import type { TypedModel } from "./suggestion.js";
+import type { ChoiceDecision } from "./choice-decision.js";
 import { PRODUCTION_RECALL_ID, isRankingVariantId } from "./variants.js";
 import {
   REPORT_VARIANTS,
@@ -337,7 +397,14 @@ async function replayCommand(options: CommandOptions): Promise<number> {
     );
     return 1;
   }
-  const result = await replayCapture({ capture, dataset, variantIds });
+  const inputs = await replayInputsOf({
+    corpusName,
+    captureDir,
+    capture,
+    variantIds,
+    modelArgument: options.get("model")
+  });
+  const result = await replayCapture({ capture, dataset, variantIds, ...inputs });
   const outputPath = path.join(
     captureDir,
     `replay-${variantIds.join("-")}.json`
@@ -373,7 +440,7 @@ async function reportCommand(options: CommandOptions): Promise<number> {
   }
   const captureId = options.get("capture");
   if (captureId === undefined) {
-    console.error("Usage: memory:eval report --capture <captureId> [--corpus marc] [--raters a.json,b.json]");
+    console.error("Usage: memory:eval report --capture <captureId> [--corpus marc] [--model marc/<captureId>] [--raters a.json,b.json]");
     return 2;
   }
   const dataset = await readDataset(corpusName, registration);
@@ -393,7 +460,15 @@ async function reportCommand(options: CommandOptions): Promise<number> {
     });
     if (latency === undefined) return 1;
   }
-  const replay = await replayCapture({ capture, dataset, variantIds: [...REPORT_VARIANTS, PRODUCTION_RECALL_ID] });
+  const reportVariants = [...REPORT_VARIANTS, PRODUCTION_RECALL_ID];
+  const reportInputs = await replayInputsOf({
+    corpusName,
+    captureDir: captureDirectoryOf(corpusName, captureId),
+    capture,
+    variantIds: reportVariants,
+    modelArgument: options.get("model")
+  });
+  const replay = await replayCapture({ capture, dataset, variantIds: reportVariants, ...reportInputs });
   const ratersArgument = options.get("raters");
   const raters = ratersArgument === undefined
     ? undefined
@@ -432,17 +507,31 @@ async function compareCommand(options: CommandOptions): Promise<number> {
   const baseline = parseSide(options.get("baseline"));
   const candidate = parseSide(options.get("candidate"));
   if (baseline === undefined || candidate === undefined) {
-    console.error("Usage: memory:eval compare --baseline <captureId>:<variant> --candidate <captureId>:<variant> [--corpus marc]");
+    console.error("Usage: memory:eval compare --baseline <captureId>:<variant> --candidate <captureId>:<variant> [--corpus marc] [--baseline-model marc/<captureId>] [--candidate-model marc/<captureId>]");
     return 2;
   }
   const dataset = await readDataset(corpusName, registration);
   if (dataset === undefined) return 2;
   const baselineCapture = await readCaptureFileOf(corpusName, baseline.captureId);
   const candidateCapture = await readCaptureFileOf(corpusName, candidate.captureId);
+  const baselineInputs = await replayInputsOf({
+    corpusName,
+    captureDir: captureDirectoryOf(corpusName, baseline.captureId),
+    capture: baselineCapture,
+    variantIds: [baseline.variant],
+    modelArgument: options.get("baseline-model")
+  });
+  const candidateInputs = await replayInputsOf({
+    corpusName,
+    captureDir: captureDirectoryOf(corpusName, candidate.captureId),
+    capture: candidateCapture,
+    variantIds: [candidate.variant],
+    modelArgument: options.get("candidate-model")
+  });
   const result = await compareCaptures({
     dataset,
-    baseline: { capture: baselineCapture, variant: baseline.variant },
-    candidate: { capture: candidateCapture, variant: candidate.variant }
+    baseline: { capture: baselineCapture, variant: baseline.variant, inputs: baselineInputs },
+    candidate: { capture: candidateCapture, variant: candidate.variant, inputs: candidateInputs }
   }).catch((error: unknown) => {
     console.error(error instanceof Error ? error.message : String(error));
     return undefined;
@@ -470,7 +559,7 @@ async function worksheetCommand(options: CommandOptions): Promise<number> {
   }
   const captureId = options.get("capture");
   if (captureId === undefined) {
-    console.error("Usage: memory:eval worksheet --capture <captureId> [--corpus marc] [--variants v1,v2]");
+    console.error("Usage: memory:eval worksheet --capture <captureId> [--corpus marc] [--variants v1,v2] [--model marc/<captureId>]");
     return 2;
   }
   const variants = splitList(options.get("variants"));
@@ -486,10 +575,19 @@ async function worksheetCommand(options: CommandOptions): Promise<number> {
     console.error("The dataset queries differ from the capture. Capture again before the worksheet.");
     return 1;
   }
+  const worksheetVariants = [...new Set(["M0", "D0", ...variants])];
+  const worksheetInputs = await replayInputsOf({
+    corpusName,
+    captureDir: captureDirectoryOf(corpusName, captureId),
+    capture,
+    variantIds: worksheetVariants,
+    modelArgument: options.get("model")
+  });
   const replay = await replayCapture({
     capture,
     dataset,
-    variantIds: [...new Set(["M0", "D0", ...variants])]
+    variantIds: worksheetVariants,
+    ...worksheetInputs
   });
   const pinned = await readPinnedCorpus(registration.pinnedPath);
   const worksheet = await buildWorksheet({
@@ -576,12 +674,109 @@ function printMergeReport(report: MergeReport, committed: boolean, reportPath: s
 }
 
 /** Measures latency of a complete capture into latency.json. Run it on a quiet machine. */
+/**
+ * latency --capture <id> --judge qwen|kev --model marc/<id>, or latency --capture <id>
+ * --choice kev|lfm: the model latency of a complete capture, with the memory of the
+ * harness process and of the M0 inference workers (E2, A4). The judge times the threads
+ * that the production H1 pre-admits, under the parameters of the given fit.
+ */
+async function modelLatencyCommand(
+  options: CommandOptions,
+  corpusName: string,
+  registration: CorpusRegistration
+): Promise<number> {
+  const judge = options.get("judge");
+  const choice = options.get("choice");
+  const captureId = options.get("capture");
+  const usage =
+    "Usage: memory:eval latency --capture <captureId> (--judge qwen|kev --model marc/<captureId> | --choice kev|lfm) [--corpus marc]";
+  if (captureId === undefined || (judge === undefined) === (choice === undefined)) {
+    console.error(usage);
+    return 2;
+  }
+  if (judge !== undefined && !JUDGE_NAMES.some((name) => name === judge)) {
+    console.error(usage);
+    return 2;
+  }
+  if (choice !== undefined && choice !== "kev" && choice !== "lfm") {
+    console.error(usage);
+    return 2;
+  }
+  const dataset = await readDataset(corpusName, registration);
+  if (dataset === undefined) return 2;
+  const capture = await readCaptureFileOf(corpusName, captureId);
+  if (sha256Json(queryFingerprintCases(dataset.cases)) !== capture.fingerprint.queryFingerprint) {
+    console.error("The dataset queries differ from the capture. Capture again before measuring.");
+    return 1;
+  }
+  const directory = captureDirectoryOf(corpusName, captureId);
+  const latency = await readLatencyFile(directory, captureId).catch((error: unknown) => {
+    console.error(`${error instanceof Error ? error.message : String(error)} The M0 part of the estimate is null.`);
+    return undefined;
+  });
+  const production = judge === undefined ? undefined : await readModelOf(options.get("model"));
+  if (judge !== undefined && production === undefined) {
+    console.error("The judge latency needs --model marc/<captureId>: its H1 parameters choose the judged threads.");
+    return 2;
+  }
+  const workerInfo = await getWorkspaceInfo(REPOSITORY_ROOT);
+  const providers = createLocalProviders(workerInfo);
+  try {
+    // The M0 models are loaded in the workers before the base reading, as in the M0 latency.
+    await providers.embedding.prepare();
+    await providers.reranker.prepare();
+    const log = (line: string) => console.log(line);
+    const result =
+      judge !== undefined && production !== undefined
+        ? await measureJudgeLatency({
+            capture,
+            records: recordsById(capture.records),
+            identities: identityRecordsOf(capture),
+            judge: judge as JudgeName,
+            production: production.fit.production,
+            productionFit: options.get("model") ?? "",
+            latency,
+            workerInfo,
+            loadRunner: () =>
+              loadJudgeRunner(judge as JudgeName, path.join(REPOSITORY_ROOT, JUDGE_CACHE_DIR)),
+            log
+          })
+        : await measureChoiceLatency({
+            capture,
+            latency,
+            workerInfo,
+            loadRunner: () =>
+              choice === "kev"
+                ? loadKevChoiceRunner(path.join(REPOSITORY_ROOT, JUDGE_CACHE_DIR))
+                : loadLfmChoiceRunner(path.join(REPOSITORY_ROOT, PRODUCTION_LFM_CACHE_DIR)),
+            log
+          });
+    const outputPath = path.join(directory, modelLatencyFileName(result.kind, judge ?? choice ?? ""));
+    await writeFileAtomically(outputPath, `${JSON.stringify(result, null, 2)}\n`);
+    const mb = (bytes: number) => Math.round(bytes / 1048576);
+    const units = result.cases.reduce((total, item) => total + item.units, 0);
+    console.log(
+      `kind=${result.kind} model=${result.model.id} captureId=${captureId} cases=${result.cases.length} units=${units} ` +
+        `harnessBaseMB=${mb(result.memory.harnessBaseBytes)} harnessPeakMB=${mb(result.memory.harnessPeakBytes)} ` +
+        `deltaMB=${mb(result.memory.harnessDeltaBytes)} freeStartMB=${mb(result.memory.freeMemStartBytes)} ` +
+        `freeEndMB=${mb(result.memory.freeMemEndBytes)} estimatedTotalMedianMs=${result.estimated.totalMedianMs?.toFixed(0) ?? "null"} ` +
+        `(${result.estimated.label}) output=${outputPath}`
+    );
+    return 0;
+  } finally {
+    await disposeProviders(providers);
+  }
+}
+
 async function latencyCommand(options: CommandOptions): Promise<number> {
   const corpusName = options.get("corpus") ?? "marc";
   const registration = CORPORA.get(corpusName);
   if (registration === undefined) {
     console.error(`Unknown corpus: ${corpusName}`);
     return 2;
+  }
+  if (options.get("judge") !== undefined || options.get("choice") !== undefined) {
+    return modelLatencyCommand(options, corpusName, registration);
   }
   const dataset = await readDataset(corpusName, registration);
   if (dataset === undefined) return 2;
@@ -616,10 +811,424 @@ async function latencyCommand(options: CommandOptions): Promise<number> {
   return 0;
 }
 
+/**
+ * The fit of a capture, when it has been written. The H1 variants need it; the
+ * other variants never read it, so a missing file is not an error here.
+ */
+async function readFitOf(
+  captureDir: string,
+  captureId: string
+): Promise<FitResult | undefined> {
+  const content = await readOptionalText(path.join(captureDir, FIT_FILE));
+  if (content === undefined) return undefined;
+  const fit = JSON.parse(content) as FitResult;
+  if (fit.captureId !== captureId) {
+    throw new Error(`The fit in ${captureDir} belongs to another capture.`);
+  }
+  return fit;
+}
+
+/** Fits the calibrated score of one capture (H1). Writes fit.json; never touches .marc/memory. */
+async function fitCommand(options: CommandOptions): Promise<number> {
+  const corpusName = options.get("corpus") ?? "marc";
+  if (corpusName !== "marc") {
+    console.error("The fit uses only the marc corpus; ledgerline-en stays an external check.");
+    return 2;
+  }
+  const registration = CORPORA.get(corpusName);
+  if (registration === undefined) {
+    console.error(`Unknown corpus: ${corpusName}`);
+    return 2;
+  }
+  const captureId = options.get("capture");
+  if (captureId === undefined) {
+    console.error("Usage: memory:eval fit --capture <captureId> [--corpus marc]");
+    return 2;
+  }
+  const dataset = await readDataset(corpusName, registration);
+  if (dataset === undefined) return 2;
+  const capture = await readCaptureFileOf(corpusName, captureId);
+  if (sha256Json(queryFingerprintCases(dataset.cases)) !== capture.fingerprint.queryFingerprint) {
+    console.error("The dataset queries differ from the capture. Capture again before fitting.");
+    return 1;
+  }
+  const bundle = await buildFit({
+    capture,
+    dataset,
+    judges: await judgeTablesOf(captureDirectoryOf(corpusName, captureId), capture)
+  });
+  const directory = captureDirectoryOf(corpusName, captureId);
+  const fitPath = path.join(directory, FIT_FILE);
+  const predictionsPath = path.join(directory, FIT_PREDICTIONS_FILE);
+  await writeFileAtomically(fitPath, `${JSON.stringify(bundle.fit, null, 2)}\n`);
+  await writeFileAtomically(
+    predictionsPath,
+    `${JSON.stringify(bundle.predictions, null, 2)}\n`
+  );
+  for (const line of fitSummaryLines(bundle.fit)) console.log(line);
+  console.log(
+    `captureId=${captureId} output=${fitPath} predictions=${predictionsPath} pairs=${bundle.predictions.pairs.length}`
+  );
+  return 0;
+}
+
+/**
+ * The calibrations of a corpus in this capture, when `calibrate` has written them: the
+ * production set (n1, n2) and, from the files that carry them, the set of each fold.
+ */
+async function readCalibrationsOf(
+  captureDir: string,
+  corpusName: string
+): Promise<{ calibrations: CalibrationSet; folds: CalibrationSet[] | undefined } | undefined> {
+  const content = await readOptionalText(path.join(captureDir, calibrationFileName(corpusName)));
+  if (content === undefined) return undefined;
+  const file = JSON.parse(content) as CalibrationFile;
+  return { calibrations: { N1: file.n1, N2: file.n2 }, folds: file.folds };
+}
+
+/** The fit and its external predictions of a model named as `marc/<captureId>`. */
+async function readModelOf(argument: string | undefined): Promise<CalibrationModel | undefined> {
+  if (argument === undefined) return undefined;
+  const [corpus, captureId] = argument.split("/");
+  if (corpus === undefined || captureId === undefined) return undefined;
+  const directory = captureDirectoryOf(corpus, captureId);
+  const fit = JSON.parse(await fs.readFile(path.join(directory, FIT_FILE), "utf8")) as FitResult;
+  const predictions = JSON.parse(
+    await fs.readFile(path.join(directory, FIT_PREDICTIONS_FILE), "utf8")
+  ) as FitPredictionsFile;
+  return { fit, predictions };
+}
+
+/**
+ * Shared argument checks of `calibrate` and `h3`: the corpus, the capture, the
+ * model and the dataset, with the query fingerprint of the capture. On marc the
+ * model must be the capture itself, because H2 reads its external predictions.
+ */
+async function calibrationInputsOf(options: CommandOptions, usage: string) {
+  const corpusName = options.get("corpus") ?? "marc";
+  const registration = CORPORA.get(corpusName);
+  if (registration === undefined) {
+    console.error(`Unknown corpus: ${corpusName}`);
+    return undefined;
+  }
+  const captureId = options.get("capture");
+  const model = await readModelOf(options.get("model"));
+  if (captureId === undefined || model === undefined) {
+    console.error(usage);
+    return undefined;
+  }
+  if (corpusName === "marc" && model.fit.captureId !== captureId) {
+    console.error("On marc the model must be the capture itself: H2 and H3 read its external predictions.");
+    return undefined;
+  }
+  const dataset = await readDataset(corpusName, registration);
+  if (dataset === undefined) return undefined;
+  const capture = await readCaptureFileOf(corpusName, captureId);
+  if (sha256Json(queryFingerprintCases(dataset.cases)) !== capture.fingerprint.queryFingerprint) {
+    console.error("The dataset queries differ from the capture. Capture again first.");
+    return undefined;
+  }
+  return { corpusName, captureId, model, dataset, capture };
+}
+
+function percentText(value: number | null): string {
+  if (value === null) return "n/a";
+  return value.toFixed(3);
+}
+
+/** Calibrates p' (N1 and N2) for one capture and evaluates H2 (marc) or H6 (other corpora). */
+async function calibrateCommand(options: CommandOptions): Promise<number> {
+  const inputs = await calibrationInputsOf(
+    options,
+    "Usage: memory:eval calibrate --capture <captureId> --model marc/<captureId> [--corpus marc]"
+  );
+  if (inputs === undefined) return 2;
+  const { file } = await calibrateCapture({
+    capture: inputs.capture,
+    dataset: inputs.dataset,
+    corpus: inputs.corpusName,
+    model: inputs.model
+  });
+  const outputPath = path.join(
+    captureDirectoryOf(inputs.corpusName, inputs.captureId),
+    calibrationFileName(inputs.corpusName)
+  );
+  await writeFileAtomically(outputPath, `${JSON.stringify(file, null, 2)}\n`);
+  console.log(
+    `captureId=${file.captureId} synthetic=${file.synthetic.used} used/${file.synthetic.queries} dropped=${file.synthetic.dropped}`
+  );
+  console.log(
+    `N1 valid=${file.n1.valid} a=${file.n1.a ?? "n/a"} b=${file.n1.b ?? "n/a"} rows=${file.n1.rows} positives=${file.n1.positives} atFloor=${file.n1.atFloor}`
+  );
+  console.log(
+    `N2 valid=${file.n2.valid} a=${file.n2.a ?? "n/a"} b=${file.n2.b ?? "n/a"} reason=${file.n2.reason ?? "none"}`
+  );
+  console.log(`${file.evaluation.kind} pairs=${file.evaluation.pairs} positives=${file.evaluation.positives}`);
+  for (const band of ["high", "medium", "low"] as const) {
+    const base = file.evaluation.base.bands[band];
+    const n1 = file.evaluation.variants.N1.bands[band];
+    const n2 = file.evaluation.variants.N2.bands[band];
+    console.log(
+      `${band} precision p=${percentText(base.precision)} N1=${percentText(n1.precision)} N2=${percentText(n2.precision)}`
+    );
+  }
+  console.log(
+    `verdict N1=${file.evaluation.variants.N1.verdict} N2=${file.evaluation.variants.N2.verdict}`
+  );
+  console.log(`output=${outputPath}`);
+  return 0;
+}
+
+/** H3: the alternatives A, B and C over the cases with an expected interpretation. */
+async function h3Command(options: CommandOptions): Promise<number> {
+  const inputs = await calibrationInputsOf(
+    options,
+    "Usage: memory:eval h3 --capture <captureId> --model marc/<captureId> [--corpus marc]"
+  );
+  if (inputs === undefined) return 2;
+  const folds = caseFolds(inputs.dataset.cases);
+  const cheapOf = (caseId: string) => {
+    if (inputs.corpusName !== "marc") return inputs.model.fit.production.cheap;
+    const fold = folds.get(caseId);
+    if (fold === undefined) throw new Error(`No fold for case ${caseId}.`);
+    return inputs.model.fit.folds[fold].cheap;
+  };
+  const directory = captureDirectoryOf(inputs.corpusName, inputs.captureId);
+  const file = await suggestionFileOf({
+    capture: inputs.capture,
+    dataset: inputs.dataset,
+    corpus: inputs.corpusName,
+    modelCaptureId: inputs.model.fit.captureId,
+    cheapOf,
+    typedDecisions: await typedDecisionsOf(directory, inputs.capture)
+  });
+  const outputPath = path.join(
+    captureDirectoryOf(inputs.corpusName, inputs.captureId),
+    suggestionFileName(inputs.corpusName)
+  );
+  await writeFileAtomically(outputPath, `${JSON.stringify(file, null, 2)}\n`);
+  for (const line of suggestionTableLines(file)) console.log(line);
+  console.log(`captureId=${inputs.captureId} output=${outputPath}`);
+  return 0;
+}
+
+/** The identity each judge file must carry: the pinned model of its judge. */
+const JUDGE_IDENTITY: Readonly<Record<JudgeName, ModelIdentity>> = {
+  qwen: QWEN_IDENTITY,
+  kev: KEV_IDENTITY
+};
+
+/**
+ * The inputs that the variants read, from the capture directory. Every judge and choice
+ * file is checked against its capture and its model, and a missing input stops the
+ * command before any replay runs, naming the file to produce.
+ */
+async function replayInputsOf(input: {
+  corpusName: string;
+  captureDir: string;
+  capture: CaptureFile;
+  variantIds: readonly string[];
+  modelArgument?: string;
+}): Promise<ReplayInputs> {
+  const fit = await fitForReplay(
+    input.modelArgument,
+    input.captureDir,
+    input.capture.captureId,
+    input.corpusName
+  );
+  const stored = await readCalibrationsOf(input.captureDir, input.corpusName);
+  const perFold = usesFoldCalibrations(input.corpusName, input.modelArgument);
+  if (perFold && stored !== undefined && stored.folds === undefined) {
+    throw new Error(
+      `${calibrationFileName(input.corpusName)} has no per-fold calibrations. Run memory:eval calibrate again.`
+    );
+  }
+  const judgeTables = await judgeTablesOf(input.captureDir, input.capture);
+  const inputs: ReplayInputs = {
+    fit,
+    calibrations: stored?.calibrations,
+    foldCalibrations: perFold ? stored?.folds : undefined,
+    judgeTables
+  };
+  assertInputsPresent(requirementsOf(input.variantIds), inputs, {
+    fit: path.join(input.captureDir, FIT_FILE),
+    calibrations: path.join(input.captureDir, calibrationFileName(input.corpusName)),
+    judge: (name) => path.join(input.captureDir, judgeFileName(name))
+  });
+  return inputs;
+}
+
+/** The judge tables of a capture: one per judge whose file exists, each checked against its capture and model. */
+async function judgeTablesOf(
+  captureDir: string,
+  capture: CaptureFile
+): Promise<Partial<Record<JudgeName, ReturnType<typeof judgeTableOf>>>> {
+  const entries = await Promise.all(
+    JUDGE_NAMES.map(async (name) => {
+      const file = await readJsonOptional<JudgeFile>(path.join(captureDir, judgeFileName(name)));
+      if (file !== undefined) assertJudgeFileReusable(file, { capture, judge: name, identity: JUDGE_IDENTITY[name] });
+      return [name, file === undefined ? undefined : judgeTableOf(file)] as const;
+    })
+  );
+  return Object.fromEntries(entries.filter(([, table]) => table !== undefined)) as Partial<
+    Record<JudgeName, ReturnType<typeof judgeTableOf>>
+  >;
+}
+
+async function readJsonOptional<T>(filePath: string): Promise<T | undefined> {
+  const content = await readOptionalText(filePath);
+  if (content === undefined) return undefined;
+  return JSON.parse(content) as T;
+}
+
+/**
+ * The fit that replay reads. With --model marc/<captureId> the fit comes from that
+ * capture, and its production parameters apply to every case, with no refit: the
+ * cross-corpus reading of H6 and H7.
+ */
+async function fitForReplay(
+  modelArgument: string | undefined,
+  captureDir: string,
+  captureId: string,
+  corpusName: string
+): Promise<FitResult | undefined> {
+  if (modelArgument === undefined) return readFitOf(captureDir, captureId);
+  const model = await readModelOf(modelArgument);
+  if (model === undefined) throw new Error(`Invalid --model ${modelArgument}; expected marc/<captureId>.`);
+  assertCrossCorpus(corpusName, model.fit.corpus);
+  const production = model.fit.production;
+  const folds = Array.from({ length: FOLD_COUNT }, (_, fold) => ({ ...production, fold }));
+  return { ...model.fit, folds };
+}
+
+/** The typed-choice decisions of a capture, by model, for the D alternatives of H3. */
+async function typedDecisionsOf(
+  captureDir: string,
+  capture: CaptureFile
+): Promise<Partial<Record<TypedModel, Map<string, ChoiceDecision>>>> {
+  const kev = await readJsonOptional<ChoiceFile>(path.join(captureDir, choiceFileName("kev")));
+  const lfm = await readJsonOptional<ChoiceFile>(path.join(captureDir, choiceFileName("lfm")));
+  if (kev !== undefined) assertChoiceFileReusable(kev, { capture, model: "kev", identity: KEV_IDENTITY });
+  if (lfm !== undefined) assertChoiceFileReusable(lfm, { capture, model: "lfm", identity: LFM_IDENTITY });
+  return {
+    ...(kev === undefined ? {} : { kev: choiceDecisionsOf(kev) }),
+    ...(lfm === undefined ? {} : { lfm: choiceDecisionsOf(lfm) })
+  };
+}
+
+/** The judge pass (H7): one judge over the capture, with its own checkpoint file. */
+async function judgeCommand(options: CommandOptions): Promise<number> {
+  const corpusName = options.get("corpus") ?? "marc";
+  const registration = CORPORA.get(corpusName);
+  if (registration === undefined) {
+    console.error(`Unknown corpus: ${corpusName}`);
+    return 2;
+  }
+  const judge = options.get("model");
+  const captureId = options.get("capture");
+  if (captureId === undefined || !JUDGE_NAMES.some((name) => name === judge)) {
+    console.error("Usage: memory:eval judge --capture <captureId> --model qwen|kev [--corpus marc] [--resume]");
+    return 2;
+  }
+  const judgeName = judge as JudgeName;
+  const dataset = await readDataset(corpusName, registration);
+  if (dataset === undefined) return 2;
+  const capture = await readCaptureFileOf(corpusName, captureId);
+  if (sha256Json(queryFingerprintCases(dataset.cases)) !== capture.fingerprint.queryFingerprint) {
+    console.error("The dataset queries differ from the capture. Capture again before judging.");
+    return 1;
+  }
+  const directory = captureDirectoryOf(corpusName, captureId);
+  const outputPath = path.join(directory, judgeFileName(judgeName));
+  const previous = await readJsonOptional<JudgeFile>(outputPath);
+  if (previous !== undefined && options.get("resume") !== "true") {
+    console.error(`${outputPath} exists. Use --resume to continue it.`);
+    return 1;
+  }
+  const started = Date.now();
+  const runner = await loadJudgeRunner(judgeName, path.join(REPOSITORY_ROOT, JUDGE_CACHE_DIR));
+  const file = await judgeCapture({
+    capture,
+    dataset,
+    judge: judgeName,
+    runner,
+    previous,
+    save: (next) => writeFileAtomically(outputPath, `${JSON.stringify(next, null, 2)}\n`),
+    log: (line) => console.log(line)
+  });
+  const threads = Object.values(file.cases).reduce((sum, entry) => sum + entry.threads.length, 0);
+  console.log(
+    `judge=${judgeName} captureId=${captureId} cases=${Object.keys(file.cases).length} threads=${threads} durationMs=${Date.now() - started} peakRssKb=${process.resourceUsage().maxRSS} output=${outputPath}`
+  );
+  return 0;
+}
+
+/** The typed choice pass (H8): KEV or LFM. Laya left the study and is refused here. */
+async function choiceCommand(options: CommandOptions): Promise<number> {
+  const corpusName = options.get("corpus") ?? "marc";
+  const registration = CORPORA.get(corpusName);
+  if (registration === undefined) {
+    console.error(`Unknown corpus: ${corpusName}`);
+    return 2;
+  }
+  const model = options.get("model");
+  const captureId = options.get("capture");
+  if (model === "laya") {
+    console.error(
+      "Laya left the study: input assembly (option tokenization, 48-token option cap, head budget, split_words) is defined only by open-jev's build_sequence; not verifiable from the card and config.json without the forbidden dependency."
+    );
+    return 2;
+  }
+  if (captureId === undefined || (model !== "kev" && model !== "lfm")) {
+    console.error("Usage: memory:eval choice --capture <captureId> --model kev|lfm [--corpus marc] [--resume]");
+    return 2;
+  }
+  const typed = model as TypedModel;
+  const dataset = await readDataset(corpusName, registration);
+  if (dataset === undefined) return 2;
+  const capture = await readCaptureFileOf(corpusName, captureId);
+  if (sha256Json(queryFingerprintCases(dataset.cases)) !== capture.fingerprint.queryFingerprint) {
+    console.error("The dataset queries differ from the capture. Capture again before the choice.");
+    return 1;
+  }
+  const directory = captureDirectoryOf(corpusName, captureId);
+  const outputPath = path.join(directory, choiceFileName(typed));
+  const previous = await readJsonOptional<ChoiceFile>(outputPath);
+  if (previous !== undefined && options.get("resume") !== "true") {
+    console.error(`${outputPath} exists. Use --resume to continue it.`);
+    return 1;
+  }
+  const started = Date.now();
+  const runner =
+    typed === "kev"
+      ? await loadKevChoiceRunner(path.join(REPOSITORY_ROOT, JUDGE_CACHE_DIR))
+      : await loadLfmChoiceRunner(path.join(REPOSITORY_ROOT, PRODUCTION_LFM_CACHE_DIR));
+  const file = await choiceCapture({
+    capture,
+    model: typed,
+    runner,
+    previous,
+    save: (next) => writeFileAtomically(outputPath, `${JSON.stringify(next, null, 2)}\n`),
+    log: (line) => console.log(line)
+  });
+  const decisions = choiceDecisionsOf(file);
+  const counts = { apply: 0, suggest: 0, none: 0 };
+  for (const decision of decisions.values()) counts[decision] += 1;
+  console.log(
+    `choice=${typed} captureId=${captureId} cases=${decisions.size} apply=${counts.apply} suggest=${counts.suggest} none=${counts.none} durationMs=${Date.now() - started} peakRssKb=${process.resourceUsage().maxRSS} output=${outputPath}`
+  );
+  return 0;
+}
+
 const COMMANDS: ReadonlyMap<string, CommandHandler> = new Map<string, CommandHandler>([
   ["validate", validateCommand],
   ["capture", captureCommand],
   ["latency", latencyCommand],
+  ["fit", fitCommand],
+  ["calibrate", calibrateCommand],
+  ["judge", judgeCommand],
+  ["choice", choiceCommand],
+  ["h3", h3Command],
   ["replay", replayCommand],
   ["report", reportCommand],
   ["compare", compareCommand],
@@ -650,7 +1259,10 @@ async function runAsEntrypoint(): Promise<void> {
   process.exitCode = await runCli(process.argv.slice(2));
 }
 
+// A failed command prints its message. The stack trace is printed only when
+// MEMORY_EVAL_STACK=1 is set, for debugging the harness itself.
 runAsEntrypoint().catch((error: unknown) => {
-  console.error(error);
+  const showStack = process.env.MEMORY_EVAL_STACK === "1";
+  console.error(error instanceof Error && !showStack ? error.message : error);
   process.exitCode = 1;
 });

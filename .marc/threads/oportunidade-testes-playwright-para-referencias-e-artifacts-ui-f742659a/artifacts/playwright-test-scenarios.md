@@ -193,6 +193,23 @@ Current contract: depth 0, 1, 2, and 3 request candidate pools of 100, 200, 300,
 - [ ] Verify interpretation runs only on the first automatic request; automatic and manual retries use the same effective query with queryMode literal.
 - [ ] Verify the UI requests limit 50; do not infer the separate MCP default of 5 from browser behavior.
 
+## Memory Confidence Bands
+
+Source thread: marc://$motor-de-busca-v2-e2-score-calibrado-faixas-e-sugestao-de-correc-c34cf4a2  
+Priority: high
+
+Current contract: each recall hit carries a heuristic `band` (high, medium, or low) derived from eligibility. It orders confidence relative to other results and is not a probability. `abstained` is true only when the search ran and admitted no thread; it does not depend on `limit`. The panel never shows the score.
+
+- [ ] Return hits in all three bands; verify high and medium render in the main list with their High confidence and Medium confidence labels, and low renders only inside the collapsed "Show less likely results" block.
+- [ ] Open and close the collapsed block by pointer and keyboard; verify low hits appear and disappear, focus stays on the summary control, and the main list does not reorder.
+- [ ] Return only low hits; verify the main list is empty, the collapsed block is still offered, and the empty state does not claim that nothing was found.
+- [ ] Verify no score, percentage, or probability text is rendered for any band, in desktop and 390x844 viewports.
+- [ ] Return `abstained: true` at each depth with automatic depth 3; verify the search continues through depths 0 to 3 and ends in "No results", exactly as an empty unsearched result does.
+- [ ] Reload after a banded result; verify the schema 6 snapshot restores bands and the collapsed block, and a stored snapshot with an invalid band is discarded.
+- [ ] Return a live response with an unknown band value; record the current behavior (empty label) as the accepted limit until the UI validates live responses.
+
+Coverage note: ad hoc Playwright CLI checks with an intercepted recall covered the three bands, the collapsed block opening and closing, absence of the score, and abstained depth continuation to "No results", with no console errors. Durable browser tests and a combined browser/daemon run remain pending; these checks do not mark the scenarios implemented.
+
 ## Memory Query Interpretation Links
 
 Source thread: marc://$oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba  

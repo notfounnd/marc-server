@@ -13,12 +13,54 @@ import type {
 import { asSearchRecord } from "./capture-types.js";
 import { CachedEmbeddingProvider, CachedRerankingProvider } from "./cached-providers.js";
 import type { EvalDataset, RelevanceGrade } from "./dataset.js";
+import type { FitResult } from "./fit-model.js";
+import type { CalibrationSet } from "./calibration.js";
+import { JUDGE_NAMES, type JudgeName } from "./judge-stage.js";
+import type { JudgeTable } from "./fit.js";
+
+import { caseFolds } from "./folds.js";
 import {
   isRankingVariantId,
   rankingVariants,
   type VariantInput,
   type VariantResult
 } from "./variants.js";
+
+/**
+ * The judge tables split by case: each judgeKeyOf key becomes (caseId, threadId).
+ * Once a judge table is given, every capture case has an entry, possibly with no
+ * thread, so a case without candidates is judged on nothing instead of failing.
+ */
+export function judgesByCase(
+  tables: Partial<Record<JudgeName, JudgeTable>> | undefined,
+  caseIds: readonly string[]
+): Map<string, Partial<Record<JudgeName, Map<string, number>>>> {
+  return new Map(
+    caseIds.map((caseId) => [caseId, judgesOfOneCase(tables, caseId)] as const)
+  );
+}
+
+function judgesOfOneCase(
+  tables: Partial<Record<JudgeName, JudgeTable>> | undefined,
+  caseId: string
+): Partial<Record<JudgeName, Map<string, number>>> {
+  return Object.fromEntries(
+    JUDGE_NAMES.flatMap((name) => {
+      const table = tables?.[name];
+      if (table === undefined) return [];
+      return [[name, scoresOfCase(table, caseId)] as const];
+    })
+  );
+}
+
+function scoresOfCase(table: JudgeTable, caseId: string): Map<string, number> {
+  const scores = new Map<string, number>();
+  for (const [key, score] of table) {
+    const [owner, threadId] = key.split("\0");
+    if (owner === caseId) scores.set(threadId, score);
+  }
+  return scores;
+}
 
 /** The replay never loads a model: only the providers built from a capture. */
 export type ReplayProviders = {
@@ -72,7 +114,32 @@ export type ReplayInput = {
   capture: CaptureFile;
   dataset: EvalDataset;
   variantIds: string[];
+  /** Required only by the H1 variants: the fit of this same capture. */
+  fit?: FitResult;
+  /** Required only by the H2 variants: the calibrations of this same capture. */
+  calibrations?: CalibrationSet;
+  /**
+   * H2 on marc only: the calibrations of each external fold, indexed by fold. A case
+   * takes the set of its own fold. Without them, every case takes `calibrations`.
+   */
+  foldCalibrations?: readonly CalibrationSet[];
+  /** Judge scores of this capture, by judge (H7). Read as data: no model is loaded. */
+  judgeTables?: Partial<Record<JudgeName, JudgeTable>>;
 };
+
+/**
+ * The calibrations of one case: the set of its own external fold when the replay has
+ * the per-fold sets, otherwise the set that every case takes.
+ */
+export function calibrationsOfCase(
+  input: Pick<ReplayInput, "calibrations" | "foldCalibrations">,
+  fold: number | undefined
+): CalibrationSet | undefined {
+  if (input.foldCalibrations === undefined || fold === undefined) return input.calibrations;
+  const calibrations = input.foldCalibrations[fold];
+  if (calibrations === undefined) throw new Error(`No calibrations for fold ${fold}.`);
+  return calibrations;
+}
 
 /** Cached providers that serve exactly the vectors and scores recorded for one case. */
 export function cachedReplayProviders(
@@ -95,6 +162,11 @@ export function cachedReplayProviders(
 export async function replayCapture(input: ReplayInput): Promise<ReplayResult> {
   assertKnownVariants(input.variantIds);
   const records = recordsById(input.capture.records);
+  const folds = caseFolds(input.dataset.cases);
+  const judgesOfCase = judgesByCase(
+    input.judgeTables,
+    input.capture.cases.map((item) => item.id)
+  );
   const cases: CaseReplay[] = [];
   for (const captured of input.capture.cases) {
     cases.push(
@@ -103,7 +175,11 @@ export async function replayCapture(input: ReplayInput): Promise<ReplayResult> {
         judgments: judgmentsOf(input.dataset, captured.id),
         records,
         variantIds: input.variantIds,
-        providers: cachedReplayProviders(captured, input.capture)
+        providers: cachedReplayProviders(captured, input.capture),
+        fold: folds.get(captured.id),
+        fit: input.fit,
+        calibrations: calibrationsOfCase(input, folds.get(captured.id)),
+        judge: judgesOfCase.get(captured.id)
       })
     );
   }
@@ -119,25 +195,47 @@ export async function replayCapture(input: ReplayInput): Promise<ReplayResult> {
   };
 }
 
-export async function replayCase(input: {
+/** What one captured case gives to a ranking variant. */
+export type VariantInputSource = {
   captured: CapturedCase;
   judgments: Record<string, RelevanceGrade>;
   records: ReadonlyMap<string, CapturedRecord>;
-  variantIds: string[];
   providers: ReplayProviders;
-}): Promise<CaseReplay> {
-  const { captured, judgments, records, variantIds, providers } = input;
+  fold?: number;
+  fit?: FitResult;
+  calibrations?: CalibrationSet;
+  judge?: Partial<Record<JudgeName, ReadonlyMap<string, number>>>;
+};
+
+export type CaseReplayInput = VariantInputSource & { variantIds: string[] };
+
+/**
+ * The input of every ranking variant for one captured case. The judgments are
+ * passed as data for the variants that read them; the H1 variants read only the
+ * channels, the fit and the fold.
+ */
+export function variantInputOf(input: VariantInputSource): VariantInput {
+  const effectiveQuery = input.captured.interpretation.effectiveQuery;
+  return {
+    query: effectiveQuery,
+    channels: channelsOf(input.captured, effectiveQuery, input.records),
+    reranker: input.providers.reranker,
+    judgments: input.judgments,
+    production: input.captured.productionRecall,
+    fold: input.fold,
+    fit: input.fit,
+    calibrations: input.calibrations,
+    judge: input.judge
+  };
+}
+
+export async function replayCase(input: CaseReplayInput): Promise<CaseReplay> {
+  const { captured, variantIds, providers } = input;
   assertKnownVariants(variantIds);
   const effectiveQuery = captured.interpretation.effectiveQuery;
   // The captured query vector must exist. The replay never embeds a query.
   await providers.embedding.embedQuery(effectiveQuery);
-  const variantInput: VariantInput = {
-    query: effectiveQuery,
-    channels: channelsOf(captured, effectiveQuery, records),
-    reranker: providers.reranker,
-    judgments,
-    production: captured.productionRecall
-  };
+  const variantInput = variantInputOf(input);
   const results = await runVariants(
     [...new Set([...variantIds, "M0"])],
     variantInput
@@ -251,6 +349,14 @@ function channelsOf(
   const channels: CapturedChannels | undefined = captured.channels[query];
   if (channels === undefined)
     throw new Error(`Capture case ${captured.id} has no channels for its effective query.`);
+  return channelsOfCaptured(channels, records);
+}
+
+/** The channels of one captured text, as the ranking variants read them. Shared by the cases and the synthetic queries. */
+export function channelsOfCaptured(
+  channels: CapturedChannels,
+  records: ReadonlyMap<string, CapturedRecord>
+): MemorySearchChannels {
   return {
     identities: channels.identities.map((hit) =>
       memoryHit(hit.recordId, hit.score, records)
@@ -286,7 +392,7 @@ function recordOf(
   return record;
 }
 
-function recordsById(
+export function recordsById(
   records: readonly CapturedRecord[]
 ): Map<string, CapturedRecord> {
   return new Map(records.map((record) => [record.recordId, record]));

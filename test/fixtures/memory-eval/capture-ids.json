@@ -1,0 +1,134 @@
+[
+  {
+    "corpus": "marc",
+    "captureId": "7020a9de1965",
+    "components": {
+      "queryFingerprint": "d9adccfcbc19ca142075325519089f51d6d48a085593de5139abab4f9d510d3f",
+      "models": {
+        "benchmarkProfile": "baseline",
+        "embedding": {
+          "providerId": "transformers-js-local-e5",
+          "model": "Xenova/multilingual-e5-small",
+          "modelFile": "model_int8.onnx",
+          "dimensions": 384,
+          "quantized": true
+        },
+        "reranking": {
+          "providerId": "transformers-js-local-mmarco",
+          "model": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+          "modelFile": "model_O4.onnx",
+          "quantized": false
+        },
+        "interpretation": {
+          "id": "transformers-js-local-lfm-query-interpreter",
+          "model": "onnx-community/LFM2.5-350M-ONNX/model_q4.onnx",
+          "version": "transformers-js-4.3.1",
+          "quantized": true
+        }
+      },
+      "packageVersion": "0.3.0",
+      "sourceHash": "f19b87eef43a7c439c021d094e02dd1991a9cf23deb9e9cf5f19a26d8b3706bb",
+      "corpusDigest": "bae33c91cf67806703c4ab32bb220986aa83033faacbebfb7f8ee0dde7ed8bba"
+    },
+    "fingerprint": "7020a9de196545800cfac9b28af69fab319aeb4c7c47748fb35098aafc6de362"
+  },
+  {
+    "corpus": "ledgerline-en",
+    "captureId": "a3761dd19573",
+    "components": {
+      "queryFingerprint": "4a30654d3bd33181b73c554bac0e49c1dc5176a2367c75dd4a6540a5a5c47fc8",
+      "models": {
+        "benchmarkProfile": "baseline",
+        "embedding": {
+          "providerId": "transformers-js-local-e5",
+          "model": "Xenova/multilingual-e5-small",
+          "modelFile": "model_int8.onnx",
+          "dimensions": 384,
+          "quantized": true
+        },
+        "reranking": {
+          "providerId": "transformers-js-local-mmarco",
+          "model": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+          "modelFile": "model_O4.onnx",
+          "quantized": false
+        },
+        "interpretation": {
+          "id": "transformers-js-local-lfm-query-interpreter",
+          "model": "onnx-community/LFM2.5-350M-ONNX/model_q4.onnx",
+          "version": "transformers-js-4.3.1",
+          "quantized": true
+        }
+      },
+      "packageVersion": "0.3.0",
+      "sourceHash": "f19b87eef43a7c439c021d094e02dd1991a9cf23deb9e9cf5f19a26d8b3706bb",
+      "corpusDigest": "44da053463b186544fc6d781f96204fbbfb9bd053ce72003b0e76bb872c9a535"
+    },
+    "fingerprint": "a3761dd195733b72904bd2fa71bb4120ade317a791a3b747aec9e124f35755ad"
+  },
+  {
+    "corpus": "marc",
+    "captureId": "8af296ddeca8",
+    "components": {
+      "queryFingerprint": "d9adccfcbc19ca142075325519089f51d6d48a085593de5139abab4f9d510d3f",
+      "models": {
+        "benchmarkProfile": "baseline",
+        "embedding": {
+          "providerId": "transformers-js-local-e5",
+          "model": "Xenova/multilingual-e5-small",
+          "modelFile": "model_int8.onnx",
+          "dimensions": 384,
+          "quantized": true
+        },
+        "reranking": {
+          "providerId": "transformers-js-local-mmarco",
+          "model": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+          "modelFile": "model_O4.onnx",
+          "quantized": false
+        },
+        "interpretation": {
+          "id": "transformers-js-local-lfm-query-interpreter",
+          "model": "onnx-community/LFM2.5-350M-ONNX/model_q4.onnx",
+          "version": "transformers-js-4.3.1",
+          "quantized": true
+        }
+      },
+      "packageVersion": "0.3.0",
+      "sourceHash": "dc4a8ddc7462e909576f41c150062b05ddc43b167c4d6694d210a090e9c7fcbc",
+      "corpusDigest": "bae33c91cf67806703c4ab32bb220986aa83033faacbebfb7f8ee0dde7ed8bba"
+    },
+    "fingerprint": "8af296ddeca8d382b1e8d15915e9389157d3abbf79ad925020d3d141a48fa570"
+  },
+  {
+    "corpus": "ledgerline-en",
+    "captureId": "4dad1e8eaea7",
+    "components": {
+      "queryFingerprint": "4a30654d3bd33181b73c554bac0e49c1dc5176a2367c75dd4a6540a5a5c47fc8",
+      "models": {
+        "benchmarkProfile": "baseline",
+        "embedding": {
+          "providerId": "transformers-js-local-e5",
+          "model": "Xenova/multilingual-e5-small",
+          "modelFile": "model_int8.onnx",
+          "dimensions": 384,
+          "quantized": true
+        },
+        "reranking": {
+          "providerId": "transformers-js-local-mmarco",
+          "model": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+          "modelFile": "model_O4.onnx",
+          "quantized": false
+        },
+        "interpretation": {
+          "id": "transformers-js-local-lfm-query-interpreter",
+          "model": "onnx-community/LFM2.5-350M-ONNX/model_q4.onnx",
+          "version": "transformers-js-4.3.1",
+          "quantized": true
+        }
+      },
+      "packageVersion": "0.3.0",
+      "sourceHash": "dc4a8ddc7462e909576f41c150062b05ddc43b167c4d6694d210a090e9c7fcbc",
+      "corpusDigest": "44da053463b186544fc6d781f96204fbbfb9bd053ce72003b0e76bb872c9a535"
+    },
+    "fingerprint": "4dad1e8eaea7708ddc08d22d33f5bd283d0f0d4ffcea5b75b10d719d3e870719"
+  }
+]

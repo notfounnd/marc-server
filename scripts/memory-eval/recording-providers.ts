@@ -101,8 +101,7 @@ export class RecordingRerankingProvider implements RerankingProvider {
 }
 
 /**
- * Delegates to a real query interpreter and records every selectVariant call,
- * following the RecordingQueryInterpreter of scripts/memory-quality-v4.ts.
+ * Delegates to a real query interpreter and records every selectVariant call.
  */
 export class RecordingQueryInterpreter implements QueryInterpretationProvider {
   readonly trace: InterpretationTrace[] = [];

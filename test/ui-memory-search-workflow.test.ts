@@ -48,6 +48,7 @@ const recallResult: MemoryRecallResult = {
     status: "ready",
     summaryCount: 1
   },
+  abstained: false,
   nextActions: [],
   query: "token rotation",
   results: [
@@ -57,6 +58,7 @@ const recallResult: MemoryRecallResult = {
       reason: "Matched summary in token rotation.",
       reference:
         "marc://$oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3",
+      band: "low",
       score: 0.82,
       summaryPath:
         "threads/oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3/SUMMARY.md",
@@ -172,6 +174,45 @@ test("runs empty automatic depths sequentially and keeps the effective query lit
     }),
     undefined
   );
+});
+
+test("an abstained search continues to the next depth, as an unsearched empty result does", async () => {
+  const abstained: MemoryRecallResult = {
+    ...recallResult,
+    abstained: true,
+    results: []
+  };
+  const unsearched: MemoryRecallResult = {
+    ...recallResult,
+    abstained: false,
+    results: []
+  };
+  const cases = [
+    ["abstained", abstained],
+    ["unsearched", unsearched]
+  ] as const;
+
+  for (const [label, first] of cases) {
+    const calls: number[] = [];
+    const firstResponses: Partial<Record<number, MemoryRecallResult>> = {
+      0: first
+    };
+    const apiPost = async <T>(_path: string, body: unknown): Promise<T> => {
+      const depth = (body as RecallRequest).depth;
+      calls.push(depth);
+      return (firstResponses[depth] ?? recallResult) as T;
+    };
+    const completed = await recallMemorySearchDepths({
+      apiPost,
+      depths: automaticMemorySearchDepths(3),
+      query: "token rotation",
+      workspaceId: "workspace-1"
+    });
+
+    assert.deepEqual(calls, [0, 1], label);
+    assert.equal(completed.lastExecutedDepth, 1, label);
+    assert.equal(completed.result.results.length, 1, label);
+  }
 });
 
 test("starts an alternate query literally at depth zero", async () => {

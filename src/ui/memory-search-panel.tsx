@@ -5,9 +5,11 @@ import {
   findMemorySearchThread,
   isMemorySearchAvailable,
   isMemorySearchClosedHit,
-  memorySearchTooltip
+  memorySearchTooltip,
+  splitMemorySearchBands
 } from "./memory-search.js";
 import type {
+  MemoryBand,
   MemoryIndexHealth,
   MemoryRecallHit,
   MemoryRecallResult,
@@ -207,17 +209,34 @@ function memorySearchBody({
       />
     );
   }
+  const { primary, lessLikely } = splitMemorySearchBands(result.results);
   return (
     <div className="memory-search-results">
-      {result.results.map((hit) => (
+      {primary.map((hit) => (
         <MemorySearchResultCard
           allThreads={allThreads}
           hit={hit}
           key={hit.threadId}
           selected={hit.threadId === selectedThreadId}
+          t={t}
           onSelectHit={onSelectHit}
         />
       ))}
+      {lessLikely.length ? (
+        <details className="memory-search-less-likely">
+          <summary>{t("Show less likely results")}</summary>
+          {lessLikely.map((hit) => (
+            <MemorySearchResultCard
+              allThreads={allThreads}
+              hit={hit}
+              key={hit.threadId}
+              selected={hit.threadId === selectedThreadId}
+              t={t}
+              onSelectHit={onSelectHit}
+            />
+          ))}
+        </details>
+      ) : null}
     </div>
   );
 }
@@ -226,11 +245,13 @@ function MemorySearchResultCard({
   allThreads,
   hit,
   selected,
+  t,
   onSelectHit
 }: {
   allThreads: Thread[];
   hit: MemoryRecallHit;
   selected: boolean;
+  t: Translation;
   onSelectHit: (hit: MemoryRecallHit) => void;
 }) {
   const thread = findMemorySearchThread(hit, allThreads);
@@ -247,12 +268,20 @@ function MemorySearchResultCard({
       title={title}
       tooltip={memorySearchTooltip(hit, title)}
     >
+      <span className="memory-search-band">{t(BAND_LABEL_KEYS[hit.band])}</span>
       {hit.matchedText.trim() ? (
         <span className="memory-search-match">{hit.matchedText}</span>
       ) : null}
     </NavItem>
   );
 }
+
+/** Translation keys of the band labels. Labels state relative confidence, never a percentage. */
+const BAND_LABEL_KEYS: Readonly<Record<MemoryBand, string>> = {
+  high: "High confidence",
+  medium: "Medium confidence",
+  low: "Low confidence"
+};
 
 function searchResultSlug(hit: MemoryRecallHit): string {
   return hit.reference.replace(/^marc:\/\/\$/, "");

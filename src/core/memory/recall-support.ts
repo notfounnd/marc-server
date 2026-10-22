@@ -13,6 +13,10 @@ import type {
   MemoryVectorStore
 } from "./types.js";
 
+/**
+ * The result of a recall that did not search: an unready index, a concurrent operation
+ * or a manifest without records. Only a search that admits nothing sets abstained.
+ */
 export function emptyMemoryRecallResult(
   query: string,
   queryMode: MemoryRecallOptions["queryMode"],
@@ -27,7 +31,8 @@ export function emptyMemoryRecallResult(
     ),
     indexStatus: status,
     results: [],
-    nextActions
+    nextActions,
+    abstained: false
   };
 }
 

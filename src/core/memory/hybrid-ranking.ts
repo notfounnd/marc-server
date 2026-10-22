@@ -60,7 +60,7 @@ export async function rankHybridMemoryCandidates(
   return [...applyMonotonicConfidence(ranked), ...ineligible];
 }
 
-function semanticHitsForChannels(
+export function semanticHitsForChannels(
   channels: MemorySearchChannels
 ): MemorySearchHit[] {
   const hits = new Map<string, MemorySearchHit>();

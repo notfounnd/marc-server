@@ -178,6 +178,8 @@ The UI can search the same summary-memory index used by `memory_recall`. This is
 
 The search panel is available only when workspace memory is `ready` or `stale`. A stale index can still be queried, but the UI warns that recent summaries may be missing. `missing`, `model_missing`, `incompatible`, `preparing`, `rebuilding`, and `degraded` states block the search action.
 
+Results are grouped by their heuristic confidence band. `High confidence` and `Medium confidence` results appear in the main list. `Low confidence` results appear in a collapsed block labelled `Show less likely results`. The panel shows the bands and no score. An abstained search continues through the automatic depths like any other empty result, and ends with the `No results` state.
+
 Search runs only when the user presses Enter or the search button. It does not run on every keystroke because recall must generate an embedding for the query with the local provider. A persistent daemon can reuse the provider during the short idle window described above.
 
 The UI stores only the latest search snapshot in local browser storage and overwrites that slot after each completed search. It does not maintain a search history.
@@ -198,6 +200,8 @@ The tool returns a compact memory pack:
 - reason for the match, including ranking signals when available;
 - canonical `marc://` thread reference;
 - source type, source path, and authority of the matched record, as optional additive fields;
+- a heuristic confidence `band` per hit (`high`, `medium`, or `low`). The band orders results relative to each other. It is not a probability of relevance, and the ranking score is unchanged;
+- `abstained`, which is `true` only when the search ran and admitted no thread. It reflects admission and does not depend on `limit`: a truncated list is not abstention. A recall that did not search, such as one on an unready index, a concurrent operation, or a manifest without records, reports `false`;
 - next actions.
 
 Recall embeds the effective query with E5 and retrieves identity records and content passages in separate dense channels. It also queries field-aware FTS over title and summary text; a title-prefix channel is added only for a single whitespace-delimited query term. The mMARCO O4 cross-encoder reranks up to three passages per thread using the canonical title, optional section, and passage text. Semantic eligibility is computed from dense retrieval and reranker evidence before lexical ranking signals are applied. Only semantically eligible threads are returned, but title, summary, and applicable title-prefix matches can reinforce the ordering of those eligible threads. The final limit is applied after thread consolidation.
@@ -206,35 +210,9 @@ This ranking is a read-time projection only. It does not change the `SUMMARY.md`
 
 When a result is relevant, the agent should read the referenced thread before reopening or contradicting the historical decision.
 
-## Quality benchmark
-
-`memory:quality` and `memory:benchmark` only run against a schema v6 generation, so they do not work with the current schema 7 index. They are superseded by `memory:eval` and will be removed.
-
-Run the opt-in local quality suite against a schema v6 generation with the required local model caches prepared. A full rebuild is required when migrating an older or incompatible generation:
-
-```bash
-pnpm run memory:quality -- --workspace <path>
-```
-
-The suite interprets each curated query once and reuses its effective query across the selected depths. By default it evaluates all cases at depths `0` through `3` with the `hybrid-prefix` strategy. It reports interpretation metadata, graded relevance, eligibility, ordering metrics, and observational duration. It does not test O4 score invariance across embedding batches or worker TTL behavior. The suite is not part of the normal unit-test command because it requires the local model cache and workspace memory generation.
-
-The quality command accepts `--workspace <path>`, `--family <name>`, `--query <exact-query>`, `--depth 0|1|2|3`, `--strategy baseline|hybrid-exact|hybrid-prefix`, and `--interpret-only`. The default strategy queries title and summary FTS, and also title-prefix FTS for a single whitespace-delimited term. `hybrid-exact` omits title-prefix FTS; `baseline` uses dense retrieval and reranking without lexical channels. `--interpret-only` skips retrieval and reranking.
-
-A separate 30-query evaluation on August 4, 2026 returned 27/30 Top-1 and 28/30 Top-10. Those measurements are historical results for that sample, not current validation or an accuracy guarantee.
-
-Use the separate model matrix only for controlled retriever and reranker experiments:
-
-```bash
-pnpm run memory:benchmark -- --workspace <path>
-```
-
-The matrix runs the `baseline`, `retriever-base`, `reranker-bge`, and `base-bge` profiles in separate processes. Each profile re-embeds rows into an `InMemoryMemoryVectorStore`; the profile run selects the `baseline` quality strategy, whose lexical search is empty. The matrix therefore compares dense model profiles and does not exercise production LanceDB FTS or hybrid-prefix ranking. It preserves the production generation. Results are written to `.marc/cache/memory-model-benchmark/latest.json` by default. Experimental model files remain isolated under `.marc/cache/memory-models/experiments/` and are not active production models.
-
-The matrix is intentionally exhaustive and CPU-intensive. Its duration does not represent normal recall latency. Long runs can use `--detach`, and an interrupted matrix can use `--resume` to preserve completed profiles.
-
 ### Evaluation harness (memory:eval)
 
-The evaluation harness is an opt-in offline suite that scores retrieval against curated, judged cases. It is separate from `memory:quality` and `memory:benchmark`. It does not change `.marc/memory/`: capture reads the production manifest only to check the rebuild, and every output is written under `.marc/cache/memory-eval/`.
+The evaluation harness is an opt-in offline suite that scores retrieval against curated, judged cases. It does not change `.marc/memory/`: capture reads the production manifest only to check the rebuild, and every output is written under `.marc/cache/memory-eval/`.
 
 Run the commands in this order with `pnpm memory:eval <command> --corpus <name>`: `validate`, `capture`, `worksheet` (the raters judge the pooled pairs), `merge-judgments`, `latency`, then `report` and `compare`. `replay` is optional for `report`, which runs the replay internally; run `replay` on its own only to inspect one variant. `compare` pairs two captures of the same corpus with the same `queryFingerprint` and the same `corpusDigest`, and refuses any other pair.
 

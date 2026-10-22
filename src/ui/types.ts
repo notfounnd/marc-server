@@ -90,6 +90,9 @@ export type MemoryIndexHealth = {
   message: string;
 };
 
+/** Heuristic confidence band of a hit. It orders the results; it is not a probability. */
+export type MemoryBand = "high" | "medium" | "low";
+
 export type MemoryRecallHit = {
   threadId: string;
   title: string;
@@ -99,6 +102,7 @@ export type MemoryRecallHit = {
   matchedText: string;
   score: number;
   reason: string;
+  band: MemoryBand;
 };
 
 export type MemoryRecallResult = {
@@ -107,6 +111,8 @@ export type MemoryRecallResult = {
   indexStatus: MemoryIndexHealth;
   results: MemoryRecallHit[];
   nextActions: string[];
+  /** True only when the search ran and admitted no thread. */
+  abstained: boolean;
 };
 
 export type MemoryQueryInterpretation = {

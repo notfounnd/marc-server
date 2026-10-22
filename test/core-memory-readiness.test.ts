@@ -26,6 +26,7 @@ test("recall does not load embeddings when the local provider is not prepared", 
 
   assert.equal(recall.indexStatus.status, "model_missing");
   assert.deepEqual(recall.results, []);
+  assert.equal(recall.abstained, false);
   assert.equal(provider.queryCalls, 0);
   assert.ok(
     recall.nextActions.some((action) => action.includes("memory_prepare"))

@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import { computeCaptureFingerprint } from "../scripts/memory-eval/capture.js";
+import { E2_CAPTURE_CHANNELS } from "../scripts/memory-eval/capture-fingerprint.js";
 import { corpusContentDigest } from "../scripts/memory-eval/corpus.js";
 import {
   createFakes,
@@ -115,7 +116,9 @@ test("refuses to reuse an existing capture directory without resume", async (t) 
   const fingerprint = await computeCaptureFingerprint(
     dataset,
     REPOSITORY_ROOT,
-    digest
+    digest,
+    undefined,
+    E2_CAPTURE_CHANNELS
   );
   await fs.mkdir(path.join(outputRoot, dataset.corpus, fingerprint.captureId), {
     recursive: true

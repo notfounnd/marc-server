@@ -5,6 +5,7 @@ import type { WorkspaceInfo } from "../../src/core/types.js";
 import { writeFileAtomically } from "../../src/core/write-coordination.js";
 import { measureLatency } from "./capture-channels.js";
 import {
+  E2_CAPTURE_CHANNELS,
   computeCaptureFingerprint,
   type CaptureFingerprint
 } from "./capture-fingerprint.js";
@@ -79,7 +80,9 @@ export async function measureCaptureLatency(
   const fingerprint = await computeCaptureFingerprint(
     options.dataset,
     options.repositoryRoot,
-    await corpusContentDigest(options.source)
+    await corpusContentDigest(options.source),
+    undefined,
+    E2_CAPTURE_CHANNELS
   );
   const captureDir = path.join(
     options.outputRoot,

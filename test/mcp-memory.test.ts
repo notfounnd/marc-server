@@ -61,10 +61,12 @@ test("memory status and recall report missing models without loading assets", as
       indexStatus: { status: string };
       results: unknown[];
       nextActions: string[];
+      abstained: boolean;
     };
   }>(recall).result;
   assert.equal(recallResult.indexStatus.status, "model_missing");
   assert.deepEqual(recallResult.results, []);
+  assert.equal(recallResult.abstained, false);
   assert.ok(
     recallResult.nextActions.includes(
       "Run memory_prepare before using memory_recall."

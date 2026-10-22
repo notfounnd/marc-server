@@ -1,7 +1,10 @@
 import http from "node:http";
 import { URL } from "node:url";
 import type { DaemonConfig, DaemonLease } from "../core/types.js";
-import { disposeMemoryProviders } from "../core/workspace-memory.js";
+import {
+  disposeMemoryProviders,
+  recallMemory
+} from "../core/workspace-memory.js";
 import { UiEventBus } from "./events.js";
 import { authorized, json, serveStatic, text } from "./http.js";
 import {
@@ -20,8 +23,18 @@ import { daemonStatus } from "./status.js";
 import { DaemonStore } from "./store.js";
 import { renderUi } from "./ui.js";
 
+/** Behavior the daemon routes call that tests may replace. Production uses the defaults. */
+export type DaemonServerDependencies = {
+  memoryRecall: typeof recallMemory;
+};
+
+const DEFAULT_DAEMON_DEPENDENCIES: DaemonServerDependencies = {
+  memoryRecall: recallMemory
+};
+
 export async function createDaemonServer(
-  config: DaemonConfig
+  config: DaemonConfig,
+  dependencies: DaemonServerDependencies = DEFAULT_DAEMON_DEPENDENCIES
 ): Promise<http.Server> {
   const store = await DaemonStore.open(config.dataDir);
   const leases = new Map<string, DaemonLease>();
@@ -133,6 +146,7 @@ export async function createDaemonServer(
 
       const handled = await handleDaemonRoute({
         events,
+        memoryRecall: dependencies.memoryRecall,
         request,
         response,
         store,

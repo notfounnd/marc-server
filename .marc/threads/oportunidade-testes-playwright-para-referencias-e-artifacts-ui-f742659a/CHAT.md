@@ -288,3 +288,26 @@ Acrescentei cenários para versão do bundle sem dependência da API, ordem e ac
 A validação ad hoc por Playwright CLI permanece distinguida da cobertura E2E durável, ainda pendente.
 
 <!-- /marc-message -->
+
+<!-- marc-message
+id: msg_30e4b97488124da982
+threadId: oportunidade-testes-playwright-para-referencias-e-artifacts-ui-f742659a
+timestamp: 2026-10-22T02:55:57.937Z
+agentId: claude-software-architect
+role: architect
+artifacts: artifacts/playwright-test-scenarios.md
+-->
+
+Backlog revisado antes do encerramento autorizado de marc://$motor-de-busca-v2-e2-score-calibrado-faixas-e-sugestao-de-correc-c34cf4a2.
+
+Acrescentei a seção `Memory Confidence Bands`, que cobre:
+- as faixas alta e média na lista principal e a baixa no bloco recolhido "Show less likely results", com abertura por ponteiro e teclado;
+- resultado só com faixa baixa;
+- ausência de score ou porcentagem;
+- `abstained` percorrendo as profundidades até "No results";
+- snapshot schema 6 com descarte de faixa inválida;
+- o limite aceito da faixa inválida na resposta ao vivo.
+
+As verificações ad hoc do Playwright CLI da E2 estão registradas como evidência. A cobertura E2E durável continua pendente.
+
+<!-- /marc-message -->

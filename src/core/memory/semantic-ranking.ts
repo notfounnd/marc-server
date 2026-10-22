@@ -1,4 +1,5 @@
 import { DEFAULT_RERANK_BATCH_SIZE } from "./model-config.js";
+import { memoryBandOf } from "./scoring/bands.js";
 import { candidateLimitForMemorySearchDepth } from "./search-depth.js";
 import {
   applyEligibility,
@@ -21,7 +22,7 @@ const MAX_RERANK_PASSAGES_PER_THREAD = 3;
 const PASSAGE_RANK_WEIGHT = 1;
 const RERANKER_RANK_WEIGHT = 2;
 
-type RankedEvidence = {
+export type RankedEvidence = {
   denseRank: number;
   record: MemoryVectorRecord;
   vectorScore: number;
@@ -43,7 +44,7 @@ export type RankedMemoryThread = {
 export { SEMANTIC_ELIGIBILITY_THRESHOLD } from "./semantic-eligibility.js";
 export type { ThreadSignals } from "./semantic-eligibility.js";
 
-type ThreadCandidate = {
+export type ThreadCandidate = {
   identity?: RankedEvidence;
   passages: RankedEvidence[];
   rerankerEvidence?: RankedEvidence;
@@ -98,7 +99,8 @@ export function semanticRecallHits(
     reason: semanticMatchReason(hit.evidence.record),
     sourceType: hit.evidence.record.sourceType,
     sourcePath: hit.evidence.record.sourcePath,
-    authority: hit.evidence.record.authority
+    authority: hit.evidence.record.authority,
+    band: memoryBandOf(hit.eligibility)
   }));
 }
 
@@ -106,7 +108,7 @@ export function candidateLimitForDepth(depth: MemorySearchDepth): number {
   return candidateLimitForMemorySearchDepth(depth);
 }
 
-function denseRanksByKind(hits: MemorySearchHit[]): RankedEvidence[] {
+export function denseRanksByKind(hits: MemorySearchHit[]): RankedEvidence[] {
   const ranks = new Map<MemoryVectorRecord["kind"], number>();
   return hits.map((hit) => {
     const denseRank = (ranks.get(hit.record.kind) ?? 0) + 1;
@@ -119,7 +121,9 @@ function denseRanksByKind(hits: MemorySearchHit[]): RankedEvidence[] {
   });
 }
 
-function consolidateThreads(evidence: RankedEvidence[]): ThreadCandidate[] {
+export function consolidateThreads(
+  evidence: RankedEvidence[]
+): ThreadCandidate[] {
   const candidates = new Map<string, ThreadCandidate>();
   for (const item of evidence) {
     const threadId = item.record.threadId;

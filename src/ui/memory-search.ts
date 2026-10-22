@@ -1,4 +1,5 @@
 import type {
+  MemoryBand,
   MemoryIndexHealth,
   MemoryQueryInterpretation,
   MemoryRecallHit,
@@ -13,7 +14,8 @@ import {
 
 export const MEMORY_SEARCH_STORAGE_KEY = "marcMemorySearchState";
 
-const MEMORY_SEARCH_SCHEMA_VERSION = 5;
+const MEMORY_SEARCH_SCHEMA_VERSION = 6;
+const MEMORY_BANDS: readonly MemoryBand[] = ["high", "medium", "low"];
 const MAX_STORED_NEXT_ACTIONS = 5;
 const MAX_STORED_TEXT_LENGTH = 360;
 
@@ -72,6 +74,20 @@ export function isMemorySearchClosedHit(
   hit: Pick<MemoryRecallHit, "closedAt" | "summaryPath">
 ): boolean {
   return Boolean(hit.closedAt || hit.summaryPath);
+}
+
+/**
+ * Splits the results for the panel: high and medium bands stay in the main list, and
+ * low band hits go to the collapsed block. Order inside each list is kept.
+ */
+export function splitMemorySearchBands(results: readonly MemoryRecallHit[]): {
+  primary: MemoryRecallHit[];
+  lessLikely: MemoryRecallHit[];
+} {
+  return {
+    primary: results.filter((hit) => hit.band !== "low"),
+    lessLikely: results.filter((hit) => hit.band === "low")
+  };
 }
 
 export function memorySearchTooltip(
@@ -265,6 +281,7 @@ function isMemoryRecallResult(value: unknown): value is MemoryRecallResult {
   if (!isRecord(value.indexStatus)) return false;
   if (!Array.isArray(value.results)) return false;
   if (!Array.isArray(value.nextActions)) return false;
+  if (typeof value.abstained !== "boolean") return false;
   return value.results.every(isMemoryRecallHit);
 }
 
@@ -293,7 +310,12 @@ function isMemoryRecallHit(value: unknown): value is MemoryRecallHit {
   if (typeof value.matchedText !== "string") return false;
   if (typeof value.score !== "number") return false;
   if (typeof value.reason !== "string") return false;
+  if (!isMemoryBand(value.band)) return false;
   return true;
+}
+
+function isMemoryBand(value: unknown): value is MemoryBand {
+  return MEMORY_BANDS.some((band) => band === value);
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

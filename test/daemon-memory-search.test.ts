@@ -4,8 +4,23 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { loadDaemonConfig } from "../src/daemon/config.js";
-import { createDaemonServer } from "../src/daemon/server.js";
+import {
+  createDaemonServer,
+  type DaemonServerDependencies
+} from "../src/daemon/server.js";
 import { initWorkspace } from "../src/core/workspace.js";
+import {
+  rebuildMemoryInWorkspace,
+  recallMemoryInWorkspace,
+  type MemoryRecallResult
+} from "../src/core/memory/index.js";
+import { memoryBandOf } from "../src/core/memory/scoring/bands.js";
+import {
+  FakeEmbeddingProvider,
+  FakeRerankingProvider,
+  ScoreOverrideStore,
+  writeSummary
+} from "./memory-test-helpers.js";
 
 async function tempDir(prefix: string): Promise<string> {
   return fs.mkdtemp(path.join(os.tmpdir(), prefix));
@@ -91,9 +106,11 @@ test("daemon exposes memory recall without an agent connection", async () => {
       indexStatus: { status: string };
       nextActions: string[];
       results: unknown[];
+      abstained: boolean;
     };
     assert.equal(body.indexStatus.status, "model_missing");
     assert.deepEqual(body.results, []);
+    assert.equal(body.abstained, false);
     assert.deepEqual(body.nextActions, [
       "Run memory_prepare before using memory_recall."
     ]);
@@ -116,3 +133,99 @@ async function registerWorkspace(
   });
   assert.equal(register.status, 200);
 }
+
+/** A daemon whose recall runs the core with fake providers, over one admitted thread. */
+async function withAdmittedThreadDaemon(
+  run: (baseUrl: string, workspaceId: string) => Promise<void>
+): Promise<void> {
+  const dataDir = await tempDir("marc-daemon-");
+  const workspaceRoot = await tempDir("marc-workspace-");
+  const workspace = await initWorkspace(workspaceRoot);
+  const provider = new FakeEmbeddingProvider();
+  const reranker = new FakeRerankingProvider();
+  const store = new ScoreOverrideStore({ "thread-toggle": 0.9 });
+  await writeSummary(
+    workspace,
+    "thread-toggle",
+    summaryDocument("thread-toggle", "Toggle settings")
+  );
+  await rebuildMemoryInWorkspace(workspace, { provider, reranker, store });
+  const config = await loadDaemonConfig({ dataDir, token: "secret", port: 0 });
+  const dependencies: DaemonServerDependencies = {
+    memoryRecall: (_rootPath, input) =>
+      recallMemoryInWorkspace(workspace, {
+        limit: input.limit,
+        provider,
+        query: input.query,
+        queryMode: input.queryMode,
+        reranker,
+        store
+      })
+  };
+  const server = await createDaemonServer(config, dependencies);
+  const baseUrl = await listen(server);
+
+  try {
+    await registerWorkspace(baseUrl, workspace);
+    await run(baseUrl, workspace.id);
+  } finally {
+    server.close();
+  }
+}
+
+function summaryDocument(threadId: string, content: string): string {
+  return [
+    `# Summary - ${content}`,
+    "",
+    `Thread: \`${threadId}\``,
+    "",
+    "## Result",
+    "",
+    `- ${content}`
+  ].join("\n");
+}
+
+async function postRecall(
+  baseUrl: string,
+  workspaceId: string,
+  body: Record<string, unknown>
+): Promise<MemoryRecallResult> {
+  const response = await fetch(
+    `${baseUrl}/api/workspaces/${encodeURIComponent(workspaceId)}/memory/recall`,
+    {
+      body: JSON.stringify(body),
+      headers: {
+        authorization: "Bearer secret",
+        "content-type": "application/json"
+      },
+      method: "POST"
+    }
+  );
+  assert.equal(response.status, 200);
+  return (await response.json()) as MemoryRecallResult;
+}
+
+test("daemon recall returns banded hits that are not abstained", async () => {
+  await withAdmittedThreadDaemon(async (baseUrl, workspaceId) => {
+    const recall = await postRecall(baseUrl, workspaceId, { query: "toogle" });
+
+    assert.equal(recall.results.length, 1);
+    assert.deepEqual(
+      recall.results.map((hit) => hit.band),
+      recall.results.map((hit) => memoryBandOf(hit.score))
+    );
+    assert.equal(recall.abstained, false);
+  });
+});
+
+test("daemon recall with limit zero is not abstained when a thread is admitted", async () => {
+  await withAdmittedThreadDaemon(async (baseUrl, workspaceId) => {
+    const recall = await postRecall(baseUrl, workspaceId, {
+      limit: 0,
+      query: "toogle"
+    });
+
+    assert.deepEqual(recall.results, []);
+    assert.equal(recall.abstained, false);
+  });
+});

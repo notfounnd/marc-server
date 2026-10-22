@@ -28,6 +28,7 @@ import {
 } from "./corpus.js";
 import type { EvalCase, EvalDataset } from "./dataset.js";
 import {
+  E2_CAPTURE_CHANNELS,
   computeCaptureFingerprint,
   type CaptureFingerprint
 } from "./capture-fingerprint.js";
@@ -36,7 +37,14 @@ import {
   captureProductionRecall
 } from "./capture-channels.js";
 import {
-  CAPTURE_FILE,
+  SYNTHETIC_QUERY_COUNT,
+  SYNTHETIC_QUERY_RULE,
+  syntheticQueries
+} from "../../src/core/memory/scoring/synthetic-queries.js";
+import { threadReferenceEdges } from "./references.js";
+import { writeFileAtomically } from "../../src/core/write-coordination.js";
+import type { CapturedSyntheticQuery } from "./capture-types.js";
+import {
   SCHEMA_VERSION,
   prepareCaptureDirectory,
   readCapturedCase,
@@ -105,7 +113,9 @@ export async function captureMemoryEval(
   const fingerprint = await computeCaptureFingerprint(
     options.dataset,
     options.repositoryRoot,
-    await corpusContentDigest(options.source)
+    await corpusContentDigest(options.source),
+    undefined,
+    E2_CAPTURE_CHANNELS
   );
   const captureDir = path.join(
     options.outputRoot,
@@ -190,6 +200,7 @@ async function captureWithProviders(
     );
   }
 
+  const synthetic = await captureSyntheticQueries(context, captureDir, options.resume);
   await writeCaptureFile(captureDir, {
     schemaVersion: SCHEMA_VERSION,
     captureId: fingerprint.captureId,
@@ -205,7 +216,15 @@ async function captureWithProviders(
     matrixRecordCount: context.matrixRecords.length,
     productionCheck: context.productionCheck,
     records: context.rows.map(recordWithoutVector),
-    cases: captured
+    cases: captured,
+    syntheticRule: SYNTHETIC_QUERY_RULE,
+    syntheticRequested: SYNTHETIC_QUERY_COUNT,
+    syntheticQueries: synthetic,
+    identityVectors: identityVectorsOf(context),
+    threadReferences: await threadReferenceEdges(
+      options.source.threadsRoot,
+      options.source.threadIds
+    )
   });
   return { cases: cases.length, executedCases, skippedCases };
 }
@@ -285,7 +304,8 @@ async function captureCase(
   for (const text of distinctTexts(
     evalCase.query,
     interpretation.effectiveQuery,
-    interpretation.suggestedQuery
+    interpretation.suggestedQuery,
+    candidates.variants[1]
   )) {
     channels[text] = await captureChannels(context, embedding, reranker, text);
   }
@@ -435,6 +455,73 @@ export async function disposeProviders(providers: CaptureProviders): Promise<voi
   ]);
 }
 
+/**
+ * Captures the synthetic Inverse Cloze queries of the generation. Each query has
+ * its own recording providers, so its query vector and reranker scores stay apart.
+ */
+const SYNTHETIC_CACHE_FILE = "synthetic-queries.json";
+
+/**
+ * The synthetic queries of a capture. A resumed capture reads them back, like its
+ * concluded cases, so the embedding and reranking of the queries run once.
+ */
+async function captureSyntheticQueries(
+  context: CaptureContext,
+  captureDir: string,
+  resume: boolean
+): Promise<CapturedSyntheticQuery[]> {
+  const cachePath = path.join(captureDir, SYNTHETIC_CACHE_FILE);
+  const cached = resume
+    ? await fs.readFile(cachePath, "utf8").catch(() => undefined)
+    : undefined;
+  if (cached !== undefined) return JSON.parse(cached) as CapturedSyntheticQuery[];
+  const captured = await computeSyntheticQueries(context);
+  await writeFileAtomically(cachePath, JSON.stringify(captured));
+  return captured;
+}
+
+async function computeSyntheticQueries(
+  context: CaptureContext
+): Promise<CapturedSyntheticQuery[]> {
+  const passages = context.rows
+    .filter((row) => row.kind === "passage")
+    .map((row) => ({
+      recordId: row.recordId,
+      threadId: row.threadId,
+      text: row.text
+    }));
+  const captured: CapturedSyntheticQuery[] = [];
+  for (const query of syntheticQueries(passages, context.generation)) {
+    const embedding = new RecordingEmbeddingProvider(context.providers.embedding);
+    const reranker = new RecordingRerankingProvider(context.providers.reranker);
+    const channels = await captureChannels(context, embedding, reranker, query.text);
+    captured.push({
+      ...query,
+      queryVector: vectorOf(embedding.queryVectors, query.text),
+      channels,
+      rerankScores: Object.fromEntries(reranker.scores)
+    });
+  }
+  return captured;
+}
+
+/** Identity vector of each pinned thread, for the identity-identity cosine of N1. */
+function identityVectorsOf(context: CaptureContext): Record<string, number[]> {
+  return Object.fromEntries(
+    context.rows
+      .filter((row) => row.kind === "identity")
+      .map((row) => [row.threadId, [...row.vector]])
+  );
+}
+
+function vectorOf(vectors: ReadonlyMap<string, number[]>, text: string): number[] {
+  const vector = vectors.get(text);
+  if (vector === undefined) {
+    throw new Error(`Missing query vector for "${text}".`);
+  }
+  return [...vector];
+}
+
 function distinctTexts(...texts: Array<string | undefined>): string[] {
   const present = texts.filter((text): text is string => text !== undefined);
   return [...new Set(present)];
@@ -442,13 +529,13 @@ function distinctTexts(...texts: Array<string | undefined>): string[] {
 
 /** Captures written before latency left capture.json may still carry latencyMs. It is dropped here. */
 function withoutLegacyLatency(captured: CapturedCase): CapturedCase {
-  const { latencyMs: _legacy, ...current } = captured as CapturedCase & {
-    latencyMs?: unknown;
-  };
+  const current: CapturedCase & { latencyMs?: unknown } = { ...captured };
+  delete current.latencyMs;
   return current;
 }
 
 function recordWithoutVector(row: MemoryVectorRow): MemoryVectorRecord {
-  const { vector: _vector, ...record } = row;
+  const record: MemoryVectorRecord & { vector?: unknown } = { ...row };
+  delete record.vector;
   return record;
 }

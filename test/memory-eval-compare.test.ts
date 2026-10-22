@@ -25,8 +25,8 @@ test("compare pairs the cases by id and gives a zero difference for the same var
 
   const result = await compareCaptures({
     dataset: judgedDataset,
-    baseline: { capture, variant: "M0" },
-    candidate: { capture, variant: "M0" }
+    baseline: { capture, variant: "M0", inputs: {} },
+    candidate: { capture, variant: "M0", inputs: {} }
   });
 
   assert.equal(result.verdict, "compared");
@@ -64,8 +64,8 @@ test("compare refuses captures built over different corpus content", async (t) =
   await assert.rejects(
     compareCaptures({
       dataset: judgedDataset,
-      baseline: { capture: baseline, variant: "M0" },
-      candidate: { capture: candidate, variant: "M0" }
+      baseline: { capture: baseline, variant: "M0", inputs: {} },
+      candidate: { capture: candidate, variant: "M0", inputs: {} }
     }),
     /corpusDigest/
   );
@@ -82,8 +82,8 @@ test("compare gives no verdict while a side has unjudged pairs in reach", async 
 
   const result = await compareCaptures({
     dataset,
-    baseline: { capture, variant: "M0" },
-    candidate: { capture, variant: "M0" }
+    baseline: { capture, variant: "M0", inputs: {} },
+    candidate: { capture, variant: "M0", inputs: {} }
   });
 
   assert.equal(result.verdict, "incomplete");
