@@ -22,3 +22,7 @@ Documents are the only source a user points at by path, so they are restricted. 
 - Indexed text turns `#`, `>`, `*`, hyphens and underscores into spaces, as the E0 baseline does. In the E1 measurement, keeping these characters inside the text changed the order of the top threads in case A25 and dropped its top thread below the eligibility threshold.
 - External documents are read at rebuild time and are not watched. A configuration change takes effect at the next rebuild.
 - Existing workspaces keep their recall behavior until a rebuild requests more layers.
+
+## Continuity note (activation)
+
+The activation of layers 0, 1, and 2 for the production index is accepted on 2026-10-27 (see ADR 0012). The statements above about the default layer describe the decision as it was taken. The default search depth stays `0`, which searches layer 0 only.

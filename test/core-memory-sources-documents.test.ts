@@ -228,7 +228,6 @@ function settingsFor(
     memory: {
       autoRebuild: true,
       embeddingBatchSize: 4,
-      searchRetryDepth: 0,
       documentSources
     }
   };

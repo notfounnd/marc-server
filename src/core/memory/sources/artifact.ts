@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import { parseMessages } from "../../markdown.js";
 import type { WorkspaceInfo } from "../../types.js";
 import { sectionChunks } from "./chunks.js";
 import { MEMORY_SOURCE_AUTHORITIES, type MemorySource } from "./contract.js";
@@ -66,6 +67,7 @@ function artifactSource(
   const fileName = path.basename(file.path);
   const markdown = file.bytes.toString("utf8");
   const title = `${thread.title} / ${fileName}`;
+  const messageId = artifactMessageId(thread.chat, fileName);
   return {
     sourceType: "artifact",
     threadId: thread.threadId,
@@ -77,13 +79,30 @@ function artifactSource(
     markdown,
     sourcePath: rootRelativePath(info, file.path),
     sourceSha256: sha256Hex(file.bytes),
-    sha256: sourceHash(markdown, title),
+    // The linking message is part of the source hash, so a changed link re-indexes the file.
+    sha256: sourceHash(markdown, `${title}\0messageId=${messageId ?? ""}`),
     mtimeMs: file.mtimeMs,
     authority: MEMORY_SOURCE_AUTHORITIES.artifact,
     chunks: sectionChunks(
       `${thread.threadId}:artifact:${fileName}:source`,
       sectionsOrOverview(markdown, ARTIFACT_LEVELS),
-      { artifactFileName: fileName }
+      { artifactFileName: fileName, messageId }
     )
   };
+}
+
+/**
+ * The id of the first CHAT.md message whose artifacts list names the file. Undefined when no
+ * message links it, or when the thread has no chat.
+ */
+export function artifactMessageId(
+  chat: RegularFile | undefined,
+  fileName: string
+): string | undefined {
+  if (chat === undefined) return undefined;
+  const target = `${ARTIFACTS_DIRECTORY}/${fileName}`;
+  const message = parseMessages(chat.bytes.toString("utf8")).find((item) =>
+    item.artifacts.includes(target)
+  );
+  return message?.id;
 }

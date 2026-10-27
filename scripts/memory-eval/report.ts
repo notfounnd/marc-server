@@ -1,11 +1,12 @@
 import fs from "node:fs/promises";
-import { candidateLimitForMemorySearchDepth } from "../../src/core/memory/search-depth.js";
+import { MEMORY_LAYER_CANDIDATE_LIMIT } from "../../src/core/memory/search-depth.js";
 import type { CaptureFile, CapturedCase } from "./capture-types.js";
 import { assignFolds } from "./folds.js";
-import type { EvalDataset } from "./dataset.js";
+import { isNonThreadGroup, type EvalDataset } from "./dataset.js";
 import {
   caseInputsFor,
   compareEvaluations,
+  decisionRowsOf,
   evaluateVariant,
   resultsForCase,
   variantDifferences,
@@ -33,7 +34,26 @@ import type { DeltaSummary, ReplayResult } from "./replay.js";
 import type { LatencyFile } from "./latency.js";
 import { PRODUCTION_RECALL_ID } from "./variants.js";
 
-export const REPORT_VARIANTS = ["M0", "D0", "ORACLE_ADMISSION"] as const;
+/** Variants replayed for the report. Each is compared with M0; an incomplete one is never approvable. */
+export const REPORT_VARIANTS = [
+  "M0",
+  "D0",
+  "ORACLE_ADMISSION",
+  "DEPTH0",
+  "DEPTH1",
+  "DEPTH2",
+  "FUNNEL_D0",
+  "FUNNEL_D1",
+  "FUNNEL_D2",
+  "ADAPTIVE",
+  "ADAPTIVE_HM",
+  "ALL_PASSAGES_D0",
+  "ALL_PASSAGES_D1",
+  "ALL_PASSAGES_D2",
+  "ALL_CANDIDATES_D0",
+  "ALL_CANDIDATES_D1",
+  "ALL_CANDIDATES_D2"
+] as const;
 
 /** Decision metrics: every metric except the diagnostic ones. */
 export const DECISION_METRICS = METRIC_IDS.filter((metric) => METRIC_REACH[metric] !== "diagnosticOnly");
@@ -122,6 +142,8 @@ export type Report = {
   };
   variants: Record<string, VariantSummary>;
   comparisons: Array<{ candidate: string; rows: MetricComparison[] }>;
+  /** The decision tables of the E3 hypotheses, each on the common reference of its two variants. */
+  decisions: Array<{ hypothesis: string; baseline: string; candidate: string; rows: MetricComparison[] }>;
   attribution: {
     counts: Record<AttributionCategory, number>;
     suspects: number;
@@ -140,6 +162,8 @@ export type VariantSummary = {
   status: "complete" | "incomplete";
   pendingPairs: number;
   pending: PendingPair[];
+  /** Cases with a missing rerank score or no replay: the variant is not approvable while any remain. */
+  incompleteCaseIds: string[];
   scopes: Record<string, ScopeValues>;
 };
 
@@ -157,7 +181,8 @@ export async function buildReport(input: ReportInput): Promise<Report> {
     PRODUCTION_RECALL_ID,
     caseInputsFor(dataset, replay, PRODUCTION_RECALL_ID)
   );
-  const comparisons = ["D0", "ORACLE_ADMISSION"].map((candidate) => ({
+  const comparedVariants = REPORT_VARIANTS.filter((variant) => variant !== "M0");
+  const comparisons = comparedVariants.map((candidate) => ({
     candidate,
     rows: compareEvaluations(
       requireEvaluation(m0),
@@ -188,11 +213,13 @@ export async function buildReport(input: ReportInput): Promise<Report> {
           status: evaluation.status,
           pendingPairs: evaluation.pending.length,
           pending: evaluation.pending,
+          incompleteCaseIds: evaluation.incompleteCaseIds,
           scopes: evaluation.scopes
         }
       ])
     ),
     comparisons,
+    decisions: decisionsOf(input),
     attribution: attributionOf(input, evaluations),
     interpretation: interpretationOf(capture, dataset),
     latency: latencySection(input.latency),
@@ -251,13 +278,20 @@ export function renderMarkdown(report: Report): string {
   );
   lines.push("## Variants and coverage", "");
   for (const [variant, summary] of Object.entries(report.variants)) {
-    lines.push(`### ${variant}: ${summary.status}, pending pairs ${summary.pendingPairs}`, "");
+    lines.push(
+      `### ${variant}: ${summary.status}, pending pairs ${summary.pendingPairs}, incomplete cases ${summary.incompleteCaseIds.length}`,
+      ""
+    );
     lines.push(scopeTable(summary.scopes), "");
   }
   lines.push("## Comparisons against M0", "");
   for (const comparison of report.comparisons) {
     lines.push(`### ${comparison.candidate} − M0`, "");
     lines.push(comparisonTable(comparison.rows), "");
+  }
+  for (const decision of report.decisions) {
+    lines.push(`## ${decision.hypothesis}: ${decision.candidate} contra ${decision.baseline}`, "");
+    lines.push(comparisonTable(decision.rows), "");
   }
   lines.push("## M0 vs PRODUCTION_RECALL", "");
   lines.push(
@@ -302,6 +336,43 @@ export function renderMarkdown(report: Report): string {
     ""
   );
   return lines.join("\n");
+}
+
+/**
+ * The hypotheses whose decision tables the report computes. H4 compares the funnel with the all-passages
+ * reference; its recall margin is −0,02. H5 compares the adaptive search with the depth-0 reference.
+ */
+const DECISION_HYPOTHESES = [
+  {
+    hypothesis: "H4",
+    baseline: "ALL_PASSAGES_D2",
+    candidate: "FUNNEL_D2",
+    metricIds: ["top1Target", "admissionRecall"] as const,
+    margins: { admissionRecall: 0.02 }
+  },
+  {
+    hypothesis: "H5",
+    baseline: "DEPTH0",
+    candidate: "ADAPTIVE",
+    metricIds: ["top1Target", "admissionRecall", "incidentalExposure", "abstentionCorrect"] as const,
+    margins: {}
+  }
+] as const;
+
+function decisionsOf(input: ReportInput): Report["decisions"] {
+  return DECISION_HYPOTHESES.map((item) => ({
+    hypothesis: item.hypothesis,
+    baseline: item.baseline,
+    candidate: item.candidate,
+    rows: decisionRowsOf({
+      dataset: input.dataset,
+      replay: input.replay,
+      baseline: item.baseline,
+      candidate: item.candidate,
+      metricIds: item.metricIds,
+      margins: item.margins
+    })
+  }));
 }
 
 function attributionOf(
@@ -391,9 +462,13 @@ function foldsOf(dataset: EvalDataset): Report["folds"] {
 function corpusSize(capture: CaptureFile): Report["corpusSize"] {
   const identityRecords = capture.records.filter((record) => record.kind === "identity").length;
   const passageRecords = capture.records.filter((record) => record.kind === "passage").length;
-  const channelLimit = candidateLimitForMemorySearchDepth(0);
+  const channelLimit = MEMORY_LAYER_CANDIDATE_LIMIT;
   return {
-    threads: new Set(capture.records.map((record) => record.threadId)).size,
+    threads: new Set(
+      capture.records
+        .map((record) => record.threadId)
+        .filter((threadId) => !isNonThreadGroup(threadId))
+    ).size,
     identityRecords,
     passageRecords,
     channelLimit,

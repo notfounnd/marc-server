@@ -141,9 +141,14 @@ export function decisionTerm(
   return { term: termOf(interval, margin), nonInferior: interval.lower > -margin };
 }
 
+/**
+ * The term of an interval. Non-inferiority is checked before worsening: an interval that stays above
+ * -margin is non-inferior even when it lies below zero, so it is never called "piora" while the
+ * non-inferiority holds. Only an interval that stays wholly below zero and below -margin is worsening.
+ */
 function termOf(interval: Interval, margin: number): DecisionTerm {
   if (interval.lower > 0) return "melhora";
-  if (interval.upper < 0) return "piora";
   if (interval.lower > -margin) return "não inferior";
+  if (interval.upper < 0) return "piora";
   return "inconclusivo";
 }

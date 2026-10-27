@@ -25,7 +25,7 @@ export const memorySourceReaders: Record<MemorySourceType, MemorySourceReader> =
     chat: readChatSources
   };
 
-export const INDEXED_LAYERS: readonly MemoryLayer[] = [0];
+export const INDEXED_LAYERS: readonly MemoryLayer[] = [0, 1, 2];
 
 const SOURCE_TYPE_ORDER: readonly MemorySourceType[] = [
   "summary",

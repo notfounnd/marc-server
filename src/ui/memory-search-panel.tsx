@@ -1,10 +1,11 @@
-import { Archive, CircleAlert } from "lucide-react";
+import { Archive, CircleAlert, FileText } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button, EmptyState, NavItem } from "./common.js";
 import {
   findMemorySearchThread,
   isMemorySearchAvailable,
   isMemorySearchClosedHit,
+  isMemorySearchHitSelected,
   memorySearchTooltip,
   splitMemorySearchBands
 } from "./memory-search.js";
@@ -21,7 +22,6 @@ type Translation = (key: string, options?: Record<string, unknown>) => string;
 
 export function MemorySearchPanel({
   allThreads,
-  deepRetryAvailable,
   error,
   health,
   query,
@@ -29,14 +29,12 @@ export function MemorySearchPanel({
   selectedThreadId,
   status,
   t,
-  onDeepRetry,
   onAlternateSearch,
   onQueryChange,
   onSelectHit,
   onSubmit
 }: {
   allThreads: Thread[];
-  deepRetryAvailable: boolean;
   error?: string;
   health?: MemoryIndexHealth;
   query: string;
@@ -44,7 +42,6 @@ export function MemorySearchPanel({
   selectedThreadId?: string;
   status: MemorySearchStatus;
   t: Translation;
-  onDeepRetry: () => void;
   onAlternateSearch: () => void;
   onQueryChange: (query: string) => void;
   onSelectHit: (hit: MemoryRecallHit) => void;
@@ -140,11 +137,6 @@ export function MemorySearchPanel({
         t,
         onSelectHit
       })}
-      {deepRetryAvailable ? (
-        <Button className="memory-search-deep-retry" onClick={onDeepRetry}>
-          {t("Deep retry")}
-        </Button>
-      ) : null}
     </div>
   );
 }
@@ -216,8 +208,8 @@ function memorySearchBody({
         <MemorySearchResultCard
           allThreads={allThreads}
           hit={hit}
-          key={hit.threadId}
-          selected={hit.threadId === selectedThreadId}
+          key={hitKey(hit)}
+          selected={isMemorySearchHitSelected(hit, selectedThreadId)}
           t={t}
           onSelectHit={onSelectHit}
         />
@@ -229,8 +221,8 @@ function memorySearchBody({
             <MemorySearchResultCard
               allThreads={allThreads}
               hit={hit}
-              key={hit.threadId}
-              selected={hit.threadId === selectedThreadId}
+              key={hitKey(hit)}
+              selected={isMemorySearchHitSelected(hit, selectedThreadId)}
               t={t}
               onSelectHit={onSelectHit}
             />
@@ -263,7 +255,7 @@ function MemorySearchResultCard({
       closed={closed}
       detail={searchResultSlug(hit)}
       disabled={!thread}
-      icon={thread ? <Archive size={16} /> : <CircleAlert size={16} />}
+      icon={memorySearchIcon(hit, thread)}
       onClick={() => onSelectHit(hit)}
       title={title}
       tooltip={memorySearchTooltip(hit, title)}
@@ -285,4 +277,16 @@ const BAND_LABEL_KEYS: Readonly<Record<MemoryBand, string>> = {
 
 function searchResultSlug(hit: MemoryRecallHit): string {
   return hit.reference.replace(/^marc:\/\/\$/, "");
+}
+
+/** The list key: the group id when the hit has one, otherwise its reference (rules and document hits). */
+function hitKey(hit: MemoryRecallHit): string {
+  return hit.groupId ?? hit.reference;
+}
+
+/** A thread that is loaded gets the archive mark; a group without a thread is a document, not an error. */
+function memorySearchIcon(hit: MemoryRecallHit, thread?: Thread) {
+  if (thread) return <Archive size={16} />;
+  if (!hit.threadId) return <FileText size={16} />;
+  return <CircleAlert size={16} />;
 }

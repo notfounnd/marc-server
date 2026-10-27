@@ -71,7 +71,7 @@ function usage(): never {
   console.error(`Usage:
   marc daemon [--host 127.0.0.1] [--port 4187] [--data-dir .marc-daemon] [--token <token>]
   marc daemon start|stop|restart|status [--host 127.0.0.1] [--port 4187] [--data-dir .marc-daemon]
-  marc memory status|prepare|rebuild|recall|purge [--workspace <path>] [--mode incremental|full] [--query <text>] [--query-mode auto|literal] [--limit <n>] [--depth 0|1|2|3]
+  marc memory status|prepare|rebuild|recall|purge [--workspace <path>] [--mode incremental|full] [--query <text>] [--query-mode auto|literal] [--limit <n>] [--depth 0|1|2]
   marc mcp [--workspace <path>] [--daemon-url http://127.0.0.1:4187] [--token <token>]`);
   process.exit(1);
 }
@@ -141,7 +141,7 @@ async function handleMemoryCommand(parsed: ParsedArgs): Promise<void> {
     usage();
   }
   if (action === "recall" && stringValue(parsed.values, "min-score"))
-    throw new Error("--min-score was removed. Use --depth from 0 to 3.");
+    throw new Error("--min-score was removed. Use --depth from 0 to 2.");
 
   const workspaceRoot =
     stringValue(parsed.values, "workspace") ?? process.cwd();

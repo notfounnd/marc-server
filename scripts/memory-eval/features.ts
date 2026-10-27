@@ -1,15 +1,15 @@
-import { semanticHitsForChannels } from "../hybrid-ranking.js";
+import { semanticHitsForChannels } from "../../src/core/memory/hybrid-ranking.js";
 import {
   consolidateThreads,
   denseRanksByKind,
   type RankedEvidence,
   type ThreadCandidate
-} from "../semantic-ranking.js";
+} from "../../src/core/memory/semantic-ranking.js";
 import type {
   MemoryLexicalSearchHit,
   MemorySearchChannels,
   MemoryVectorRecord
-} from "../types.js";
+} from "../../src/core/memory/types.js";
 
 /**
  * Feature order of every vector of the calibrated score. The weights, the

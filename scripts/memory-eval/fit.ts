@@ -32,7 +32,7 @@ import {
   semanticOnlyVectorOf,
   FEATURE_NAMES,
   type ThreadFeatures
-} from "../../src/core/memory/scoring/features.js";
+} from "./features.js";
 import { M0, type VariantResult } from "./variants.js";
 import { cheapScoresOf } from "./cheap.js";
 import {

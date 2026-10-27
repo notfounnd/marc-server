@@ -1,9 +1,10 @@
 import {
   rankSemanticMemoryCandidates,
   SEMANTIC_ELIGIBILITY_THRESHOLD,
-  semanticRecallHits,
+  semanticFusionScore,
   type RankedMemoryThread
 } from "./semantic-ranking.js";
+import { semanticRecallHits } from "./recall-hits.js";
 import type {
   MemoryLexicalField,
   MemorySearchChannels,
@@ -41,13 +42,25 @@ export async function rankHybridMemoryCandidates(
     semanticHits,
     reranker
   );
+  return hybridAdmissionOrder(candidates, lexicalRanksByThread(channels));
+}
+
+/**
+ * The M0 admission order, shared with the funnel. The threads whose semantic eligibility reaches the threshold
+ * come first, by the hybrid score (then the lexical score, then the ranking score), and the monotone ceiling is
+ * applied in that order. The other threads follow in their input order. An ineligible thread never caps an
+ * eligible one, because the ceiling runs over the eligible threads only.
+ */
+export function hybridAdmissionOrder(
+  candidates: RankedMemoryThread[],
+  lexicalRanks: LexicalRanks
+): RankedMemoryThread[] {
   const eligible = candidates.filter(
     (thread) => thread.semanticEligibility >= SEMANTIC_ELIGIBILITY_THRESHOLD
   );
   const ineligible = candidates.filter(
     (thread) => thread.semanticEligibility < SEMANTIC_ELIGIBILITY_THRESHOLD
   );
-  const lexicalRanks = lexicalRanksByThread(channels);
   const ranked = eligible.sort((left, right) => {
     const scoreDifference =
       hybridScore(right, lexicalRanks) - hybridScore(left, lexicalRanks);
@@ -82,9 +95,14 @@ export function semanticHitsForChannels(
   return ranked;
 }
 
-type LexicalRanks = Map<string, Partial<Record<MemoryLexicalField, number>>>;
+/** The first rank of each lexical field, per thread. */
+export type ThreadLexicalRanks = Partial<Record<MemoryLexicalField, number>>;
 
-function lexicalRanksByThread(channels: MemorySearchChannels): LexicalRanks {
+export type LexicalRanks = Map<string, ThreadLexicalRanks>;
+
+export function lexicalRanksByThread(
+  channels: MemorySearchChannels
+): LexicalRanks {
   const ranks: LexicalRanks = new Map();
   const fieldRanks = new Map<MemoryLexicalField, number>();
   for (const hit of channels.lexical) {
@@ -98,7 +116,7 @@ function lexicalRanksByThread(channels: MemorySearchChannels): LexicalRanks {
   return ranks;
 }
 
-function hybridScore(
+export function hybridScore(
   thread: RankedMemoryThread,
   lexicalRanks: LexicalRanks
 ): number {
@@ -111,12 +129,33 @@ function lexicalScore(
   thread: RankedMemoryThread,
   lexicalRanks: LexicalRanks
 ): number {
-  const ranks = lexicalRanks.get(thread.evidence.record.threadId);
+  return lexicalScoreOfRanks(lexicalRanks.get(thread.evidence.record.threadId));
+}
+
+/** The lexical term of the M0 fusion for one thread: each field's reciprocal rank, weighted. */
+export function lexicalScoreOfRanks(
+  ranks: ThreadLexicalRanks | undefined
+): number {
   if (!ranks) return 0;
   return Object.entries(ranks).reduce((score, [field, rank]) => {
     const weight = LEXICAL_RANK_WEIGHTS[field as MemoryLexicalField];
     return score + reciprocalRank(rank) * weight;
   }, 0);
+}
+
+/**
+ * The M0 fusion without the reranker term: 1/identity rank + 1/passage rank + the lexical
+ * term. The production hybridScore keeps its operation order: rankingScore, which already
+ * holds the reranker term, plus the lexical term. Same value, same floating-point order.
+ */
+export function fusionWithoutRerankerScore(
+  identityRank: number | undefined,
+  passageRank: number | undefined,
+  ranks: ThreadLexicalRanks | undefined
+): number {
+  return (
+    semanticFusionScore(identityRank, passageRank) + lexicalScoreOfRanks(ranks)
+  );
 }
 
 function reciprocalRank(rank: number | undefined): number {

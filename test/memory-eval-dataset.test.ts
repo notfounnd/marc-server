@@ -4,7 +4,6 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 import {
   HISTORICAL_ORIGINS,
-  buildValidationCorpus,
   findSharedWordRun,
   validateDataset,
   type CorpusIndex,
@@ -14,7 +13,11 @@ import {
   type RelevanceGrade,
   type ValidationRule
 } from "../scripts/memory-eval/dataset.js";
-import { readClosedThreads, runCli } from "../scripts/memory-eval/cli.js";
+import {
+  CORPORA,
+  runCli,
+  validationCorpus
+} from "../scripts/memory-eval/cli.js";
 
 const ALPHA_SUMMARY =
   "Resumo: acao de sincronizacao rapida fica registrada aqui.";
@@ -243,20 +246,20 @@ test("loads the migrated and approver-written marc cases and validates them agai
   const pinnedPath = fileURLToPath(
     new URL("../scripts/memory-eval/datasets/marc.corpus.json", import.meta.url)
   );
-  const threadsPath = fileURLToPath(
-    new URL("../.marc/threads", import.meta.url)
-  );
   const dataset = JSON.parse(
     await fs.readFile(datasetPath, "utf8")
   ) as EvalDataset;
   const pinned = JSON.parse(
     await fs.readFile(pinnedPath, "utf8")
   ) as PinnedCorpus;
-  const closedThreads = await readClosedThreads(threadsPath);
-  const { corpus, issues: pinnedIssues } = buildValidationCorpus(
-    pinned,
-    closedThreads
-  );
+  // The validation corpus and its sources come from the same function as the validate command.
+  const marc = CORPORA.get("marc");
+  assert.ok(marc !== undefined);
+  const {
+    corpus,
+    issues: pinnedIssues,
+    sources
+  } = await validationCorpus(marc);
 
   const historicalCaseIds = dataset.cases
     .filter((evalCase) =>
@@ -272,10 +275,10 @@ test("loads the migrated and approver-written marc cases and validates them agai
     .filter((evalCase) => evalCase.origin === APPROVER_A1_ORIGIN)
     .map((evalCase) => evalCase.id);
   assert.deepEqual(approverCaseIds, approverA1Ids);
-  assert.equal(dataset.cases.length, 114);
+  assert.equal(dataset.cases.length, 137);
   assert.equal(corpus.size, pinned.threadIds.length);
   assert.deepEqual(pinnedIssues, []);
-  assert.deepEqual(validateDataset(dataset, corpus).issues, []);
+  assert.deepEqual(validateDataset(dataset, corpus, sources).issues, []);
 });
 
 const dispatchScenarios: Array<{

@@ -7,6 +7,7 @@ import type {
   CaptureFile,
   CapturedCase,
   CapturedChannels,
+  CapturedIncomplete,
   CapturedProductionRecall,
   CapturedRecord
 } from "./capture-types.js";
@@ -19,12 +20,25 @@ import { JUDGE_NAMES, type JudgeName } from "./judge-stage.js";
 import type { JudgeTable } from "./fit.js";
 
 import { caseFolds } from "./folds.js";
+import { MissingRerankScore } from "../../src/core/memory/funnel-admission.js";
+import type { CaseIncomplete } from "./metrics.js";
 import {
+  MissingFunnelInputs,
+  MissingFunnelParams,
   isRankingVariantId,
+  judgedDepthOfVariant,
   rankingVariants,
+  runFunnelRanking,
+  type FunnelParams,
+  type FunnelVariantInput,
   type VariantInput,
   type VariantResult
 } from "./variants.js";
+import { FUNNEL_VARIANT_NAMES, type FunnelVariantName } from "./funnel-variants.js";
+import type { MemorySearchDepth } from "../../src/core/memory/types.js";
+import type { CatalogRow } from "../../src/core/memory/funnel-groups.js";
+import { presentLayersOf } from "./required-cells.js";
+import { E3_CAPTURE_CHANNELS } from "./capture-layers.js";
 
 /**
  * The judge tables split by case: each judgeKeyOf key becomes (caseId, threadId).
@@ -91,6 +105,16 @@ export type DeltaSummary = {
 export type VariantOutput = {
   variant: string;
   results: VariantResult[];
+  /** Deepest layer whose judgments grade this variant on this case (see judgedDepthOf). */
+  judgedDepth: MemorySearchDepth;
+  /** Set when the variant could not finish on this case. Its results are then empty. */
+  incomplete?: CaseIncomplete;
+};
+
+type VariantRun = {
+  results: VariantResult[];
+  judgedDepth: MemorySearchDepth;
+  incomplete?: CaseIncomplete;
 };
 
 export type CaseReplay = {
@@ -108,6 +132,8 @@ export type ReplayResult = {
   failedCaseIds: string[];
   scoreDelta: DeltaSummary;
   cases: CaseReplay[];
+  /** Layers that the capture holds for each group. Absent in replays written before the required cells. */
+  presentLayers?: Record<string, number[]>;
 };
 
 export type ReplayInput = {
@@ -125,6 +151,10 @@ export type ReplayInput = {
   foldCalibrations?: readonly CalibrationSet[];
   /** Judge scores of this capture, by judge (H7). Read as data: no model is loaded. */
   judgeTables?: Partial<Record<JudgeName, JudgeTable>>;
+  /** E3 vectors of every record of the capture, read from its vector file. Only the funnel reads them. */
+  vectors?: ReadonlyMap<string, number[]>;
+  /** Budget, K, selection mode and band cuts of the funnel runs, given by the command. */
+  funnelParams?: FunnelParams;
 };
 
 /**
@@ -159,7 +189,20 @@ export function cachedReplayProviders(
 }
 
 /** Replays every captured case with the requested variants, judged by the dataset's current judgments. */
+/**
+ * An E3 capture written before the catalog cannot replay: its funnel would select passages that the
+ * capture does not hold. It fails with the reason; there is no silent fallback to the channels.
+ */
+export function assertCatalogOf(capture: CaptureFile): void {
+  if (capture.vectors === undefined) return;
+  if (capture.fingerprint.captureChannels === E3_CAPTURE_CHANNELS) return;
+  throw new Error(
+    `The capture ${capture.captureId} is E3 without the passage catalog (channels ${capture.fingerprint.captureChannels ?? "none"}): capture again with ${E3_CAPTURE_CHANNELS}.`
+  );
+}
+
 export async function replayCapture(input: ReplayInput): Promise<ReplayResult> {
+  assertCatalogOf(input.capture);
   assertKnownVariants(input.variantIds);
   const records = recordsById(input.capture.records);
   const folds = caseFolds(input.dataset.cases);
@@ -179,7 +222,9 @@ export async function replayCapture(input: ReplayInput): Promise<ReplayResult> {
         fold: folds.get(captured.id),
         fit: input.fit,
         calibrations: calibrationsOfCase(input, folds.get(captured.id)),
-        judge: judgesOfCase.get(captured.id)
+        judge: judgesOfCase.get(captured.id),
+        vectors: input.vectors,
+        funnelParams: input.funnelParams
       })
     );
   }
@@ -191,7 +236,8 @@ export async function replayCapture(input: ReplayInput): Promise<ReplayResult> {
     equivalence: summary.equivalence,
     failedCaseIds: summary.failedCaseIds,
     scoreDelta: summary.scoreDelta,
-    cases
+    cases,
+    presentLayers: presentLayersOf(input.capture.records)
   };
 }
 
@@ -205,6 +251,8 @@ export type VariantInputSource = {
   fit?: FitResult;
   calibrations?: CalibrationSet;
   judge?: Partial<Record<JudgeName, ReadonlyMap<string, number>>>;
+  vectors?: ReadonlyMap<string, number[]>;
+  funnelParams?: FunnelParams;
 };
 
 export type CaseReplayInput = VariantInputSource & { variantIds: string[] };
@@ -225,7 +273,9 @@ export function variantInputOf(input: VariantInputSource): VariantInput {
     fold: input.fold,
     fit: input.fit,
     calibrations: input.calibrations,
-    judge: input.judge
+    judge: input.judge,
+    funnel: funnelInputOf(input),
+    funnelParams: input.funnelParams
   };
 }
 
@@ -236,35 +286,91 @@ export async function replayCase(input: CaseReplayInput): Promise<CaseReplay> {
   // The captured query vector must exist. The replay never embeds a query.
   await providers.embedding.embedQuery(effectiveQuery);
   const variantInput = variantInputOf(input);
-  const results = await runVariants(
+  const runs = await runVariants(
     [...new Set([...variantIds, "M0"])],
     variantInput
   );
   return {
     caseId: captured.id,
     effectiveQuery,
-    variants: variantIds.map((variant) => ({
-      variant,
-      results: results.get(variant) ?? []
-    })),
+    variants: variantIds.map((variant) =>
+      outputOf(variant, runs.get(variant), captured.incomplete)
+    ),
     equivalence: equivalenceOf(
       captured.productionRecall,
-      results.get("M0") ?? []
+      runs.get("M0")?.results ?? []
     )
+  };
+}
+
+/**
+ * A case that the capture marks incomplete (its evidence is not indexed as a whole) cannot approve
+ * any variant: each requested variant reports the reason and has no results.
+ */
+function outputOf(
+  variant: string,
+  run: VariantRun | undefined,
+  caseIncomplete: CapturedIncomplete | undefined
+): VariantOutput {
+  if (caseIncomplete !== undefined) {
+    return { variant, results: [], judgedDepth: 0, incomplete: caseIncomplete };
+  }
+  return {
+    variant,
+    results: run?.results ?? [],
+    judgedDepth: run?.judgedDepth ?? 0,
+    incomplete: run?.incomplete
   };
 }
 
 async function runVariants(
   ids: string[],
   input: VariantInput
-): Promise<Map<string, VariantResult[]>> {
-  const results = new Map<string, VariantResult[]>();
-  for (const id of ids) {
-    const variant = rankingVariants[id];
-    if (variant === undefined) throw new Error(`Unknown ranking variant: ${id}`);
-    results.set(id, await variant(input));
+): Promise<Map<string, VariantRun>> {
+  const runs = new Map<string, VariantRun>();
+  for (const id of ids) runs.set(id, await runOne(id, input));
+  return runs;
+}
+
+/**
+ * One ranking variant on one case. A funnel variant runs once and reports the judged depth of that
+ * run. A missing score or missing inputs makes the variant incomplete, never zero: its results are
+ * empty. Any other error is a real failure and is not hidden.
+ */
+async function runOne(id: string, input: VariantInput): Promise<VariantRun> {
+  try {
+    return await rankOf(id, input);
+  } catch (error) {
+    return incompleteOfError(error);
   }
-  return results;
+}
+
+async function rankOf(id: string, input: VariantInput): Promise<VariantRun> {
+  if (isFunnelName(id)) return runFunnelRanking(id, input);
+  const variant = rankingVariants[id];
+  if (variant === undefined) throw new Error(`Unknown ranking variant: ${id}`);
+  return { results: await variant(input), judgedDepth: judgedDepthOfVariant(id) };
+}
+
+function isFunnelName(id: string): id is FunnelVariantName {
+  return (FUNNEL_VARIANT_NAMES as readonly string[]).includes(id);
+}
+
+function incompleteOfError(error: unknown): VariantRun {
+  if (error instanceof MissingRerankScore) {
+    return incompleteRun({ reason: "missing-score", recordId: error.recordId });
+  }
+  if (error instanceof MissingFunnelInputs) {
+    return incompleteRun({ reason: "missing-funnel-inputs" });
+  }
+  if (error instanceof MissingFunnelParams) {
+    return incompleteRun({ reason: "missing-funnel-params" });
+  }
+  throw error;
+}
+
+function incompleteRun(incomplete: CaseIncomplete): VariantRun {
+  return { results: [], judgedDepth: 0, incomplete };
 }
 
 function assertKnownVariants(ids: readonly string[]): void {
@@ -350,6 +456,77 @@ function channelsOf(
   if (channels === undefined)
     throw new Error(`Capture case ${captured.id} has no channels for its effective query.`);
   return channelsOfCaptured(channels, records);
+}
+
+const REPLAY_DEPTHS: readonly MemorySearchDepth[] = [0, 1, 2];
+
+/**
+ * The funnel input of a case: the channels of every depth, the vectors, the captured scores of the
+ * effective query and its query vector. A capture without them (E0 and E2) has no funnel input.
+ */
+export function funnelInputOf(
+  input: Pick<VariantInputSource, "captured" | "records" | "vectors">
+): FunnelVariantInput | undefined {
+  const { captured, records, vectors } = input;
+  const effectiveQuery = captured.interpretation.effectiveQuery;
+  const queryVector = captured.queryVectors[effectiveQuery];
+  const byDepth = captured.channelsByDepth;
+  const scores = captured.recordScores;
+  const complete = REPLAY_DEPTHS.every((depth) => byDepth?.[depth] !== undefined);
+  if (byDepth === undefined || scores === undefined || !complete) return undefined;
+  if (vectors === undefined || queryVector === undefined) return undefined;
+  return {
+    channelsByDepth: liveChannelsByDepth(byDepth, records),
+    vectors,
+    catalog: catalogOf(records, vectors),
+    queryVector,
+    scores: new Map(Object.entries(scores)),
+    ftsRecordIds: new Set(lexicalRecordIdsOf(byDepth))
+  };
+}
+
+/**
+ * The catalog of a capture: every identity and passage record, with its group, its layer and its vector.
+ * The vector file holds a vector for each of them; a missing one is a broken capture, not a zero.
+ */
+export function catalogOf(
+  records: ReadonlyMap<string, CapturedRecord>,
+  vectors: ReadonlyMap<string, readonly number[]>
+): Map<string, CatalogRow[]> {
+  const byGroup = new Map<string, CatalogRow[]>();
+  for (const record of records.values()) {
+    if (record.kind !== "identity" && record.kind !== "passage") continue;
+    const vector = vectors.get(record.recordId);
+    if (vector === undefined)
+      throw new Error(`The vector file has no vector for record ${record.recordId}: capture again.`);
+    const row: CatalogRow = { recordId: record.recordId, kind: record.kind, layer: record.layer ?? 0, vector };
+    byGroup.set(record.threadId, [...(byGroup.get(record.threadId) ?? []), row]);
+  }
+  return byGroup;
+}
+
+function liveChannelsByDepth(
+  byDepth: Partial<Record<MemorySearchDepth, CapturedChannels>>,
+  records: ReadonlyMap<string, CapturedRecord>
+): Partial<Record<MemorySearchDepth, MemorySearchChannels>> {
+  return Object.fromEntries(
+    REPLAY_DEPTHS.map((depth) => [depth, channelsOfCaptured(capturedAt(byDepth, depth), records)])
+  ) as Partial<Record<MemorySearchDepth, MemorySearchChannels>>;
+}
+
+function lexicalRecordIdsOf(byDepth: Partial<Record<MemorySearchDepth, CapturedChannels>>): string[] {
+  return REPLAY_DEPTHS.flatMap((depth) =>
+    capturedAt(byDepth, depth).lexical.map((hit) => hit.recordId)
+  );
+}
+
+function capturedAt(
+  byDepth: Partial<Record<MemorySearchDepth, CapturedChannels>>,
+  depth: MemorySearchDepth
+): CapturedChannels {
+  const channels = byDepth[depth];
+  if (channels === undefined) throw new MissingFunnelInputs();
+  return channels;
 }
 
 /** The channels of one captured text, as the ranking variants read them. Shared by the cases and the synthetic queries. */

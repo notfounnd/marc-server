@@ -4,7 +4,7 @@ import {
   threadFeatures,
   type RerankScores,
   type ThreadFeatures
-} from "../../src/core/memory/scoring/features.js";
+} from "./features.js";
 import type {
   MemorySearchChannels,
   MemoryVectorRecord,

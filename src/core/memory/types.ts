@@ -1,4 +1,5 @@
 import type { WorkspaceInfo } from "../types.js";
+import type { RerankOrder } from "./rerank-order.js";
 import type {
   MEMORY_RETRIEVAL_CONTRACT,
   MEMORY_SCHEMA_VERSION,
@@ -51,7 +52,8 @@ export type RerankingProvider = {
   rerank(
     query: string,
     documents: string[],
-    batchSize: number
+    batchSize: number,
+    order?: RerankOrder
   ): Promise<number[]>;
   splitPassages(
     texts: string[],
@@ -205,13 +207,28 @@ export type MemoryRecallResult = {
   nextActions: string[];
   /** True only when the search ran and admitted no thread. Recalls that did not search are false. */
   abstained: boolean;
+  /** Layers that the passage and lexical channels searched, in layer order. */
+  layersSearched: MemoryLayer[];
+  /** Documents sent to the reranker by this recall: the pairs that M0 scores. */
+  rerankPairs: number;
+  /** Why an adaptive expansion stopped. Only adaptive recalls set it. */
+  expansionStop?: MemoryExpansionStop;
 };
 
+/** Why an adaptive expansion stopped: a high-band result, the deepest layer, or the budget. */
+export type MemoryExpansionStop = "high-band" | "deepest-layer" | "budget";
+
+/** Kind of group a hit belongs to. Only thread groups have a thread and a summary path. */
+export type MemoryGroupKind = "thread" | "rules" | "document";
+
 export type MemoryRecallHit = {
-  threadId: string;
+  /** Thread id for a thread group, `@rules`, or `@document/<sourcePath>`. */
+  groupId: string;
+  groupKind: MemoryGroupKind;
+  threadId?: string;
   title: string;
   closedAt?: string;
-  summaryPath: string;
+  summaryPath?: string;
   reference: string;
   matchedText: string;
   score: number;
@@ -228,7 +245,8 @@ export type MemoryVectorStore = {
   listRecordIds(info: WorkspaceInfo, generation?: string): Promise<string[]>;
   readRows?(
     info: WorkspaceInfo,
-    generation?: string
+    generation?: string,
+    options?: { layers?: readonly MemoryLayer[] }
   ): Promise<MemoryVectorRow[]>;
   rebuild(
     info: WorkspaceInfo,
@@ -320,4 +338,5 @@ export type MemoryRecallOptions = MemoryOperationOptions & {
   depth?: MemorySearchDepth;
 };
 
-export type MemorySearchDepth = 0 | 1 | 2 | 3;
+/** Count of corpus layers that a search reads: 0 summaries, 1 adds artifacts, rules and documents, 2 adds chat. */
+export type MemorySearchDepth = 0 | 1 | 2;

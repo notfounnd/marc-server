@@ -7,7 +7,7 @@ import {
   eligibleSentences,
   syntheticQueries,
   type SyntheticPassage
-} from "../src/core/memory/scoring/synthetic-queries.js";
+} from "../scripts/memory-eval/synthetic-queries.js";
 
 /**
  * Sixty passages with an eligible first sentence of twelve words, and a second

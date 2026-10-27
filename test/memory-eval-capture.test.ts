@@ -3,7 +3,11 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import { computeCaptureFingerprint } from "../scripts/memory-eval/capture.js";
-import { E2_CAPTURE_CHANNELS } from "../scripts/memory-eval/capture-fingerprint.js";
+import {
+  E3_CAPTURE_CHANNELS,
+  E3_INDEXED_LAYERS,
+  E3_RERANK_ORDER
+} from "../scripts/memory-eval/capture-layers.js";
 import { corpusContentDigest } from "../scripts/memory-eval/corpus.js";
 import {
   createFakes,
@@ -16,47 +20,52 @@ import {
   tempDirectory
 } from "./memory-eval-capture-fixtures.js";
 
-test("captures channels, the reranker matrix and latency for every case", async (t) => {
+test("captures the three layers of every case: channels per depth, the scored matrix and the vectors", async (t) => {
   const fakes = createFakes();
-  const { result, logs } = await runCapture({
+  const { result } = await runCapture({
     threadsRoot: await fixtureThreadsRoot(t),
     outputRoot: await tempDirectory(t),
-    fakes
+    fakes,
+    syntheticQueries: false
   });
 
   assert.equal(result.cases, 3);
   assert.equal(result.executedCases, 3);
   assert.equal(result.skippedCases, 0);
-  assert.equal(logs.length, 3);
   assert.equal(path.basename(result.captureDir), result.captureId);
 
   const capture = await readCaptureFile(result.captureDir);
   assert.equal(capture.captureId, result.captureId);
-  assert.equal(capture.matrixRecordCount, 6);
+  assert.deepEqual(capture.fingerprint.indexedLayers, E3_INDEXED_LAYERS);
+  assert.equal(capture.fingerprint.captureChannels, E3_CAPTURE_CHANNELS);
+  assert.equal(capture.fingerprint.rerankOrder, E3_RERANK_ORDER);
   assert.equal(capture.cases.length, 3);
+  assert.equal(capture.syntheticQueries, undefined);
+  assert.equal(capture.vectors?.recordIds.length, capture.records.length);
+  assert.equal(capture.vectors?.dimension, 3);
 
   for (const captured of capture.cases) {
-    const distinctTexts = Object.keys(captured.channels);
-    assert.equal(
-      Object.keys(captured.rerankScores).length,
-      capture.matrixRecordCount * distinctTexts.length
-    );
+    assert.deepEqual(Object.keys(captured.channelsByDepth ?? {}).sort(), [
+      "0",
+      "1",
+      "2"
+    ]);
+    assert.deepEqual(Object.keys(captured.channels), [
+      captured.interpretation.effectiveQuery
+    ]);
     assert.equal("latencyMs" in captured, false);
-    for (const text of distinctTexts) {
-      assert.equal(captured.queryVectors[text]?.length, 3);
-      assert.ok(captured.channels[text].identities.length > 0);
-      assert.ok(captured.channels[text].passages.length > 0);
-    }
+    assert.ok(Object.keys(captured.recordScores ?? {}).length > 0);
+    assert.deepEqual(captured.evidence, []);
+    assert.equal(captured.incomplete, undefined);
   }
 
   const direct = capture.cases[0];
-  assert.ok(direct.channels[direct.originalQuery].lexical.length > 0);
+  assert.ok(
+    direct.channels[direct.interpretation.effectiveQuery].lexical.length > 0
+  );
 
   const corrected = capture.cases[1];
-  assert.deepEqual(Object.keys(corrected.channels).sort(), [
-    "settings em JSON",
-    "settngs em JSON"
-  ]);
+  assert.deepEqual(Object.keys(corrected.channels), ["settings em JSON"]);
   assert.equal(corrected.interpretation.effectiveQuery, "settings em JSON");
   assert.equal(corrected.interpretation.correctionApplied, true);
   assert.deepEqual([...new Set(fakes.interpreter.calls)], ["settngs em JSON"]);
@@ -68,7 +77,8 @@ test("resume skips concluded cases and runs only the ones missing from the check
   const first = await runCapture({
     threadsRoot,
     outputRoot,
-    fakes: createFakes()
+    fakes: createFakes(),
+    syntheticQueries: false
   });
   const checkpointPath = path.join(first.result.captureDir, "checkpoint.json");
   const checkpoint = JSON.parse(await fs.readFile(checkpointPath, "utf8")) as {
@@ -80,12 +90,12 @@ test("resume skips concluded cases and runs only the ones missing from the check
   };
   await fs.writeFile(checkpointPath, JSON.stringify(withoutLast));
 
-  const resumedFakes = createFakes();
   const resumed = await runCapture({
     threadsRoot,
     outputRoot,
-    fakes: resumedFakes,
-    resume: true
+    fakes: createFakes(),
+    resume: true,
+    syntheticQueries: false
   });
 
   assert.equal(resumed.result.captureId, first.result.captureId);
@@ -95,16 +105,14 @@ test("resume skips concluded cases and runs only the ones missing from the check
     resumed.logs.filter((line) => line.endsWith("resumed")).length,
     2
   );
-  assert.deepEqual(
-    [...new Set(resumedFakes.embedding.queryTexts)],
-    ["separar instrucoes gerenciadas"]
-  );
-  assert.deepEqual(resumedFakes.interpreter.calls, []);
 
+  // The plan of every case runs again, because the count gate needs the whole matrix before any pair
+  // is scored. Only the case missing from the checkpoint is scored; the concluded cases are read back.
   const before = await readCaptureFile(first.result.captureDir);
   const after = await readCaptureFile(resumed.result.captureDir);
   assert.deepEqual(after.cases[0], before.cases[0]);
   assert.deepEqual(after.cases[1], before.cases[1]);
+  assert.deepEqual(after.vectors, before.vectors);
 });
 
 test("refuses to reuse an existing capture directory without resume", async (t) => {
@@ -117,8 +125,9 @@ test("refuses to reuse an existing capture directory without resume", async (t) 
     dataset,
     REPOSITORY_ROOT,
     digest,
-    undefined,
-    E2_CAPTURE_CHANNELS
+    E3_INDEXED_LAYERS,
+    E3_CAPTURE_CHANNELS,
+    E3_RERANK_ORDER
   );
   await fs.mkdir(path.join(outputRoot, dataset.corpus, fingerprint.captureId), {
     recursive: true
@@ -128,7 +137,8 @@ test("refuses to reuse an existing capture directory without resume", async (t) 
     runCapture({
       threadsRoot: await fixtureThreadsRoot(t),
       outputRoot,
-      fakes: createFakes()
+      fakes: createFakes(),
+      syntheticQueries: false
     }),
     /already exists/
   );
@@ -139,11 +149,13 @@ test("compares temporary record ids with the production manifest, read-only", as
   const first = await runCapture({
     threadsRoot,
     outputRoot: await tempDirectory(t),
-    fakes: createFakes()
+    fakes: createFakes(),
+    syntheticQueries: false
   });
   const capture = await readCaptureFile(first.result.captureDir);
   const recordIdsByThread = new Map<string, string[]>();
   for (const record of capture.records) {
+    if (record.layer !== 0) continue;
     const current = recordIdsByThread.get(record.threadId) ?? [];
     recordIdsByThread.set(record.threadId, [...current, record.recordId]);
   }
@@ -170,7 +182,8 @@ test("compares temporary record ids with the production manifest, read-only", as
     threadsRoot,
     outputRoot: await tempDirectory(t),
     fakes: createFakes(),
-    productionManifestPath: matchingPath
+    productionManifestPath: matchingPath,
+    syntheticQueries: false
   });
   assert.equal(accepted.result.executedCases, 3);
   const acceptedCapture = await readCaptureFile(accepted.result.captureDir);
@@ -180,7 +193,8 @@ test("compares temporary record ids with the production manifest, read-only", as
       threadsRoot,
       outputRoot: await tempDirectory(t),
       fakes: createFakes(),
-      productionManifestPath: divergingPath
+      productionManifestPath: divergingPath,
+      syntheticQueries: false
     }),
     /diverges from production/
   );
@@ -192,7 +206,8 @@ test("resume refuses a checkpoint written over different corpus content", async 
   const first = await runCapture({
     threadsRoot,
     outputRoot,
-    fakes: createFakes()
+    fakes: createFakes(),
+    syntheticQueries: false
   });
   const checkpointPath = path.join(first.result.captureDir, "checkpoint.json");
   const checkpoint = JSON.parse(await fs.readFile(checkpointPath, "utf8")) as {
@@ -204,7 +219,13 @@ test("resume refuses a checkpoint written over different corpus content", async 
   );
 
   await assert.rejects(
-    runCapture({ threadsRoot, outputRoot, fakes: createFakes(), resume: true }),
+    runCapture({
+      threadsRoot,
+      outputRoot,
+      fakes: createFakes(),
+      resume: true,
+      syntheticQueries: false
+    }),
     /corpus changed since the checkpoint/
   );
 });

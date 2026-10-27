@@ -10,10 +10,7 @@ import {
   rebuildMemoryInWorkspace
 } from "./operations.js";
 import { memoryRebuildActiveInWorkspace } from "./rebuild-coordination.js";
-import {
-  DEFAULT_MEMORY_EMBEDDING_BATCH_SIZE,
-  DEFAULT_MEMORY_SEARCH_RETRY_DEPTH
-} from "./settings.js";
+import { DEFAULT_MEMORY_EMBEDDING_BATCH_SIZE } from "./settings.js";
 import type {
   EmbeddingProvider,
   MemoryRebuildMode,
@@ -30,7 +27,6 @@ type MemoryHealthSettings = {
   memory: {
     autoRebuild: boolean;
     embeddingBatchSize?: number;
-    searchRetryDepth?: number;
   };
 };
 
@@ -106,8 +102,6 @@ export class BackgroundMemoryReconciler {
       embeddingBatchSize:
         settings.memory.embeddingBatchSize ??
         DEFAULT_MEMORY_EMBEDDING_BATCH_SIZE,
-      searchRetryDepth:
-        settings.memory.searchRetryDepth ?? DEFAULT_MEMORY_SEARCH_RETRY_DEPTH,
       maintenance: base.maintenance,
       message: base.message
     };

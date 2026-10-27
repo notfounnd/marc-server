@@ -1,5 +1,6 @@
 import type { WorkspaceInfo } from "../types.js";
 import { defaultMemoryInferenceManager } from "./inference-manager.js";
+import { DEFAULT_RERANK_ORDER, type RerankOrder } from "./rerank-order.js";
 import {
   DEFAULT_RERANK_BATCH_SIZE,
   isLocalMemoryModelPrepared,
@@ -35,12 +36,14 @@ export class LocalRerankingProvider implements RerankingProvider {
   async rerank(
     query: string,
     documents: string[],
-    batchSize = DEFAULT_RERANK_BATCH_SIZE
+    batchSize = DEFAULT_RERANK_BATCH_SIZE,
+    order: RerankOrder = DEFAULT_RERANK_ORDER
   ): Promise<number[]> {
     const result = await this.inference.run(this.info, "reranking", {
       action: "rerank",
       batchSize,
       documents,
+      order,
       query
     });
     if ("scores" in result) return result.scores;

@@ -111,7 +111,7 @@ test("recall applies limit after semantic ranking", async () => {
   );
 });
 
-test("recall depth expands only the semantic candidate pool", async () => {
+test("recall depth does not change the candidate limit of each layer", async () => {
   const info = await tempWorkspace();
   const provider = new FakeEmbeddingProvider();
   const reranker = new FakeRerankingProvider();
@@ -135,12 +135,36 @@ test("recall depth expands only the semantic candidate pool", async () => {
     reranker,
     store,
     query: "interface com brutalism",
-    depth: 3
+    depth: 2
   });
 
   assert.deepEqual(
     store.searchOptions.map((options) => options.limit),
-    [100, 100, 400, 400]
+    [100, 100, 100, 100]
+  );
+});
+
+test("recall rejects depth 3 with the layer explanation", async () => {
+  const info = await tempWorkspace();
+  const provider = new FakeEmbeddingProvider();
+  const reranker = new FakeRerankingProvider();
+  const store = new ScoreOverrideStore({});
+  await writeSummary(
+    info,
+    "thread-ui",
+    summary("thread-ui", "Neo-brutalism UI")
+  );
+  await rebuildMemoryInWorkspace(info, { provider, reranker, store });
+
+  await assert.rejects(
+    recallMemoryInWorkspace(info, {
+      provider,
+      reranker,
+      store,
+      query: "interface com brutalism",
+      depth: 3 as never
+    }),
+    /Memory search depth counts corpus layers/
   );
 });
 

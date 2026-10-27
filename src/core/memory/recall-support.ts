@@ -1,4 +1,5 @@
 import type { WorkspaceInfo } from "../types.js";
+import { INTERPRETATION_LAYERS } from "./search-depth.js";
 import {
   buildMemoryQueryCandidates,
   interpretMemoryQuery,
@@ -32,7 +33,9 @@ export function emptyMemoryRecallResult(
     indexStatus: status,
     results: [],
     nextActions,
-    abstained: false
+    abstained: false,
+    layersSearched: [],
+    rerankPairs: 0
   };
 }
 
@@ -47,7 +50,11 @@ export async function resolveMemoryQueryInterpretation(
     return literalMemoryQueryInterpretation(options.query, mode);
   if (!options.interpreter)
     return literalMemoryQueryInterpretation(options.query, mode);
-  const rows = store.readRows ? await store.readRows(info, generation) : [];
+  const rows = store.readRows
+    ? await store.readRows(info, generation, {
+        layers: INTERPRETATION_LAYERS
+      })
+    : [];
   const candidates = buildMemoryQueryCandidates(options.query, rows);
   return interpretMemoryQuery({
     mode,
@@ -63,8 +70,8 @@ export function dedupeMemoryRecallHits(
   const seen = new Set<string>();
   const results: MemoryRecallHit[] = [];
   for (const hit of hits) {
-    if (seen.has(hit.threadId)) continue;
-    seen.add(hit.threadId);
+    if (seen.has(hit.groupId)) continue;
+    seen.add(hit.groupId);
     results.push(hit);
   }
   return results;

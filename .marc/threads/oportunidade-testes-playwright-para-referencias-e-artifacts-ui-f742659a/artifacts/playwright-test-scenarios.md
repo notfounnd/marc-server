@@ -172,25 +172,20 @@ Priority: high
 - [ ] Verify the Neobrutalism/Radix switch thumb is visually aligned in both checked and unchecked states, matching the documented switch spacing.
 - [ ] Verify workspace, thread, and agent headers keep the same eyebrow/title/reference structure, including copyable `marc://$threadId`, `marc://@agentId`, and workspace path rows.
 
-## Memory Search Progressive Deep Retry
+## Memory Search Single Query
 
-Source threads: marc://$oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac, marc://$oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba  
+Source threads: marc://$motor-de-busca-v2-e3-profundidade-em-camadas-e-funil-de-latencia-cd4a49b8 (supersedes the progressive Deep retry of marc://$oportunidade-calibragem-de-recall-lexical-e-candidatos-da-memory-e4478bac and marc://$oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba)  
 Priority: high
 
-Coverage note: the scenarios below remain pending as durable automated E2E tests. Ad hoc Playwright CLI checks on desktop/mobile and user checks after restart validated early-success visibility, sequential retries, reload persistence, exhaustion, and new-query reset for thread 834716ba. They do not replace this regression backlog.
+Coverage note: the E3 T4 delivery validated these behaviors with ad hoc Playwright CLI checks on an intercepted recall (1280x720, 1440x900 and 390x844). Durable automated E2E tests remain pending.
 
-Current contract: depth 0, 1, 2, and 3 request candidate pools of 100, 200, 300, and 400 per retrieval channel. Depth does not lower semantic eligibility. The former minScore ladder is no longer part of the recall contract.
+Current contract (E3, ADR 0012): the UI runs one search at depth 0 and sends no `depth`. There is no Deep retry, no retry ladder, and no search-depth setting. Layers 1 and 2 are available to agents through the MCP and CLI `depth`, not through the UI. The search snapshot uses schema 7.
 
-- [ ] With memory ready, submit a query with no result at depth 0 and verify the empty state retains Deep retry while another depth remains.
-- [ ] Configure automatic depth 0 through 3; verify every new query starts at 0, advances sequentially only after empty responses, and stops at the first result or configured limit.
-- [ ] Configure automatic depth 3 and return results at depth 0; verify Deep retry remains available and its next request uses depth 1 rather than skipping levels or disappearing.
-- [ ] Configure automatic depth 1 and return results at depth 0; verify the first manual retry uses depth 1.
-- [ ] Click Deep retry through remaining depths; verify each action requests exactly the next completed depth, replaces the result set, and disappears only when depth 3 completed.
-- [ ] Submit a new query after manual retries or exhaustion; verify its first request uses depth 0 and does not inherit prior progress.
-- [ ] Refresh after success or exhaustion; verify the latest per-workspace snapshot restores its last completed depth, without replaying a request automatically.
-- [ ] Restore a legacy localStorage snapshot without reliable completed-depth metadata; verify it is discarded rather than inventing progress.
+- [ ] Submit a query; verify exactly one recall request, with a body of `{limit, query, queryMode}` and no `depth`, and no Deep or retry control in the results or the empty state.
+- [ ] Open workspace settings; verify there is no Search depth section, no Deep or retries text, and the inference batch size control is still present.
+- [ ] Store a schema 6 snapshot in localStorage and reload; verify it is discarded and removed without an error.
+- [ ] Return hits for a `rules` group (`RULES.md`) and a `document` group; verify they show their source path, render as not selectable for thread navigation, and never show "Thread not found".
 - [ ] Switch workspace or submit a new query while a response is pending; verify stale responses cannot replace the active workspace/query result or persisted snapshot.
-- [ ] Verify interpretation runs only on the first automatic request; automatic and manual retries use the same effective query with queryMode literal.
 - [ ] Verify the UI requests limit 50; do not infer the separate MCP default of 5 from browser behavior.
 
 ## Memory Confidence Bands
@@ -204,8 +199,8 @@ Current contract: each recall hit carries a heuristic `band` (high, medium, or l
 - [ ] Open and close the collapsed block by pointer and keyboard; verify low hits appear and disappear, focus stays on the summary control, and the main list does not reorder.
 - [ ] Return only low hits; verify the main list is empty, the collapsed block is still offered, and the empty state does not claim that nothing was found.
 - [ ] Verify no score, percentage, or probability text is rendered for any band, in desktop and 390x844 viewports.
-- [ ] Return `abstained: true` at each depth with automatic depth 3; verify the search continues through depths 0 to 3 and ends in "No results", exactly as an empty unsearched result does.
-- [ ] Reload after a banded result; verify the schema 6 snapshot restores bands and the collapsed block, and a stored snapshot with an invalid band is discarded.
+- [ ] Return `abstained: true`; verify the single search ends in "No results", exactly as an empty unsearched result does.
+- [ ] Reload after a banded result; verify the schema 7 snapshot restores bands and the collapsed block, and a stored snapshot with an invalid band is discarded.
 - [ ] Return a live response with an unknown band value; record the current behavior (empty label) as the accepted limit until the UI validates live responses.
 
 Coverage note: ad hoc Playwright CLI checks with an intercepted recall covered the three bands, the collapsed block opening and closing, absence of the score, and abstained depth continuation to "No results", with no console errors. Durable browser tests and a combined browser/daemon run remain pending; these checks do not mark the scenarios implemented.
@@ -217,7 +212,7 @@ Priority: high
 
 - [ ] Return an automatically corrected query; verify the effective-query notice and original-term alternative are shown, with only the alternative query underlined as a link and no boxed button.
 - [ ] Return a corpus-backed suggestion without correction; verify the literal search stays effective and the suggested term alone is presented as the alternative link.
-- [ ] Activate either alternative after deep retries; verify a new literal search starts at depth 0 and does not inherit prior progress or reinterpret the explicitly selected term.
+- [ ] Activate either alternative; verify a new literal search runs once and does not reinterpret the explicitly selected term.
 - [ ] Verify link typography matches adjacent interpretation text and supports keyboard activation/focus without shifting the result layout.
 
 ## Memory Model Maintenance

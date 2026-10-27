@@ -18,7 +18,7 @@ import {
   featureVectorOf,
   semanticOnlyVectorOf,
   type ThreadFeatures
-} from "../src/core/memory/scoring/features.js";
+} from "../scripts/memory-eval/features.js";
 
 /**
  * Hand-set parameters. Weights follow the feature order: identityCosine,

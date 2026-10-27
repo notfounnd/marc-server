@@ -217,7 +217,7 @@ test("a temporary rebuild indexes the 30 closed threads and ignores the 3 open o
         store
       };
       await prepareMemoryInWorkspace(info, options);
-      await rebuildMemoryInWorkspace(info, options);
+      await rebuildMemoryInWorkspace(info, { ...options, indexedLayers: [0] });
       const manifest = await readMemoryManifest(info);
       const rows = await store.readRows(info, manifest?.generation);
       const indexed = [...new Set(rows.map((row) => row.threadId))].sort();

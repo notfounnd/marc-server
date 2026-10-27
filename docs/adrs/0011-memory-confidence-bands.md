@@ -31,3 +31,7 @@ The low cut is below the M0 admission threshold of 0.5, so every admitted thread
 - The UI shows high and medium results in the main list and low results in a collapsed block. It shows no score.
 - Calibration of the bands for individual projects is a future topic. It needs new labelled evidence and a new decision.
 - The live recall path trusts the daemon response in the UI, as the rest of the UI does. Only the stored search state is validated, so an invalid band in a live response is shown as received; this is a recorded limit.
+
+## Continuity note (E3)
+
+The bands are unchanged by the E3 program. They still come from the eligibility, and the ranking and admission still follow the M0 order. The UI no longer runs an automatic depth sequence, as the consequence above describes: it runs one search at depth `0` (see ADR 0012). The E3 evaluation measured the high band at the saturated tail of the reranker score, with cut points close to `1` on every fold, so the high band admits few results. The per-fold cut points and their precision are in the T2 report of the E3 thread, and they are not a new calibration.

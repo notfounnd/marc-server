@@ -15,7 +15,7 @@ import {
   cheapSemanticOnlyVectorOf,
   cheapVectorOf,
   type ThreadFeatures
-} from "../src/core/memory/scoring/features.js";
+} from "../scripts/memory-eval/features.js";
 import {
   captureFixture,
   dataset,

@@ -218,14 +218,50 @@ test("daemon recall returns banded hits that are not abstained", async () => {
   });
 });
 
-test("daemon recall with limit zero is not abstained when a thread is admitted", async () => {
+test("daemon recall rejects a limit that is not a positive integer, as MCP does", async () => {
   await withAdmittedThreadDaemon(async (baseUrl, workspaceId) => {
-    const recall = await postRecall(baseUrl, workspaceId, {
+    const response = await postRaw(baseUrl, workspaceId, {
       limit: 0,
       query: "toogle"
     });
 
-    assert.deepEqual(recall.results, []);
-    assert.equal(recall.abstained, false);
+    assert.equal(response.status, 400);
+    assert.match(
+      await response.text(),
+      /Memory search limit must be a positive integer/
+    );
   });
 });
+
+test("daemon recall rejects depth 3 with the layer explanation", async () => {
+  await withAdmittedThreadDaemon(async (baseUrl, workspaceId) => {
+    const response = await postRaw(baseUrl, workspaceId, {
+      depth: 3,
+      query: "toogle"
+    });
+
+    assert.equal(response.status, 400);
+    assert.match(
+      await response.text(),
+      /Memory search depth counts corpus layers/
+    );
+  });
+});
+
+function postRaw(
+  baseUrl: string,
+  workspaceId: string,
+  body: Record<string, unknown>
+): Promise<Response> {
+  return fetch(
+    `${baseUrl}/api/workspaces/${encodeURIComponent(workspaceId)}/memory/recall`,
+    {
+      body: JSON.stringify(body),
+      headers: {
+        authorization: "Bearer secret",
+        "content-type": "application/json"
+      },
+      method: "POST"
+    }
+  );
+}

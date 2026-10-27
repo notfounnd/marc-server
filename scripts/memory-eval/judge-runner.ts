@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import { queryInterpretationMessages } from "../../src/core/memory/query-interpretation-inference.js";
-import type { TokenTruncator } from "../../src/core/memory/scoring/judge-document.js";
+import type { TokenTruncator } from "./judge-document.js";
 import {
   KEV_CHOICE_QUESTION,
   KEV_JUDGE_QUESTION,

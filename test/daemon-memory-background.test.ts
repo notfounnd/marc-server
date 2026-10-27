@@ -35,31 +35,28 @@ test("daemon exposes workspace memory settings and status health", async () => {
       memory: {
         autoRebuild: boolean;
         embeddingBatchSize: number;
-        searchRetryDepth: number;
       };
     }>(`${baseUrl}/api/workspaces/${encodedWorkspace}/settings`);
 
     assert.equal(initialSettings.memory.autoRebuild, true);
     assert.equal(initialSettings.memory.embeddingBatchSize, 4);
-    assert.equal(initialSettings.memory.searchRetryDepth, 0);
+    assert.equal("searchRetryDepth" in initialSettings.memory, false);
 
     const updatedSettings = await postJson<{
       memory: {
         autoRebuild: boolean;
         embeddingBatchSize: number;
-        searchRetryDepth: number;
       };
     }>(`${baseUrl}/api/workspaces/${encodedWorkspace}/settings`, {
       memory: {
         autoRebuild: false,
-        embeddingBatchSize: 8,
-        searchRetryDepth: 2
+        embeddingBatchSize: 8
       }
     });
 
     assert.equal(updatedSettings.memory.autoRebuild, false);
     assert.equal(updatedSettings.memory.embeddingBatchSize, 8);
-    assert.equal(updatedSettings.memory.searchRetryDepth, 2);
+    assert.equal("searchRetryDepth" in updatedSettings.memory, false);
 
     const status = await fetchJson<{
       modules: {

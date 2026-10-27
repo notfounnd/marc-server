@@ -1,21 +1,16 @@
 import { performance } from "node:perf_hooks";
 import type { WorkspaceInfo } from "../../src/core/types.js";
-import { DEFAULT_RERANK_BATCH_SIZE } from "../../src/core/memory/model-config.js";
 import {
   recallMemoryInWorkspace
 } from "../../src/core/memory/operations.js";
-import { candidateLimitForMemorySearchDepth } from "../../src/core/memory/search-depth.js";
 import type {
-  EmbeddingProvider,
   MemoryLexicalField,
   MemoryLexicalSearchHit,
   MemorySearchDepth,
-  MemorySearchHit,
-  RerankingProvider
+  MemorySearchHit
 } from "../../src/core/memory/types.js";
 import type { EvalCase } from "./dataset.js";
 import type {
-  CapturedChannels,
   CapturedHit,
   CapturedLatency,
   CapturedLexicalHit,
@@ -23,8 +18,12 @@ import type {
   CaptureContext
 } from "./capture-types.js";
 
-export const CAPTURE_DEPTH: MemorySearchDepth = 0;
-const PRODUCTION_RECALL_LIMIT = 50;
+/**
+ * The production recall and the latency are the M0 baseline, so they always run at depth 0.
+ * Every other depth of a capture comes from the per-depth channels of capture-layers.ts.
+ */
+export const BASELINE_DEPTH: MemorySearchDepth = 0;
+export const PRODUCTION_RECALL_LIMIT = 50;
 const LATENCY_LIMIT = 5;
 const LATENCY_SAMPLES = 3;
 
@@ -48,46 +47,6 @@ export function lexicalFieldsForQueryReplica(query: string): MemoryLexicalField[
   return [...(fields ?? MULTI_TERM_LEXICAL_FIELDS)];
 }
 
-/**
- * Captures the production channels for one text and scores every identity and
- * passage record through the recording reranker, which fills the matrix.
- */
-export async function captureChannels(
-  context: CaptureContext,
-  embedding: EmbeddingProvider,
-  reranker: RerankingProvider,
-  text: string
-): Promise<CapturedChannels> {
-  const vector = await embedding.embedQuery(text);
-  const { info, store, generation } = context;
-  const limit = candidateLimitForMemorySearchDepth(CAPTURE_DEPTH);
-  const [identityHits, passageHits, ...lexicalHits] = await Promise.all([
-    store.searchVector(info, vector, {
-      generation,
-      kind: "identity",
-      limit
-    }),
-    store.searchVector(info, vector, {
-      generation,
-      kind: "passage",
-      limit
-    }),
-    ...lexicalFieldsForQueryReplica(text).map((field) =>
-      store.searchLexical(info, text, vector, {
-        field,
-        generation,
-        limit
-      })
-    )
-  ]);
-  await reranker.rerank(text, context.matrixDocuments, DEFAULT_RERANK_BATCH_SIZE);
-  return {
-    identities: identityHits.map(toCapturedHit),
-    passages: passageHits.map(toCapturedHit),
-    lexical: lexicalHits.flat().map(toCapturedLexicalHit)
-  };
-}
-
 /** Production recall in literal mode with the effective query, for the equivalence check. */
 export async function captureProductionRecall(
   context: CaptureContext,
@@ -97,7 +56,7 @@ export async function captureProductionRecall(
     query: effectiveQuery,
     queryMode: "literal",
     limit: PRODUCTION_RECALL_LIMIT,
-    depth: CAPTURE_DEPTH,
+    depth: BASELINE_DEPTH,
     provider: context.providers.embedding,
     reranker: context.providers.reranker,
     store: context.store
@@ -106,7 +65,7 @@ export async function captureProductionRecall(
     effectiveQuery,
     limit: PRODUCTION_RECALL_LIMIT,
     results: recall.results.map((hit) => ({
-      threadId: hit.threadId,
+      threadId: hit.groupId,
       score: hit.score
     }))
   };
@@ -121,7 +80,7 @@ export async function measureLatency(
     query: evalCase.query,
     queryMode: evalCase.queryMode,
     limit: LATENCY_LIMIT,
-    depth: CAPTURE_DEPTH,
+    depth: BASELINE_DEPTH,
     provider: context.providers.embedding,
     reranker: context.providers.reranker,
     interpreter: context.providers.interpreter,
@@ -144,11 +103,11 @@ async function timedRecall(
   return performance.now() - started;
 }
 
-function toCapturedHit(hit: MemorySearchHit): CapturedHit {
+export function toCapturedHit(hit: MemorySearchHit): CapturedHit {
   return { recordId: hit.record.recordId, score: hit.score };
 }
 
-function toCapturedLexicalHit(hit: MemoryLexicalSearchHit): CapturedLexicalHit {
+export function toCapturedLexicalHit(hit: MemoryLexicalSearchHit): CapturedLexicalHit {
   return {
     field: hit.field,
     recordId: hit.record.recordId,

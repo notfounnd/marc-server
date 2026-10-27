@@ -2,8 +2,10 @@ import { createHash } from "node:crypto";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import { readWorkspaceSettingsInWorkspace } from "../../src/core/memory/settings.js";
+import { readDocumentSources } from "../../src/core/memory/sources/document.js";
 import type { WorkspaceInfo } from "../../src/core/types.js";
-import { initWorkspace } from "../../src/core/workspace.js";
+import { getWorkspaceInfo, initWorkspace } from "../../src/core/workspace.js";
 
 export type CorpusSource = {
   /** Directory whose children are thread folders with SUMMARY.md and CHAT.md. */
@@ -12,6 +14,15 @@ export type CorpusSource = {
   threadIds: readonly string[];
   /** RULES.md copied next to the threads, when present. */
   rulesPath?: string;
+  /** Configured documents (`memory.documentSources`), copied at their workspace paths and digested. */
+  documents?: readonly CorpusDocument[];
+};
+
+/** A configured document: its path inside the workspace, the file that holds it, and its authority. */
+export type CorpusDocument = {
+  relativePath: string;
+  absolutePath: string;
+  authority: string;
 };
 
 type CorpusFile = {
@@ -55,6 +66,18 @@ export async function corpusContentDigest(source: CorpusSource): Promise<string>
   return createHash("sha256").update(digests.join("\n")).digest("hex");
 }
 
+/**
+ * Text of every file of the pinned corpus, keyed by its corpus path (e.g. `threads/<id>/CHAT.md`,
+ * `RULES.md`). The evidence quotes of the dataset are checked against these texts.
+ */
+export async function corpusSourceTexts(source: CorpusSource): Promise<Map<string, string>> {
+  const files = await corpusFiles(source);
+  const entries = await Promise.all(
+    files.map(async (file) => [file.relativePath, await fs.readFile(file.absolutePath, "utf8")] as const)
+  );
+  return new Map(entries);
+}
+
 async function copyCorpus(source: CorpusSource, marcPath: string): Promise<void> {
   for (const threadId of source.threadIds) {
     await fs.cp(
@@ -64,6 +87,58 @@ async function copyCorpus(source: CorpusSource, marcPath: string): Promise<void>
     );
   }
   await copyRules(source.rulesPath, marcPath);
+  await copyDocuments(source.documents ?? [], marcPath);
+}
+
+/**
+ * Copies the configured documents to their workspace paths, which are relative to the workspace
+ * root (the parent of the memory directory), and lists them in the copy's memory settings.
+ */
+async function copyDocuments(documents: readonly CorpusDocument[], marcPath: string): Promise<void> {
+  if (documents.length === 0) return;
+  const workspaceRoot = path.dirname(marcPath);
+  for (const document of documents) {
+    const target = path.join(workspaceRoot, ...document.relativePath.split("/"));
+    await fs.mkdir(path.dirname(target), { recursive: true });
+    await fs.copyFile(document.absolutePath, target);
+  }
+  await writeDocumentSources(marcPath, documents);
+}
+
+async function writeDocumentSources(marcPath: string, documents: readonly CorpusDocument[]): Promise<void> {
+  const configPath = path.join(marcPath, "marc.config.json");
+  const config = JSON.parse(await fs.readFile(configPath, "utf8")) as Record<string, unknown>;
+  const memory = (config.memory ?? {}) as Record<string, unknown>;
+  const documentSources = documents.map((document) => ({
+    path: document.relativePath,
+    authority: document.authority
+  }));
+  const next = { ...config, memory: { ...memory, documentSources } };
+  await fs.writeFile(configPath, `${JSON.stringify(next, null, 2)}\n`);
+}
+
+/** Authority names of the memory sources, mapped back to the names of the settings. */
+const CONFIGURED_AUTHORITY: Readonly<Record<string, string>> = {
+  rule: "normative",
+  document: "reference"
+};
+
+/**
+ * The documents that the workspace configures in `memory.documentSources`, read with the production
+ * reader: the same settings normalization, the same files and directory entries, and the same limits.
+ * The workspace is read without `initWorkspace`, so nothing is created in the repository.
+ */
+export async function configuredDocumentsOf(input: {
+  repositoryRoot: string;
+}): Promise<CorpusDocument[]> {
+  const info = await getWorkspaceInfo(input.repositoryRoot);
+  const settings = await readWorkspaceSettingsInWorkspace(info);
+  const sources = await readDocumentSources(info, settings);
+  return sources.map((source) => ({
+    relativePath: source.sourcePath,
+    absolutePath: path.join(input.repositoryRoot, ...source.sourcePath.split("/")),
+    authority: CONFIGURED_AUTHORITY[source.authority] ?? source.authority
+  }));
 }
 
 async function copyRules(
@@ -85,7 +160,11 @@ async function corpusFiles(source: CorpusSource): Promise<CorpusFile[]> {
       }));
     })
   );
-  const files = [...threadFiles.flat(), ...rulesFiles(source.rulesPath)];
+  const documents = (source.documents ?? []).map((document) => ({
+    relativePath: document.relativePath,
+    absolutePath: document.absolutePath
+  }));
+  const files = [...threadFiles.flat(), ...rulesFiles(source.rulesPath), ...documents];
   return files.sort(compareRelativePaths);
 }
 

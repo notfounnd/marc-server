@@ -2,8 +2,21 @@ import { rankHybridMemoryCandidates } from "../../src/core/memory/hybrid-ranking
 import { SEMANTIC_ELIGIBILITY_THRESHOLD } from "../../src/core/memory/semantic-eligibility.js";
 import type {
   MemorySearchChannels,
+  MemorySearchDepth,
   RerankingProvider
 } from "../../src/core/memory/types.js";
+import type { MemoryLayer } from "../../src/core/memory/sources/contract.js";
+import { runFunnel, type FunnelConfig, type FunnelStop } from "../../src/core/memory/funnel-run.js";
+import { VARIANT_PLANS, reachEntries } from "./metrics.js";
+import type { CatalogRow } from "../../src/core/memory/funnel-groups.js";
+import type { RerankSelectionMode } from "../../src/core/memory/funnel-selection.js";
+import {
+  ADAPTIVE_FUNNEL_NAMES,
+  FUNNEL_VARIANT_NAMES,
+  deepestSearchedDepth,
+  funnelConfigOf,
+  type FunnelVariantName
+} from "./funnel-variants.js";
 import type { RelevanceGrade } from "./dataset.js";
 import type { CapturedProductionRecall } from "./capture-types.js";
 import { candidateFeaturesOf } from "./candidate-pairs.js";
@@ -30,7 +43,7 @@ import {
   featureVectorOf,
   semanticOnlyVectorOf,
   type ThreadFeatures
-} from "../../src/core/memory/scoring/features.js";
+} from "./features.js";
 
 export type VariantInput = {
   query: string;
@@ -47,6 +60,38 @@ export type VariantInput = {
   calibrations?: CalibrationSet;
   /** Judge scores of this case, by threadId (H7). Only the H7 variants read it. */
   judge?: Partial<Record<JudgeName, ReadonlyMap<string, number>>>;
+  /** The funnel inputs of the case: channels per depth, vectors and captured scores (E3). */
+  funnel?: FunnelVariantInput;
+  /** The parameters of the funnel runs. Never defaulted: a run without them is missing-funnel-params. */
+  funnelParams?: FunnelParams;
+};
+
+/** What the funnel and the per-depth variants read, on top of the M0 inputs. */
+export type FunnelVariantInput = {
+  channelsByDepth: Partial<Record<MemorySearchDepth, MemorySearchChannels>>;
+  vectors: ReadonlyMap<string, readonly number[]>;
+  /** The catalog of the capture: every identity and passage of each group, with its layer and vector. */
+  catalog: ReadonlyMap<string, readonly CatalogRow[]>;
+  queryVector: readonly number[];
+  /** Captured reranker score of each pair of the effective query, keyed by recordId. */
+  scores: ReadonlyMap<string, number>;
+  ftsRecordIds: ReadonlySet<string>;
+};
+
+/**
+ * The parameters of a funnel run, given by the replay command. Budget B, K and the selection mode
+ * are required for every funnel variant; the band cuts only for the variants that stop on a band.
+ */
+export type FunnelParams = {
+  budget: number;
+  k: number;
+  mode: RerankSelectionMode;
+  cuts?: { high: number; medium: number };
+  /**
+   * Worksheet only: the run takes every step and never stops early, so no band cuts are needed. The
+   * replay parser never sets it, so a replay of an adaptive variant still requires the cuts.
+   */
+  exhaustiveSteps?: boolean;
 };
 
 export type VariantResult = {
@@ -54,6 +99,14 @@ export type VariantResult = {
   score: number;
   admitted: boolean;
   band?: "high" | "medium" | "low";
+  /** Funnel detail of the admitted group. Only the funnel variants set it. */
+  funnel?: {
+    chosenPassages: string[];
+    layersSearched: MemoryLayer[];
+    pairsRequested: number;
+    pairsUnique: number;
+    stopReason: FunnelStop;
+  };
 };
 
 export type RankingVariant = (input: VariantInput) => Promise<VariantResult[]>;
@@ -290,6 +343,128 @@ export const H7_JUDGE_KEV: RankingVariant = judgeChainVariant("kev");
 export const H7_JUDGE_QWEN_FALLBACK: RankingVariant = judgeFallbackVariant("qwen");
 export const H7_JUDGE_KEV_FALLBACK: RankingVariant = judgeFallbackVariant("kev");
 
+/**
+ * The capture does not hold the channels of every depth for this case. Not an error: the
+ * replay records the variant as incomplete, so it cannot be approved on this capture.
+ */
+export class MissingFunnelInputs extends Error {
+  constructor() {
+    super("The case has no funnel inputs: the capture does not hold the channels of every depth.");
+  }
+}
+
+/**
+ * A funnel run without its parameters. They are never defaulted here: the replay command gives the
+ * budget, K and the selection mode, and the band cuts for the adaptive variants.
+ */
+export class MissingFunnelParams extends Error {
+  constructor() {
+    super("The funnel run has no parameters: give the budget, K and the selection mode, and the band cuts for ADAPTIVE.");
+  }
+}
+
+/** The funnel input of a case. A funnel variant without it is incomplete, never zero. */
+function requireFunnel(input: Pick<VariantInput, "funnel">): FunnelVariantInput {
+  if (input.funnel === undefined) throw new MissingFunnelInputs();
+  return input.funnel;
+}
+
+/**
+ * The parameters of one funnel variant. A variant that stops on a band also needs the band cuts,
+ * unless the run is exhaustive: then it takes every step and no cut is read.
+ */
+function requireParams(name: FunnelVariantName, input: Pick<VariantInput, "funnelParams">): FunnelParams {
+  const params = input.funnelParams;
+  if (params === undefined) throw new MissingFunnelParams();
+  if (funnelConfigOf(name).stopOn !== "none" && params.cuts === undefined && params.exhaustiveSteps !== true)
+    throw new MissingFunnelParams();
+  return params;
+}
+
+/** The funnel config of a run. An exhaustive run never stops early, whatever the variant's stop rule. */
+function configOf(name: FunnelVariantName, params: FunnelParams): FunnelConfig {
+  const config = funnelConfigOf(name);
+  if (params.exhaustiveSteps !== true) return config;
+  return { ...config, stopOn: "none" };
+}
+
+/**
+ * The reach of an exhaustive run, step by step. Each step reaches the groups that the reach rule of its
+ * variant reads from the groups it admitted (the same rule as the replay). Each group keeps the deepest
+ * step that reaches it. The run takes every step, so every stop point is covered.
+ */
+export function exhaustiveReachOf(
+  name: FunnelVariantName,
+  input: Pick<VariantInput, "funnel" | "funnelParams">
+): Map<string, MemorySearchDepth> {
+  const funnel = requireFunnel(input);
+  const params = requireParams(name, input);
+  const config: FunnelConfig = { ...funnelConfigOf(name), stopOn: "none" };
+  const result = runFunnel({ ...funnel, ...params }, config);
+  const plan = VARIANT_PLANS[name];
+  if (plan === undefined) throw new Error(`Unknown ranking variant: ${name}`);
+  const depths = new Map<string, MemorySearchDepth>();
+  for (const step of result.steps) {
+    const results: VariantResult[] = step.admitted.map((item) => ({
+      threadId: item.groupId,
+      score: item.eligibility,
+      admitted: true
+    }));
+    for (const entry of reachEntries({ results }, plan.requireAdmitted)) {
+      depths.set(entry.threadId, Math.max(depths.get(entry.threadId) ?? 0, step.depth) as MemorySearchDepth);
+    }
+  }
+  return depths;
+}
+
+/** The M0 algorithm at one depth: the production order and admission over that depth's channels. */
+function depthVariant(depth: MemorySearchDepth): RankingVariant {
+  return async (input) => {
+    const channels = requireFunnel(input).channelsByDepth[depth];
+    if (channels === undefined)
+      throw new Error(`The case has no channels for depth ${depth}.`);
+    return (await productionOrder({ ...input, channels })).map((item) => ({
+      threadId: item.threadId,
+      score: item.score,
+      admitted: item.eligible
+    }));
+  };
+}
+
+/** The result of one funnel run: its admitted groups and the depth that grades it, from the same run. */
+export type FunnelRanking = { results: VariantResult[]; judgedDepth: MemorySearchDepth };
+
+/**
+ * Runs one funnel variant once. The judged depth is the deepest layer that this run searched, so no
+ * variant is run again only to measure it. The results carry the funnel detail of each admitted group.
+ */
+export function runFunnelRanking(name: FunnelVariantName, input: VariantInput): FunnelRanking {
+  const funnel = requireFunnel(input);
+  const params = requireParams(name, input);
+  const result = runFunnel({ ...funnel, ...params }, configOf(name, params));
+  return {
+    results: result.admitted.map((item) => ({
+      threadId: item.groupId,
+      score: item.eligibility,
+      admitted: true,
+      band: item.band,
+      funnel: {
+        chosenPassages: item.chosenPassages,
+        layersSearched: result.layersSearched,
+        pairsRequested: result.pairsRequested,
+        pairsUnique: result.pairsUnique,
+        stopReason: result.stopReason
+      }
+    })),
+    judgedDepth: deepestSearchedDepth(result)
+  };
+}
+
+/** One funnel variant as a ranking variant: the admitted groups of its run. */
+function funnelVariant(name: FunnelVariantName): RankingVariant {
+  return async (input) => runFunnelRanking(name, input).results;
+}
+
 export const PRODUCTION_RECALL_ID = "PRODUCTION_RECALL";
 
 /**
@@ -317,9 +492,37 @@ export const rankingVariants: Readonly<Record<string, RankingVariant>> = {
   H7_JUDGE_KEV,
   H7_JUDGE_QWEN_FALLBACK,
   H7_JUDGE_KEV_FALLBACK,
-  [PRODUCTION_RECALL_ID]: PRODUCTION_RECALL
+  [PRODUCTION_RECALL_ID]: PRODUCTION_RECALL,
+  DEPTH0: depthVariant(0),
+  DEPTH1: depthVariant(1),
+  DEPTH2: depthVariant(2),
+  ...Object.fromEntries(
+    FUNNEL_VARIANT_NAMES.map((name) => [name, funnelVariant(name)] as const)
+  )
 };
 
 export function isRankingVariantId(id: string): boolean {
   return Object.hasOwn(rankingVariants, id);
+}
+
+const FIXED_DEPTH_VARIANTS: Readonly<Record<string, MemorySearchDepth>> = {
+  DEPTH0: 0,
+  DEPTH1: 1,
+  DEPTH2: 2
+};
+
+const DEPTH_SUFFIX = /_D([012])$/;
+
+/**
+ * The deepest layer whose judgments grade a variant on a case. DEPTHd and the `_Dd` funnel variants
+ * are graded at d. Every other fixed variant is graded at layer 0. The adaptive variants have no fixed
+ * depth: their judged depth is the deepest layer of their own run (runFunnelRanking), never a second run.
+ */
+export function judgedDepthOfVariant(id: string): MemorySearchDepth {
+  if ((ADAPTIVE_FUNNEL_NAMES as readonly string[]).includes(id))
+    throw new Error(`The judged depth of ${id} comes from its funnel run, not from its id.`);
+  if (Object.hasOwn(FIXED_DEPTH_VARIANTS, id)) return FIXED_DEPTH_VARIANTS[id] ?? 0;
+  const suffix = DEPTH_SUFFIX.exec(id);
+  if (suffix !== null) return Number(suffix[1]) as MemorySearchDepth;
+  return 0;
 }

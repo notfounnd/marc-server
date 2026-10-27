@@ -26,7 +26,6 @@ export function AppSidebarMiddle({
   allWorkspaceThreads,
   canCreateThread,
   memorySearchError,
-  memorySearchDeepRetryAvailable,
   memorySearchQuery,
   memorySearchResult,
   memorySearchStatus,
@@ -38,7 +37,6 @@ export function AppSidebarMiddle({
   uiAgentId,
   visibleThreads,
   onMemorySearchQueryChange,
-  onMemorySearchDeepRetry,
   onMemorySearchAlternate,
   onMemorySearchSubmit,
   onMiddleModeChange,
@@ -51,7 +49,6 @@ export function AppSidebarMiddle({
   allWorkspaceThreads: Thread[];
   canCreateThread: boolean;
   memorySearchError?: string;
-  memorySearchDeepRetryAvailable: boolean;
   memorySearchQuery: string;
   memorySearchResult?: MemoryRecallResult;
   memorySearchStatus: MemorySearchStatus;
@@ -63,7 +60,6 @@ export function AppSidebarMiddle({
   uiAgentId: string;
   visibleThreads: Thread[];
   onMemorySearchQueryChange: (query: string) => void;
-  onMemorySearchDeepRetry: () => void;
   onMemorySearchAlternate: () => void;
   onMemorySearchSubmit: () => void;
   onMiddleModeChange: (mode: MiddleMode) => void;
@@ -93,7 +89,6 @@ export function AppSidebarMiddle({
     agents,
     allWorkspaceThreads,
     memorySearchError,
-    memorySearchDeepRetryAvailable,
     memorySearchQuery,
     memorySearchResult,
     memorySearchStatus,
@@ -105,7 +100,6 @@ export function AppSidebarMiddle({
     visibleThreads,
     t,
     onMemorySearchQueryChange,
-    onMemorySearchDeepRetry,
     onMemorySearchAlternate,
     onMemorySearchSubmit,
     onSelectAgent,
@@ -232,7 +226,6 @@ function middleContent(props: {
   agents: Agent[];
   allWorkspaceThreads: Thread[];
   memorySearchError?: string;
-  memorySearchDeepRetryAvailable: boolean;
   memorySearchQuery: string;
   memorySearchResult?: MemoryRecallResult;
   memorySearchStatus: MemorySearchStatus;
@@ -244,7 +237,6 @@ function middleContent(props: {
   visibleThreads: Thread[];
   t: Translation;
   onMemorySearchQueryChange: (query: string) => void;
-  onMemorySearchDeepRetry: () => void;
   onMemorySearchAlternate: () => void;
   onMemorySearchSubmit: () => void;
   onSelectAgent: (agent: Agent) => void;
@@ -257,7 +249,6 @@ function middleContent(props: {
     search: (
       <MemorySearchPanel
         allThreads={props.allWorkspaceThreads}
-        deepRetryAvailable={props.memorySearchDeepRetryAvailable}
         error={props.memorySearchError}
         health={props.selectedMemoryHealth}
         query={props.memorySearchQuery}
@@ -265,7 +256,6 @@ function middleContent(props: {
         selectedThreadId={props.selectedThreadId}
         status={props.memorySearchStatus}
         t={props.t}
-        onDeepRetry={props.onMemorySearchDeepRetry}
         onAlternateSearch={props.onMemorySearchAlternate}
         onQueryChange={props.onMemorySearchQueryChange}
         onSelectHit={props.onSelectMemorySearchHit}

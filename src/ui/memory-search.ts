@@ -6,15 +6,12 @@ import type {
   MemoryRecallResult,
   Thread
 } from "./types.js";
-import {
-  isMemorySearchRetryDepth,
-  MEMORY_SEARCH_UI_LIMIT,
-  type MemorySearchRetryDepth
-} from "./memory-search-depth.js";
 
 export const MEMORY_SEARCH_STORAGE_KEY = "marcMemorySearchState";
+/** The number of hits the panel keeps and the snapshot stores. */
+export const MEMORY_SEARCH_UI_LIMIT = 50;
 
-const MEMORY_SEARCH_SCHEMA_VERSION = 6;
+const MEMORY_SEARCH_SCHEMA_VERSION = 7;
 const MEMORY_BANDS: readonly MemoryBand[] = ["high", "medium", "low"];
 const MAX_STORED_NEXT_ACTIONS = 5;
 const MAX_STORED_TEXT_LENGTH = 360;
@@ -28,8 +25,6 @@ export type MemorySearchStorage = {
 type MemorySearchApiPost = <T>(path: string, body: unknown) => Promise<T>;
 
 export type MemorySearchSnapshot = {
-  configuredDepth: MemorySearchRetryDepth;
-  lastExecutedDepth: MemorySearchRetryDepth;
   workspaceId: string;
   query: string;
   result: MemoryRecallResult;
@@ -38,11 +33,6 @@ export type MemorySearchSnapshot = {
 type StoredMemorySearchState = MemorySearchSnapshot & {
   savedAt: string;
   schemaVersion: number;
-};
-
-type MemorySearchDepthRun = {
-  lastExecutedDepth: MemorySearchRetryDepth;
-  result: MemoryRecallResult;
 };
 
 export function isCurrentMemorySearchRequest(
@@ -63,11 +53,22 @@ export function isMemorySearchAvailable(
   return health.searchReady;
 }
 
+/** A hit without a thread id (rules and document groups) has no thread to find. */
 export function findMemorySearchThread(
   hit: MemoryRecallHit,
   threads: Thread[]
 ): Thread | undefined {
+  if (!hit.threadId) return undefined;
   return threads.find((thread) => thread.id === hit.threadId);
+}
+
+/** Only a hit with a thread id can be selected as the open thread. */
+export function isMemorySearchHitSelected(
+  hit: MemoryRecallHit,
+  selectedThreadId: string | undefined
+): boolean {
+  if (!hit.threadId) return false;
+  return hit.threadId === selectedThreadId;
 }
 
 export function isMemorySearchClosedHit(
@@ -99,71 +100,52 @@ export function memorySearchTooltip(
   return title;
 }
 
+/** The recall request of the UI: one search at the default depth (0), the same as the M0 path. */
 export function memorySearchRecallInput(
   originalQuery: string,
-  depth: MemorySearchRetryDepth,
   interpretation?: MemoryQueryInterpretation,
   initialMode: "auto" | "literal" = "auto"
 ): {
-  depth: MemorySearchRetryDepth;
   limit: number;
   query: string;
   queryMode: "auto" | "literal";
 } {
   if (!interpretation) {
     return {
-      depth,
       limit: MEMORY_SEARCH_UI_LIMIT,
       query: originalQuery,
       queryMode: initialMode
     };
   }
   return {
-    depth,
     limit: MEMORY_SEARCH_UI_LIMIT,
     query: interpretation.effectiveQuery,
     queryMode: "literal"
   };
 }
 
-export async function recallMemorySearchDepths({
+export async function recallMemorySearch({
   apiPost,
-  depths,
   initialMode = "auto",
   interpretation,
   query,
   workspaceId
 }: {
   apiPost: MemorySearchApiPost;
-  depths: MemorySearchRetryDepth[];
   initialMode?: "auto" | "literal";
   interpretation?: MemoryQueryInterpretation;
   query: string;
   workspaceId: string;
-}): Promise<MemorySearchDepthRun> {
-  let latestResult: MemoryRecallResult | undefined;
-  let lastExecutedDepth: MemorySearchRetryDepth | undefined;
-  let stableInterpretation = interpretation;
-  for (const depth of depths) {
-    const recalled = await apiPost<MemoryRecallResult>(
-      `/api/workspaces/${encodeURIComponent(workspaceId)}/memory/recall`,
-      memorySearchRecallInput(query, depth, stableInterpretation, initialMode)
-    );
-    lastExecutedDepth = depth;
-    if (!stableInterpretation) stableInterpretation = recalled.interpretation;
-    latestResult = {
-      ...recalled,
-      interpretation: stableInterpretation,
-      query
-    };
-    if (latestResult.results.length) {
-      return { lastExecutedDepth, result: latestResult };
-    }
-  }
-  if (!latestResult || lastExecutedDepth === undefined) {
-    throw new Error("Memory search requires at least one depth.");
-  }
-  return { lastExecutedDepth, result: latestResult };
+}): Promise<MemoryRecallResult> {
+  const recalled = await apiPost<MemoryRecallResult>(
+    `/api/workspaces/${encodeURIComponent(workspaceId)}/memory/recall`,
+    memorySearchRecallInput(query, interpretation, initialMode)
+  );
+  return {
+    ...recalled,
+    interpretation: interpretation ?? recalled.interpretation,
+    query
+  };
 }
 
 export function alternateMemorySearchQuery(
@@ -196,8 +178,6 @@ export function readStoredMemorySearchState(
   if (!parsed) return undefined;
   if (parsed.workspaceId !== workspaceId) return undefined;
   return {
-    configuredDepth: parsed.configuredDepth,
-    lastExecutedDepth: parsed.lastExecutedDepth,
     query: parsed.query,
     result: parsed.result,
     workspaceId: parsed.workspaceId
@@ -229,12 +209,8 @@ function parseStoredMemorySearchState(
   if (typeof parsed.workspaceId !== "string") return undefined;
   if (typeof parsed.query !== "string") return undefined;
   if (typeof parsed.savedAt !== "string") return undefined;
-  if (!isMemorySearchRetryDepth(parsed.configuredDepth)) return undefined;
-  if (!isMemorySearchRetryDepth(parsed.lastExecutedDepth)) return undefined;
   if (!isMemoryRecallResult(parsed.result)) return undefined;
   return {
-    configuredDepth: parsed.configuredDepth,
-    lastExecutedDepth: parsed.lastExecutedDepth,
     query: parsed.query,
     result: compactMemoryRecallResult(parsed.result),
     savedAt: parsed.savedAt,
@@ -301,11 +277,17 @@ function isMemoryQueryInterpretation(
   return true;
 }
 
+/**
+ * A hit of a thread group carries its thread id and summary path; a rules or document hit
+ * carries neither, only its reference (the path shown to the user).
+ */
 function isMemoryRecallHit(value: unknown): value is MemoryRecallHit {
   if (!isRecord(value)) return false;
-  if (typeof value.threadId !== "string") return false;
+  if (value.threadId !== undefined && typeof value.threadId !== "string")
+    return false;
   if (typeof value.title !== "string") return false;
-  if (typeof value.summaryPath !== "string") return false;
+  if (value.summaryPath !== undefined && typeof value.summaryPath !== "string")
+    return false;
   if (typeof value.reference !== "string") return false;
   if (typeof value.matchedText !== "string") return false;
   if (typeof value.score !== "number") return false;

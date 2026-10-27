@@ -11,7 +11,6 @@ export function WorkspaceSettingsModal({
   workspace,
   onAutoRebuildChange,
   onEmbeddingBatchSizeChange,
-  onSearchRetryDepthChange,
   onClose,
   onPrepareModel,
   onPurge,
@@ -21,7 +20,6 @@ export function WorkspaceSettingsModal({
   workspace: Workspace;
   onAutoRebuildChange: (autoRebuild: boolean) => void;
   onEmbeddingBatchSizeChange: (embeddingBatchSize: number) => void;
-  onSearchRetryDepthChange: (searchRetryDepth: number) => void;
   onClose: () => void;
   onPrepareModel: () => void;
   onPurge: () => void;
@@ -55,7 +53,6 @@ export function WorkspaceSettingsModal({
             t={t}
             onAutoRebuildChange={onAutoRebuildChange}
             onEmbeddingBatchSizeChange={onEmbeddingBatchSizeChange}
-            onSearchRetryDepthChange={onSearchRetryDepthChange}
             onPrepareModel={onPrepareModel}
             onPurge={onPurge}
             onRebuild={onRebuild}

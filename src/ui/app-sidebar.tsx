@@ -147,7 +147,6 @@ export function AppSidebar({
         agents={agents}
         allWorkspaceThreads={allWorkspaceThreads}
         canCreateThread={canCreateThread}
-        memorySearchDeepRetryAvailable={memorySearch.deepRetryAvailable}
         memorySearchError={memorySearch.error}
         memorySearchQuery={memorySearch.query}
         memorySearchResult={memorySearch.result}
@@ -160,7 +159,6 @@ export function AppSidebar({
         uiAgentId={uiAgentId}
         visibleThreads={visibleThreads}
         onMemorySearchQueryChange={memorySearch.setQuery}
-        onMemorySearchDeepRetry={memorySearch.runDeepRetry}
         onMemorySearchAlternate={memorySearch.runAlternateSearch}
         onMemorySearchSubmit={memorySearch.runSearch}
         onMiddleModeChange={onMiddleModeChange}

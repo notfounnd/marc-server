@@ -44,7 +44,7 @@ import { channelsOfCaptured, recordsById } from "./replay.js";
 import {
   featureVectorOf,
   type ThreadFeatures
-} from "../../src/core/memory/scoring/features.js";
+} from "./features.js";
 
 /** Name of the calibration file, in the capture directory. */
 export function calibrationFileName(corpus: string): string {

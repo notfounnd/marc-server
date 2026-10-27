@@ -2,14 +2,13 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import test from "node:test";
 
-test("renders full-width memory search and deep retry actions", () => {
+test("renders full-width memory search with no deep retry action", () => {
   const panel = fs.readFileSync("src/ui/memory-search-panel.tsx", "utf8");
   const css = fs.readFileSync("src/ui/styles/shell-navigation.css", "utf8");
 
   assert.match(panel, /className="memory-search-submit"/);
   assert.match(panel, /\{t\("Search"\)\}/);
-  assert.match(panel, /className="memory-search-deep-retry"/);
-  assert.match(panel, /\{t\("Deep retry"\)\}/);
+  assert.doesNotMatch(panel, /Deep retry|deepRetry|DeepRetry/);
   assert.match(panel, /className="memory-search-interpretation"/);
   assert.match(panel, /t\("Searching for \{\{query\}\}"/);
   assert.match(panel, /t\("Search instead for"\)/);
@@ -26,5 +25,14 @@ test("renders full-width memory search and deep retry actions", () => {
     css,
     /\.memory-search-submit\s*{[\s\S]*width: 100%;[\s\S]*min-height: 40px;/
   );
-  assert.match(css, /\.memory-search-deep-retry\s*{[\s\S]*width: 100%;/);
+  assert.doesNotMatch(css, /memory-search-deep-retry/);
+});
+
+test("a hit without a thread shows its path, never the selected state or an error mark", () => {
+  const panel = fs.readFileSync("src/ui/memory-search-panel.tsx", "utf8");
+
+  assert.match(panel, /isMemorySearchHitSelected\(hit, selectedThreadId\)/);
+  assert.doesNotMatch(panel, /hit\.threadId === selectedThreadId/);
+  assert.match(panel, /key=\{hitKey\(hit\)\}/);
+  assert.match(panel, /<FileText size=\{16\} \/>/);
 });

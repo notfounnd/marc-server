@@ -11,6 +11,7 @@ import {
   isMemoryAllocationError,
   rerankBatchSizes
 } from "./rerank-batching.js";
+import { rerankSendOrder, restoreScoreOrder } from "./rerank-order.js";
 import type { MemoryInferenceRole } from "./model-config.js";
 import {
   activeMemoryModelSelection,
@@ -133,7 +134,8 @@ async function handleRerankingRequest(
       scores: await rerankDocuments(
         request.query,
         request.documents,
-        request.batchSize
+        request.batchSize,
+        request.order
       )
     };
   }
@@ -214,12 +216,22 @@ async function loadTransformers(
 async function rerankDocuments(
   query: string,
   documents: string[],
-  batchSize: number
+  batchSize: number,
+  order: unknown
 ): Promise<number[]> {
   if (!documents.length) return [];
   const { model, tokenizer } = await loadReranker(false);
   const size = normalizedBatchSize(batchSize);
-  return rerankWithBackoff(model, tokenizer, query, documents, size);
+  const sendOrder = rerankSendOrder(order, documents);
+  const sent = sendOrder.map((index) => documents[index]);
+  const sentScores = await rerankWithBackoff(
+    model,
+    tokenizer,
+    query,
+    sent,
+    size
+  );
+  return restoreScoreOrder(sendOrder, sentScores);
 }
 
 async function rerankWithBackoff(

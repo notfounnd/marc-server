@@ -12,11 +12,13 @@
         "account-linking-flow-for-bank-connections-0b7d6e31": 3,
         "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
         "categorization-rules-priority-ordering-0d4f9b13": 0,
+        "categorization-rules-regex-first-version-5c8e1a77": 0,
         "csv-importer-bank-export-parsing-3a1f0c21": 0,
         "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
         "daily-balance-snapshot-job-5e9c3b84": 0,
         "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
         "encryption-at-rest-config-key-41c7f0ae": 0,
+        "http-api-static-token-auth-d2f7a041": 0,
         "local-api-json-error-envelope-8d4b1f67": 0,
         "logging-redaction-of-account-numbers-a2c8f750": 0,
         "ofx-importer-statement-header-parsing-c71e0b94": 1,
@@ -24,7 +26,26 @@
         "sync-scheduler-exponential-backoff-88f1d2b4": 0,
         "sync-scheduler-fixed-interval-e2a6c590": 0
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0
+        },
+        "2": {
+          "categorization-rules-regex-first-version-5c8e1a77": 0,
+          "csv-importer-bank-export-parsing-3a1f0c21": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+          "http-api-static-token-auth-d2f7a041": 0,
+          "logging-redaction-of-account-numbers-a2c8f750": 0,
+          "ofx-importer-statement-header-parsing-c71e0b94": 0,
+          "retry-policy-for-bank-connector-timeouts-4b3a9f20": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0
+        }
+      }
     },
     {
       "id": "L02",
@@ -38,6 +59,7 @@
         "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
         "categorization-rules-priority-ordering-0d4f9b13": 0,
         "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
         "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
         "encryption-at-rest-config-key-41c7f0ae": 2,
         "encryption-at-rest-passphrase-derived-key-c39e5d62": 2,
@@ -46,11 +68,33 @@
         "key-rotation-procedure-for-encrypted-store-a85f3e27": 1,
         "local-api-json-error-envelope-8d4b1f67": 0,
         "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "ofx-importer-currency-handling-2f5d8a6c": 0,
         "settings-file-migration-to-toml-e94b1d26": 0,
         "sync-scheduler-exponential-backoff-88f1d2b4": 0,
         "web-ui-transactions-paged-list-6a0b7f15": 0
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 1,
+          "ofx-importer-currency-handling-2f5d8a6c": 0
+        },
+        "2": {
+          "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "encryption-at-rest-config-key-41c7f0ae": 1,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 2,
+          "http-api-static-token-auth-d2f7a041": 0,
+          "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+          "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+          "ofx-importer-currency-handling-2f5d8a6c": 0,
+          "settings-file-migration-to-toml-e94b1d26": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0
+        }
+      }
     },
     {
       "id": "L03",
@@ -61,10 +105,12 @@
       "judgments": {
         "account-linking-flow-for-bank-connections-0b7d6e31": 0,
         "bank-connector-plugin-interface-decision-5d2e8a17": 3,
+        "categorization-rules-priority-ordering-0d4f9b13": 0,
         "csv-importer-bank-export-parsing-3a1f0c21": 0,
         "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
         "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
         "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+        "http-api-static-token-auth-d2f7a041": 0,
         "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
         "local-api-json-error-envelope-8d4b1f67": 0,
         "logging-redaction-of-account-numbers-a2c8f750": 0,
@@ -72,9 +118,29 @@
         "retry-policy-for-bank-connector-timeouts-4b3a9f20": 0,
         "sync-scheduler-exponential-backoff-88f1d2b4": 0,
         "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
         "web-ui-transactions-paged-list-6a0b7f15": 0
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0
+        },
+        "2": {
+          "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+          "categorization-rules-priority-ordering-0d4f9b13": 0,
+          "csv-importer-bank-export-parsing-3a1f0c21": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "http-api-static-token-auth-d2f7a041": 0,
+          "logging-redaction-of-account-numbers-a2c8f750": 0,
+          "ofx-importer-statement-header-parsing-c71e0b94": 0,
+          "retry-policy-for-bank-connector-timeouts-4b3a9f20": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0
+        }
+      }
     },
     {
       "id": "L04",
@@ -93,6 +159,7 @@
         "encryption-at-rest-config-key-41c7f0ae": 0,
         "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
         "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+        "http-api-static-token-auth-d2f7a041": 0,
         "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
         "local-api-json-error-envelope-8d4b1f67": 0,
         "logging-redaction-of-account-numbers-a2c8f750": 0,
@@ -102,7 +169,26 @@
         "web-ui-transactions-paged-list-6a0b7f15": 0,
         "web-ui-transactions-virtual-scrolling-b4e8c293": 0
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "@rules": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        },
+        "2": {
+          "categorization-rule-tester-command-6b5c9e04": 0,
+          "categorization-rules-priority-ordering-0d4f9b13": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+          "encryption-at-rest-config-key-41c7f0ae": 0,
+          "http-api-static-token-auth-d2f7a041": 0,
+          "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        }
+      }
     },
     {
       "id": "L05",
@@ -119,8 +205,10 @@
         "csv-importer-bank-export-parsing-3a1f0c21": 0,
         "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
         "encryption-at-rest-config-key-41c7f0ae": 0,
+        "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
         "http-api-scoped-tokens-per-client-9e1c6b38": 0,
         "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
         "local-api-json-error-envelope-8d4b1f67": 0,
         "logging-redaction-of-account-numbers-a2c8f750": 0,
         "ofx-importer-currency-handling-2f5d8a6c": 0,
@@ -130,7 +218,27 @@
         "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
         "web-ui-transactions-paged-list-6a0b7f15": 0
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "@rules": 1,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "ofx-importer-currency-handling-2f5d8a6c": 0
+        },
+        "2": {
+          "categorization-rules-priority-ordering-0d4f9b13": 1,
+          "categorization-rules-regex-first-version-5c8e1a77": 1,
+          "csv-importer-bank-export-parsing-3a1f0c21": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+          "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+          "logging-redaction-of-account-numbers-a2c8f750": 0,
+          "ofx-importer-currency-handling-2f5d8a6c": 0,
+          "ofx-importer-statement-header-parsing-c71e0b94": 0
+        }
+      }
     },
     {
       "id": "L06",
@@ -144,11 +252,14 @@
         "categorization-rule-tester-command-6b5c9e04": 2,
         "categorization-rules-priority-ordering-0d4f9b13": 3,
         "categorization-rules-regex-first-version-5c8e1a77": 2,
+        "csv-importer-bank-export-parsing-3a1f0c21": 0,
         "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
         "daemon-startup-health-check-c0e6b915": 0,
         "daily-balance-snapshot-job-5e9c3b84": 0,
         "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
         "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+        "http-api-static-token-auth-d2f7a041": 0,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
         "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
         "logging-redaction-of-account-numbers-a2c8f750": 0,
         "ofx-importer-currency-handling-2f5d8a6c": 0,
@@ -157,7 +268,28 @@
         "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
         "web-ui-transactions-virtual-scrolling-b4e8c293": 0
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        },
+        "2": {
+          "categorization-rule-tester-command-6b5c9e04": 1,
+          "categorization-rules-regex-first-version-5c8e1a77": 1,
+          "csv-importer-bank-export-parsing-3a1f0c21": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+          "http-api-static-token-auth-d2f7a041": 0,
+          "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+          "ofx-importer-statement-header-parsing-c71e0b94": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        }
+      }
     },
     {
       "id": "L07",
@@ -176,13 +308,35 @@
         "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
         "http-api-scoped-tokens-per-client-9e1c6b38": 0,
         "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
         "local-api-json-error-envelope-8d4b1f67": 0,
         "logging-redaction-of-account-numbers-a2c8f750": 0,
         "ofx-importer-statement-header-parsing-c71e0b94": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0,
         "web-ui-transactions-paged-list-6a0b7f15": 0,
         "web-ui-transactions-virtual-scrolling-b4e8c293": 0
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "@rules": 1,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        },
+        "2": {
+          "categorization-rule-tester-command-6b5c9e04": 1,
+          "categorization-rules-priority-ordering-0d4f9b13": 1,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+          "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+          "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+          "logging-redaction-of-account-numbers-a2c8f750": 0,
+          "ofx-importer-statement-header-parsing-c71e0b94": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0,
+          "web-ui-transactions-paged-list-6a0b7f15": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        }
+      }
     },
     {
       "id": "L08",
@@ -191,6 +345,7 @@
       "query": "what exit status should scripts expect when the daemon cannot be reached",
       "queryMode": "auto",
       "judgments": {
+        "bank-connector-plugin-interface-decision-5d2e8a17": 0,
         "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
         "categorization-rule-tester-command-6b5c9e04": 1,
         "cli-command-structure-and-exit-codes-3c9e0a52": 3,
@@ -203,13 +358,29 @@
         "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
         "local-api-json-error-envelope-8d4b1f67": 0,
         "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "ofx-importer-statement-header-parsing-c71e0b94": 0,
         "retry-policy-for-bank-connector-timeouts-4b3a9f20": 0,
         "settings-file-migration-to-toml-e94b1d26": 0,
         "sync-scheduler-exponential-backoff-88f1d2b4": 0,
         "sync-scheduler-fixed-interval-e2a6c590": 0,
         "web-ui-transactions-virtual-scrolling-b4e8c293": 0
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "2": {
+          "bank-connector-plugin-interface-decision-5d2e8a17": 0,
+          "categorization-rule-tester-command-6b5c9e04": 1,
+          "daemon-startup-health-check-c0e6b915": 0,
+          "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+          "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+          "logging-redaction-of-account-numbers-a2c8f750": 0,
+          "ofx-importer-statement-header-parsing-c71e0b94": 0,
+          "retry-policy-for-bank-connector-timeouts-4b3a9f20": 0,
+          "settings-file-migration-to-toml-e94b1d26": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0
+        }
+      }
     },
     {
       "id": "L09",
@@ -227,6 +398,8 @@
         "csv-importer-column-mapping-and-header-detection-7b92e4d0": 2,
         "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
         "import-batch-size-limits-and-progress-events-1d8f2a73": 1,
+        "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+        "local-api-json-error-envelope-8d4b1f67": 0,
         "logging-redaction-of-account-numbers-a2c8f750": 0,
         "ofx-importer-currency-handling-2f5d8a6c": 0,
         "ofx-importer-statement-header-parsing-c71e0b94": 0,
@@ -234,7 +407,26 @@
         "sync-scheduler-exponential-backoff-88f1d2b4": 0,
         "sync-scheduler-fixed-interval-e2a6c590": 0
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "@rules": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 2,
+          "ofx-importer-currency-handling-2f5d8a6c": 0
+        },
+        "2": {
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 1,
+          "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+          "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+          "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+          "local-api-json-error-envelope-8d4b1f67": 0,
+          "logging-redaction-of-account-numbers-a2c8f750": 0,
+          "ofx-importer-currency-handling-2f5d8a6c": 0,
+          "ofx-importer-statement-header-parsing-c71e0b94": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0
+        }
+      }
     },
     {
       "id": "L10",
@@ -250,6 +442,7 @@
         "csv-importer-column-mapping-and-header-detection-7b92e4d0": 3,
         "daily-balance-snapshot-job-5e9c3b84": 0,
         "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+        "http-api-static-token-auth-d2f7a041": 0,
         "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
         "local-api-json-error-envelope-8d4b1f67": 0,
         "logging-redaction-of-account-numbers-a2c8f750": 0,
@@ -258,7 +451,26 @@
         "sync-scheduler-exponential-backoff-88f1d2b4": 0,
         "sync-scheduler-fixed-interval-e2a6c590": 0
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "@rules": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "ofx-importer-currency-handling-2f5d8a6c": 0
+        },
+        "2": {
+          "csv-importer-bank-export-parsing-3a1f0c21": 1,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+          "http-api-static-token-auth-d2f7a041": 0,
+          "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+          "logging-redaction-of-account-numbers-a2c8f750": 0,
+          "ofx-importer-currency-handling-2f5d8a6c": 0,
+          "ofx-importer-statement-header-parsing-c71e0b94": 1,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0
+        }
+      }
     },
     {
       "id": "L11",
@@ -267,9 +479,11 @@
       "query": "daemon should refuse to boot if storage is full or the db is held by another process",
       "queryMode": "auto",
       "judgments": {
+        "account-linking-flow-for-bank-connections-0b7d6e31": 0,
         "backup-export-of-local-database-3e0a7d92": 0,
         "bank-connector-plugin-interface-decision-5d2e8a17": 0,
         "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+        "cli-command-structure-and-exit-codes-3c9e0a52": 0,
         "daemon-startup-health-check-c0e6b915": 3,
         "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
         "encryption-at-rest-config-key-41c7f0ae": 0,
@@ -281,9 +495,29 @@
         "logging-redaction-of-account-numbers-a2c8f750": 0,
         "settings-file-migration-to-toml-e94b1d26": 1,
         "sync-scheduler-exponential-backoff-88f1d2b4": 0,
-        "sync-scheduler-fixed-interval-e2a6c590": 0
+        "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 0
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        },
+        "2": {
+          "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+          "backup-export-of-local-database-3e0a7d92": 0,
+          "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+          "encryption-at-rest-config-key-41c7f0ae": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+          "logging-redaction-of-account-numbers-a2c8f750": 0,
+          "settings-file-migration-to-toml-e94b1d26": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        }
+      }
     },
     {
       "id": "L12",
@@ -299,6 +533,7 @@
         "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
         "daemon-startup-health-check-c0e6b915": 0,
         "daily-balance-snapshot-job-5e9c3b84": 3,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
         "encryption-at-rest-config-key-41c7f0ae": 0,
         "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
         "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
@@ -309,10 +544,32 @@
         "ofx-importer-statement-header-parsing-c71e0b94": 0,
         "sync-scheduler-exponential-backoff-88f1d2b4": 0,
         "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
         "web-ui-transactions-paged-list-6a0b7f15": 0,
         "web-ui-transactions-virtual-scrolling-b4e8c293": 1
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "ofx-importer-currency-handling-2f5d8a6c": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        },
+        "2": {
+          "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+          "csv-importer-bank-export-parsing-3a1f0c21": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+          "logging-redaction-of-account-numbers-a2c8f750": 0,
+          "ofx-importer-currency-handling-2f5d8a6c": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+          "web-ui-transactions-paged-list-6a0b7f15": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        }
+      }
     },
     {
       "id": "L13",
@@ -326,9 +583,11 @@
         "categorization-rules-priority-ordering-0d4f9b13": 0,
         "categorization-rules-regex-first-version-5c8e1a77": 0,
         "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "daemon-startup-health-check-c0e6b915": 0,
         "daily-balance-snapshot-job-5e9c3b84": 0,
         "duplicate-transaction-detection-by-fingerprint-f16a2d09": 3,
         "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+        "http-api-static-token-auth-d2f7a041": 0,
         "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
         "local-api-json-error-envelope-8d4b1f67": 0,
         "logging-redaction-of-account-numbers-a2c8f750": 0,
@@ -338,7 +597,26 @@
         "web-ui-transactions-paged-list-6a0b7f15": 0,
         "web-ui-transactions-virtual-scrolling-b4e8c293": 0
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        },
+        "2": {
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+          "categorization-rule-tester-command-6b5c9e04": 0,
+          "categorization-rules-priority-ordering-0d4f9b13": 0,
+          "categorization-rules-regex-first-version-5c8e1a77": 0,
+          "daemon-startup-health-check-c0e6b915": 0,
+          "http-api-static-token-auth-d2f7a041": 0,
+          "logging-redaction-of-account-numbers-a2c8f750": 0,
+          "ofx-importer-statement-header-parsing-c71e0b94": 2,
+          "sync-scheduler-fixed-interval-e2a6c590": 0,
+          "web-ui-transactions-paged-list-6a0b7f15": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        }
+      }
     },
     {
       "id": "L14",
@@ -349,10 +627,12 @@
       "judgments": {
         "account-linking-flow-for-bank-connections-0b7d6e31": 0,
         "backup-export-of-local-database-3e0a7d92": 1,
+        "bank-connector-plugin-interface-decision-5d2e8a17": 0,
         "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
         "cli-command-structure-and-exit-codes-3c9e0a52": 0,
         "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
         "daemon-startup-health-check-c0e6b915": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
         "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
         "encryption-at-rest-config-key-41c7f0ae": 3,
         "encryption-at-rest-passphrase-derived-key-c39e5d62": 3,
@@ -366,7 +646,25 @@
         "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
         "web-ui-transactions-paged-list-6a0b7f15": 0
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0
+        },
+        "2": {
+          "backup-export-of-local-database-3e0a7d92": 1,
+          "bank-connector-plugin-interface-decision-5d2e8a17": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daemon-startup-health-check-c0e6b915": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "http-api-static-token-auth-d2f7a041": 0,
+          "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+          "settings-file-migration-to-toml-e94b1d26": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0
+        }
+      }
     },
     {
       "id": "L15",
@@ -385,14 +683,35 @@
         "encryption-at-rest-config-key-41c7f0ae": 2,
         "encryption-at-rest-passphrase-derived-key-c39e5d62": 3,
         "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+        "http-api-static-token-auth-d2f7a041": 0,
         "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
         "local-api-json-error-envelope-8d4b1f67": 0,
         "logging-redaction-of-account-numbers-a2c8f750": 0,
         "ofx-importer-currency-handling-2f5d8a6c": 0,
         "ofx-importer-statement-header-parsing-c71e0b94": 0,
-        "settings-file-migration-to-toml-e94b1d26": 0
+        "settings-file-migration-to-toml-e94b1d26": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "ofx-importer-currency-handling-2f5d8a6c": 0
+        },
+        "2": {
+          "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+          "backup-export-of-local-database-3e0a7d92": 1,
+          "categorization-rule-tester-command-6b5c9e04": 0,
+          "csv-importer-bank-export-parsing-3a1f0c21": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "http-api-static-token-auth-d2f7a041": 0,
+          "logging-redaction-of-account-numbers-a2c8f750": 0,
+          "ofx-importer-currency-handling-2f5d8a6c": 0,
+          "ofx-importer-statement-header-parsing-c71e0b94": 0,
+          "settings-file-migration-to-toml-e94b1d26": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0
+        }
+      }
     },
     {
       "id": "L16",
@@ -403,6 +722,7 @@
       "judgments": {
         "account-linking-flow-for-bank-connections-0b7d6e31": 0,
         "backup-export-of-local-database-3e0a7d92": 0,
+        "categorization-rule-tester-command-6b5c9e04": 0,
         "categorization-rules-priority-ordering-0d4f9b13": 0,
         "cli-command-structure-and-exit-codes-3c9e0a52": 0,
         "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
@@ -414,11 +734,32 @@
         "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
         "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
         "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "ofx-importer-currency-handling-2f5d8a6c": 0,
         "settings-file-migration-to-toml-e94b1d26": 0,
         "sync-scheduler-exponential-backoff-88f1d2b4": 0,
-        "sync-scheduler-fixed-interval-e2a6c590": 0
+        "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "ui-dark-mode-toggle-persistence-7f3a0c48": 0
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "ofx-importer-currency-handling-2f5d8a6c": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0
+        },
+        "2": {
+          "backup-export-of-local-database-3e0a7d92": 0,
+          "categorization-rule-tester-command-6b5c9e04": 0,
+          "categorization-rules-priority-ordering-0d4f9b13": 0,
+          "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+          "encryption-at-rest-config-key-41c7f0ae": 0,
+          "http-api-static-token-auth-d2f7a041": 1,
+          "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+          "ofx-importer-currency-handling-2f5d8a6c": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0
+        }
+      }
     },
     {
       "id": "L17",
@@ -437,12 +778,32 @@
         "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
         "local-api-json-error-envelope-8d4b1f67": 0,
         "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "retry-policy-for-bank-connector-timeouts-4b3a9f20": 0,
         "settings-file-migration-to-toml-e94b1d26": 0,
         "sync-scheduler-exponential-backoff-88f1d2b4": 0,
         "sync-scheduler-fixed-interval-e2a6c590": 0,
-        "web-ui-transactions-paged-list-6a0b7f15": 0
+        "web-ui-transactions-paged-list-6a0b7f15": 0,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 0
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "@rules": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        },
+        "2": {
+          "encryption-at-rest-config-key-41c7f0ae": 0,
+          "http-api-scoped-tokens-per-client-9e1c6b38": 2,
+          "local-api-json-error-envelope-8d4b1f67": 0,
+          "logging-redaction-of-account-numbers-a2c8f750": 0,
+          "retry-policy-for-bank-connector-timeouts-4b3a9f20": 0,
+          "settings-file-migration-to-toml-e94b1d26": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0,
+          "web-ui-transactions-paged-list-6a0b7f15": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        }
+      }
     },
     {
       "id": "L18",
@@ -451,7 +812,9 @@
       "query": "importing a huge statement freezes the interface and eats all memory",
       "queryMode": "auto",
       "judgments": {
+        "account-linking-flow-for-bank-connections-0b7d6e31": 0,
         "backup-export-of-local-database-3e0a7d92": 0,
+        "bank-connector-plugin-interface-decision-5d2e8a17": 0,
         "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
         "categorization-rules-priority-ordering-0d4f9b13": 0,
         "cli-command-structure-and-exit-codes-3c9e0a52": 0,
@@ -467,7 +830,27 @@
         "settings-file-migration-to-toml-e94b1d26": 0,
         "web-ui-transactions-virtual-scrolling-b4e8c293": 0
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "@rules": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "ofx-importer-currency-handling-2f5d8a6c": 0
+        },
+        "2": {
+          "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+          "backup-export-of-local-database-3e0a7d92": 0,
+          "bank-connector-plugin-interface-decision-5d2e8a17": 0,
+          "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+          "csv-importer-bank-export-parsing-3a1f0c21": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "ofx-importer-currency-handling-2f5d8a6c": 0,
+          "ofx-importer-statement-header-parsing-c71e0b94": 0,
+          "settings-file-migration-to-toml-e94b1d26": 0
+        }
+      }
     },
     {
       "id": "L19",
@@ -477,7 +860,9 @@
       "queryMode": "auto",
       "judgments": {
         "backup-export-of-local-database-3e0a7d92": 0,
+        "bank-connector-plugin-interface-decision-5d2e8a17": 0,
         "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+        "cli-command-structure-and-exit-codes-3c9e0a52": 0,
         "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
         "daemon-startup-health-check-c0e6b915": 0,
         "daily-balance-snapshot-job-5e9c3b84": 0,
@@ -490,9 +875,29 @@
         "settings-file-migration-to-toml-e94b1d26": 0,
         "sync-scheduler-exponential-backoff-88f1d2b4": 0,
         "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "web-ui-transactions-paged-list-6a0b7f15": 0,
         "web-ui-transactions-virtual-scrolling-b4e8c293": 0
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0
+        },
+        "2": {
+          "backup-export-of-local-database-3e0a7d92": 0,
+          "bank-connector-plugin-interface-decision-5d2e8a17": 0,
+          "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+          "encryption-at-rest-config-key-41c7f0ae": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "http-api-static-token-auth-d2f7a041": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0,
+          "web-ui-transactions-paged-list-6a0b7f15": 0
+        }
+      }
     },
     {
       "id": "L20",
@@ -506,19 +911,40 @@
         "cli-command-structure-and-exit-codes-3c9e0a52": 0,
         "daemon-startup-health-check-c0e6b915": 1,
         "encryption-at-rest-config-key-41c7f0ae": 0,
+        "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
         "http-api-scoped-tokens-per-client-9e1c6b38": 1,
         "http-api-static-token-auth-d2f7a041": 0,
         "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
         "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
         "local-api-json-error-envelope-8d4b1f67": 3,
         "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "ofx-importer-currency-handling-2f5d8a6c": 0,
         "settings-file-migration-to-toml-e94b1d26": 0,
         "sync-scheduler-exponential-backoff-88f1d2b4": 0,
         "sync-scheduler-fixed-interval-e2a6c590": 0,
         "web-ui-transactions-paged-list-6a0b7f15": 0,
         "web-ui-transactions-virtual-scrolling-b4e8c293": 0
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "@rules": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "ofx-importer-currency-handling-2f5d8a6c": 0
+        },
+        "2": {
+          "daemon-startup-health-check-c0e6b915": 0,
+          "encryption-at-rest-config-key-41c7f0ae": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+          "http-api-static-token-auth-d2f7a041": 0,
+          "ofx-importer-currency-handling-2f5d8a6c": 0,
+          "settings-file-migration-to-toml-e94b1d26": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0,
+          "web-ui-transactions-paged-list-6a0b7f15": 0
+        }
+      }
     },
     {
       "id": "L21",
@@ -528,6 +954,7 @@
       "queryMode": "auto",
       "judgments": {
         "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+        "backup-export-of-local-database-3e0a7d92": 0,
         "bank-connector-plugin-interface-decision-5d2e8a17": 0,
         "csv-importer-bank-export-parsing-3a1f0c21": 0,
         "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
@@ -539,9 +966,30 @@
         "logging-redaction-of-account-numbers-a2c8f750": 3,
         "ofx-importer-statement-header-parsing-c71e0b94": 0,
         "sync-scheduler-exponential-backoff-88f1d2b4": 0,
-        "sync-scheduler-fixed-interval-e2a6c590": 0
+        "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "ui-dark-mode-toggle-persistence-7f3a0c48": 0
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "@rules": 2,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0
+        },
+        "2": {
+          "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+          "backup-export-of-local-database-3e0a7d92": 0,
+          "csv-importer-bank-export-parsing-3a1f0c21": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+          "local-api-json-error-envelope-8d4b1f67": 1,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0
+        }
+      }
     },
     {
       "id": "L22",
@@ -553,6 +1001,8 @@
         "account-linking-flow-for-bank-connections-0b7d6e31": 0,
         "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
         "categorization-rules-priority-ordering-0d4f9b13": 0,
+        "categorization-rules-regex-first-version-5c8e1a77": 0,
+        "cli-command-structure-and-exit-codes-3c9e0a52": 0,
         "csv-importer-bank-export-parsing-3a1f0c21": 2,
         "csv-importer-column-mapping-and-header-detection-7b92e4d0": 1,
         "daily-balance-snapshot-job-5e9c3b84": 0,
@@ -561,6 +1011,7 @@
         "http-api-scoped-tokens-per-client-9e1c6b38": 0,
         "http-api-static-token-auth-d2f7a041": 0,
         "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "local-api-json-error-envelope-8d4b1f67": 0,
         "logging-redaction-of-account-numbers-a2c8f750": 0,
         "ofx-importer-currency-handling-2f5d8a6c": 3,
         "ofx-importer-statement-header-parsing-c71e0b94": 0,
@@ -568,7 +1019,26 @@
         "sync-scheduler-fixed-interval-e2a6c590": 0,
         "web-ui-transactions-virtual-scrolling-b4e8c293": 0
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "@rules": 2,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0
+        },
+        "2": {
+          "categorization-rules-regex-first-version-5c8e1a77": 0,
+          "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+          "csv-importer-bank-export-parsing-3a1f0c21": 1,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "encryption-at-rest-config-key-41c7f0ae": 0,
+          "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+          "local-api-json-error-envelope-8d4b1f67": 0,
+          "logging-redaction-of-account-numbers-a2c8f750": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0
+        }
+      }
     },
     {
       "id": "L23",
@@ -586,16 +1056,38 @@
         "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
         "encryption-at-rest-config-key-41c7f0ae": 0,
         "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+        "http-api-static-token-auth-d2f7a041": 0,
         "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
         "local-api-json-error-envelope-8d4b1f67": 0,
         "logging-redaction-of-account-numbers-a2c8f750": 0,
         "ofx-importer-currency-handling-2f5d8a6c": 0,
         "ofx-importer-statement-header-parsing-c71e0b94": 3,
+        "retry-policy-for-bank-connector-timeouts-4b3a9f20": 0,
         "settings-file-migration-to-toml-e94b1d26": 0,
         "sync-scheduler-exponential-backoff-88f1d2b4": 0,
         "sync-scheduler-fixed-interval-e2a6c590": 0
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "ofx-importer-currency-handling-2f5d8a6c": 0
+        },
+        "2": {
+          "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+          "categorization-rules-priority-ordering-0d4f9b13": 0,
+          "csv-importer-bank-export-parsing-3a1f0c21": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "http-api-static-token-auth-d2f7a041": 0,
+          "logging-redaction-of-account-numbers-a2c8f750": 0,
+          "ofx-importer-currency-handling-2f5d8a6c": 0,
+          "retry-policy-for-bank-connector-timeouts-4b3a9f20": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0
+        }
+      }
     },
     {
       "id": "L24",
@@ -618,10 +1110,32 @@
         "local-api-json-error-envelope-8d4b1f67": 0,
         "logging-redaction-of-account-numbers-a2c8f750": 0,
         "retry-policy-for-bank-connector-timeouts-4b3a9f20": 3,
+        "settings-file-migration-to-toml-e94b1d26": 0,
         "sync-scheduler-exponential-backoff-88f1d2b4": 1,
-        "sync-scheduler-fixed-interval-e2a6c590": 1
+        "sync-scheduler-fixed-interval-e2a6c590": 1,
+        "ui-dark-mode-toggle-persistence-7f3a0c48": 0
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0
+        },
+        "2": {
+          "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+          "bank-connector-plugin-interface-decision-5d2e8a17": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+          "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+          "logging-redaction-of-account-numbers-a2c8f750": 0,
+          "settings-file-migration-to-toml-e94b1d26": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 1,
+          "sync-scheduler-fixed-interval-e2a6c590": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0
+        }
+      }
     },
     {
       "id": "L25",
@@ -644,12 +1158,34 @@
         "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
         "local-api-json-error-envelope-8d4b1f67": 0,
         "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "retry-policy-for-bank-connector-timeouts-4b3a9f20": 0,
         "settings-file-migration-to-toml-e94b1d26": 3,
         "sync-scheduler-exponential-backoff-88f1d2b4": 0,
         "sync-scheduler-fixed-interval-e2a6c590": 0,
-        "ui-dark-mode-toggle-persistence-7f3a0c48": 0
+        "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 0
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "@rules": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        },
+        "2": {
+          "categorization-rule-tester-command-6b5c9e04": 0,
+          "categorization-rules-priority-ordering-0d4f9b13": 0,
+          "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+          "http-api-static-token-auth-d2f7a041": 0,
+          "local-api-json-error-envelope-8d4b1f67": 0,
+          "retry-policy-for-bank-connector-timeouts-4b3a9f20": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        }
+      }
     },
     {
       "id": "L26",
@@ -661,6 +1197,7 @@
         "account-linking-flow-for-bank-connections-0b7d6e31": 0,
         "bank-connector-plugin-interface-decision-5d2e8a17": 0,
         "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+        "categorization-rule-tester-command-6b5c9e04": 0,
         "cli-command-structure-and-exit-codes-3c9e0a52": 0,
         "csv-importer-bank-export-parsing-3a1f0c21": 0,
         "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
@@ -673,11 +1210,31 @@
         "local-api-json-error-envelope-8d4b1f67": 0,
         "logging-redaction-of-account-numbers-a2c8f750": 0,
         "retry-policy-for-bank-connector-timeouts-4b3a9f20": 2,
+        "settings-file-migration-to-toml-e94b1d26": 0,
         "sync-scheduler-exponential-backoff-88f1d2b4": 3,
         "sync-scheduler-fixed-interval-e2a6c590": 2,
         "web-ui-transactions-virtual-scrolling-b4e8c293": 0
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0
+        },
+        "2": {
+          "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+          "bank-connector-plugin-interface-decision-5d2e8a17": 0,
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+          "categorization-rule-tester-command-6b5c9e04": 0,
+          "daemon-startup-health-check-c0e6b915": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+          "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+          "retry-policy-for-bank-connector-timeouts-4b3a9f20": 2,
+          "settings-file-migration-to-toml-e94b1d26": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 2
+        }
+      }
     },
     {
       "id": "L27",
@@ -687,6 +1244,7 @@
       "queryMode": "auto",
       "judgments": {
         "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+        "bank-connector-plugin-interface-decision-5d2e8a17": 0,
         "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
         "categorization-rule-tester-command-6b5c9e04": 0,
         "categorization-rules-priority-ordering-0d4f9b13": 0,
@@ -697,6 +1255,7 @@
         "http-api-scoped-tokens-per-client-9e1c6b38": 0,
         "key-rotation-procedure-for-encrypted-store-a85f3e27": 1,
         "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "ofx-importer-currency-handling-2f5d8a6c": 0,
         "retry-policy-for-bank-connector-timeouts-4b3a9f20": 0,
         "settings-file-migration-to-toml-e94b1d26": 0,
         "sync-scheduler-exponential-backoff-88f1d2b4": 3,
@@ -704,7 +1263,27 @@
         "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
         "web-ui-transactions-virtual-scrolling-b4e8c293": 0
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "@rules": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "ofx-importer-currency-handling-2f5d8a6c": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        },
+        "2": {
+          "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+          "bank-connector-plugin-interface-decision-5d2e8a17": 0,
+          "categorization-rules-priority-ordering-0d4f9b13": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+          "ofx-importer-currency-handling-2f5d8a6c": 0,
+          "settings-file-migration-to-toml-e94b1d26": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        }
+      }
     },
     {
       "id": "L28",
@@ -713,6 +1292,8 @@
       "query": "the theme goes back to light every time I restart",
       "queryMode": "auto",
       "judgments": {
+        "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+        "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
         "categorization-rules-priority-ordering-0d4f9b13": 0,
         "cli-command-structure-and-exit-codes-3c9e0a52": 0,
         "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
@@ -730,7 +1311,28 @@
         "ui-dark-mode-toggle-persistence-7f3a0c48": 3,
         "web-ui-transactions-virtual-scrolling-b4e8c293": 0
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        },
+        "2": {
+          "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+          "daemon-startup-health-check-c0e6b915": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "encryption-at-rest-config-key-41c7f0ae": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "local-api-json-error-envelope-8d4b1f67": 0,
+          "settings-file-migration-to-toml-e94b1d26": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        }
+      }
     },
     {
       "id": "L29",
@@ -746,6 +1348,8 @@
         "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
         "daily-balance-snapshot-job-5e9c3b84": 0,
         "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+        "encryption-at-rest-config-key-41c7f0ae": 0,
+        "http-api-scoped-tokens-per-client-9e1c6b38": 0,
         "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
         "local-api-json-error-envelope-8d4b1f67": 0,
         "logging-redaction-of-account-numbers-a2c8f750": 0,
@@ -754,7 +1358,28 @@
         "web-ui-transactions-paged-list-6a0b7f15": 3,
         "web-ui-transactions-virtual-scrolling-b4e8c293": 2
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 1,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 2
+        },
+        "2": {
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 1,
+          "categorization-rules-priority-ordering-0d4f9b13": 0,
+          "categorization-rules-regex-first-version-5c8e1a77": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+          "encryption-at-rest-config-key-41c7f0ae": 0,
+          "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+          "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        }
+      }
     },
     {
       "id": "L30",
@@ -765,13 +1390,16 @@
       "judgments": {
         "account-linking-flow-for-bank-connections-0b7d6e31": 0,
         "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+        "categorization-rules-priority-ordering-0d4f9b13": 0,
         "csv-importer-bank-export-parsing-3a1f0c21": 0,
         "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
         "daemon-startup-health-check-c0e6b915": 0,
         "daily-balance-snapshot-job-5e9c3b84": 0,
         "encryption-at-rest-config-key-41c7f0ae": 0,
         "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+        "http-api-static-token-auth-d2f7a041": 0,
         "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
         "local-api-json-error-envelope-8d4b1f67": 0,
         "logging-redaction-of-account-numbers-a2c8f750": 0,
         "settings-file-migration-to-toml-e94b1d26": 0,
@@ -781,7 +1409,28 @@
         "web-ui-transactions-paged-list-6a0b7f15": 2,
         "web-ui-transactions-virtual-scrolling-b4e8c293": 3
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0
+        },
+        "2": {
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+          "categorization-rules-priority-ordering-0d4f9b13": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "http-api-static-token-auth-d2f7a041": 0,
+          "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+          "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+          "local-api-json-error-envelope-8d4b1f67": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0
+        }
+      }
     },
     {
       "id": "LN01",
@@ -791,13 +1440,16 @@
       "queryMode": "auto",
       "judgments": {
         "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+        "categorization-rule-tester-command-6b5c9e04": 0,
         "categorization-rules-priority-ordering-0d4f9b13": 0,
         "categorization-rules-regex-first-version-5c8e1a77": 0,
         "csv-importer-bank-export-parsing-3a1f0c21": 0,
         "daemon-startup-health-check-c0e6b915": 0,
         "daily-balance-snapshot-job-5e9c3b84": 0,
+        "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
         "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
         "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+        "local-api-json-error-envelope-8d4b1f67": 0,
         "logging-redaction-of-account-numbers-a2c8f750": 0,
         "ofx-importer-statement-header-parsing-c71e0b94": 0,
         "sync-scheduler-exponential-backoff-88f1d2b4": 0,
@@ -806,7 +1458,29 @@
         "web-ui-transactions-paged-list-6a0b7f15": 0,
         "web-ui-transactions-virtual-scrolling-b4e8c293": 0
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0
+        },
+        "2": {
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+          "categorization-rule-tester-command-6b5c9e04": 0,
+          "csv-importer-bank-export-parsing-3a1f0c21": 0,
+          "daemon-startup-health-check-c0e6b915": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+          "local-api-json-error-envelope-8d4b1f67": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+          "web-ui-transactions-paged-list-6a0b7f15": 0
+        }
+      }
     },
     {
       "id": "LN02",
@@ -819,6 +1493,7 @@
         "categorization-rules-priority-ordering-0d4f9b13": 0,
         "cli-command-structure-and-exit-codes-3c9e0a52": 0,
         "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "daemon-startup-health-check-c0e6b915": 0,
         "daily-balance-snapshot-job-5e9c3b84": 0,
         "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
         "encryption-at-rest-config-key-41c7f0ae": 0,
@@ -827,13 +1502,38 @@
         "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
         "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
         "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "ofx-importer-statement-header-parsing-c71e0b94": 0,
+        "retry-policy-for-bank-connector-timeouts-4b3a9f20": 0,
         "settings-file-migration-to-toml-e94b1d26": 0,
         "sync-scheduler-exponential-backoff-88f1d2b4": 0,
         "sync-scheduler-fixed-interval-e2a6c590": 0,
         "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+        "web-ui-transactions-paged-list-6a0b7f15": 0,
         "web-ui-transactions-virtual-scrolling-b4e8c293": 0
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        },
+        "2": {
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daemon-startup-health-check-c0e6b915": 0,
+          "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+          "http-api-static-token-auth-d2f7a041": 0,
+          "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+          "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+          "logging-redaction-of-account-numbers-a2c8f750": 0,
+          "ofx-importer-statement-header-parsing-c71e0b94": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+          "web-ui-transactions-paged-list-6a0b7f15": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        }
+      }
     },
     {
       "id": "LN03",
@@ -843,6 +1543,7 @@
       "queryMode": "auto",
       "judgments": {
         "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+        "backup-export-of-local-database-3e0a7d92": 0,
         "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
         "categorization-rule-tester-command-6b5c9e04": 0,
         "categorization-rules-priority-ordering-0d4f9b13": 0,
@@ -858,12 +1559,35 @@
         "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
         "local-api-json-error-envelope-8d4b1f67": 0,
         "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "ofx-importer-currency-handling-2f5d8a6c": 0,
         "settings-file-migration-to-toml-e94b1d26": 0,
         "sync-scheduler-exponential-backoff-88f1d2b4": 0,
         "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
         "web-ui-transactions-virtual-scrolling-b4e8c293": 0
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "ofx-importer-currency-handling-2f5d8a6c": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0
+        },
+        "2": {
+          "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+          "backup-export-of-local-database-3e0a7d92": 0,
+          "categorization-rule-tester-command-6b5c9e04": 0,
+          "categorization-rules-priority-ordering-0d4f9b13": 0,
+          "categorization-rules-regex-first-version-5c8e1a77": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "encryption-at-rest-config-key-41c7f0ae": 0,
+          "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+          "ofx-importer-currency-handling-2f5d8a6c": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0
+        }
+      }
     },
     {
       "id": "LN04",
@@ -874,6 +1598,8 @@
       "judgments": {
         "account-linking-flow-for-bank-connections-0b7d6e31": 0,
         "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+        "categorization-rules-regex-first-version-5c8e1a77": 0,
+        "cli-command-structure-and-exit-codes-3c9e0a52": 0,
         "csv-importer-bank-export-parsing-3a1f0c21": 0,
         "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
         "daily-balance-snapshot-job-5e9c3b84": 0,
@@ -888,7 +1614,28 @@
         "web-ui-transactions-paged-list-6a0b7f15": 0,
         "web-ui-transactions-virtual-scrolling-b4e8c293": 0
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        },
+        "2": {
+          "categorization-rules-regex-first-version-5c8e1a77": 0,
+          "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+          "csv-importer-bank-export-parsing-3a1f0c21": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "encryption-at-rest-config-key-41c7f0ae": 0,
+          "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+          "http-api-static-token-auth-d2f7a041": 0,
+          "settings-file-migration-to-toml-e94b1d26": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        }
+      }
     },
     {
       "id": "LN05",
@@ -900,8 +1647,10 @@
         "account-linking-flow-for-bank-connections-0b7d6e31": 0,
         "bank-connector-plugin-interface-decision-5d2e8a17": 0,
         "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+        "categorization-rules-priority-ordering-0d4f9b13": 0,
         "cli-command-structure-and-exit-codes-3c9e0a52": 0,
         "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "daemon-startup-health-check-c0e6b915": 0,
         "daily-balance-snapshot-job-5e9c3b84": 0,
         "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
         "http-api-scoped-tokens-per-client-9e1c6b38": 0,
@@ -913,9 +1662,29 @@
         "sync-scheduler-exponential-backoff-88f1d2b4": 0,
         "sync-scheduler-fixed-interval-e2a6c590": 0,
         "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+        "web-ui-transactions-paged-list-6a0b7f15": 0,
         "web-ui-transactions-virtual-scrolling-b4e8c293": 0
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0
+        },
+        "2": {
+          "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+          "bank-connector-plugin-interface-decision-5d2e8a17": 0,
+          "categorization-rules-priority-ordering-0d4f9b13": 0,
+          "daemon-startup-health-check-c0e6b915": 0,
+          "http-api-static-token-auth-d2f7a041": 0,
+          "local-api-json-error-envelope-8d4b1f67": 0,
+          "retry-policy-for-bank-connector-timeouts-4b3a9f20": 0,
+          "settings-file-migration-to-toml-e94b1d26": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+          "web-ui-transactions-paged-list-6a0b7f15": 0
+        }
+      }
     },
     {
       "id": "LN06",
@@ -929,11 +1698,13 @@
         "categorization-rule-tester-command-6b5c9e04": 0,
         "categorization-rules-priority-ordering-0d4f9b13": 0,
         "categorization-rules-regex-first-version-5c8e1a77": 0,
+        "cli-command-structure-and-exit-codes-3c9e0a52": 0,
         "csv-importer-bank-export-parsing-3a1f0c21": 0,
         "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
         "daemon-startup-health-check-c0e6b915": 0,
         "daily-balance-snapshot-job-5e9c3b84": 0,
         "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+        "http-api-scoped-tokens-per-client-9e1c6b38": 0,
         "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
         "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
         "local-api-json-error-envelope-8d4b1f67": 0,
@@ -941,9 +1712,29 @@
         "ofx-importer-currency-handling-2f5d8a6c": 0,
         "ofx-importer-statement-header-parsing-c71e0b94": 0,
         "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0,
         "web-ui-transactions-virtual-scrolling-b4e8c293": 0
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0
+        },
+        "2": {
+          "backup-export-of-local-database-3e0a7d92": 0,
+          "categorization-rules-regex-first-version-5c8e1a77": 0,
+          "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+          "csv-importer-bank-export-parsing-3a1f0c21": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+          "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+          "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+          "logging-redaction-of-account-numbers-a2c8f750": 0,
+          "ofx-importer-statement-header-parsing-c71e0b94": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0
+        }
+      }
     },
     {
       "id": "LT01",
@@ -956,6 +1747,7 @@
       },
       "judgments": {
         "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+        "backup-export-of-local-database-3e0a7d92": 0,
         "bank-connector-plugin-interface-decision-5d2e8a17": 0,
         "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
         "categorization-rule-tester-command-6b5c9e04": 0,
@@ -971,10 +1763,32 @@
         "ofx-importer-statement-header-parsing-c71e0b94": 0,
         "sync-scheduler-exponential-backoff-88f1d2b4": 0,
         "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
         "web-ui-transactions-paged-list-6a0b7f15": 0,
         "web-ui-transactions-virtual-scrolling-b4e8c293": 0
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        },
+        "2": {
+          "backup-export-of-local-database-3e0a7d92": 0,
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+          "categorization-rule-tester-command-6b5c9e04": 0,
+          "encryption-at-rest-config-key-41c7f0ae": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+          "logging-redaction-of-account-numbers-a2c8f750": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+          "web-ui-transactions-paged-list-6a0b7f15": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        }
+      }
     },
     {
       "id": "LT02",
@@ -989,6 +1803,7 @@
         "account-linking-flow-for-bank-connections-0b7d6e31": 0,
         "backup-export-of-local-database-3e0a7d92": 0,
         "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+        "cli-command-structure-and-exit-codes-3c9e0a52": 0,
         "csv-importer-bank-export-parsing-3a1f0c21": 0,
         "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
         "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
@@ -996,13 +1811,35 @@
         "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
         "local-api-json-error-envelope-8d4b1f67": 0,
         "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "ofx-importer-currency-handling-2f5d8a6c": 0,
         "ofx-importer-statement-header-parsing-c71e0b94": 0,
         "retry-policy-for-bank-connector-timeouts-4b3a9f20": 1,
+        "settings-file-migration-to-toml-e94b1d26": 0,
         "sync-scheduler-exponential-backoff-88f1d2b4": 3,
         "sync-scheduler-fixed-interval-e2a6c590": 2,
         "web-ui-transactions-virtual-scrolling-b4e8c293": 0
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "@rules": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "ofx-importer-currency-handling-2f5d8a6c": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        },
+        "2": {
+          "backup-export-of-local-database-3e0a7d92": 0,
+          "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+          "csv-importer-bank-export-parsing-3a1f0c21": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+          "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+          "ofx-importer-currency-handling-2f5d8a6c": 0,
+          "retry-policy-for-bank-connector-timeouts-4b3a9f20": 1,
+          "settings-file-migration-to-toml-e94b1d26": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0
+        }
+      }
     },
     {
       "id": "LT03",
@@ -1021,6 +1858,7 @@
         "cli-command-structure-and-exit-codes-3c9e0a52": 0,
         "csv-importer-bank-export-parsing-3a1f0c21": 0,
         "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
         "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
         "encryption-at-rest-config-key-41c7f0ae": 2,
         "encryption-at-rest-passphrase-derived-key-c39e5d62": 3,
@@ -1029,11 +1867,31 @@
         "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
         "logging-redaction-of-account-numbers-a2c8f750": 0,
         "ofx-importer-statement-header-parsing-c71e0b94": 0,
+        "retry-policy-for-bank-connector-timeouts-4b3a9f20": 0,
         "settings-file-migration-to-toml-e94b1d26": 0,
         "sync-scheduler-exponential-backoff-88f1d2b4": 0,
         "web-ui-transactions-virtual-scrolling-b4e8c293": 0
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0
+        },
+        "2": {
+          "backup-export-of-local-database-3e0a7d92": 1,
+          "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+          "csv-importer-bank-export-parsing-3a1f0c21": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+          "encryption-at-rest-config-key-41c7f0ae": 1,
+          "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+          "retry-policy-for-bank-connector-timeouts-4b3a9f20": 0,
+          "settings-file-migration-to-toml-e94b1d26": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0
+        }
+      }
     },
     {
       "id": "LT04",
@@ -1058,10 +1916,1930 @@
         "local-api-json-error-envelope-8d4b1f67": 2,
         "logging-redaction-of-account-numbers-a2c8f750": 3,
         "ofx-importer-statement-header-parsing-c71e0b94": 0,
+        "retry-policy-for-bank-connector-timeouts-4b3a9f20": 0,
+        "settings-file-migration-to-toml-e94b1d26": 0,
         "sync-scheduler-exponential-backoff-88f1d2b4": 0,
         "sync-scheduler-fixed-interval-e2a6c590": 0
       },
-      "origin": "approvers-a2-2026-10-15"
+      "origin": "approvers-a2-2026-10-15",
+      "layerJudgments": {
+        "1": {
+          "@rules": 3,
+          "daily-balance-snapshot-job-5e9c3b84": 0
+        },
+        "2": {
+          "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+          "categorization-rules-regex-first-version-5c8e1a77": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+          "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+          "local-api-json-error-envelope-8d4b1f67": 1,
+          "retry-policy-for-bank-connector-timeouts-4b3a9f20": 0,
+          "settings-file-migration-to-toml-e94b1d26": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0
+        }
+      }
+    },
+    {
+      "id": "LY01",
+      "family": "benchmark-sqlite-storage-for-transactions-e07d5c18",
+      "style": "layer",
+      "query": "what p95 read latency did SQLite reach with half a million rows",
+      "queryMode": "auto",
+      "judgments": {
+        "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+        "benchmark-sqlite-storage-for-transactions-e07d5c18": 1,
+        "categorization-rule-tester-command-6b5c9e04": 0,
+        "categorization-rules-priority-ordering-0d4f9b13": 0,
+        "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
+        "encryption-at-rest-config-key-41c7f0ae": 0,
+        "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+        "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "settings-file-migration-to-toml-e94b1d26": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+      },
+      "layerJudgments": {
+        "1": {
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 3,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        },
+        "2": {
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 1,
+          "categorization-rule-tester-command-6b5c9e04": 0,
+          "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "encryption-at-rest-config-key-41c7f0ae": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+          "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        }
+      },
+      "evidence": [
+        {
+          "sourcePath": "threads/benchmark-sqlite-storage-for-transactions-e07d5c18/artifacts/storage-benchmark.md",
+          "quote": "At 500,000 rows the p95 read latency is 180 ms, which is within the budget of 250 ms for the list."
+        }
+      ],
+      "origin": "approvers-e3-2026-10-22"
+    },
+    {
+      "id": "LY02",
+      "family": "ofx-importer-currency-handling-2f5d8a6c",
+      "style": "layer",
+      "query": "what happens to an OFX amount with more decimal places than its currency allows",
+      "queryMode": "auto",
+      "judgments": {
+        "categorization-rule-tester-command-6b5c9e04": 0,
+        "categorization-rules-priority-ordering-0d4f9b13": 0,
+        "categorization-rules-regex-first-version-5c8e1a77": 0,
+        "csv-importer-bank-export-parsing-3a1f0c21": 1,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+        "ofx-importer-currency-handling-2f5d8a6c": 1,
+        "ofx-importer-statement-header-parsing-c71e0b94": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "ui-dark-mode-toggle-persistence-7f3a0c48": 0
+      },
+      "layerJudgments": {
+        "1": {
+          "@rules": 2,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "ofx-importer-currency-handling-2f5d8a6c": 3,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0
+        },
+        "2": {
+          "categorization-rule-tester-command-6b5c9e04": 0,
+          "categorization-rules-priority-ordering-0d4f9b13": 0,
+          "categorization-rules-regex-first-version-5c8e1a77": 0,
+          "csv-importer-bank-export-parsing-3a1f0c21": 1,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+          "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+          "ofx-importer-currency-handling-2f5d8a6c": 1,
+          "ofx-importer-statement-header-parsing-c71e0b94": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0
+        }
+      },
+      "evidence": [
+        {
+          "sourcePath": "threads/ofx-importer-currency-handling-2f5d8a6c/artifacts/ofx-currency-analysis.md",
+          "quote": "it never rounds a value that has more digits than the exponent allows. Such a value is rejected with the line number."
+        }
+      ],
+      "origin": "approvers-e3-2026-10-22"
+    },
+    {
+      "id": "LY03",
+      "family": "csv-importer-column-mapping-and-header-detection-7b92e4d0",
+      "style": "layer",
+      "query": "which CSV layout does the importer refuse until someone confirms the columns",
+      "queryMode": "auto",
+      "judgments": {
+        "backup-export-of-local-database-3e0a7d92": 0,
+        "categorization-rule-tester-command-6b5c9e04": 0,
+        "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+        "csv-importer-bank-export-parsing-3a1f0c21": 1,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 2,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "ofx-importer-currency-handling-2f5d8a6c": 0,
+        "ofx-importer-statement-header-parsing-c71e0b94": 0,
+        "settings-file-migration-to-toml-e94b1d26": 0,
+        "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+        "web-ui-transactions-paged-list-6a0b7f15": 0
+      },
+      "layerJudgments": {
+        "1": {
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 3,
+          "ofx-importer-currency-handling-2f5d8a6c": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0
+        },
+        "2": {
+          "backup-export-of-local-database-3e0a7d92": 0,
+          "categorization-rule-tester-command-6b5c9e04": 0,
+          "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+          "csv-importer-bank-export-parsing-3a1f0c21": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 2,
+          "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+          "logging-redaction-of-account-numbers-a2c8f750": 0,
+          "ofx-importer-currency-handling-2f5d8a6c": 0,
+          "ofx-importer-statement-header-parsing-c71e0b94": 0,
+          "settings-file-migration-to-toml-e94b1d26": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+          "web-ui-transactions-paged-list-6a0b7f15": 0
+        }
+      },
+      "evidence": [
+        {
+          "sourcePath": "threads/csv-importer-column-mapping-and-header-detection-7b92e4d0/artifacts/column-mapping-fixtures.md",
+          "quote": "Variant 8 is rejected by design. The user confirms a mapping, and the confirmed mapping is then saved for the profile."
+        }
+      ],
+      "origin": "approvers-e3-2026-10-22"
+    },
+    {
+      "id": "LY04",
+      "family": "daily-balance-snapshot-job-5e9c3b84",
+      "style": "layer",
+      "query": "for how many days are balance snapshots kept at daily detail",
+      "queryMode": "auto",
+      "judgments": {
+        "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+        "csv-importer-bank-export-parsing-3a1f0c21": 0,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 1,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+        "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "ofx-importer-currency-handling-2f5d8a6c": 0,
+        "retry-policy-for-bank-connector-timeouts-4b3a9f20": 0,
+        "settings-file-migration-to-toml-e94b1d26": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+      },
+      "layerJudgments": {
+        "1": {
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 3,
+          "ofx-importer-currency-handling-2f5d8a6c": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        },
+        "2": {
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+          "csv-importer-bank-export-parsing-3a1f0c21": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 1,
+          "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+          "logging-redaction-of-account-numbers-a2c8f750": 0,
+          "ofx-importer-currency-handling-2f5d8a6c": 0,
+          "retry-policy-for-bank-connector-timeouts-4b3a9f20": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        }
+      },
+      "evidence": [
+        {
+          "sourcePath": "threads/daily-balance-snapshot-job-5e9c3b84/artifacts/snapshot-retention-notes.md",
+          "quote": "Snapshots are kept at full daily detail for ninety days. Older snapshots are compacted into one value per month"
+        }
+      ],
+      "origin": "approvers-e3-2026-10-22"
+    },
+    {
+      "id": "LY05",
+      "family": "encryption-at-rest-passphrase-derived-key-c39e5d62",
+      "style": "layer",
+      "query": "how much time does deriving the key from the passphrase add when the daemon starts",
+      "queryMode": "auto",
+      "judgments": {
+        "backup-export-of-local-database-3e0a7d92": 0,
+        "categorization-rule-tester-command-6b5c9e04": 0,
+        "categorization-rules-priority-ordering-0d4f9b13": 0,
+        "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+        "daemon-startup-health-check-c0e6b915": 0,
+        "encryption-at-rest-config-key-41c7f0ae": 1,
+        "encryption-at-rest-passphrase-derived-key-c39e5d62": 1,
+        "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+        "http-api-static-token-auth-d2f7a041": 0,
+        "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "settings-file-migration-to-toml-e94b1d26": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0
+      },
+      "layerJudgments": {
+        "1": {
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 3
+        },
+        "2": {
+          "categorization-rule-tester-command-6b5c9e04": 0,
+          "categorization-rules-priority-ordering-0d4f9b13": 0,
+          "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+          "daemon-startup-health-check-c0e6b915": 0,
+          "encryption-at-rest-config-key-41c7f0ae": 1,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 1,
+          "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+          "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+          "logging-redaction-of-account-numbers-a2c8f750": 0,
+          "settings-file-migration-to-toml-e94b1d26": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0
+        }
+      },
+      "evidence": [
+        {
+          "sourcePath": "threads/encryption-at-rest-passphrase-derived-key-c39e5d62/artifacts/kdf-parameters.md",
+          "quote": "The startup delay measured on the reference laptop is about 0.6 seconds."
+        }
+      ],
+      "origin": "approvers-e3-2026-10-22"
+    },
+    {
+      "id": "LY06",
+      "family": "ui-dark-mode-toggle-persistence-7f3a0c48",
+      "style": "layer",
+      "query": "which theme does the web UI use when the saved theme value is corrupt",
+      "queryMode": "auto",
+      "judgments": {
+        "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+        "daemon-startup-health-check-c0e6b915": 0,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+        "encryption-at-rest-config-key-41c7f0ae": 0,
+        "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+        "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+        "http-api-static-token-auth-d2f7a041": 0,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "local-api-json-error-envelope-8d4b1f67": 0,
+        "settings-file-migration-to-toml-e94b1d26": 0,
+        "ui-dark-mode-toggle-persistence-7f3a0c48": 1,
+        "web-ui-transactions-paged-list-6a0b7f15": 0,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+      },
+      "layerJudgments": {
+        "1": {
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 3,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        },
+        "2": {
+          "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+          "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+          "encryption-at-rest-config-key-41c7f0ae": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+          "http-api-static-token-auth-d2f7a041": 0,
+          "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+          "local-api-json-error-envelope-8d4b1f67": 0,
+          "settings-file-migration-to-toml-e94b1d26": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 1,
+          "web-ui-transactions-paged-list-6a0b7f15": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        }
+      },
+      "evidence": [
+        {
+          "sourcePath": "threads/ui-dark-mode-toggle-persistence-7f3a0c48/artifacts/theme-persistence-checks.md",
+          "quote": "A corrupt value falls back to light theme and writes a warning to the log."
+        }
+      ],
+      "origin": "approvers-e3-2026-10-22"
+    },
+    {
+      "id": "LY07",
+      "family": "web-ui-transactions-virtual-scrolling-b4e8c293",
+      "style": "layer",
+      "query": "what does the continuous transaction list cost in first paint and memory compared to pages",
+      "queryMode": "auto",
+      "judgments": {
+        "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+        "categorization-rules-priority-ordering-0d4f9b13": 0,
+        "categorization-rules-regex-first-version-5c8e1a77": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+        "encryption-at-rest-config-key-41c7f0ae": 0,
+        "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+        "web-ui-transactions-paged-list-6a0b7f15": 1,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 1
+      },
+      "layerJudgments": {
+        "1": {
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 1,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 3
+        },
+        "2": {
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 1,
+          "categorization-rules-priority-ordering-0d4f9b13": 0,
+          "categorization-rules-regex-first-version-5c8e1a77": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+          "encryption-at-rest-config-key-41c7f0ae": 0,
+          "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+          "logging-redaction-of-account-numbers-a2c8f750": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+          "web-ui-transactions-paged-list-6a0b7f15": 1,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 1
+        }
+      },
+      "evidence": [
+        {
+          "sourcePath": "threads/web-ui-transactions-virtual-scrolling-b4e8c293/artifacts/scrolling-measurements.md",
+          "quote": "The virtual list is slower on the first paint and uses more memory, but it keeps one scroll position across the whole history."
+        }
+      ],
+      "origin": "approvers-e3-2026-10-22"
+    },
+    {
+      "id": "LY08",
+      "family": "retry-policy-for-bank-connector-timeouts-4b3a9f20",
+      "style": "layer",
+      "query": "how many attempts are made before a timing out bank connection is flagged as stale",
+      "queryMode": "auto",
+      "judgments": {
+        "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+        "bank-connector-plugin-interface-decision-5d2e8a17": 0,
+        "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+        "csv-importer-bank-export-parsing-3a1f0c21": 0,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+        "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "retry-policy-for-bank-connector-timeouts-4b3a9f20": 1,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 1,
+        "sync-scheduler-fixed-interval-e2a6c590": 0
+      },
+      "layerJudgments": {
+        "1": {
+          "@rules": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0
+        },
+        "2": {
+          "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+          "bank-connector-plugin-interface-decision-5d2e8a17": 0,
+          "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+          "retry-policy-for-bank-connector-timeouts-4b3a9f20": 3,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 1,
+          "sync-scheduler-fixed-interval-e2a6c590": 0
+        }
+      },
+      "evidence": [
+        {
+          "sourcePath": "threads/retry-policy-for-bank-connector-timeouts-4b3a9f20/CHAT.md",
+          "quote": "retry three times over a fifteen minute window, then mark the connection as stale"
+        }
+      ],
+      "origin": "approvers-e3-2026-10-22"
+    },
+    {
+      "id": "LY09",
+      "family": "key-rotation-procedure-for-encrypted-store-a85f3e27",
+      "style": "layer",
+      "query": "every how many days is the data encryption key rotated",
+      "queryMode": "auto",
+      "judgments": {
+        "backup-export-of-local-database-3e0a7d92": 0,
+        "bank-connector-plugin-interface-decision-5d2e8a17": 0,
+        "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+        "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+        "daemon-startup-health-check-c0e6b915": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
+        "encryption-at-rest-config-key-41c7f0ae": 0,
+        "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+        "http-api-static-token-auth-d2f7a041": 0,
+        "key-rotation-procedure-for-encrypted-store-a85f3e27": 1,
+        "ofx-importer-currency-handling-2f5d8a6c": 0,
+        "settings-file-migration-to-toml-e94b1d26": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+      },
+      "layerJudgments": {
+        "1": {
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "ofx-importer-currency-handling-2f5d8a6c": 0
+        },
+        "2": {
+          "bank-connector-plugin-interface-decision-5d2e8a17": 0,
+          "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+          "daemon-startup-health-check-c0e6b915": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "encryption-at-rest-config-key-41c7f0ae": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "http-api-static-token-auth-d2f7a041": 0,
+          "key-rotation-procedure-for-encrypted-store-a85f3e27": 3,
+          "ofx-importer-currency-handling-2f5d8a6c": 0,
+          "settings-file-migration-to-toml-e94b1d26": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0
+        }
+      },
+      "evidence": [
+        {
+          "sourcePath": "threads/key-rotation-procedure-for-encrypted-store-a85f3e27/CHAT.md",
+          "quote": "rotate the data-encryption key every ninety days by rewrapping it"
+        }
+      ],
+      "origin": "approvers-e3-2026-10-22"
+    },
+    {
+      "id": "LY10",
+      "family": "key-rotation-procedure-for-encrypted-store-a85f3e27",
+      "style": "layer",
+      "query": "does changing the store key mean re-encrypting all the data and taking the database offline",
+      "queryMode": "auto",
+      "judgments": {
+        "backup-export-of-local-database-3e0a7d92": 0,
+        "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+        "daemon-startup-health-check-c0e6b915": 0,
+        "encryption-at-rest-config-key-41c7f0ae": 0,
+        "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+        "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+        "http-api-static-token-auth-d2f7a041": 0,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "key-rotation-procedure-for-encrypted-store-a85f3e27": 1,
+        "settings-file-migration-to-toml-e94b1d26": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+      },
+      "layerJudgments": {
+        "1": {
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        },
+        "2": {
+          "backup-export-of-local-database-3e0a7d92": 0,
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+          "daemon-startup-health-check-c0e6b915": 0,
+          "encryption-at-rest-config-key-41c7f0ae": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "http-api-static-token-auth-d2f7a041": 0,
+          "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+          "key-rotation-procedure-for-encrypted-store-a85f3e27": 3,
+          "settings-file-migration-to-toml-e94b1d26": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        }
+      },
+      "evidence": [
+        {
+          "sourcePath": "threads/key-rotation-procedure-for-encrypted-store-a85f3e27/CHAT.md",
+          "quote": "The payload is not re-encrypted, so the rotation takes seconds and the database stays available."
+        }
+      ],
+      "origin": "approvers-e3-2026-10-22"
+    },
+    {
+      "id": "LY11",
+      "family": "@rules",
+      "style": "layer",
+      "query": "which file holds the CLI reference that a command change has to update",
+      "queryMode": "auto",
+      "judgments": {
+        "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+        "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+        "categorization-rule-tester-command-6b5c9e04": 0,
+        "categorization-rules-priority-ordering-0d4f9b13": 0,
+        "cli-command-structure-and-exit-codes-3c9e0a52": 1,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "encryption-at-rest-config-key-41c7f0ae": 0,
+        "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+        "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+        "http-api-static-token-auth-d2f7a041": 0,
+        "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+        "ofx-importer-statement-header-parsing-c71e0b94": 0,
+        "settings-file-migration-to-toml-e94b1d26": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+      },
+      "layerJudgments": {
+        "1": {
+          "@rules": 3,
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        },
+        "2": {
+          "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+          "categorization-rule-tester-command-6b5c9e04": 0,
+          "categorization-rules-priority-ordering-0d4f9b13": 0,
+          "cli-command-structure-and-exit-codes-3c9e0a52": 1,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+          "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+          "ofx-importer-statement-header-parsing-c71e0b94": 0,
+          "settings-file-migration-to-toml-e94b1d26": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        }
+      },
+      "evidence": [
+        {
+          "sourcePath": "RULES.md",
+          "quote": "A change to a public CLI command must update the CLI reference in docs/cli.md."
+        }
+      ],
+      "origin": "approvers-e3-2026-10-22"
+    },
+    {
+      "id": "LY12",
+      "family": "@rules",
+      "style": "layer",
+      "query": "in which format should the web interface display dates",
+      "queryMode": "auto",
+      "judgments": {
+        "backup-export-of-local-database-3e0a7d92": 0,
+        "bank-connector-plugin-interface-decision-5d2e8a17": 0,
+        "csv-importer-bank-export-parsing-3a1f0c21": 0,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
+        "encryption-at-rest-config-key-41c7f0ae": 0,
+        "http-api-static-token-auth-d2f7a041": 0,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "local-api-json-error-envelope-8d4b1f67": 0,
+        "retry-policy-for-bank-connector-timeouts-4b3a9f20": 0,
+        "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+        "web-ui-transactions-paged-list-6a0b7f15": 1,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+      },
+      "layerJudgments": {
+        "1": {
+          "@rules": 3,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        },
+        "2": {
+          "backup-export-of-local-database-3e0a7d92": 0,
+          "bank-connector-plugin-interface-decision-5d2e8a17": 0,
+          "csv-importer-bank-export-parsing-3a1f0c21": 0,
+          "encryption-at-rest-config-key-41c7f0ae": 0,
+          "http-api-static-token-auth-d2f7a041": 0,
+          "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+          "local-api-json-error-envelope-8d4b1f67": 0,
+          "retry-policy-for-bank-connector-timeouts-4b3a9f20": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+          "web-ui-transactions-paged-list-6a0b7f15": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        }
+      },
+      "evidence": [
+        {
+          "sourcePath": "RULES.md",
+          "quote": "The web UI strings are written in en-US, and dates are rendered in ISO 8601."
+        }
+      ],
+      "origin": "approvers-e3-2026-10-22"
+    },
+    {
+      "id": "LY13",
+      "family": "@rules",
+      "style": "layer",
+      "query": "how does running the same import file twice stay idempotent",
+      "queryMode": "auto",
+      "judgments": {
+        "backup-export-of-local-database-3e0a7d92": 0,
+        "categorization-rule-tester-command-6b5c9e04": 0,
+        "categorization-rules-priority-ordering-0d4f9b13": 0,
+        "csv-importer-bank-export-parsing-3a1f0c21": 0,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 2,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 1,
+        "ofx-importer-statement-header-parsing-c71e0b94": 0,
+        "settings-file-migration-to-toml-e94b1d26": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+      },
+      "layerJudgments": {
+        "1": {
+          "@rules": 3,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        },
+        "2": {
+          "categorization-rule-tester-command-6b5c9e04": 0,
+          "categorization-rules-priority-ordering-0d4f9b13": 0,
+          "csv-importer-bank-export-parsing-3a1f0c21": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "duplicate-transaction-detection-by-fingerprint-f16a2d09": 1,
+          "import-batch-size-limits-and-progress-events-1d8f2a73": 1,
+          "ofx-importer-statement-header-parsing-c71e0b94": 0,
+          "settings-file-migration-to-toml-e94b1d26": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        }
+      },
+      "evidence": [
+        {
+          "sourcePath": "RULES.md",
+          "quote": "Every import keeps the SHA-256 of the source file, so that a repeated run is idempotent."
+        }
+      ],
+      "origin": "approvers-e3-2026-10-22"
+    },
+    {
+      "id": "LY14",
+      "family": "categorization-rule-tester-command-6b5c9e04",
+      "style": "layer",
+      "query": "which exit code does the rule tester return when some sample has no matching rule",
+      "queryMode": "auto",
+      "judgments": {
+        "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+        "categorization-rule-tester-command-6b5c9e04": 2,
+        "categorization-rules-priority-ordering-0d4f9b13": 0,
+        "categorization-rules-regex-first-version-5c8e1a77": 1,
+        "cli-command-structure-and-exit-codes-3c9e0a52": 1,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "local-api-json-error-envelope-8d4b1f67": 0,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "ofx-importer-currency-handling-2f5d8a6c": 0,
+        "ofx-importer-statement-header-parsing-c71e0b94": 0,
+        "settings-file-migration-to-toml-e94b1d26": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0
+      },
+      "layerJudgments": {
+        "1": {
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "ofx-importer-currency-handling-2f5d8a6c": 0
+        },
+        "2": {
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+          "categorization-rule-tester-command-6b5c9e04": 3,
+          "categorization-rules-priority-ordering-0d4f9b13": 0,
+          "categorization-rules-regex-first-version-5c8e1a77": 1,
+          "cli-command-structure-and-exit-codes-3c9e0a52": 1,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "local-api-json-error-envelope-8d4b1f67": 0,
+          "logging-redaction-of-account-numbers-a2c8f750": 0,
+          "ofx-importer-statement-header-parsing-c71e0b94": 0,
+          "settings-file-migration-to-toml-e94b1d26": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0
+        }
+      },
+      "evidence": [
+        {
+          "sourcePath": "threads/categorization-rule-tester-command-6b5c9e04/CHAT.md",
+          "quote": "with code one, the business failure code defined in the CLI command structure, when at least one transaction has none"
+        }
+      ],
+      "origin": "approvers-e3-2026-10-22"
+    },
+    {
+      "id": "LY15",
+      "family": "daily-balance-snapshot-job-5e9c3b84",
+      "style": "layer",
+      "query": "can the monthly compaction of old balance values be interrupted safely",
+      "queryMode": "auto",
+      "judgments": {
+        "categorization-rules-regex-first-version-5c8e1a77": 0,
+        "csv-importer-bank-export-parsing-3a1f0c21": 0,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 1,
+        "encryption-at-rest-config-key-41c7f0ae": 0,
+        "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+        "http-api-static-token-auth-d2f7a041": 0,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 1,
+        "retry-policy-for-bank-connector-timeouts-4b3a9f20": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+        "web-ui-transactions-paged-list-6a0b7f15": 0,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+      },
+      "layerJudgments": {
+        "1": {
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 3,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        },
+        "2": {
+          "categorization-rules-regex-first-version-5c8e1a77": 0,
+          "csv-importer-bank-export-parsing-3a1f0c21": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 1,
+          "encryption-at-rest-config-key-41c7f0ae": 0,
+          "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+          "http-api-static-token-auth-d2f7a041": 0,
+          "retry-policy-for-bank-connector-timeouts-4b3a9f20": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 1,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+          "web-ui-transactions-paged-list-6a0b7f15": 0
+        }
+      },
+      "evidence": [
+        {
+          "sourcePath": "threads/daily-balance-snapshot-job-5e9c3b84/artifacts/snapshot-retention-notes.md",
+          "quote": "The job is safe to stop, because each month is written in one transaction and the source days are removed only after the write commits."
+        }
+      ],
+      "origin": "approvers-e3-2026-10-22"
+    },
+    {
+      "id": "LY16",
+      "family": "ui-dark-mode-toggle-persistence-7f3a0c48",
+      "style": "layer",
+      "query": "does switching between light and dark theme reload the page",
+      "queryMode": "auto",
+      "judgments": {
+        "categorization-rules-priority-ordering-0d4f9b13": 0,
+        "daemon-startup-health-check-c0e6b915": 0,
+        "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+        "local-api-json-error-envelope-8d4b1f67": 0,
+        "retry-policy-for-bank-connector-timeouts-4b3a9f20": 0,
+        "settings-file-migration-to-toml-e94b1d26": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "ui-dark-mode-toggle-persistence-7f3a0c48": 1,
+        "web-ui-transactions-paged-list-6a0b7f15": 0,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+      },
+      "layerJudgments": {
+        "1": {
+          "@rules": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 3,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        },
+        "2": {
+          "categorization-rules-priority-ordering-0d4f9b13": 0,
+          "daemon-startup-health-check-c0e6b915": 0,
+          "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+          "local-api-json-error-envelope-8d4b1f67": 0,
+          "retry-policy-for-bank-connector-timeouts-4b3a9f20": 0,
+          "settings-file-migration-to-toml-e94b1d26": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 1,
+          "web-ui-transactions-paged-list-6a0b7f15": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        }
+      },
+      "evidence": [
+        {
+          "sourcePath": "threads/ui-dark-mode-toggle-persistence-7f3a0c48/artifacts/theme-persistence-checks.md",
+          "quote": "Switching theme does not reload the page, and the chart colors update with the theme."
+        }
+      ],
+      "origin": "approvers-e3-2026-10-23"
+    },
+    {
+      "id": "LY17",
+      "family": "encryption-at-rest-passphrase-derived-key-c39e5d62",
+      "style": "layer",
+      "query": "what does the interface show while the key is being derived from the passphrase",
+      "queryMode": "auto",
+      "judgments": {
+        "backup-export-of-local-database-3e0a7d92": 0,
+        "bank-connector-plugin-interface-decision-5d2e8a17": 0,
+        "categorization-rules-regex-first-version-5c8e1a77": 0,
+        "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "encryption-at-rest-config-key-41c7f0ae": 1,
+        "encryption-at-rest-passphrase-derived-key-c39e5d62": 1,
+        "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+        "local-api-json-error-envelope-8d4b1f67": 0,
+        "retry-policy-for-bank-connector-timeouts-4b3a9f20": 0,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+      },
+      "layerJudgments": {
+        "1": {
+          "@rules": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 3,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        },
+        "2": {
+          "backup-export-of-local-database-3e0a7d92": 0,
+          "bank-connector-plugin-interface-decision-5d2e8a17": 0,
+          "categorization-rules-regex-first-version-5c8e1a77": 0,
+          "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "encryption-at-rest-config-key-41c7f0ae": 1,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 1,
+          "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+          "local-api-json-error-envelope-8d4b1f67": 0,
+          "retry-policy-for-bank-connector-timeouts-4b3a9f20": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        }
+      },
+      "evidence": [
+        {
+          "sourcePath": "threads/encryption-at-rest-passphrase-derived-key-c39e5d62/artifacts/kdf-parameters.md",
+          "quote": "The delay is intentional and the UI shows a progress line while it runs."
+        }
+      ],
+      "origin": "approvers-e3-2026-10-23"
+    },
+    {
+      "id": "LY18",
+      "family": "encryption-at-rest-passphrase-derived-key-c39e5d62",
+      "style": "layer",
+      "query": "how much memory and how many iterations does the passphrase hashing use",
+      "queryMode": "auto",
+      "judgments": {
+        "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+        "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+        "csv-importer-bank-export-parsing-3a1f0c21": 0,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
+        "encryption-at-rest-config-key-41c7f0ae": 1,
+        "encryption-at-rest-passphrase-derived-key-c39e5d62": 1,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "ofx-importer-statement-header-parsing-c71e0b94": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+      },
+      "layerJudgments": {
+        "1": {
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 3,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        },
+        "2": {
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+          "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+          "csv-importer-bank-export-parsing-3a1f0c21": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "encryption-at-rest-config-key-41c7f0ae": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 1,
+          "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+          "logging-redaction-of-account-numbers-a2c8f750": 0,
+          "ofx-importer-statement-header-parsing-c71e0b94": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        }
+      },
+      "evidence": [
+        {
+          "sourcePath": "threads/encryption-at-rest-passphrase-derived-key-c39e5d62/artifacts/kdf-parameters.md",
+          "quote": "Function memory-hard password hash Memory cost 64 MiB Iterations 3"
+        }
+      ],
+      "origin": "approvers-e3-2026-10-23"
+    },
+    {
+      "id": "LY19",
+      "family": "benchmark-sqlite-storage-for-transactions-e07d5c18",
+      "style": "layer",
+      "query": "how long does writing a batch of a thousand transactions take when the table already holds half a million rows",
+      "queryMode": "auto",
+      "judgments": {
+        "backup-export-of-local-database-3e0a7d92": 0,
+        "benchmark-sqlite-storage-for-transactions-e07d5c18": 1,
+        "categorization-rules-regex-first-version-5c8e1a77": 0,
+        "csv-importer-bank-export-parsing-3a1f0c21": 0,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+        "http-api-static-token-auth-d2f7a041": 0,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 1,
+        "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "web-ui-transactions-paged-list-6a0b7f15": 0,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+      },
+      "layerJudgments": {
+        "1": {
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 3,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        },
+        "2": {
+          "backup-export-of-local-database-3e0a7d92": 0,
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 1,
+          "categorization-rules-regex-first-version-5c8e1a77": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "http-api-static-token-auth-d2f7a041": 0,
+          "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+          "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0,
+          "web-ui-transactions-paged-list-6a0b7f15": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        }
+      },
+      "evidence": [
+        {
+          "sourcePath": "threads/benchmark-sqlite-storage-for-transactions-e07d5c18/artifacts/storage-benchmark.md",
+          "quote": "Write batches of 1,000 rows take 0.9 s, so the sync jobs finish within their interval."
+        }
+      ],
+      "origin": "approvers-e3-2026-10-23"
+    },
+    {
+      "id": "LY20",
+      "family": "web-ui-transactions-virtual-scrolling-b4e8c293",
+      "style": "layer",
+      "query": "how quickly does the paged transaction list paint with eighty thousand rows",
+      "queryMode": "auto",
+      "judgments": {
+        "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+        "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+        "categorization-rules-priority-ordering-0d4f9b13": 0,
+        "categorization-rules-regex-first-version-5c8e1a77": 0,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+        "http-api-static-token-auth-d2f7a041": 0,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "web-ui-transactions-paged-list-6a0b7f15": 1,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 1
+      },
+      "layerJudgments": {
+        "1": {
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 1,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 3
+        },
+        "2": {
+          "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+          "http-api-static-token-auth-d2f7a041": 0,
+          "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+          "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0,
+          "web-ui-transactions-paged-list-6a0b7f15": 1,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 1
+        }
+      },
+      "evidence": [
+        {
+          "sourcePath": "threads/web-ui-transactions-virtual-scrolling-b4e8c293/artifacts/scrolling-measurements.md",
+          "quote": "Paged list, fifty rows per page 140 ms 16 ms 3 MB"
+        }
+      ],
+      "origin": "approvers-e3-2026-10-23"
+    },
+    {
+      "id": "LY21",
+      "family": "encryption-at-rest-passphrase-derived-key-c39e5d62",
+      "style": "layer",
+      "query": "is the salt for the passphrase derivation shared or different for each database",
+      "queryMode": "auto",
+      "judgments": {
+        "backup-export-of-local-database-3e0a7d92": 0,
+        "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+        "categorization-rules-priority-ordering-0d4f9b13": 0,
+        "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
+        "encryption-at-rest-config-key-41c7f0ae": 1,
+        "encryption-at-rest-passphrase-derived-key-c39e5d62": 1,
+        "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "ofx-importer-currency-handling-2f5d8a6c": 0,
+        "ofx-importer-statement-header-parsing-c71e0b94": 0,
+        "settings-file-migration-to-toml-e94b1d26": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0
+      },
+      "layerJudgments": {
+        "1": {
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 3,
+          "ofx-importer-currency-handling-2f5d8a6c": 0
+        },
+        "2": {
+          "backup-export-of-local-database-3e0a7d92": 0,
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+          "categorization-rules-priority-ordering-0d4f9b13": 0,
+          "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "encryption-at-rest-config-key-41c7f0ae": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 1,
+          "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+          "ofx-importer-currency-handling-2f5d8a6c": 0,
+          "ofx-importer-statement-header-parsing-c71e0b94": 0,
+          "settings-file-migration-to-toml-e94b1d26": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0
+        }
+      },
+      "evidence": [
+        {
+          "sourcePath": "threads/encryption-at-rest-passphrase-derived-key-c39e5d62/artifacts/kdf-parameters.md",
+          "quote": "Salt length 16 bytes, random per database"
+        }
+      ],
+      "origin": "approvers-e3-2026-10-23"
+    },
+    {
+      "id": "LI01",
+      "family": "account-linking-flow-for-bank-connections-0b7d6e31",
+      "style": "indirect",
+      "query": "what happens to past transactions once a bank no longer exposes one of my accounts",
+      "queryMode": "auto",
+      "judgments": {
+        "account-linking-flow-for-bank-connections-0b7d6e31": 3,
+        "categorization-rule-tester-command-6b5c9e04": 0,
+        "categorization-rules-priority-ordering-0d4f9b13": 0,
+        "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+        "csv-importer-bank-export-parsing-3a1f0c21": 0,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+        "encryption-at-rest-config-key-41c7f0ae": 0,
+        "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "ofx-importer-statement-header-parsing-c71e0b94": 0,
+        "retry-policy-for-bank-connector-timeouts-4b3a9f20": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0
+      },
+      "origin": "approvers-e3-2026-10-23",
+      "layerJudgments": {
+        "1": {
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0
+        },
+        "2": {
+          "categorization-rule-tester-command-6b5c9e04": 0,
+          "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+          "csv-importer-bank-export-parsing-3a1f0c21": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+          "encryption-at-rest-config-key-41c7f0ae": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "logging-redaction-of-account-numbers-a2c8f750": 0,
+          "ofx-importer-statement-header-parsing-c71e0b94": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0
+        }
+      }
+    },
+    {
+      "id": "LI02",
+      "family": "backup-export-of-local-database-3e0a7d92",
+      "style": "indirect",
+      "query": "can exporting a backup replace an older archive with the same name",
+      "queryMode": "auto",
+      "judgments": {
+        "backup-export-of-local-database-3e0a7d92": 3,
+        "categorization-rules-regex-first-version-5c8e1a77": 0,
+        "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+        "csv-importer-bank-export-parsing-3a1f0c21": 0,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "ofx-importer-statement-header-parsing-c71e0b94": 0,
+        "settings-file-migration-to-toml-e94b1d26": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+      },
+      "origin": "approvers-e3-2026-10-23",
+      "layerJudgments": {
+        "1": {
+          "@rules": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        },
+        "2": {
+          "categorization-rules-regex-first-version-5c8e1a77": 0,
+          "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+          "csv-importer-bank-export-parsing-3a1f0c21": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+          "logging-redaction-of-account-numbers-a2c8f750": 0,
+          "ofx-importer-statement-header-parsing-c71e0b94": 0,
+          "settings-file-migration-to-toml-e94b1d26": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        }
+      }
+    },
+    {
+      "id": "LI03",
+      "family": "bank-connector-plugin-interface-decision-5d2e8a17",
+      "style": "indirect",
+      "query": "why can third parties not yet build their own bank connectors against a stable API",
+      "queryMode": "auto",
+      "judgments": {
+        "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+        "bank-connector-plugin-interface-decision-5d2e8a17": 3,
+        "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "daemon-startup-health-check-c0e6b915": 0,
+        "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+        "http-api-static-token-auth-d2f7a041": 0,
+        "local-api-json-error-envelope-8d4b1f67": 0,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "retry-policy-for-bank-connector-timeouts-4b3a9f20": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0
+      },
+      "origin": "approvers-e3-2026-10-23",
+      "layerJudgments": {
+        "1": {
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0
+        },
+        "2": {
+          "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+          "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daemon-startup-health-check-c0e6b915": 0,
+          "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+          "http-api-static-token-auth-d2f7a041": 0,
+          "local-api-json-error-envelope-8d4b1f67": 0,
+          "logging-redaction-of-account-numbers-a2c8f750": 0,
+          "retry-policy-for-bank-connector-timeouts-4b3a9f20": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0
+        }
+      }
+    },
+    {
+      "id": "LI04",
+      "family": "cli-command-structure-and-exit-codes-3c9e0a52",
+      "style": "indirect",
+      "query": "which status code should a script expect from the CLI when the background service is down",
+      "queryMode": "auto",
+      "judgments": {
+        "backup-export-of-local-database-3e0a7d92": 0,
+        "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+        "categorization-rule-tester-command-6b5c9e04": 0,
+        "cli-command-structure-and-exit-codes-3c9e0a52": 3,
+        "daemon-startup-health-check-c0e6b915": 1,
+        "encryption-at-rest-config-key-41c7f0ae": 0,
+        "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+        "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+        "http-api-static-token-auth-d2f7a041": 0,
+        "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+        "local-api-json-error-envelope-8d4b1f67": 0,
+        "ofx-importer-statement-header-parsing-c71e0b94": 0,
+        "settings-file-migration-to-toml-e94b1d26": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0
+      },
+      "origin": "approvers-e3-2026-10-23",
+      "layerJudgments": {
+        "1": {
+          "@rules": 0,
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0
+        },
+        "2": {
+          "backup-export-of-local-database-3e0a7d92": 0,
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+          "categorization-rule-tester-command-6b5c9e04": 1,
+          "daemon-startup-health-check-c0e6b915": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+          "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+          "ofx-importer-statement-header-parsing-c71e0b94": 0,
+          "settings-file-migration-to-toml-e94b1d26": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0
+        }
+      }
+    },
+    {
+      "id": "LI05",
+      "family": "daemon-startup-health-check-c0e6b915",
+      "style": "indirect",
+      "query": "will the service refuse to boot when the disk is almost full",
+      "queryMode": "auto",
+      "judgments": {
+        "backup-export-of-local-database-3e0a7d92": 0,
+        "bank-connector-plugin-interface-decision-5d2e8a17": 0,
+        "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+        "categorization-rules-regex-first-version-5c8e1a77": 0,
+        "csv-importer-bank-export-parsing-3a1f0c21": 0,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "daemon-startup-health-check-c0e6b915": 3,
+        "encryption-at-rest-config-key-41c7f0ae": 0,
+        "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+        "http-api-static-token-auth-d2f7a041": 0,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "ui-dark-mode-toggle-persistence-7f3a0c48": 0
+      },
+      "origin": "approvers-e3-2026-10-23",
+      "layerJudgments": {
+        "1": {
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0
+        },
+        "2": {
+          "backup-export-of-local-database-3e0a7d92": 0,
+          "bank-connector-plugin-interface-decision-5d2e8a17": 0,
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "encryption-at-rest-config-key-41c7f0ae": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "http-api-static-token-auth-d2f7a041": 0,
+          "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+          "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0
+        }
+      }
+    },
+    {
+      "id": "LI06",
+      "family": "http-api-scoped-tokens-per-client-9e1c6b38",
+      "style": "indirect",
+      "query": "what does a script receive when it calls an endpoint its token was not granted",
+      "queryMode": "auto",
+      "judgments": {
+        "categorization-rules-priority-ordering-0d4f9b13": 0,
+        "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "daemon-startup-health-check-c0e6b915": 0,
+        "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+        "http-api-scoped-tokens-per-client-9e1c6b38": 3,
+        "http-api-static-token-auth-d2f7a041": 1,
+        "local-api-json-error-envelope-8d4b1f67": 1,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "ofx-importer-statement-header-parsing-c71e0b94": 0,
+        "settings-file-migration-to-toml-e94b1d26": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "ui-dark-mode-toggle-persistence-7f3a0c48": 0
+      },
+      "origin": "approvers-e3-2026-10-23",
+      "layerJudgments": {
+        "1": {
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0
+        },
+        "2": {
+          "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daemon-startup-health-check-c0e6b915": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "http-api-static-token-auth-d2f7a041": 0,
+          "local-api-json-error-envelope-8d4b1f67": 0,
+          "logging-redaction-of-account-numbers-a2c8f750": 0,
+          "ofx-importer-statement-header-parsing-c71e0b94": 0,
+          "settings-file-migration-to-toml-e94b1d26": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0
+        }
+      }
+    },
+    {
+      "id": "LI07",
+      "family": "import-batch-size-limits-and-progress-events-1d8f2a73",
+      "style": "indirect",
+      "query": "what range of rows per committed import chunk can be configured",
+      "queryMode": "auto",
+      "judgments": {
+        "bank-connector-plugin-interface-decision-5d2e8a17": 0,
+        "categorization-rules-regex-first-version-5c8e1a77": 0,
+        "csv-importer-bank-export-parsing-3a1f0c21": 0,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "daemon-startup-health-check-c0e6b915": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
+        "encryption-at-rest-config-key-41c7f0ae": 0,
+        "http-api-static-token-auth-d2f7a041": 0,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 3,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "ofx-importer-currency-handling-2f5d8a6c": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "web-ui-transactions-paged-list-6a0b7f15": 0,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+      },
+      "origin": "approvers-e3-2026-10-23",
+      "layerJudgments": {
+        "1": {
+          "@rules": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "ofx-importer-currency-handling-2f5d8a6c": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        },
+        "2": {
+          "bank-connector-plugin-interface-decision-5d2e8a17": 0,
+          "csv-importer-bank-export-parsing-3a1f0c21": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daemon-startup-health-check-c0e6b915": 0,
+          "encryption-at-rest-config-key-41c7f0ae": 0,
+          "http-api-static-token-auth-d2f7a041": 0,
+          "logging-redaction-of-account-numbers-a2c8f750": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0,
+          "web-ui-transactions-paged-list-6a0b7f15": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        }
+      }
+    },
+    {
+      "id": "LI08",
+      "family": "local-api-json-error-envelope-8d4b1f67",
+      "style": "indirect",
+      "query": "which fields come back in the body when a request to the local server fails",
+      "queryMode": "auto",
+      "judgments": {
+        "backup-export-of-local-database-3e0a7d92": 0,
+        "daemon-startup-health-check-c0e6b915": 0,
+        "encryption-at-rest-config-key-41c7f0ae": 0,
+        "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+        "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+        "http-api-static-token-auth-d2f7a041": 0,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "local-api-json-error-envelope-8d4b1f67": 3,
+        "settings-file-migration-to-toml-e94b1d26": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "web-ui-transactions-paged-list-6a0b7f15": 0,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+      },
+      "origin": "approvers-e3-2026-10-23",
+      "layerJudgments": {
+        "1": {
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        },
+        "2": {
+          "backup-export-of-local-database-3e0a7d92": 0,
+          "daemon-startup-health-check-c0e6b915": 0,
+          "encryption-at-rest-config-key-41c7f0ae": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+          "http-api-static-token-auth-d2f7a041": 0,
+          "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+          "settings-file-migration-to-toml-e94b1d26": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "web-ui-transactions-paged-list-6a0b7f15": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        }
+      }
+    },
+    {
+      "id": "LI09",
+      "family": "ofx-importer-statement-header-parsing-c71e0b94",
+      "style": "indirect",
+      "query": "is a reissued bank statement covering days I already imported rejected",
+      "queryMode": "auto",
+      "judgments": {
+        "categorization-rule-tester-command-6b5c9e04": 0,
+        "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+        "csv-importer-bank-export-parsing-3a1f0c21": 0,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 1,
+        "http-api-static-token-auth-d2f7a041": 0,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "ofx-importer-currency-handling-2f5d8a6c": 0,
+        "ofx-importer-statement-header-parsing-c71e0b94": 3,
+        "retry-policy-for-bank-connector-timeouts-4b3a9f20": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0
+      },
+      "origin": "approvers-e3-2026-10-23",
+      "layerJudgments": {
+        "1": {
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "ofx-importer-currency-handling-2f5d8a6c": 0
+        },
+        "2": {
+          "categorization-rule-tester-command-6b5c9e04": 0,
+          "csv-importer-bank-export-parsing-3a1f0c21": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "duplicate-transaction-detection-by-fingerprint-f16a2d09": 1,
+          "http-api-static-token-auth-d2f7a041": 0,
+          "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+          "logging-redaction-of-account-numbers-a2c8f750": 0,
+          "ofx-importer-currency-handling-2f5d8a6c": 0,
+          "retry-policy-for-bank-connector-timeouts-4b3a9f20": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0
+        }
+      }
+    },
+    {
+      "id": "LI10",
+      "family": "settings-file-migration-to-toml-e94b1d26",
+      "style": "indirect",
+      "query": "does the upgrade keep the old JSON configuration after converting it",
+      "queryMode": "auto",
+      "judgments": {
+        "categorization-rule-tester-command-6b5c9e04": 0,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "encryption-at-rest-config-key-41c7f0ae": 0,
+        "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+        "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+        "http-api-static-token-auth-d2f7a041": 0,
+        "local-api-json-error-envelope-8d4b1f67": 0,
+        "settings-file-migration-to-toml-e94b1d26": 3,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+      },
+      "origin": "approvers-e3-2026-10-23",
+      "layerJudgments": {
+        "1": {
+          "@rules": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        },
+        "2": {
+          "categorization-rule-tester-command-6b5c9e04": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "encryption-at-rest-config-key-41c7f0ae": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+          "http-api-static-token-auth-d2f7a041": 0,
+          "local-api-json-error-envelope-8d4b1f67": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        }
+      }
+    },
+    {
+      "id": "LA01",
+      "family": "retry-policy-for-bank-connector-timeouts-4b3a9f20",
+      "style": "adaptive-trap",
+      "query": "how many times does a failing bank get retried before the user sees a problem",
+      "queryMode": "auto",
+      "judgments": {
+        "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+        "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "daemon-startup-health-check-c0e6b915": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
+        "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "local-api-json-error-envelope-8d4b1f67": 0,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "retry-policy-for-bank-connector-timeouts-4b3a9f20": 1,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 1,
+        "sync-scheduler-fixed-interval-e2a6c590": 1
+      },
+      "layerJudgments": {
+        "1": {
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0
+        },
+        "2": {
+          "account-linking-flow-for-bank-connections-0b7d6e31": 0,
+          "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daemon-startup-health-check-c0e6b915": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+          "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+          "local-api-json-error-envelope-8d4b1f67": 0,
+          "logging-redaction-of-account-numbers-a2c8f750": 0,
+          "retry-policy-for-bank-connector-timeouts-4b3a9f20": 3,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 1,
+          "sync-scheduler-fixed-interval-e2a6c590": 1
+        }
+      },
+      "evidence": [
+        {
+          "sourcePath": "threads/retry-policy-for-bank-connector-timeouts-4b3a9f20/CHAT.md",
+          "quote": "retry three times over a fifteen minute window, then mark the connection as stale"
+        }
+      ],
+      "origin": "approvers-e3-2026-10-22"
+    },
+    {
+      "id": "LA02",
+      "family": "benchmark-sqlite-storage-for-transactions-e07d5c18",
+      "style": "adaptive-trap",
+      "query": "what p95 budget was adopted for the read query behind the transaction list on the reference laptop",
+      "queryMode": "auto",
+      "judgments": {
+        "benchmark-sqlite-storage-for-transactions-e07d5c18": 1,
+        "categorization-rules-priority-ordering-0d4f9b13": 0,
+        "categorization-rules-regex-first-version-5c8e1a77": 0,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+        "encryption-at-rest-config-key-41c7f0ae": 0,
+        "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "web-ui-transactions-paged-list-6a0b7f15": 0,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+      },
+      "layerJudgments": {
+        "1": {
+          "@rules": 0,
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 3,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        },
+        "2": {
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 1,
+          "categorization-rules-priority-ordering-0d4f9b13": 0,
+          "categorization-rules-regex-first-version-5c8e1a77": 0,
+          "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+          "encryption-at-rest-config-key-41c7f0ae": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0,
+          "web-ui-transactions-paged-list-6a0b7f15": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        }
+      },
+      "evidence": [
+        {
+          "sourcePath": "threads/benchmark-sqlite-storage-for-transactions-e07d5c18/artifacts/storage-benchmark.md",
+          "quote": "At 500,000 rows the p95 read latency is 180 ms, which is within the budget of 250 ms for the list."
+        }
+      ],
+      "origin": "approvers-e3-2026-10-22"
+    },
+    {
+      "id": "LA03",
+      "family": "ui-dark-mode-toggle-persistence-7f3a0c48",
+      "style": "adaptive-trap",
+      "query": "what happens when the settings file has a broken value for the theme",
+      "queryMode": "auto",
+      "judgments": {
+        "backup-export-of-local-database-3e0a7d92": 0,
+        "categorization-rules-priority-ordering-0d4f9b13": 0,
+        "daemon-startup-health-check-c0e6b915": 1,
+        "encryption-at-rest-config-key-41c7f0ae": 0,
+        "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "local-api-json-error-envelope-8d4b1f67": 0,
+        "ofx-importer-currency-handling-2f5d8a6c": 0,
+        "settings-file-migration-to-toml-e94b1d26": 1,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "ui-dark-mode-toggle-persistence-7f3a0c48": 1,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+      },
+      "layerJudgments": {
+        "1": {
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "ofx-importer-currency-handling-2f5d8a6c": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 3,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        },
+        "2": {
+          "backup-export-of-local-database-3e0a7d92": 0,
+          "categorization-rules-priority-ordering-0d4f9b13": 0,
+          "daemon-startup-health-check-c0e6b915": 1,
+          "encryption-at-rest-config-key-41c7f0ae": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+          "local-api-json-error-envelope-8d4b1f67": 0,
+          "ofx-importer-currency-handling-2f5d8a6c": 0,
+          "settings-file-migration-to-toml-e94b1d26": 1,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 1,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        }
+      },
+      "evidence": [
+        {
+          "sourcePath": "threads/ui-dark-mode-toggle-persistence-7f3a0c48/artifacts/theme-persistence-checks.md",
+          "quote": "A corrupt value falls back to light theme and writes a warning to the log."
+        }
+      ],
+      "origin": "approvers-e3-2026-10-22"
+    },
+    {
+      "id": "LA04",
+      "family": "ofx-importer-currency-handling-2f5d8a6c",
+      "style": "adaptive-trap",
+      "query": "how many decimal places are used when an amount is converted to minor units",
+      "queryMode": "auto",
+      "judgments": {
+        "categorization-rules-priority-ordering-0d4f9b13": 0,
+        "categorization-rules-regex-first-version-5c8e1a77": 0,
+        "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+        "csv-importer-bank-export-parsing-3a1f0c21": 1,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+        "encryption-at-rest-config-key-41c7f0ae": 0,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "ofx-importer-currency-handling-2f5d8a6c": 1,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "web-ui-transactions-paged-list-6a0b7f15": 0,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+      },
+      "layerJudgments": {
+        "1": {
+          "@rules": 3,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "ofx-importer-currency-handling-2f5d8a6c": 3
+        },
+        "2": {
+          "categorization-rules-priority-ordering-0d4f9b13": 0,
+          "categorization-rules-regex-first-version-5c8e1a77": 0,
+          "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+          "csv-importer-bank-export-parsing-3a1f0c21": 1,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+          "encryption-at-rest-config-key-41c7f0ae": 0,
+          "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+          "logging-redaction-of-account-numbers-a2c8f750": 0,
+          "ofx-importer-currency-handling-2f5d8a6c": 2
+        }
+      },
+      "evidence": [
+        {
+          "sourcePath": "threads/ofx-importer-currency-handling-2f5d8a6c/artifacts/ofx-currency-analysis.md",
+          "quote": "The amounts are stored with the exponent of the ISO 4217 currency code, so the number of decimal places follows the currency and not the bank."
+        }
+      ],
+      "origin": "approvers-e3-2026-10-22"
+    },
+    {
+      "id": "LA05",
+      "family": "encryption-at-rest-passphrase-derived-key-c39e5d62",
+      "style": "adaptive-trap",
+      "query": "why does the daemon take longer to start and by how much",
+      "queryMode": "auto",
+      "judgments": {
+        "categorization-rules-regex-first-version-5c8e1a77": 0,
+        "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+        "daemon-startup-health-check-c0e6b915": 1,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
+        "encryption-at-rest-passphrase-derived-key-c39e5d62": 2,
+        "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+        "http-api-static-token-auth-d2f7a041": 0,
+        "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+        "local-api-json-error-envelope-8d4b1f67": 0,
+        "settings-file-migration-to-toml-e94b1d26": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+      },
+      "layerJudgments": {
+        "1": {
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 3,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        },
+        "2": {
+          "categorization-rules-regex-first-version-5c8e1a77": 0,
+          "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+          "daemon-startup-health-check-c0e6b915": 1,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 2,
+          "http-api-static-token-auth-d2f7a041": 0,
+          "key-rotation-procedure-for-encrypted-store-a85f3e27": 0,
+          "local-api-json-error-envelope-8d4b1f67": 0,
+          "settings-file-migration-to-toml-e94b1d26": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        }
+      },
+      "evidence": [
+        {
+          "sourcePath": "threads/encryption-at-rest-passphrase-derived-key-c39e5d62/artifacts/kdf-parameters.md",
+          "quote": "The startup delay measured on the reference laptop is about 0.6 seconds."
+        }
+      ],
+      "origin": "approvers-e3-2026-10-22"
+    },
+    {
+      "id": "LA06",
+      "family": "web-ui-transactions-virtual-scrolling-b4e8c293",
+      "style": "adaptive-trap",
+      "query": "how much browser memory does the transaction list need with eighty thousand rows",
+      "queryMode": "auto",
+      "judgments": {
+        "bank-connector-plugin-interface-decision-5d2e8a17": 0,
+        "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+        "encryption-at-rest-config-key-41c7f0ae": 0,
+        "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "settings-file-migration-to-toml-e94b1d26": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "web-ui-transactions-paged-list-6a0b7f15": 1,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 1
+      },
+      "layerJudgments": {
+        "1": {
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 3
+        },
+        "2": {
+          "bank-connector-plugin-interface-decision-5d2e8a17": 0,
+          "benchmark-sqlite-storage-for-transactions-e07d5c18": 0,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+          "encryption-at-rest-config-key-41c7f0ae": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+          "logging-redaction-of-account-numbers-a2c8f750": 0,
+          "settings-file-migration-to-toml-e94b1d26": 0,
+          "web-ui-transactions-paged-list-6a0b7f15": 1,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 1
+        }
+      },
+      "evidence": [
+        {
+          "sourcePath": "threads/web-ui-transactions-virtual-scrolling-b4e8c293/artifacts/scrolling-measurements.md",
+          "quote": "Virtual list, two hundred rows per window 210 ms 18 ms 9 MB"
+        }
+      ],
+      "origin": "approvers-e3-2026-10-22"
+    },
+    {
+      "id": "LA07",
+      "family": "key-rotation-procedure-for-encrypted-store-a85f3e27",
+      "style": "adaptive-trap",
+      "query": "how often is the database data key replaced",
+      "queryMode": "auto",
+      "judgments": {
+        "backup-export-of-local-database-3e0a7d92": 0,
+        "csv-importer-bank-export-parsing-3a1f0c21": 0,
+        "daemon-startup-health-check-c0e6b915": 0,
+        "daily-balance-snapshot-job-5e9c3b84": 0,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+        "encryption-at-rest-config-key-41c7f0ae": 1,
+        "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+        "key-rotation-procedure-for-encrypted-store-a85f3e27": 1,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "settings-file-migration-to-toml-e94b1d26": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+      },
+      "layerJudgments": {
+        "1": {
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        },
+        "2": {
+          "backup-export-of-local-database-3e0a7d92": 0,
+          "csv-importer-bank-export-parsing-3a1f0c21": 0,
+          "daemon-startup-health-check-c0e6b915": 0,
+          "daily-balance-snapshot-job-5e9c3b84": 0,
+          "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+          "encryption-at-rest-config-key-41c7f0ae": 0,
+          "encryption-at-rest-passphrase-derived-key-c39e5d62": 0,
+          "key-rotation-procedure-for-encrypted-store-a85f3e27": 3,
+          "logging-redaction-of-account-numbers-a2c8f750": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "sync-scheduler-fixed-interval-e2a6c590": 0,
+          "web-ui-transactions-virtual-scrolling-b4e8c293": 0
+        }
+      },
+      "evidence": [
+        {
+          "sourcePath": "threads/key-rotation-procedure-for-encrypted-store-a85f3e27/CHAT.md",
+          "quote": "rotate the data-encryption key every ninety days by rewrapping it"
+        }
+      ],
+      "origin": "approvers-e3-2026-10-22"
+    },
+    {
+      "id": "LA08",
+      "family": "csv-importer-column-mapping-and-header-detection-7b92e4d0",
+      "style": "adaptive-trap",
+      "query": "which bank file layout does the CSV import reject",
+      "queryMode": "auto",
+      "judgments": {
+        "backup-export-of-local-database-3e0a7d92": 0,
+        "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+        "csv-importer-bank-export-parsing-3a1f0c21": 1,
+        "csv-importer-column-mapping-and-header-detection-7b92e4d0": 1,
+        "duplicate-transaction-detection-by-fingerprint-f16a2d09": 0,
+        "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+        "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+        "logging-redaction-of-account-numbers-a2c8f750": 0,
+        "ofx-importer-currency-handling-2f5d8a6c": 0,
+        "ofx-importer-statement-header-parsing-c71e0b94": 0,
+        "settings-file-migration-to-toml-e94b1d26": 0,
+        "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+        "sync-scheduler-fixed-interval-e2a6c590": 0,
+        "ui-dark-mode-toggle-persistence-7f3a0c48": 0
+      },
+      "layerJudgments": {
+        "1": {
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 3,
+          "ofx-importer-currency-handling-2f5d8a6c": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0
+        },
+        "2": {
+          "backup-export-of-local-database-3e0a7d92": 0,
+          "cli-command-structure-and-exit-codes-3c9e0a52": 0,
+          "csv-importer-bank-export-parsing-3a1f0c21": 1,
+          "csv-importer-column-mapping-and-header-detection-7b92e4d0": 1,
+          "http-api-scoped-tokens-per-client-9e1c6b38": 0,
+          "import-batch-size-limits-and-progress-events-1d8f2a73": 0,
+          "logging-redaction-of-account-numbers-a2c8f750": 0,
+          "ofx-importer-currency-handling-2f5d8a6c": 0,
+          "ofx-importer-statement-header-parsing-c71e0b94": 0,
+          "settings-file-migration-to-toml-e94b1d26": 0,
+          "sync-scheduler-exponential-backoff-88f1d2b4": 0,
+          "ui-dark-mode-toggle-persistence-7f3a0c48": 0
+        }
+      },
+      "evidence": [
+        {
+          "sourcePath": "threads/csv-importer-column-mapping-and-header-detection-7b92e4d0/artifacts/column-mapping-fixtures.md",
+          "quote": "Variant 8 is rejected by design. The user confirms a mapping, and the confirmed mapping is then saved for the profile."
+        }
+      ],
+      "origin": "approvers-e3-2026-10-22"
     }
   ]
 }

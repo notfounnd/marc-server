@@ -1,6 +1,4 @@
 import { DEFAULT_RERANK_BATCH_SIZE } from "./model-config.js";
-import { memoryBandOf } from "./scoring/bands.js";
-import { candidateLimitForMemorySearchDepth } from "./search-depth.js";
 import {
   applyEligibility,
   identityRerankerAgreement,
@@ -9,8 +7,6 @@ import {
   type ThreadSignals
 } from "./semantic-eligibility.js";
 import type {
-  MemoryRecallHit,
-  MemorySearchDepth,
   MemorySearchHit,
   MemoryVectorRecord,
   RerankingProvider
@@ -52,7 +48,7 @@ export type ThreadCandidate = {
   rerankerScore: number;
 };
 
-type PassageRerankEntry = {
+export type PassageRerankEntry = {
   candidate: ThreadCandidate;
   evidence: RankedEvidence;
 };
@@ -83,29 +79,6 @@ export async function rankSemanticMemoryCandidates(
   const reranked = await rerankPassages(query, candidates, reranker);
   const ranked = rankThreads(reranked);
   return applyEligibility(ranked);
-}
-
-export function semanticRecallHits(
-  hits: RankedMemoryThread[]
-): MemoryRecallHit[] {
-  return hits.map((hit) => ({
-    threadId: hit.evidence.record.threadId,
-    title: hit.evidence.record.title,
-    closedAt: hit.evidence.record.closedAt,
-    summaryPath: hit.evidence.record.relativeSummaryPath,
-    reference: hit.evidence.record.reference,
-    matchedText: hit.evidence.record.text,
-    score: hit.eligibility,
-    reason: semanticMatchReason(hit.evidence.record),
-    sourceType: hit.evidence.record.sourceType,
-    sourcePath: hit.evidence.record.sourcePath,
-    authority: hit.evidence.record.authority,
-    band: memoryBandOf(hit.eligibility)
-  }));
-}
-
-export function candidateLimitForDepth(depth: MemorySearchDepth): number {
-  return candidateLimitForMemorySearchDepth(depth);
 }
 
 export function denseRanksByKind(hits: MemorySearchHit[]): RankedEvidence[] {
@@ -151,9 +124,7 @@ async function rerankPassages(
   reranker: RerankingProvider
 ): Promise<ThreadCandidate[]> {
   if (!candidates.length) return [];
-  const entries = candidates.flatMap((candidate) =>
-    rerankingEvidence(candidate).map((evidence) => ({ candidate, evidence }))
-  );
+  const entries = rerankingEntriesOf(candidates);
   if (!entries.length) return candidates;
   const scores = await reranker.rerank(
     query,
@@ -162,6 +133,27 @@ async function rerankPassages(
   );
   if (scores.length !== entries.length)
     throw new Error("Memory reranker returned an unexpected score count.");
+  return applyRerankScores(candidates, entries, scores);
+}
+
+/** The reranker input of M0 for these candidates: the evidence each one sends, in candidate order. */
+export function rerankingEntriesOf(
+  candidates: ThreadCandidate[]
+): PassageRerankEntry[] {
+  return candidates.flatMap((candidate) =>
+    rerankingEvidence(candidate).map((evidence) => ({ candidate, evidence }))
+  );
+}
+
+/**
+ * The M0 rerank step once the scores of the entries are known: the global rank of each entry (numericRanks), and
+ * the best entry of each candidate, which gives its reranker rank, evidence and score.
+ */
+export function applyRerankScores(
+  candidates: ThreadCandidate[],
+  entries: PassageRerankEntry[],
+  scores: number[]
+): ThreadCandidate[] {
   const ranks = numericRanks(scores);
   const scored = entries.map((entry, index) => ({
     ...entry,
@@ -171,7 +163,10 @@ async function rerankPassages(
   return candidates.map((candidate) => applyBestPassage(candidate, scored));
 }
 
-function rerankingEvidence(candidate: ThreadCandidate): RankedEvidence[] {
+/** The evidence that M0 sends to the reranker for a candidate: its passages, or its identity alone. */
+export function rerankingEvidence(
+  candidate: ThreadCandidate
+): RankedEvidence[] {
   if (candidate.passages.length) return candidate.passages;
   if (candidate.identity) return [candidate.identity];
   return [];
@@ -199,7 +194,8 @@ function compareScoredPassages(left: ScoredPassage, right: ScoredPassage) {
   return left.evidence.denseRank - right.evidence.denseRank;
 }
 
-function numericRanks(values: number[]): number[] {
+/** The global ordinal position of each value, higher first; a tie keeps the order of the values (M0's rule). */
+export function numericRanks(values: number[]): number[] {
   const sorted = values
     .map((value, index) => ({ index, value }))
     .sort((left, right) => right.value - left.value);
@@ -217,9 +213,8 @@ function rankThreads(candidates: ThreadCandidate[]): RankedMemoryThread[] {
       const identityRank = candidate.identity?.denseRank;
       const passageRank = minimumPassageRank(candidate.passages);
       const rankingScore =
-        reciprocalRank(identityRank) * IDENTITY_RANK_WEIGHT +
-        reciprocalRank(passageRank) * PASSAGE_RANK_WEIGHT +
-        reciprocalRank(candidate.rerankerRank) * RERANKER_RANK_WEIGHT;
+        semanticFusionScore(identityRank, passageRank) +
+        rerankerFusionScore(candidate.rerankerRank);
       const signals = threadSignals(candidate, identityRank, passageRank);
       return {
         eligibility: 0,
@@ -293,6 +288,32 @@ function reciprocalRank(rank: number | undefined): number {
   return 1 / (RRF_K + rank);
 }
 
+/**
+ * Ranks thread candidates with the production eligibility, without a reranker call. The
+ * funnel scores only some passages, so it builds its own candidates and uses this rule.
+ */
+export function rankThreadCandidates(
+  candidates: ThreadCandidate[]
+): RankedMemoryThread[] {
+  return applyEligibility(rankThreads(candidates));
+}
+
+/** The M0 fusion without the reranker term: the identity and passage ranks, weighted. */
+export function semanticFusionScore(
+  identityRank: number | undefined,
+  passageRank: number | undefined
+): number {
+  return (
+    reciprocalRank(identityRank) * IDENTITY_RANK_WEIGHT +
+    reciprocalRank(passageRank) * PASSAGE_RANK_WEIGHT
+  );
+}
+
+/** The reranker term of the M0 fusion: the reciprocal of the group's rank under the reranker. */
+export function rerankerFusionScore(rerankerRank: number): number {
+  return reciprocalRank(rerankerRank) * RERANKER_RANK_WEIGHT;
+}
+
 function compareRankedThreads(
   left: RankedMemoryThread,
   right: RankedMemoryThread
@@ -304,11 +325,6 @@ function compareRankedThreads(
   return left.evidence.record.recordId.localeCompare(
     right.evidence.record.recordId
   );
-}
-
-function semanticMatchReason(record: MemoryVectorRecord): string {
-  const section = record.sectionTitle ?? "summary";
-  return `Matched ${section} in ${record.title}.`;
 }
 
 export function semanticRerankingDocument(

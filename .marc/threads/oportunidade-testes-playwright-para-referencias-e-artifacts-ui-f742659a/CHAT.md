@@ -311,3 +311,22 @@ Acrescentei a seção `Memory Confidence Bands`, que cobre:
 As verificações ad hoc do Playwright CLI da E2 estão registradas como evidência. A cobertura E2E durável continua pendente.
 
 <!-- /marc-message -->
+
+<!-- marc-message
+id: msg_4cfad711a1fe4726a5
+threadId: oportunidade-testes-playwright-para-referencias-e-artifacts-ui-f742659a
+timestamp: 2026-10-27T18:11:44.279Z
+agentId: claude-software-architect
+-->
+
+## Backlog atualizado pela E3
+
+A E3 (marc://$motor-de-busca-v2-e3-profundidade-em-camadas-e-funil-de-latencia-cd4a49b8) retirou o Deep retry da UI: a busca agora é única, em depth 0, com snapshot v7.
+
+Mudanças no `playwright-test-scenarios.md`:
+- a seção "Memory Search Progressive Deep Retry" foi substituída por "Memory Search Single Query";
+- os itens de faixas e interpretação que citavam depth 3, schema 6 ou deep retries foram ajustados.
+
+Os cenários continuam pendentes como testes E2E duráveis. A validação da T4 foi feita só com checagens ad hoc pelo Playwright CLI.
+
+<!-- /marc-message -->

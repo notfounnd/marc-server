@@ -4,7 +4,7 @@ mARC can maintain a shared semantic memory index for closed thread summaries. Th
 
 ## Source of truth
 
-Only closed-thread `SUMMARY.md` content is indexed by default (layer 0). Use `thread_write_summary` to create a summary or revision-check an update; the Markdown file remains the source of truth. When available, the canonical title is read from `CHAT.md` and stored with the summary records, but message bodies are not indexed by default. Agent profiles are never part of the memory corpus.
+Closed-thread `SUMMARY.md` content is indexed in layer 0. The production index also holds the other source layers: artifacts, workspace rules, and configured documents in layer 1, and chat messages of closed threads in layer 2 (see the source layers below). The default search, at depth `0`, reads layer 0 only. Use `thread_write_summary` to create a summary or revision-check an update; the Markdown file remains the source of truth. When available, the canonical title is read from `CHAT.md` and stored with the summary records. Agent profiles are never part of the memory corpus.
 
 A summary write commits the source before refreshing derived projections. The result reports thread-index and memory projection state; an unavailable refresh does not undo the saved summary. Automatic memory rebuilds may schedule an incremental reconciliation when eligible. If memory remains pending, run `memory_rebuild` in its default incremental mode. Summary writes do not prepare or download retrieval models.
 
@@ -30,7 +30,7 @@ If `.marc/memory/` is deleted, it can be rebuilt from the summaries.
 
 ### Source layers and provenance
 
-The rebuild reads source layers. Layer 0 holds closed-thread summaries. Layer 1 holds artifacts (top-level `.md` files of closed threads), the workspace rules (`.marc/RULES.md`), and configured documents. Layer 2 holds chat messages (`CHAT.md` of closed threads). Only layer 0 is indexed by default. A rebuild with more layers indexes those sources too; the harness uses that option only to measure cost.
+The rebuild reads source layers. Layer 0 holds closed-thread summaries. Layer 1 holds artifacts (top-level `.md` files of closed threads), the workspace rules (`.marc/RULES.md`), and configured documents. Layer 2 holds chat messages (`CHAT.md` of closed threads). The rebuild indexes the layers in `INDEXED_LAYERS`, which is `[0, 1, 2]` since the activation accepted on 2026-10-27. A rebuild with explicit layers indexes only those; the harness uses `[0]` to build the layer-0 M0 reference copy.
 
 Every record carries its provenance: `sourceType`, `layer`, `sourcePath` (relative to the workspace root, with `/`), `authority` (`decision`, `rule`, `artifact`, `document`, or `conversation`), `lineStart` and `lineEnd`, `sourceSha256` (the hash of the source file bytes), `passageOrdinal`, `passageSha256` (the hash of the indexed text), and `passageId`. Chat records also carry `messageId` and `agentId`, and artifact records carry `artifactFileName`.
 
@@ -82,28 +82,31 @@ Candidate provenance controls how a selected alternative is applied. When the or
 
 Callers can pass `queryMode: "literal"` to bypass interpretation. Recall responses expose `originalQuery`, `effectiveQuery`, `suggestedQuery`, `mode`, and `correctionApplied`. The embedding retriever and mMARCO reranker both consume `effectiveQuery`.
 
-## UI search depth
+## UI search
 
-The UI uses the existing workspace memory recall route and shares the same candidate and eligibility policy as MCP. MCP keeps its default `limit` of `5`. The UI requests up to `50` results because its purpose is to give a human a broader view of relevant closed-thread history.
+The UI uses the workspace memory recall route and shares the same candidate and eligibility policy as MCP. MCP keeps its default `limit` of `5`. The UI requests up to `50` results because its purpose is to give a human a broader view of relevant history.
 
-Workspace settings persist `memory.searchRetryDepth` as an integer from `0` through `3`, with `0` as the default. Every newly submitted UI query starts at depth `0`. If a depth returns no results, the UI can continue automatically through the configured depth:
+The UI runs one search per submitted query, at the default depth `0`, which is the same candidate path as the M0 search. It sends no `depth` and offers no retry or search-depth setting. Layers `1` and `2` are not part of the UI; agents reach them through the MCP tool and the CLI (see the depth section below and ADR 0012).
 
-```text
-0: 100 candidates
-1: 200 candidates
-2: 300 candidates
-3: 400 candidates
-```
+Lexical matches cannot make an otherwise ineligible thread eligible. The `minScore` input was removed from the CLI, MCP, and HTTP recall contracts; callers cannot use it to change the eligibility threshold.
 
-When a result or empty result remains below the maximum depth, the UI exposes `Deep retry` below the search content. Each click issues exactly one candidate depth after the last depth that actually completed, independent of the configured automatic retry limit. The automatic loop stops at its first result. The first request interprets the query; automatic and manual retries reuse its effective query in literal mode, so deeper retrieval never reinterprets or changes the correction. A new query resets interpretation and starts again at depth `0`.
+## Depth and corpus layers
 
-Depth controls candidate-pool size only; it does not relax semantic eligibility. At depths `0`, `1`, `2`, and `3`, each dense and lexical channel requests up to `100`, `200`, `300`, and `400` candidates, respectively. Lexical matches cannot make an otherwise ineligible thread eligible. The `minScore` input was removed from the CLI, MCP, and HTTP recall contracts; callers cannot use it to change the eligibility threshold.
+Recall takes a `depth` from `0` through `2`, with `0` as the default. The depth counts corpus layers: depth `d` searches every layer up to `d`.
 
-When correction is applied, the UI shows the effective query and offers `Search instead for <original query>`. When a corpus-backed spelling produces a suggested alternative, the UI keeps the literal result and offers `Search for <suggested query>`. In each case, only the alternate query text is a link; it uses the same auxiliary typography as the surrounding interpretation text. Following it starts a new literal search from depth `0`. The versioned per-workspace localStorage snapshot preserves only the latest query, interpretation, configured retry limit, last executed depth, and compact result. Snapshots from older schema versions are discarded because they do not prove which depth actually completed.
+| Depth | Layers searched | Candidates |
+| --- | --- | --- |
+| `0` | `0`: summaries | the M0 candidate pool |
+| `1` | `0` and `1`: adds artifacts, rules, and documents | the whole consolidated M0 pool of those layers (each group's identity record and up to three passages), reranked |
+| `2` | `0`, `1`, and `2`: adds chat messages | the whole consolidated M0 pool of those layers (each group's identity record and up to three passages), reranked |
+
+The MCP tool, the CLI, and the HTTP route reject depth `3` with the layer explanation. The response reports `layersSearched` with the layers that ran, and `rerankPairs` with the pairs sent to the reranker. A layer that the index does not hold is skipped. The production index has held layers `0`, `1`, and `2` since the rebuild of 2026-10-27, so depths `1` and `2` search and rerank the layers they name. The funnel and the adaptive expansion are not production paths (see ADR 0012).
+
+When correction is applied, the UI shows the effective query and offers `Search instead for <original query>`. When a corpus-backed spelling produces a suggested alternative, the UI keeps the literal result and offers `Search for <suggested query>`. In each case, only the alternate query text is a link; it uses the same auxiliary typography as the surrounding interpretation text. Following it starts a new literal search from depth `0`. The versioned per-workspace localStorage snapshot (schema `7`) preserves only the latest query and its compact result. Snapshots from older schema versions are discarded.
 
 ## Rebuild flow
 
-Memory rebuilds read the source layers selected for the index. By default that is layer 0, the closed-thread `SUMMARY.md` files. The core exposes two modes:
+Memory rebuilds read the source layers selected for the index. By default that is every layer: the production constant `INDEXED_LAYERS` is `[0, 1, 2]` since the activation accepted on 2026-10-27, so the summaries, the artifacts, the rules, the configured documents, and the chat messages are indexed. A rebuild with explicit layers, such as `[0]`, indexes only those. The core exposes two modes:
 
 - `incremental` is the normal reconciliation path. It embeds only new or changed summary records and removes records whose source summary disappeared.
 - `full` rebuilds the entire derived snapshot. It remains an explicit manual operation for recovery or provider-contract changes.
@@ -130,7 +133,7 @@ The daemon and UI add background rebuild for interactive use:
 - manual rebuild from the CLI, UI, MCP, and HTTP API defaults to `incremental`, while `full` requires an explicit mode selection;
 - the UI uses the existing `POST /api/workspaces/:workspaceId/memory/rebuild` route with an optional `mode` body field;
 - the workspace settings panel exposes the shared batch-size setting as a slider from `2` to `16` records;
-- the workspace settings panel exposes search retry depth from `0` to `3` and a manual purge action for unused model files and index generations;
+- the workspace settings panel exposes the automatic rebuild switch, the embedding batch size, and a manual purge action for unused model files and index generations;
 - background prepare and rebuild requests are deduplicated per workspace inside the daemon;
 - memory rebuild execution is guarded by a cache-backed workspace lock shared by daemon, MCP, and CLI;
 - a concurrent memory rebuild request does not queue another run; it reports `rebuilding` while the active owner continues;
@@ -286,7 +289,7 @@ Options and production check:
 - `capture --all-layers` captures no cases. It rebuilds a temporary workspace twice, once with layer 0 and once with layers 0, 1, and 2, times each rebuild, and counts the records per layer and per source type. It writes `<corpus>/layers-<captureId>.json`, where the id is the fingerprint with every layer indexed. It uses no checkpoint and creates no capture folder. Use it to measure what more layers cost before indexing them.
 - `report --without-latency` builds the report without `latency.json`. It writes `report-no-latency.json` and `report-no-latency.md`, never overwrites `report.json` or `report.md`, and renders `Latency: not measured`. Without the flag, the command still requires `latency.json`.
 - `capture.json` records `productionCheck` when a production manifest is given. Its mode is `record-ids` when the production manifest has the schema version of the code, and `thread-ids` otherwise. The `thread-ids` check requires every pinned thread in the production manifest and exactly the pinned threads in the temporary manifest. The record stores both schema versions. The field is optional, so captures written before it remain readable.
-- The capture id covers every TypeScript file under `src/core/memory/`, including `sources/`. The indexed layers join the fingerprint only when they differ from the default `[0]`. Captures made after the source layers therefore have new ids; captures made before them keep their ids but no longer match the current code.
+- The capture id covers every TypeScript file under `src/core/memory/`, including `sources/`. The fingerprint keeps its own baseline, `[0]` (`DEFAULT_INDEXED_LAYERS` in `capture-fingerprint.ts`), not the production `INDEXED_LAYERS`: the indexed layers join the id only when they differ from `[0]`, so a capture with `[0, 1, 2]` names its layers in the id and the layer-0 baseline adds nothing. Captures made after the source layers therefore have new ids; captures made before them keep their ids but no longer match the current code.
 
 ## MCP tools
 

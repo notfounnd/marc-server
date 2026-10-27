@@ -22,13 +22,9 @@ test("workspace memory settings persist automatic rebuild and embedding batch si
     (await readWorkspaceSettingsInWorkspace(first)).memory.embeddingBatchSize,
     4
   );
-  assert.equal(
-    (await readWorkspaceSettingsInWorkspace(first)).memory.searchRetryDepth,
-    0
-  );
 
   await updateWorkspaceSettingsInWorkspace(first, {
-    memory: { autoRebuild: false, embeddingBatchSize: 8, searchRetryDepth: 2 }
+    memory: { autoRebuild: false, embeddingBatchSize: 8 }
   });
 
   const settingsPath = workspaceSettingsPath(first);
@@ -38,7 +34,6 @@ test("workspace memory settings persist automatic rebuild and embedding batch si
     memory?: {
       autoRebuild?: boolean;
       embeddingBatchSize?: number;
-      searchRetryDepth?: number;
     };
   };
 
@@ -46,7 +41,7 @@ test("workspace memory settings persist automatic rebuild and embedding batch si
   assert.equal(path.basename(path.dirname(settingsPath)), ".marc");
   assert.equal(settingsContent.memory?.autoRebuild, false);
   assert.equal(settingsContent.memory?.embeddingBatchSize, 8);
-  assert.equal(settingsContent.memory?.searchRetryDepth, 2);
+  assert.equal("searchRetryDepth" in (settingsContent.memory ?? {}), false);
   assert.equal(
     await fileExists(path.join(first.marcPath, "SETTINGS.md")),
     false
@@ -63,6 +58,42 @@ test("workspace memory settings persist automatic rebuild and embedding batch si
     (await readWorkspaceSettingsInWorkspace(second)).memory.autoRebuild,
     true
   );
+});
+
+test("an old settings file with searchRetryDepth is read without the key and loses it on the next write", async () => {
+  const workspace = await tempWorkspace();
+  const settingsPath = workspaceSettingsPath(workspace);
+  await fs.writeFile(
+    settingsPath,
+    `${JSON.stringify(
+      {
+        memory: {
+          autoRebuild: false,
+          documentSources: [],
+          embeddingBatchSize: 8,
+          searchRetryDepth: 2
+        }
+      },
+      null,
+      2
+    )}\n`
+  );
+
+  const read = await readWorkspaceSettingsInWorkspace(workspace);
+  assert.equal(read.memory.autoRebuild, false);
+  assert.equal(read.memory.embeddingBatchSize, 8);
+  assert.equal("searchRetryDepth" in read.memory, false);
+
+  await updateWorkspaceSettingsInWorkspace(workspace, {
+    memory: { autoRebuild: true }
+  });
+
+  const stored = JSON.parse(await fs.readFile(settingsPath, "utf8")) as {
+    memory: Record<string, unknown>;
+  };
+  assert.equal(stored.memory.autoRebuild, true);
+  assert.equal(stored.memory.embeddingBatchSize, 8);
+  assert.equal("searchRetryDepth" in stored.memory, false);
 });
 
 test("workspace memory settings reject unsupported embedding batch sizes", async () => {

@@ -56,12 +56,16 @@ export class InMemoryMemoryVectorStore implements MemoryVectorStore {
 
   async readRows(
     _info?: WorkspaceInfo,
-    generation?: string
+    generation?: string,
+    options?: { layers?: readonly MemoryLayer[] }
   ): Promise<MemoryVectorRow[]> {
-    return this.rowsForGeneration(generation).map((record) => ({
-      ...record,
-      vector: [...record.vector]
-    }));
+    const layers = options?.layers;
+    return this.rowsForGeneration(generation)
+      .filter((record) => layers === undefined || layers.includes(record.layer))
+      .map((record) => ({
+        ...record,
+        vector: [...record.vector]
+      }));
   }
 
   async rebuild(

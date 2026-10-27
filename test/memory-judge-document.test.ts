@@ -7,7 +7,7 @@ import {
   judgeDocumentOf,
   judgeDocumentSha256,
   type TokenTruncator
-} from "../src/core/memory/scoring/judge-document.js";
+} from "../scripts/memory-eval/judge-document.js";
 import type { MemoryVectorRecord } from "../src/core/memory/types.js";
 import { captureFixture } from "./memory-eval-capture-fixtures.js";
 

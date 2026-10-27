@@ -9,7 +9,7 @@ import {
   ruleOutcome,
   type SuggestionOutcome
 } from "../scripts/memory-eval/suggestion.js";
-import { type ThreadFeatures } from "../src/core/memory/scoring/features.js";
+import { type ThreadFeatures } from "../scripts/memory-eval/features.js";
 
 /** A captured case with the candidate variants and the suggestion-only indexes declared. */
 function capturedOf(

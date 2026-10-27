@@ -4,6 +4,7 @@ import {
   LocalRerankingProvider,
   defaultMemoryInferenceManager,
   isMemorySearchDepth,
+  MEMORY_SEARCH_DEPTH_RANGE_MESSAGE,
   memoryRebuildActiveInWorkspace,
   memoryRebuildingStatus,
   prepareMemoryInWorkspace,
@@ -144,7 +145,7 @@ export async function recallMemory(
 ): Promise<MemoryRecallResult> {
   const info = await initWorkspace(workspaceRoot);
   if (input.depth !== undefined && !isMemorySearchDepth(input.depth))
-    throw new Error("Memory search depth must be an integer from 0 to 3.");
+    throw new Error(MEMORY_SEARCH_DEPTH_RANGE_MESSAGE);
   return recallMemoryInWorkspace(info, {
     provider: new LocalEmbeddingProvider(info),
     interpreter: new LocalQueryInterpretationProvider(info),

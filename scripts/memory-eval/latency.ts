@@ -5,10 +5,14 @@ import type { WorkspaceInfo } from "../../src/core/types.js";
 import { writeFileAtomically } from "../../src/core/write-coordination.js";
 import { measureLatency } from "./capture-channels.js";
 import {
-  E2_CAPTURE_CHANNELS,
   computeCaptureFingerprint,
   type CaptureFingerprint
 } from "./capture-fingerprint.js";
+import {
+  E3_CAPTURE_CHANNELS,
+  E3_INDEXED_LAYERS,
+  E3_RERANK_ORDER
+} from "./capture-layers.js";
 import { CAPTURE_FILE } from "./capture-storage.js";
 import { disposeProviders, openCaptureContext } from "./capture.js";
 import type { CaptureFile, CaptureProviders } from "./capture-types.js";
@@ -81,8 +85,9 @@ export async function measureCaptureLatency(
     options.dataset,
     options.repositoryRoot,
     await corpusContentDigest(options.source),
-    undefined,
-    E2_CAPTURE_CHANNELS
+    E3_INDEXED_LAYERS,
+    E3_CAPTURE_CHANNELS,
+    E3_RERANK_ORDER
   );
   const captureDir = path.join(
     options.outputRoot,
@@ -165,7 +170,8 @@ async function measureInWorkspace(
       info,
       providers,
       productionManifestPath: options.productionManifestPath,
-      threadIds: options.source.threadIds
+      threadIds: options.source.threadIds,
+      layers: E3_INDEXED_LAYERS
     });
     const cases: LatencyCase[] = [];
     for (const [index, evalCase] of options.dataset.cases.entries()) {

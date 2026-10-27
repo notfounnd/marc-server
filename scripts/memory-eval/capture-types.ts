@@ -6,6 +6,7 @@ import type {
   EmbeddingProviderMetadata,
   MemoryLexicalField,
   MemoryQueryInterpretation,
+  MemorySearchDepth,
   MemoryVectorRecord,
   MemoryVectorRow,
   QueryInterpretationProvider,
@@ -15,6 +16,7 @@ import type {
 } from "../../src/core/memory/types.js";
 import type { CaptureFingerprint } from "./capture-fingerprint.js";
 import type { EvalCase } from "./dataset.js";
+import type { ComplementRound, EvidenceMatch } from "./matrix-plan.js";
 import type { InterpretationTrace } from "./recording-providers.js";
 
 export type CaptureProviders = {
@@ -60,6 +62,31 @@ export type CapturedCase = {
   /** Reranker score for every identity and passage record, keyed by rerankPairKey. */
   rerankScores: Record<string, number>;
   productionRecall: CapturedProductionRecall;
+  /**
+   * E3 captures only: the channels of each depth for the effective query. `channels` keeps the
+   * depth 0 channels under the effective query, so the readers of E0 and E2 captures still work.
+   */
+  channelsByDepth?: Partial<Record<MemorySearchDepth, CapturedChannels>>;
+  /** E3 captures only: reranker score of each scoped record for the effective query, by recordId. */
+  recordScores?: Record<string, number>;
+  /** E3 captures only: where each evidence quote of the case is held. */
+  evidence?: EvidenceMatch[];
+  /** E3 captures only: why the case cannot be approved on this capture. Absent when it can. */
+  incomplete?: CapturedIncomplete;
+};
+
+/** Why a case of an E3 capture stays incomplete: its evidence is not indexed as a whole, or missing. */
+export type CapturedIncomplete = {
+  reason: "evidence_unindexable" | "evidence_missing";
+};
+
+/** E3 captures only: the vectors of every record of the temporary index, float32, in one file. */
+export type CapturedVectors = {
+  /** File in the capture directory, little-endian float32 values, one record after another. */
+  file: string;
+  dimension: number;
+  /** recordIds in the order of the file. */
+  recordIds: string[];
 };
 
 /** Provenance fields added by the source layers. Captures from E0 do not carry them. */
@@ -126,6 +153,10 @@ export type CaptureFile = {
   identityVectors?: Record<string, number[]>;
   /** Directed references between pinned threads, read from the raw SUMMARY.md and CHAT.md. */
   threadReferences?: Array<[from: string, to: string]>;
+  /** E3 captures only: the vectors of every record of the temporary index. */
+  vectors?: CapturedVectors;
+  /** E3 captures only: the complement rounds, appended in order. Each round only adds cells. */
+  complementRounds?: ComplementRound[];
 };
 
 /** A synthetic Inverse Cloze query: captured like a case, with its source thread as positive. */
@@ -150,4 +181,6 @@ export type CaptureContext = {
   matrixRecords: MemoryVectorRecord[];
   matrixDocuments: string[];
   productionCheck?: ProductionCheckRecord;
+  /** Text of every corpus file, by corpus path: the sources that evidence quotes are checked against. */
+  sourceTexts?: ReadonlyMap<string, string>;
 };

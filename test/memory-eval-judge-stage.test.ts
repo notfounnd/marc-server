@@ -22,7 +22,7 @@ import type { VariantResult } from "../scripts/memory-eval/variants.js";
 import type {
   FeatureVector,
   ThreadFeatures
-} from "../src/core/memory/scoring/features.js";
+} from "../scripts/memory-eval/features.js";
 
 const NO_CUTS: BandCuts = { high: null, medium: null, low: null };
 

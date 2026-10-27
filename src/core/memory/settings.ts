@@ -17,14 +17,11 @@ const SETTINGS_FILE = "marc.config.json";
 export const DEFAULT_MEMORY_EMBEDDING_BATCH_SIZE = 4;
 export const MIN_MEMORY_EMBEDDING_BATCH_SIZE = 2;
 export const MAX_MEMORY_EMBEDDING_BATCH_SIZE = 16;
-export const DEFAULT_MEMORY_SEARCH_RETRY_DEPTH = 0;
-export const MAX_MEMORY_SEARCH_RETRY_DEPTH = 3;
 
 const DEFAULT_SETTINGS: WorkspaceSettings = {
   memory: {
     autoRebuild: true,
     embeddingBatchSize: DEFAULT_MEMORY_EMBEDDING_BATCH_SIZE,
-    searchRetryDepth: DEFAULT_MEMORY_SEARCH_RETRY_DEPTH,
     documentSources: []
   }
 };
@@ -33,7 +30,6 @@ type WorkspaceSettingsFile = Partial<{
   memory: Partial<{
     autoRebuild: boolean;
     embeddingBatchSize: number;
-    searchRetryDepth: number;
     documentSources: unknown;
   }>;
 }>;
@@ -44,13 +40,6 @@ export function isMemoryEmbeddingBatchSize(value: unknown): value is number {
   if (value < MIN_MEMORY_EMBEDDING_BATCH_SIZE) return false;
   if (value > MAX_MEMORY_EMBEDDING_BATCH_SIZE) return false;
   return value % 2 === 0;
-}
-
-export function isMemorySearchRetryDepth(value: unknown): value is number {
-  if (typeof value !== "number") return false;
-  if (!Number.isInteger(value)) return false;
-  if (value < 0) return false;
-  return value <= MAX_MEMORY_SEARCH_RETRY_DEPTH;
 }
 
 export function workspaceSettingsPath(info: WorkspaceInfo): string {
@@ -88,7 +77,6 @@ function mergeWorkspaceSettings(
           ? input.memory.autoRebuild
           : current.memory.autoRebuild,
       embeddingBatchSize: nextEmbeddingBatchSize(current, input),
-      searchRetryDepth: nextSearchRetryDepth(current, input),
       documentSources: current.memory.documentSources
     }
   };
@@ -104,16 +92,6 @@ function nextEmbeddingBatchSize(
   throw new Error(
     "Memory embedding batch size must be an even integer from 2 to 16."
   );
-}
-
-function nextSearchRetryDepth(
-  current: WorkspaceSettings,
-  input: WorkspaceSettingsInput
-): number {
-  const next = input.memory?.searchRetryDepth;
-  if (next === undefined) return current.memory.searchRetryDepth;
-  if (isMemorySearchRetryDepth(next)) return next;
-  throw new Error("Memory search retry depth must be an integer from 0 to 3.");
 }
 
 async function readSettingsContent(
@@ -144,9 +122,6 @@ function normalizeWorkspaceSettings(value: unknown): WorkspaceSettings {
       embeddingBatchSize: isMemoryEmbeddingBatchSize(memory.embeddingBatchSize)
         ? memory.embeddingBatchSize
         : DEFAULT_SETTINGS.memory.embeddingBatchSize,
-      searchRetryDepth: isMemorySearchRetryDepth(memory.searchRetryDepth)
-        ? memory.searchRetryDepth
-        : DEFAULT_SETTINGS.memory.searchRetryDepth,
       documentSources: normalizeDocumentSources(memory.documentSources)
     }
   };
@@ -157,7 +132,6 @@ function defaultSettings(): WorkspaceSettings {
     memory: {
       autoRebuild: DEFAULT_SETTINGS.memory.autoRebuild,
       embeddingBatchSize: DEFAULT_SETTINGS.memory.embeddingBatchSize,
-      searchRetryDepth: DEFAULT_SETTINGS.memory.searchRetryDepth,
       documentSources: []
     }
   };

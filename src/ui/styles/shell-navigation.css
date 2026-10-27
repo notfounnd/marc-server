@@ -266,10 +266,6 @@ h3 {
   min-height: 40px;
 }
 
-.memory-search-deep-retry {
-  width: 100%;
-}
-
 .memory-search-interpretation {
   align-items: flex-start;
   border: 1px solid var(--border-soft);

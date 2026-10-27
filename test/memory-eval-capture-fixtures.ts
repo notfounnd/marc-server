@@ -248,6 +248,10 @@ export async function tempDirectory(t: TestContext): Promise<string> {
   return directory;
 }
 
+/**
+ * Runs one capture over the fixture corpus with the fake providers. The E2 synthetic queries are on
+ * by default, because the calibration tests read them; the E3 tests pass `syntheticQueries: false`.
+ */
 export async function runCapture(input: {
   threadsRoot: string;
   outputRoot: string;
@@ -255,6 +259,7 @@ export async function runCapture(input: {
   resume?: boolean;
   productionManifestPath?: string;
   dataset?: EvalDataset;
+  syntheticQueries?: boolean;
 }): Promise<{
   result: Awaited<ReturnType<typeof captureMemoryEval>>;
   logs: string[];
@@ -268,7 +273,8 @@ export async function runCapture(input: {
     createProviders: () => input.fakes.providers,
     productionManifestPath: input.productionManifestPath,
     resume: input.resume ?? false,
-    log: (line) => logs.push(line)
+    log: (line) => logs.push(line),
+    syntheticQueries: input.syntheticQueries ?? true
   };
   const result = await captureMemoryEval(options);
   return { result, logs };

@@ -14,6 +14,7 @@ import type { WorkspaceInfo, WorkspaceSettings } from "../src/core/types.js";
 import type {
   MemoryLexicalField,
   MemoryLexicalSearchHit,
+  MemoryManifestRecord,
   MemorySearchHit,
   MemoryVectorRecord,
   MemoryVectorRow,
@@ -28,6 +29,12 @@ import {
   getSummaryPath,
   tempWorkspace
 } from "./core-thread-summary-fixtures.js";
+
+function summaryRecords(
+  records: MemoryManifestRecord[]
+): MemoryManifestRecord[] {
+  return records.filter((record) => record.sourceType === "summary");
+}
 
 class ObservedMemoryReconciler extends BackgroundMemoryReconciler {
   rebuildCalls = 0;
@@ -247,11 +254,12 @@ test("eligible auto mode completes an incremental rebuild without model preparat
   const updatedManifest = await readMemoryManifest(info);
   assert.ok(updatedManifest);
   assert.notEqual(updatedManifest.generation, initialManifest.generation);
-  assert.equal(updatedManifest.records.length, 1);
-  assert.equal(updatedManifest.records[0]?.threadId, thread.id);
+  const updatedSummaries = summaryRecords(updatedManifest.records);
+  assert.equal(updatedSummaries.length, 1);
+  assert.equal(updatedSummaries[0]?.threadId, thread.id);
   assert.notEqual(
-    updatedManifest.records[0]?.sha256,
-    initialManifest.records[0]?.sha256
+    updatedSummaries[0]?.sha256,
+    summaryRecords(initialManifest.records)[0]?.sha256
   );
   assert.ok(provider.documentCalls > initialDocumentCalls);
 });

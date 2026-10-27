@@ -2,17 +2,12 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import test from "node:test";
 
-test("forwards the deep retry state and action to the middle sidebar", () => {
+test("forwards no deep retry state or action to the middle sidebar", () => {
   const sidebar = fs.readFileSync("src/ui/app-sidebar.tsx", "utf8");
+  const middle = fs.readFileSync("src/ui/app-sidebar-middle.tsx", "utf8");
 
-  assert.match(
-    sidebar,
-    /memorySearchDeepRetryAvailable=\{memorySearch\.deepRetryAvailable\}/
-  );
-  assert.match(
-    sidebar,
-    /onMemorySearchDeepRetry=\{memorySearch\.runDeepRetry\}/
-  );
+  assert.doesNotMatch(sidebar, /DeepRetry|deepRetry/);
+  assert.doesNotMatch(middle, /DeepRetry|deepRetry/);
 });
 
 test("shows a workspace-gated create thread action before search", () => {

@@ -84,9 +84,7 @@ export function useWorkspaceMemoryActions({
     updateWorkspaceAutoRebuild: (autoRebuild: boolean) =>
       postWorkspace("/settings", { memory: { autoRebuild } }),
     updateWorkspaceEmbeddingBatchSize: (embeddingBatchSize: number) =>
-      postWorkspace("/settings", { memory: { embeddingBatchSize } }),
-    updateWorkspaceSearchRetryDepth: (searchRetryDepth: number) =>
-      postWorkspace("/settings", { memory: { searchRetryDepth } })
+      postWorkspace("/settings", { memory: { embeddingBatchSize } })
   };
 }
 

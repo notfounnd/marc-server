@@ -22,6 +22,8 @@ export type CaptureFingerprint = {
   indexedLayers?: readonly MemoryLayer[];
   /** Version of the captured channels. Present only in captures that record the E2 channels. */
   captureChannels?: string;
+  /** Order in which the reranker receives the documents (`length`). Present only when it is recorded. */
+  rerankOrder?: string;
 };
 
 /** The components that the captureId hashes. A capture.json stores them all. */
@@ -45,7 +47,8 @@ export async function computeCaptureFingerprint(
   repositoryRoot: string,
   corpusDigest: string,
   indexedLayers?: readonly MemoryLayer[],
-  captureChannels?: string
+  captureChannels?: string,
+  rerankOrder?: string
 ): Promise<CaptureFingerprint> {
   const components: FingerprintComponents = {
     queryFingerprint: sha256Json(queryFingerprintCases(dataset.cases)),
@@ -54,9 +57,15 @@ export async function computeCaptureFingerprint(
     sourceHash: await memorySourceHash(repositoryRoot),
     corpusDigest,
     ...layersPart(indexedLayers),
-    ...channelsPart(captureChannels)
+    ...channelsPart(captureChannels),
+    ...orderPart(rerankOrder)
   };
   return fingerprintOf(components);
+}
+
+function orderPart(rerankOrder: string | undefined): { rerankOrder?: string } {
+  if (rerankOrder === undefined) return {};
+  return { rerankOrder };
 }
 
 /**
@@ -71,7 +80,8 @@ export function fingerprintOf(components: FingerprintComponents): CaptureFingerp
     sourceHash: components.sourceHash,
     corpusDigest: components.corpusDigest,
     ...layersPart(components.indexedLayers),
-    ...channelsPart(components.captureChannels)
+    ...channelsPart(components.captureChannels),
+    ...orderPart(components.rerankOrder)
   });
   return {
     captureId: fingerprint.slice(0, 12),

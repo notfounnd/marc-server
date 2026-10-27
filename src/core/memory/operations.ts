@@ -3,10 +3,14 @@ import { LanceDbMemoryVectorStore, readMemoryManifest } from "./store.js";
 import { rebuildAllMemory, reconcileMemory } from "./rebuild-operations.js";
 import { purgeUnusedMemory, readMemoryMaintenance } from "./maintenance.js";
 import { rankHybridMemoryHits, semanticRecallHits } from "./hybrid-ranking.js";
-import { candidateLimitForDepth } from "./semantic-ranking.js";
+import { CountingRerankingProvider } from "./counting-reranker.js";
+import { searchChannelsByLayer } from "./layered-search.js";
 import {
   DEFAULT_MEMORY_SEARCH_DEPTH,
-  isMemorySearchDepth
+  isMemorySearchDepth,
+  layersForDepth,
+  MEMORY_SEARCH_DEPTH_RANGE_MESSAGE,
+  presentLayersOf
 } from "./search-depth.js";
 import { nextActionsForRecallResults } from "./recall-actions.js";
 import {
@@ -24,7 +28,8 @@ import {
   compareMemoryManifestSources,
   memoryProvidersMatch
 } from "./status.js";
-import { scanThreadSummarySources } from "./summaries.js";
+import { readWorkspaceSettingsInWorkspace } from "./settings.js";
+import { INDEXED_LAYERS, readIndexedSources } from "./sources/index.js";
 import type {
   EmbeddingProvider,
   MemoryManifest,
@@ -77,19 +82,24 @@ export async function readMemoryStatusInWorkspace(
   const provider = options.provider;
   const [
     manifest,
-    sources,
+    settings,
     retrieverPrepared,
     rerankerPrepared,
     interpreterPrepared,
     maintenance
   ] = await Promise.all([
     readMemoryManifest(info),
-    scanThreadSummarySources(info),
+    readWorkspaceSettingsInWorkspace(info),
     provider.isPrepared(),
     options.reranker.isPrepared(),
     interpreterIsPrepared(options.interpreter),
     readMemoryMaintenance(info)
   ]);
+  const sources = await readIndexedSources(
+    info,
+    settings,
+    options.indexedLayers ?? INDEXED_LAYERS
+  );
   const storeExists =
     manifest?.records.length === 0 ||
     (await store.exists(info, manifest?.generation));
@@ -155,6 +165,8 @@ export async function recallMemoryInWorkspace(
   info: WorkspaceInfo,
   options: MemoryRecallOptions
 ): Promise<MemoryRecallResult> {
+  if (options.depth !== undefined && !isMemorySearchDepth(options.depth))
+    throw new Error(MEMORY_SEARCH_DEPTH_RANGE_MESSAGE);
   const status = await readMemoryStatusInWorkspace(info, options);
   if (!status.rebuildReady) {
     return emptyMemoryRecallResult(options.query, options.queryMode, status, [
@@ -213,38 +225,23 @@ async function runReadyMemoryRecall(
   const depth = isMemorySearchDepth(options.depth)
     ? options.depth
     : DEFAULT_MEMORY_SEARCH_DEPTH;
-  const candidateLimit = candidateLimitForDepth(depth);
-  const lexicalFields = lexicalFieldsForQuery(effectiveQuery);
-  const [identityHits, passageHits, ...lexicalHits] = await Promise.all([
-    store.searchVector(info, vector, {
-      generation: manifest?.generation,
-      kind: "identity",
-      limit: candidateLimit
-    }),
-    store.searchVector(info, vector, {
-      generation: manifest?.generation,
-      kind: "passage",
-      limit: candidateLimit
-    }),
-    ...lexicalFields.map((field) =>
-      store.searchLexical(info, effectiveQuery, vector, {
-        field,
-        generation: manifest?.generation,
-        limit: candidateLimit
-      })
-    )
-  ]);
+  const layers = layersForDepth(
+    depth,
+    presentLayersOf(manifest?.records ?? [])
+  );
+  const channels = await searchChannelsByLayer({
+    info,
+    store,
+    generation: manifest?.generation,
+    vector,
+    queryText: effectiveQuery,
+    fields: lexicalFieldsForQuery(effectiveQuery),
+    layers
+  });
+  const reranker = new CountingRerankingProvider(options.reranker);
   const admitted = dedupeMemoryRecallHits(
     semanticRecallHits(
-      await rankHybridMemoryHits(
-        effectiveQuery,
-        {
-          identities: identityHits,
-          passages: passageHits,
-          lexical: lexicalHits.flat()
-        },
-        options.reranker
-      )
+      await rankHybridMemoryHits(effectiveQuery, channels, reranker)
     )
   );
   const results = admitted.slice(0, limit);
@@ -254,7 +251,9 @@ async function runReadyMemoryRecall(
     indexStatus: status,
     results,
     nextActions: nextActionsForRecallResults(results, status),
-    abstained: admitted.length === 0
+    abstained: admitted.length === 0,
+    layersSearched: layers,
+    rerankPairs: reranker.pairs
   };
 }
 

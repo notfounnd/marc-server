@@ -296,9 +296,6 @@ export function App() {
         onWorkspaceEmbeddingBatchSizeChange={
           workspaceMemoryActions.updateWorkspaceEmbeddingBatchSize
         }
-        onWorkspaceSearchRetryDepthChange={
-          workspaceMemoryActions.updateWorkspaceSearchRetryDepth
-        }
       />
       <Toaster closeLabel={t("Close toast")} regionLabel={t("Notifications")} />
     </div>

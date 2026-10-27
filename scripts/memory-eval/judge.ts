@@ -10,12 +10,12 @@ import type { TypedModel } from "./suggestion.js";
 import {
   judgeDocumentOf,
   judgeDocumentSha256
-} from "../../src/core/memory/scoring/judge-document.js";
+} from "./judge-document.js";
 import {
   selectedEvidenceOf,
   type RerankScores,
   type ThreadFeatures
-} from "../../src/core/memory/scoring/features.js";
+} from "./features.js";
 import type { MemoryVectorRecord } from "../../src/core/memory/types.js";
 
 /**

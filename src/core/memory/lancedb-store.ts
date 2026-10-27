@@ -64,12 +64,18 @@ export class LanceDbMemoryVectorStore implements MemoryVectorStore {
 
   async readRows(
     info: WorkspaceInfo,
-    generation?: string
+    generation?: string,
+    options?: { layers?: readonly MemoryLayer[] }
   ): Promise<MemoryVectorRow[]> {
     if (!(await this.exists(info, generation))) return [];
+    const layers = options?.layers;
+    if (layers && !layers.length) return [];
     const db = await connectLanceDb(info);
     const table = await db.openTable(tableName(generation));
-    return (await table.query().toArray()).map(memoryVectorRowFromStored);
+    const query = layers
+      ? table.query().where(layerPredicate(layers))
+      : table.query();
+    return (await query.toArray()).map(memoryVectorRowFromStored);
   }
 
   async rebuild(

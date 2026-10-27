@@ -33,8 +33,7 @@ export function AppModals({
   onShowWorkspaceSettingsChange,
   onShortcutsClose,
   onWorkspaceAutoRebuildChange,
-  onWorkspaceEmbeddingBatchSizeChange,
-  onWorkspaceSearchRetryDepthChange
+  onWorkspaceEmbeddingBatchSizeChange
 }: {
   artifactDraft?: ArtifactDraft;
   artifactView?: ArtifactView;
@@ -55,7 +54,6 @@ export function AppModals({
   onShortcutsClose: () => void;
   onWorkspaceAutoRebuildChange: (autoRebuild: boolean) => void;
   onWorkspaceEmbeddingBatchSizeChange: (embeddingBatchSize: number) => void;
-  onWorkspaceSearchRetryDepthChange: (searchRetryDepth: number) => void;
 }) {
   return (
     <>
@@ -81,7 +79,6 @@ export function AppModals({
           workspace={selectedWorkspace}
           onAutoRebuildChange={onWorkspaceAutoRebuildChange}
           onEmbeddingBatchSizeChange={onWorkspaceEmbeddingBatchSizeChange}
-          onSearchRetryDepthChange={onWorkspaceSearchRetryDepthChange}
           onClose={() => onShowWorkspaceSettingsChange(false)}
           onPrepareModel={onPrepareMemoryModel}
           onPurge={onPurgeUnusedMemory}

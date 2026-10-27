@@ -195,13 +195,6 @@
   color: var(--ink-muted);
 }
 
-.workspace-settings-slider-legend {
-  display: flex;
-  justify-content: space-between;
-  color: var(--ink-muted);
-  font-size: 11px;
-}
-
 .workspace-settings-status {
   display: grid;
   gap: 4px;

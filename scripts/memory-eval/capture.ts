@@ -1,12 +1,10 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { performance } from "node:perf_hooks";
+import { isNonThreadGroup, type EvalDataset } from "./dataset.js";
+import type { MemoryLayer } from "../../src/core/memory/sources/contract.js";
+import { INDEXED_LAYERS } from "../../src/core/memory/sources/index.js";
 import type { WorkspaceInfo } from "../../src/core/types.js";
-import type { MemoryQueryCandidateSet } from "../../src/core/memory/query-candidates.js";
-import {
-  buildMemoryQueryCandidates,
-  interpretMemoryQuery
-} from "../../src/core/memory/query-interpretation.js";
 import {
   prepareMemoryInWorkspace,
   readMemoryStatusInWorkspace,
@@ -23,31 +21,39 @@ import {
 } from "../../src/core/memory/types.js";
 import {
   corpusContentDigest,
+  corpusSourceTexts,
   withTemporaryWorkspace,
   type CorpusSource
 } from "./corpus.js";
-import type { EvalCase, EvalDataset } from "./dataset.js";
 import {
-  E2_CAPTURE_CHANNELS,
   computeCaptureFingerprint,
   type CaptureFingerprint
 } from "./capture-fingerprint.js";
 import {
-  captureChannels,
-  captureProductionRecall
-} from "./capture-channels.js";
+  E3_CAPTURE_CHANNELS,
+  E3_INDEXED_LAYERS,
+  E3_RERANK_ORDER
+} from "./capture-layers.js";
+import { planCases, type CasePlan } from "./capture-plan.js";
+import { scoreCase } from "./capture-score.js";
 import {
-  SYNTHETIC_QUERY_COUNT,
-  SYNTHETIC_QUERY_RULE,
-  syntheticQueries
-} from "../../src/core/memory/scoring/synthetic-queries.js";
+  captureSyntheticQueries,
+  E2_SYNTHETIC_REQUESTED,
+  E2_SYNTHETIC_RULE
+} from "./capture-synthetic.js";
+import { writeVectors } from "./capture-vectors.js";
+import { COUNT_LIMIT_HOURS, type ComplementRound } from "./matrix-plan.js";
+import {
+  gateOf,
+  productionRecallPairsOf,
+  type CaseGateCount
+} from "./capture-gate.js";
 import { threadReferenceEdges } from "./references.js";
-import { writeFileAtomically } from "../../src/core/write-coordination.js";
-import type { CapturedSyntheticQuery } from "./capture-types.js";
 import {
   SCHEMA_VERSION,
   prepareCaptureDirectory,
   readCapturedCase,
+  CAPTURE_FILE,
   readCheckpoint,
   writeCaptureFile,
   writeCapturedCase,
@@ -55,17 +61,12 @@ import {
 } from "./capture-storage.js";
 import type {
   CaptureContext,
+  CaptureFile,
   CaptureProviders,
   CapturedCase,
-  CapturedChannels,
   ProductionCheckMode,
   ProductionCheckRecord
 } from "./capture-types.js";
-import {
-  RecordingEmbeddingProvider,
-  RecordingQueryInterpreter,
-  RecordingRerankingProvider
-} from "./recording-providers.js";
 
 export {
   computeCaptureFingerprint,
@@ -88,6 +89,13 @@ export type CaptureOptions = {
   productionManifestPath?: string;
   resume: boolean;
   log: (line: string) => void;
+  /**
+   * Legacy E2 step: the synthetic Inverse Cloze queries that the H2 calibration reads. E3 captures
+   * leave it off; the E2 fixtures of the calibration tests turn it on.
+   */
+  syntheticQueries?: boolean;
+  /** Hours above which the count refuses the capture. The command uses the 12 h limit; tests lower it. */
+  countLimitHours?: number;
 };
 
 export type CaptureResult = {
@@ -114,15 +122,15 @@ export async function captureMemoryEval(
     options.dataset,
     options.repositoryRoot,
     await corpusContentDigest(options.source),
-    undefined,
-    E2_CAPTURE_CHANNELS
+    E3_INDEXED_LAYERS,
+    E3_CAPTURE_CHANNELS,
+    E3_RERANK_ORDER
   );
   const captureDir = path.join(
     options.outputRoot,
     options.dataset.corpus,
     fingerprint.captureId
   );
-  await prepareCaptureDirectory(captureDir, options.resume);
   const counts = await withTemporaryWorkspace(options.source, (info) =>
     runCaptureInWorkspace(options, fingerprint, captureDir, info)
   );
@@ -161,12 +169,22 @@ async function captureWithProviders(
   info: WorkspaceInfo,
   providers: CaptureProviders
 ): Promise<CaptureCounts> {
-  const context = await openCaptureContext({
+  const index = await openCaptureContext({
     info,
     providers,
     productionManifestPath: options.productionManifestPath,
-    threadIds: options.source.threadIds
+    threadIds: options.source.threadIds,
+    layers: E3_INDEXED_LAYERS
   });
+  const context: CaptureContext = {
+    ...index,
+    sourceTexts: await corpusSourceTexts(options.source)
+  };
+  const cases = options.dataset.cases;
+  const planned = await planCases(context, cases);
+  refuseAboveLimit(await gateCountsOf(context, planned), options.countLimitHours ?? COUNT_LIMIT_HOURS);
+  // The capture directory is created only once the count is accepted, so a refused capture leaves nothing.
+  await prepareCaptureDirectory(captureDir, options.resume);
 
   const digest = fingerprint.corpusDigest;
   const completed = await readCheckpoint(
@@ -177,30 +195,30 @@ async function captureWithProviders(
   const captured: CapturedCase[] = [];
   let executedCases = 0;
   let skippedCases = 0;
-  const cases = options.dataset.cases;
-  for (const [index, evalCase] of cases.entries()) {
-    const position = `[${index + 1}/${cases.length}]`;
+  for (const [position, plan] of planned.entries()) {
+    const label = `[${position + 1}/${cases.length}]`;
+    const evalCase = plan.evalCase;
     if (completed.includes(evalCase.id)) {
       captured.push(
         withoutLegacyLatency(await readCapturedCase(captureDir, evalCase.id))
       );
       skippedCases += 1;
-      options.log(`${position} ${evalCase.id} resumed`);
+      options.log(`${label} ${evalCase.id} resumed`);
       continue;
     }
     const started = performance.now();
-    const result = await captureCase(context, evalCase);
+    const result = await scoreCase(context, plan);
     await writeCapturedCase(captureDir, result);
     completed.push(evalCase.id);
     await writeCheckpoint(captureDir, fingerprint.captureId, digest, completed);
     captured.push(result);
     executedCases += 1;
     options.log(
-      `${position} ${evalCase.id} ${(performance.now() - started).toFixed(0)} ms`
+      `${label} ${evalCase.id} ${plan.scopeRecordIds.length} pairs ${(performance.now() - started).toFixed(0)} ms`
     );
   }
 
-  const synthetic = await captureSyntheticQueries(context, captureDir, options.resume);
+  const vectors = await writeVectors(captureDir, context.rows);
   await writeCaptureFile(captureDir, {
     schemaVersion: SCHEMA_VERSION,
     captureId: fingerprint.captureId,
@@ -217,16 +235,47 @@ async function captureWithProviders(
     productionCheck: context.productionCheck,
     records: context.rows.map(recordWithoutVector),
     cases: captured,
-    syntheticRule: SYNTHETIC_QUERY_RULE,
-    syntheticRequested: SYNTHETIC_QUERY_COUNT,
-    syntheticQueries: synthetic,
     identityVectors: identityVectorsOf(context),
     threadReferences: await threadReferenceEdges(
       options.source.threadsRoot,
       options.source.threadIds
-    )
+    ),
+    vectors,
+    complementRounds: await complementRoundsOf(captureDir),
+    ...(await legacySyntheticOf(options, context, captureDir))
   });
   return { cases: cases.length, executedCases, skippedCases };
+}
+
+/** The pairs of every case that the gate counts: its matrix and its production recall. */
+async function gateCountsOf(context: CaptureContext, planned: readonly CasePlan[]): Promise<CaseGateCount[]> {
+  const counts: CaseGateCount[] = [];
+  for (const plan of planned) {
+    counts.push({
+      pairs: plan.scopeRecordIds.length,
+      productionRecallPairs: await productionRecallPairsOf(context, plan.effectiveQuery)
+    });
+  }
+  return counts;
+}
+
+/** The complement rounds already in the capture file. A resume keeps them, so the log stays append-only. */
+async function complementRoundsOf(captureDir: string): Promise<ComplementRound[] | undefined> {
+  const content = await fs.readFile(path.join(captureDir, CAPTURE_FILE), "utf8").catch(() => undefined);
+  if (content === undefined) return undefined;
+  return (JSON.parse(content) as CaptureFile).complementRounds;
+}
+
+/**
+ * Refuses the capture before any pair is scored when its count of pairs needs more than the limit
+ * of hours. The approvers are consulted before a capture of that size runs.
+ */
+function refuseAboveLimit(counts: readonly CaseGateCount[], limitHours: number): void {
+  const count = gateOf(counts, limitHours);
+  if (!count.refused) return;
+  throw new Error(
+    `The capture counts ${count.totalPairs} pairs with production recall, ${count.hours.toFixed(2)} h, above the ${limitHours} h limit. Nothing was scored.`
+  );
 }
 
 /**
@@ -239,6 +288,8 @@ export async function openCaptureContext(input: {
   providers: CaptureProviders;
   productionManifestPath?: string;
   threadIds: readonly string[];
+  /** Layers of the temporary rebuild. Defaults to the production layers; E3 captures pass [0, 1, 2]. */
+  layers?: readonly MemoryLayer[];
 }): Promise<CaptureContext> {
   const { info, providers } = input;
   const store = new LanceDbMemoryVectorStore();
@@ -246,23 +297,29 @@ export async function openCaptureContext(input: {
     provider: providers.embedding,
     reranker: providers.reranker,
     interpreter: providers.interpreter,
-    store
+    store,
+    indexedLayers: input.layers ?? INDEXED_LAYERS
   };
   await prepareMemoryInWorkspace(info, operationOptions);
   const attempt = await rebuildMemoryInWorkspace(info, operationOptions);
   if (!attempt.acquired)
     throw new Error("Another memory operation is already running.");
   const manifest = attempt.manifest;
+  const rows = await store.readRows(info, manifest.generation);
+  // Only the layers that production indexes are compared with the production manifest.
+  const comparableRecordIds = new Set(
+    rows.filter((row) => INDEXED_LAYERS.includes(row.layer)).map((row) => row.recordId)
+  );
   const productionCheck = await assertProductionCheck(
     manifest,
     input.productionManifestPath,
-    input.threadIds
+    input.threadIds,
+    comparableRecordIds
   );
   const status = await readMemoryStatusInWorkspace(info, operationOptions);
   if (!status.searchReady)
     throw new Error(`Temporary memory index is not search-ready: ${status.message}`);
 
-  const rows = await store.readRows(info, manifest.generation);
   const matrixRecords = rows
     .map(recordWithoutVector)
     .filter((record) => record.kind === "identity" || record.kind === "passage");
@@ -280,52 +337,6 @@ export async function openCaptureContext(input: {
   };
 }
 
-/** Captures one case: interpretation trace, channels per text and production recall. Latency is measured apart. */
-async function captureCase(
-  context: CaptureContext,
-  evalCase: EvalCase
-): Promise<CapturedCase> {
-  const embedding = new RecordingEmbeddingProvider(context.providers.embedding);
-  const reranker = new RecordingRerankingProvider(context.providers.reranker);
-  const interpreter = new RecordingQueryInterpreter(
-    context.providers.interpreter
-  );
-  const candidates: MemoryQueryCandidateSet = buildMemoryQueryCandidates(
-    evalCase.query,
-    context.rows
-  );
-  const interpretation = await interpretMemoryQuery({
-    mode: evalCase.queryMode,
-    originalQuery: evalCase.query,
-    provider: interpreter,
-    ...candidates
-  });
-  const channels: Record<string, CapturedChannels> = {};
-  for (const text of distinctTexts(
-    evalCase.query,
-    interpretation.effectiveQuery,
-    interpretation.suggestedQuery,
-    candidates.variants[1]
-  )) {
-    channels[text] = await captureChannels(context, embedding, reranker, text);
-  }
-  return {
-    id: evalCase.id,
-    queryMode: evalCase.queryMode,
-    originalQuery: evalCase.query,
-    interpretation,
-    candidates,
-    interpretationTrace: interpreter.trace,
-    queryVectors: Object.fromEntries(embedding.queryVectors),
-    channels,
-    rerankScores: Object.fromEntries(reranker.scores),
-    productionRecall: await captureProductionRecall(
-      context,
-      interpretation.effectiveQuery
-    )
-  };
-}
-
 /** Production check modes, in order. The first predicate that matches the production schema version wins. */
 const PRODUCTION_CHECK_MODES: ReadonlyArray<{
   mode: ProductionCheckMode;
@@ -338,10 +349,16 @@ const PRODUCTION_CHECK_MODES: ReadonlyArray<{
   { mode: "thread-ids", matches: () => true }
 ];
 
+/**
+ * Mismatches of a temporary manifest against production. `comparableRecordIds` holds the records of
+ * the temporary rebuild whose layer the production index holds, so that the layers that production
+ * does not index (layers 1 and 2 in the default setting) are not compared.
+ */
 type ProductionComparison = (
   manifest: MemoryManifest,
   production: MemoryManifest,
-  pinned: ReadonlySet<string>
+  pinned: ReadonlySet<string>,
+  comparableRecordIds: ReadonlySet<string>
 ) => string[];
 
 /** One comparison per mode. Each returns mismatch descriptions; an empty list means a match. */
@@ -358,7 +375,8 @@ const PRODUCTION_COMPARISONS: Record<ProductionCheckMode, ProductionComparison> 
 async function assertProductionCheck(
   manifest: MemoryManifest,
   productionManifestPath: string | undefined,
-  threadIds: readonly string[]
+  threadIds: readonly string[],
+  comparableRecordIds: ReadonlySet<string>
 ): Promise<ProductionCheckRecord | undefined> {
   if (productionManifestPath === undefined) return undefined;
   const production = JSON.parse(
@@ -368,7 +386,8 @@ async function assertProductionCheck(
   const problems = PRODUCTION_COMPARISONS[mode](
     manifest,
     production,
-    new Set(threadIds)
+    new Set(threadIds),
+    comparableRecordIds
   );
   if (problems.length > 0)
     throw new Error(
@@ -388,13 +407,16 @@ function productionCheckMode(productionSchemaVersion: number): ProductionCheckMo
   return entry?.mode ?? "thread-ids";
 }
 
-function compareRecordIds(
+export function compareRecordIds(
   manifest: MemoryManifest,
   production: MemoryManifest,
-  pinned: ReadonlySet<string>
+  pinned: ReadonlySet<string>,
+  comparableRecordIds: ReadonlySet<string>
 ): string[] {
   const expected = recordIdSet(production, pinned);
-  const actual = recordIdSet(manifest, pinned);
+  const actual = new Set(
+    [...recordIdSet(manifest, pinned)].filter((recordId) => comparableRecordIds.has(recordId))
+  );
   return differences([
     [
       "record ids missing from the temporary manifest",
@@ -407,13 +429,16 @@ function compareRecordIds(
   ]);
 }
 
-function compareThreadIds(
+export function compareThreadIds(
   manifest: MemoryManifest,
   production: MemoryManifest,
   pinned: ReadonlySet<string>
 ): string[] {
   const productionThreads = threadIdSet(production);
-  const temporaryThreads = threadIdSet(manifest);
+  const temporaryThreads = new Set(
+    [...threadIdSet(manifest)].filter((groupId) => !isNonThreadGroup(groupId))
+  );
+  // @rules and @document groups are accepted in the temporary manifest: production indexes layer 0 only.
   return differences([
     [
       "pinned threads missing from production",
@@ -455,54 +480,18 @@ export async function disposeProviders(providers: CaptureProviders): Promise<voi
   ]);
 }
 
-/**
- * Captures the synthetic Inverse Cloze queries of the generation. Each query has
- * its own recording providers, so its query vector and reranker scores stay apart.
- */
-const SYNTHETIC_CACHE_FILE = "synthetic-queries.json";
-
-/**
- * The synthetic queries of a capture. A resumed capture reads them back, like its
- * concluded cases, so the embedding and reranking of the queries run once.
- */
-async function captureSyntheticQueries(
+/** The E2 synthetic fields, only when the legacy step is on. E3 captures carry none of them. */
+async function legacySyntheticOf(
+  options: CaptureOptions,
   context: CaptureContext,
-  captureDir: string,
-  resume: boolean
-): Promise<CapturedSyntheticQuery[]> {
-  const cachePath = path.join(captureDir, SYNTHETIC_CACHE_FILE);
-  const cached = resume
-    ? await fs.readFile(cachePath, "utf8").catch(() => undefined)
-    : undefined;
-  if (cached !== undefined) return JSON.parse(cached) as CapturedSyntheticQuery[];
-  const captured = await computeSyntheticQueries(context);
-  await writeFileAtomically(cachePath, JSON.stringify(captured));
-  return captured;
-}
-
-async function computeSyntheticQueries(
-  context: CaptureContext
-): Promise<CapturedSyntheticQuery[]> {
-  const passages = context.rows
-    .filter((row) => row.kind === "passage")
-    .map((row) => ({
-      recordId: row.recordId,
-      threadId: row.threadId,
-      text: row.text
-    }));
-  const captured: CapturedSyntheticQuery[] = [];
-  for (const query of syntheticQueries(passages, context.generation)) {
-    const embedding = new RecordingEmbeddingProvider(context.providers.embedding);
-    const reranker = new RecordingRerankingProvider(context.providers.reranker);
-    const channels = await captureChannels(context, embedding, reranker, query.text);
-    captured.push({
-      ...query,
-      queryVector: vectorOf(embedding.queryVectors, query.text),
-      channels,
-      rerankScores: Object.fromEntries(reranker.scores)
-    });
-  }
-  return captured;
+  captureDir: string
+): Promise<Partial<Pick<CaptureFile, "syntheticRule" | "syntheticRequested" | "syntheticQueries">>> {
+  if (options.syntheticQueries !== true) return {};
+  return {
+    syntheticRule: E2_SYNTHETIC_RULE,
+    syntheticRequested: E2_SYNTHETIC_REQUESTED,
+    syntheticQueries: await captureSyntheticQueries(context, captureDir, options.resume)
+  };
 }
 
 /** Identity vector of each pinned thread, for the identity-identity cosine of N1. */
@@ -512,19 +501,6 @@ function identityVectorsOf(context: CaptureContext): Record<string, number[]> {
       .filter((row) => row.kind === "identity")
       .map((row) => [row.threadId, [...row.vector]])
   );
-}
-
-function vectorOf(vectors: ReadonlyMap<string, number[]>, text: string): number[] {
-  const vector = vectors.get(text);
-  if (vector === undefined) {
-    throw new Error(`Missing query vector for "${text}".`);
-  }
-  return [...vector];
-}
-
-function distinctTexts(...texts: Array<string | undefined>): string[] {
-  const present = texts.filter((text): text is string => text !== undefined);
-  return [...new Set(present)];
 }
 
 /** Captures written before latency left capture.json may still carry latencyMs. It is dropped here. */

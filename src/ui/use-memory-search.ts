@@ -4,20 +4,12 @@ import {
   findMemorySearchThread,
   isCurrentMemorySearchRequest,
   isMemorySearchAvailable,
-  recallMemorySearchDepths,
   readStoredMemorySearchState,
+  recallMemorySearch,
   writeStoredMemorySearchState
 } from "./memory-search.js";
-import {
-  automaticMemorySearchDepths,
-  isMemorySearchRetryDepth,
-  nextMemorySearchDepth,
-  type MemorySearchDepthState,
-  type MemorySearchRetryDepth
-} from "./memory-search-depth.js";
 import type {
   MemoryIndexHealth,
-  MemoryQueryInterpretation,
   MemoryRecallHit,
   MemoryRecallResult,
   MemorySearchStatus,
@@ -50,7 +42,6 @@ export function useMemorySearch({
   const [result, setResult] = useState<MemoryRecallResult>();
   const [status, setStatus] = useState<MemorySearchStatus>("idle");
   const [error, setError] = useState<string>();
-  const [activeSearch, setActiveSearch] = useState<MemorySearchDepthState>();
   const workspaceId = selectedWorkspace?.id;
   const requestId = useRef(0);
   const currentWorkspaceId = useRef(workspaceId);
@@ -63,14 +54,6 @@ export function useMemorySearch({
     setResult(saved?.result);
     setStatus("idle");
     setError(undefined);
-    setActiveSearch(
-      saved
-        ? {
-            configuredDepth: saved.configuredDepth,
-            lastExecutedDepth: saved.lastExecutedDepth
-          }
-        : undefined
-    );
   }, [workspaceId]);
 
   async function runSearch(): Promise<void> {
@@ -87,56 +70,23 @@ export function useMemorySearch({
       return;
     }
 
-    const configuredDepth = selectedSearchRetryDepth(selectedMemoryHealth);
-    await executeSearch({
-      configuredDepth,
-      query: trimmedQuery,
-      depths: automaticMemorySearchDepths(configuredDepth)
-    });
-  }
-
-  async function runDeepRetry(): Promise<void> {
-    if (!selectedWorkspace) return;
-    if (!isMemorySearchAvailable(selectedMemoryHealth)) return;
-    if (!activeSearch) return;
-    if (!result) return;
-    const depth = nextMemorySearchDepth(activeSearch);
-    if (depth === undefined) return;
-
-    await executeSearch({
-      configuredDepth: activeSearch.configuredDepth,
-      query: result.query,
-      depths: [depth],
-      interpretation: result.interpretation
-    });
+    await executeSearch({ query: trimmedQuery });
   }
 
   async function runAlternateSearch(): Promise<void> {
     if (!result) return;
     const alternateQuery = alternateMemorySearchQuery(result.interpretation);
     if (!alternateQuery) return;
-    const configuredDepth = selectedSearchRetryDepth(selectedMemoryHealth);
     setQuery(alternateQuery);
-    await executeSearch({
-      configuredDepth,
-      depths: automaticMemorySearchDepths(configuredDepth),
-      initialMode: "literal",
-      query: alternateQuery
-    });
+    await executeSearch({ initialMode: "literal", query: alternateQuery });
   }
 
   async function executeSearch({
-    configuredDepth,
     query: nextQuery,
-    depths,
-    initialMode = "auto",
-    interpretation
+    initialMode = "auto"
   }: {
-    configuredDepth: MemorySearchRetryDepth;
     query: string;
-    depths: MemorySearchRetryDepth[];
     initialMode?: "auto" | "literal";
-    interpretation?: MemoryQueryInterpretation;
   }): Promise<void> {
     if (!selectedWorkspace) return;
     const nextWorkspaceId = selectedWorkspace.id;
@@ -146,15 +96,12 @@ export function useMemorySearch({
     setError(undefined);
 
     try {
-      const { lastExecutedDepth, result: nextResult } =
-        await recallMemorySearchDepths({
-          apiPost,
-          query: nextQuery,
-          depths,
-          initialMode,
-          interpretation,
-          workspaceId: nextWorkspaceId
-        });
+      const nextResult = await recallMemorySearch({
+        apiPost,
+        initialMode,
+        query: nextQuery,
+        workspaceId: nextWorkspaceId
+      });
       if (
         !isCurrentMemorySearchRequest(
           nextRequestId,
@@ -165,12 +112,9 @@ export function useMemorySearch({
       ) {
         return;
       }
-      const active = { configuredDepth, lastExecutedDepth };
-      setActiveSearch(active);
       setResult(nextResult);
       setStatus("idle");
       writeStoredMemorySearchState(localStorage, {
-        ...active,
         query: nextQuery,
         result: nextResult,
         workspaceId: nextWorkspaceId
@@ -191,7 +135,9 @@ export function useMemorySearch({
     }
   }
 
+  /** A rules or document hit has no thread to open: selecting it does nothing and reports no error. */
   function selectHit(hit: MemoryRecallHit): void {
+    if (!hit.threadId) return;
     const thread = findMemorySearchThread(hit, allWorkspaceThreads);
     if (!thread) {
       onStatusChange(
@@ -205,28 +151,12 @@ export function useMemorySearch({
 
   return {
     error,
-    deepRetryAvailable:
-      activeSearch !== undefined &&
-      result !== undefined &&
-      !error &&
-      status !== "searching" &&
-      nextMemorySearchDepth(activeSearch) !== undefined,
     query,
     result,
-    runDeepRetry,
     runAlternateSearch,
     status,
     runSearch,
     selectHit,
     setQuery
   };
-}
-
-function selectedSearchRetryDepth(
-  health: MemoryIndexHealth | undefined
-): MemorySearchRetryDepth {
-  if (isMemorySearchRetryDepth(health?.searchRetryDepth)) {
-    return health.searchRetryDepth;
-  }
-  return 0;
 }

@@ -1,5 +1,6 @@
 import type { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
+import { MEMORY_SEARCH_DEPTH_RANGE_MESSAGE } from "../core/memory/index.js";
 import {
   prepareMemory,
   readMemoryStatus,
@@ -52,8 +53,13 @@ export function registerMemoryTools(
       query: z.string().min(1),
       queryMode: z.enum(["auto", "literal"]).optional(),
       limit: z.number().int().positive().optional(),
-      depth: z.number().int().min(0).max(3).optional(),
-      minScore: z.never().optional().describe("Removed. Use depth from 0 to 3.")
+      depth: z
+        .number()
+        .int()
+        .min(0, MEMORY_SEARCH_DEPTH_RANGE_MESSAGE)
+        .max(2, MEMORY_SEARCH_DEPTH_RANGE_MESSAGE)
+        .optional(),
+      minScore: z.never().optional().describe("Removed. Use depth from 0 to 2.")
     }),
     async (input) =>
       withBootstrap(input, async () =>

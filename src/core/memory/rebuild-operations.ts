@@ -20,6 +20,7 @@ import {
   MEMORY_SCHEMA_VERSION,
   MEMORY_SOURCE_LAYERS
 } from "./types.js";
+import { compareSourcesToManifest } from "./source-comparison.js";
 import type {
   EmbeddingProvider,
   MemoryChunk,
@@ -66,8 +67,10 @@ export async function reconcileMemory(
     );
 
   const sources = await materializedSources(info, options);
-  const changedPaths = changedSourcePaths(sources, manifest);
-  const removedPaths = removedSourcePaths(sources, manifest);
+  const { changedPaths, removedPaths } = compareSourcesToManifest(
+    sources,
+    manifest
+  );
   if (!changedPaths.size && !removedPaths.size) return manifest;
 
   if (!store.readRows)
@@ -126,48 +129,6 @@ async function publishGeneration(
 
 function memoryStore(store?: MemoryVectorStore): MemoryVectorStore {
   return store ?? new LanceDbMemoryVectorStore();
-}
-
-function changedSourcePaths(
-  sources: MemorySource[],
-  manifest: MemoryManifest
-): Set<string> {
-  const previous = new Map(
-    manifest.records.map((record) => [record.sourcePath, record])
-  );
-  return new Set(
-    sources
-      .filter((source) =>
-        isChangedSource(source, previous.get(source.sourcePath))
-      )
-      .map((source) => source.sourcePath)
-  );
-}
-
-// The hash covers only the content. Authority, layer, and source type are
-// stored in every indexed record too, so a change in any of them re-indexes
-// the source. A reference-to-normative switch keeps the same hash.
-function isChangedSource(
-  source: MemorySource,
-  record: MemoryManifestRecord | undefined
-): boolean {
-  if (!record) return true;
-  if (record.sha256 !== source.sha256) return true;
-  if (record.authority !== source.authority) return true;
-  if (record.sourceType !== source.sourceType) return true;
-  return record.layer !== MEMORY_SOURCE_LAYERS[source.sourceType];
-}
-
-function removedSourcePaths(
-  sources: MemorySource[],
-  manifest: MemoryManifest
-): Set<string> {
-  const currentPaths = new Set(sources.map((source) => source.sourcePath));
-  return new Set(
-    manifest.records
-      .filter((record) => !currentPaths.has(record.sourcePath))
-      .map((record) => record.sourcePath)
-  );
 }
 
 async function embedRecords(

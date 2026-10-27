@@ -13,7 +13,7 @@ import {
   cheapSemanticOnlyVectorOf,
   cheapVectorOf,
   type ThreadFeatures
-} from "../../src/core/memory/scoring/features.js";
+} from "./features.js";
 import { interpretationContribution, type Contribution } from "./metrics.js";
 import { cachedReplayProviders, channelsOfCaptured } from "./replay.js";
 

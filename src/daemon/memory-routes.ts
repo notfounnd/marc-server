@@ -11,7 +11,7 @@ import {
 import {
   isMemoryEmbeddingBatchSize,
   isMemorySearchDepth,
-  isMemorySearchRetryDepth,
+  MEMORY_SEARCH_DEPTH_RANGE_MESSAGE,
   type MemoryRebuildMode
 } from "../core/memory/index.js";
 import type { WorkspaceInfo, WorkspaceSettingsInput } from "../core/types.js";
@@ -40,7 +40,6 @@ type WorkspaceSettingsBody = Partial<{
   memory: Partial<{
     autoRebuild: boolean;
     embeddingBatchSize: number;
-    searchRetryDepth: number;
   }>;
 }>;
 
@@ -173,31 +172,32 @@ function memoryRecallInput(body: unknown):
   | undefined {
   if (!isRecord(body)) return undefined;
   if ("minScore" in body)
-    return { error: "minScore was removed. Use depth from 0 to 3." };
+    return { error: "minScore was removed. Use depth from 0 to 2." };
   const input = body as MemoryRecallBody;
   if (typeof input.query !== "string") return undefined;
   const query = input.query.trim();
   if (!query) return undefined;
   if (input.depth !== undefined && !isMemorySearchDepth(input.depth))
-    return undefined;
+    return { error: MEMORY_SEARCH_DEPTH_RANGE_MESSAGE };
+  if (input.limit !== undefined && !isPositiveInteger(input.limit))
+    return { error: "Memory search limit must be a positive integer." };
   if (input.queryMode !== undefined && !isMemoryQueryMode(input.queryMode))
     return { error: "Memory query mode must be auto or literal" };
   return {
     depth: input.depth,
-    limit: optionalFiniteNumber(input.limit),
+    limit: input.limit,
     query,
     queryMode: input.queryMode
   };
 }
 
-function isMemoryQueryMode(value: unknown): value is "auto" | "literal" {
-  return value === "auto" || value === "literal";
+function isPositiveInteger(value: unknown): value is number {
+  if (typeof value !== "number") return false;
+  return Number.isInteger(value) && value > 0;
 }
 
-function optionalFiniteNumber(value: unknown): number | undefined {
-  if (typeof value !== "number") return undefined;
-  if (!Number.isFinite(value)) return undefined;
-  return value;
+function isMemoryQueryMode(value: unknown): value is "auto" | "literal" {
+  return value === "auto" || value === "literal";
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -224,7 +224,6 @@ function workspaceSettingsInput(
   const memory = isRecord(input.memory) ? input.memory : undefined;
   const autoRebuild = memory?.autoRebuild;
   const embeddingBatchSize = memory?.embeddingBatchSize;
-  const searchRetryDepth = memory?.searchRetryDepth;
   if (autoRebuild !== undefined && typeof autoRebuild !== "boolean")
     return undefined;
   if (
@@ -232,12 +231,7 @@ function workspaceSettingsInput(
     !isMemoryEmbeddingBatchSize(embeddingBatchSize)
   )
     return undefined;
-  if (
-    searchRetryDepth !== undefined &&
-    !isMemorySearchRetryDepth(searchRetryDepth)
-  )
-    return undefined;
-  return { memory: { autoRebuild, embeddingBatchSize, searchRetryDepth } };
+  return { memory: { autoRebuild, embeddingBatchSize } };
 }
 
 function memoryRebuildMode(body: unknown): MemoryRebuildMode | undefined {

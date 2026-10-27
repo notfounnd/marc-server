@@ -1,4 +1,5 @@
 import type { EvalCaseStyle, RelevanceGrade } from "./dataset.js";
+import { requiredLayersOf, saturatedOf } from "./required-cells.js";
 import type { VariantResult } from "./variants.js";
 import { PROPORTION_MARGIN, RANKING_MARGIN } from "./statistics.js";
 
@@ -74,6 +75,22 @@ export const VARIANT_PLANS: Readonly<Record<string, VariantPlan>> = {
     requireAdmitted: true
   },
   D0: { metricIds: FULL_LIST_METRICS, requireAdmitted: false },
+  /** The M0 algorithm at each depth: the same decision plan as M0. */
+  DEPTH0: { metricIds: [...ADMITTED_METRICS, ...FULL_LIST_METRICS], requireAdmitted: true },
+  DEPTH1: { metricIds: [...ADMITTED_METRICS, ...FULL_LIST_METRICS], requireAdmitted: true },
+  DEPTH2: { metricIds: [...ADMITTED_METRICS, ...FULL_LIST_METRICS], requireAdmitted: true },
+  /** Adaptive funnel variants (E3): the admitted groups must be judged, as for M0. */
+  ADAPTIVE: { metricIds: [...ADMITTED_METRICS, ...FULL_LIST_METRICS], requireAdmitted: true },
+  ADAPTIVE_HM: { metricIds: [...ADMITTED_METRICS, ...FULL_LIST_METRICS], requireAdmitted: true },
+  /** One funnel variant per depth: FUNNEL and ALL_PASSAGES admit groups, as for M0. */
+  ...Object.fromEntries(
+    [0, 1, 2].flatMap((depth) => [
+      [`FUNNEL_D${depth}`, { metricIds: [...ADMITTED_METRICS, ...FULL_LIST_METRICS], requireAdmitted: true }],
+      [`ALL_PASSAGES_D${depth}`, { metricIds: [...ADMITTED_METRICS, ...FULL_LIST_METRICS], requireAdmitted: true }],
+      /** Reference ceiling: every candidate is admitted, so its list is judged like D0. */
+      [`ALL_CANDIDATES_D${depth}`, { metricIds: FULL_LIST_METRICS, requireAdmitted: false }]
+    ])
+  ),
   ORACLE_ADMISSION: {
     metricIds: [...ADMITTED_METRICS, ...FULL_LIST_METRICS],
     requireAdmitted: false
@@ -133,18 +150,55 @@ export function sharedMetrics(baseline: string, candidate: string): MetricId[] {
 export type Contribution = { num: number; den: number };
 export type CaseContribution = Record<MetricId, Contribution>;
 
+/**
+ * Why a variant has no complete result for a case. Every reason makes the variant not
+ * approvable; none is ever scored as zero.
+ */
+export type CaseIncomplete =
+  | { reason: "missing-score"; recordId: string }
+  | { reason: "missing-funnel-inputs" }
+  | { reason: "missing-funnel-params" }
+  | { reason: "evidence_unindexable" }
+  | { reason: "evidence_missing" }
+  | { reason: "unreplayed" };
+
 export type CaseInput = {
   caseId: string;
   family: string;
   style: EvalCaseStyle;
   judgments: Record<string, RelevanceGrade>;
   results: VariantResult[];
+  /**
+   * Why the variant has no complete result for this case. `missing-score`: a pair the variant
+   * needs is not in the matrix. `missing-funnel-inputs`: the capture lacks the channels of some
+   * depth. `unreplayed`: the variant was not replayed for this case. Every reason makes the
+   * variant not approvable; the case is never read as a zero.
+   */
+  incomplete?: CaseIncomplete;
+  /** Judgments of each layer, as the dataset holds them. With `judgedDepth`, they decide the required cells. */
+  gradesByLayer?: Partial<Record<0 | 1 | 2, Record<string, RelevanceGrade>>>;
+  /** Layers that the capture holds for each group. A group missing from the map holds layer 0 only. */
+  presentLayers?: ReadonlyMap<string, ReadonlySet<number>>;
+  /** Deepest layer that grades the variant on this case. Without it, only the effective judgments count. */
+  judgedDepth?: number;
+  /**
+   * Common reference of a comparison (plan revision 8): the judgments that fix the relevant set of the case,
+   * at the largest depth of the compared variants. The numerators keep the variant's own judgments.
+   */
+  referenceJudgments?: Record<string, RelevanceGrade>;
+  /**
+   * Depth of the common reference (the largest depth of the compared variants). It fixes the relevant set from
+   * the judged layers up to it; it does not require cells, so an unjudged layer is not a pending cell.
+   */
+  referenceDepth?: number;
 };
 
 export type PendingPair = {
   caseId: string;
   threadId: string;
   reach: "admittedList" | "fullTop10";
+  /** The layer of the cell that has no judgment; absent for the effective judgments of old inputs. */
+  layer?: number;
 };
 
 export const INTERPRETATION_IDS = [
@@ -167,7 +221,8 @@ export function caseContribution(input: CaseInput): CaseContribution {
   const admittedGrades = admitted.map((item) => gradeOf(input.judgments, item.threadId));
   const topResults = input.results.slice(0, LIST_DEPTH);
   const topGrades = topResults.map((item) => gradeOf(input.judgments, item.threadId));
-  const judgedRelevant = Object.values(input.judgments).filter(
+  const reference = input.referenceJudgments ?? input.judgments;
+  const judgedRelevant = Object.values(reference).filter(
     (grade) => grade >= RELEVANT_GRADE
   ).length;
   const admittedRelevant = admittedGrades.filter((grade) => grade >= RELEVANT_GRADE).length;
@@ -242,13 +297,31 @@ export function reachEntries(item: Pick<CaseInput, "results">, requireAdmitted: 
   });
 }
 
-/** Unjudged positions inside the reach of a variant. */
+/** Unjudged positions inside the reach of a variant: every required cell without a judgment of its layer. */
 export function pendingPairs(cases: readonly CaseInput[], requireAdmitted: boolean): PendingPair[] {
   return cases.flatMap((item) =>
-    reachEntries(item, requireAdmitted)
-      .filter((entry) => !Object.hasOwn(item.judgments, entry.threadId))
-      .map((entry) => ({ caseId: item.caseId, threadId: entry.threadId, reach: entry.reach }))
+    reachEntries(item, requireAdmitted).flatMap((entry) => unjudgedOf(item, entry))
   );
+}
+
+/** The pending cells of one reached group. Without the layer grades, the effective judgments decide. */
+function unjudgedOf(item: CaseInput, entry: ReachEntry): PendingPair[] {
+  const pending = (layer?: number): PendingPair => ({
+    caseId: item.caseId,
+    threadId: entry.threadId,
+    reach: entry.reach,
+    ...(layer === undefined ? {} : { layer })
+  });
+  // Completeness follows the variant's own depth. The common reference (referenceDepth) fixes only the
+  // relevant set, from the judged layers; a layer cell that nobody judged neither blocks nor counts as zero.
+  const depth = item.judgedDepth;
+  if (depth === undefined || item.gradesByLayer === undefined)
+    return Object.hasOwn(item.judgments, entry.threadId) ? [] : [pending()];
+  const present = new Set(item.presentLayers?.get(entry.threadId) ?? [0]);
+  const saturated = saturatedOf(item.gradesByLayer?.[0] ?? {}, entry.threadId);
+  return requiredLayersOf(entry.threadId, depth, present, saturated)
+    .filter((layer) => !Object.hasOwn(item.gradesByLayer?.[layer] ?? {}, entry.threadId))
+    .map((layer) => pending(layer));
 }
 
 /** Contributions of the interpretation metrics of one case with an expected interpretation. */

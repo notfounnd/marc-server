@@ -74,7 +74,6 @@ export type MemoryIndexHealth = {
   lastError: string | null;
   autoRebuild: boolean;
   embeddingBatchSize: number;
-  searchRetryDepth: number;
   maintenance?: {
     models: Array<{
       active: boolean;
@@ -93,11 +92,13 @@ export type MemoryIndexHealth = {
 /** Heuristic confidence band of a hit. It orders the results; it is not a probability. */
 export type MemoryBand = "high" | "medium" | "low";
 
+/** A thread group carries `threadId` and `summaryPath`; a rules or document group carries neither. */
 export type MemoryRecallHit = {
-  threadId: string;
+  groupId?: string;
+  threadId?: string;
   title: string;
   closedAt?: string;
-  summaryPath: string;
+  summaryPath?: string;
   reference: string;
   matchedText: string;
   score: number;

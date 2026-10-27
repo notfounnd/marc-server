@@ -43,16 +43,16 @@ export {
   DEFAULT_MEMORY_EMBEDDING_BATCH_SIZE,
   MAX_MEMORY_EMBEDDING_BATCH_SIZE,
   MIN_MEMORY_EMBEDDING_BATCH_SIZE,
-  isMemoryEmbeddingBatchSize,
-  DEFAULT_MEMORY_SEARCH_RETRY_DEPTH,
-  MAX_MEMORY_SEARCH_RETRY_DEPTH,
-  isMemorySearchRetryDepth
+  isMemoryEmbeddingBatchSize
 } from "./settings.js";
 export {
-  candidateLimitForMemorySearchDepth,
   DEFAULT_MEMORY_SEARCH_DEPTH,
   isMemorySearchDepth,
-  MEMORY_SEARCH_CANDIDATE_LIMITS
+  layersForDepth,
+  MAX_MEMORY_SEARCH_DEPTH,
+  MEMORY_DEPTH_LAYERS,
+  MEMORY_LAYER_CANDIDATE_LIMIT,
+  MEMORY_SEARCH_DEPTH_RANGE_MESSAGE
 } from "./search-depth.js";
 export { semanticRerankingDocument } from "./semantic-ranking.js";
 export {

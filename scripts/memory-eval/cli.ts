@@ -1,5 +1,7 @@
+import { createHash } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
+import { COUNT_LIMIT_HOURS, type EvidenceMatch } from "./matrix-plan.js";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 import type { WorkspaceInfo } from "../../src/core/types.js";
@@ -7,8 +9,36 @@ import { getWorkspaceInfo } from "../../src/core/workspace.js";
 import { LocalEmbeddingProvider } from "../../src/core/memory/local-provider.js";
 import { LocalQueryInterpretationProvider } from "../../src/core/memory/local-query-interpreter.js";
 import { LocalRerankingProvider } from "../../src/core/memory/local-reranker.js";
-import { captureMemoryEval, disposeProviders, type CaptureProviders } from "./capture.js";
+import {
+  captureMemoryEval,
+  disposeProviders,
+  type CaptureOptions,
+  type CaptureProviders
+} from "./capture.js";
 import { queryFingerprintCases, sha256Json } from "./capture-fingerprint.js";
+import { countCapture } from "./capture-count.js";
+import {
+  complementCapture,
+  complementCountOf,
+  targetsOfJudged,
+  type ComplementTargets
+} from "./capture-complement.js";
+import { readVectors } from "./capture-vectors.js";
+import { funnelParamsOf, funnelWorksheetGridOf } from "./replay-funnel.js";
+import type { WorksheetRun } from "./judgments.js";
+import {
+  AUDIT_DEPTH_VARIANTS,
+  AUDIT_SEED,
+  auditCasesOf,
+  complementGroupsOf,
+  type ComplementGroupsFile,
+  mergeReportOf,
+  medianOf,
+  readOrCreateAuditManifest,
+  sampledByCaseOf
+} from "./audit-sample.js";
+import { exhaustiveReachesOf } from "./worksheet-reach.js";
+import { isFunnelVariantName } from "./funnel-variants.js";
 import type { CaptureFile } from "./capture-types.js";
 import { recordsById, replayCapture } from "./replay.js";
 import {
@@ -80,7 +110,14 @@ import {
   reportFileNames
 } from "./report.js";
 import { compareCaptures } from "./compare.js";
+import {
+  compareCommonCases,
+  renderCompareCommonMarkdown
+} from "./compare-common.js";
 import { measureAllLayers } from "./layers.js";
+import { renderT2Markdown, runT2, type T2Report } from "./t2-run.js";
+import type { KChoice } from "./t2-decision.js";
+import type { AuditManifest } from "./audit-sample.js";
 import {
   measureCaptureLatency,
   readLatencyFile,
@@ -94,6 +131,11 @@ import {
   type MergeReport
 } from "./judgments.js";
 import { writeFileAtomically } from "../../src/core/write-coordination.js";
+import {
+  configuredDocumentsOf,
+  corpusSourceTexts,
+  type CorpusDocument
+} from "./corpus.js";
 import {
   buildValidationCorpus,
   validateDataset,
@@ -112,9 +154,11 @@ type CorpusRegistration = {
   threadsPath: string;
   rulesPath: string;
   productionManifestPath?: string;
+  /** Workspace settings whose `memory.documentSources` list the configured documents of the corpus. */
+  settingsPath?: string;
 };
 
-const CORPORA: ReadonlyMap<string, CorpusRegistration> = new Map<
+export const CORPORA: ReadonlyMap<string, CorpusRegistration> = new Map<
   string,
   CorpusRegistration
 >([
@@ -125,6 +169,7 @@ const CORPORA: ReadonlyMap<string, CorpusRegistration> = new Map<
       pinnedPath: path.join(MEMORY_EVAL_DIR, "datasets", "marc.corpus.json"),
       threadsPath: path.join(REPOSITORY_ROOT, ".marc", "threads"),
       rulesPath: path.join(REPOSITORY_ROOT, ".marc", "RULES.md"),
+      settingsPath: path.join(REPOSITORY_ROOT, ".marc", "marc.config.json"),
       productionManifestPath: path.join(
         REPOSITORY_ROOT,
         ".marc",
@@ -201,12 +246,25 @@ async function readPinnedCorpus(pinnedPath: string): Promise<PinnedCorpus> {
   return JSON.parse(await fs.readFile(pinnedPath, "utf8")) as PinnedCorpus;
 }
 
-async function validationCorpus(
+/** The configured documents of a corpus: the `memory.documentSources` of its settings, or none. */
+async function documentsOf(registration: CorpusRegistration): Promise<CorpusDocument[]> {
+  if (registration.settingsPath === undefined) return [];
+  return configuredDocumentsOf({ repositoryRoot: REPOSITORY_ROOT });
+}
+
+/** The validation corpus, the pinned files that evidence quotes are checked against, and the issues of pinning. */
+export async function validationCorpus(
   registration: CorpusRegistration
-): Promise<ReturnType<typeof buildValidationCorpus>> {
+): Promise<ReturnType<typeof buildValidationCorpus> & { sources: Map<string, string> }> {
   const pinned = await readPinnedCorpus(registration.pinnedPath);
   const closed = await readClosedThreads(registration.threadsPath);
-  return buildValidationCorpus(pinned, closed);
+  const sources = await corpusSourceTexts({
+    threadsRoot: registration.threadsPath,
+    threadIds: pinned.threadIds,
+    rulesPath: registration.rulesPath,
+    documents: await documentsOf(registration)
+  });
+  return { ...buildValidationCorpus(pinned, closed), sources };
 }
 
 function optionValue(next: string | undefined): string | undefined {
@@ -261,6 +319,107 @@ async function readDataset(
   return undefined;
 }
 
+/**
+ * Complements the groups of a groups file (the cosine rows of a worksheet). With --count-only it writes
+ * nothing and reports the pairs and the hours; without it, it scores them with the reranker.
+ */
+async function complementGroupsCommand(input: {
+  corpusName: string;
+  captureId: string | undefined;
+  groupsPath: string;
+  countOnly: boolean;
+  modelInfo: WorkspaceInfo;
+}): Promise<number> {
+  if (input.captureId === undefined) {
+    console.error("Usage: memory:eval capture --complement-groups <file> --capture <captureId> [--count-only true]");
+    return 2;
+  }
+  const captureDir = path.join(REPOSITORY_ROOT, ".marc", "cache", "memory-eval", input.corpusName, input.captureId);
+  const targets = targetsOfGroupsFile(JSON.parse(await fs.readFile(input.groupsPath, "utf8")) as ComplementGroupsFile);
+  if (input.countOnly) {
+    const count = await complementCountOf({ captureDir, targets });
+    console.log(
+      `captureId=${input.captureId} round=${count.round} cases=${count.perCase.length} addedRecords=${count.addedRecords} scoredPairs=${count.scoredPairs} hours=${count.hours.toFixed(2)} limitHours=${COUNT_LIMIT_HOURS} refused=${count.refused} written=none`
+    );
+    return count.refused ? 1 : 0;
+  }
+  const providers = createLocalProviders(input.modelInfo);
+  const summary = await complementCapture({ captureDir, targets, reranker: providers.reranker });
+  console.log(`captureId=${input.captureId} round=${summary.round} addedPairs=${summary.addedPairs} cases=${summary.perCase.length}`);
+  return 0;
+}
+
+/** The targets of a groups file: the groups of each case, by case id. */
+function targetsOfGroupsFile(file: ComplementGroupsFile): ComplementTargets {
+  return new Map(Object.entries(file.cases).map(([caseId, groups]) => [caseId, new Set(groups)] as const));
+}
+
+/**
+ * The T2 of the E3 on a frozen capture: K and the fallback cuts chosen on the training folds, the decision
+ * rows on the common reference, the evidence survival by passageId, and the audit pool. Writes the JSON and
+ * the Markdown report beside the capture. Refuses without the capture vectors.
+ */
+async function t2Command(options: CommandOptions): Promise<number> {
+  const corpusName = options.get("corpus") ?? "marc";
+  const registration = CORPORA.get(corpusName);
+  if (registration === undefined) {
+    console.error(`Unknown corpus: ${corpusName}`);
+    return 2;
+  }
+  const captureId = options.get("capture");
+  if (captureId === undefined) {
+    console.error("Usage: memory:eval t2 --capture <captureId> [--corpus marc] [--funnel-mode cosine|cosine-fts] [--k-from <cosine t2-report.json>]");
+    return 2;
+  }
+  const dataset = await readDataset(corpusName, registration);
+  if (dataset === undefined) return 2;
+  const capture = await readCaptureFileOf(corpusName, captureId);
+  const directory = captureDirectoryOf(corpusName, captureId);
+  if (capture.vectors === undefined) {
+    console.error("The T2 needs the capture vectors: capture an E3 capture first.");
+    return 1;
+  }
+  const vectors = await readVectors(directory, capture.vectors);
+  const evidence = await readEvidenceOf(directory);
+  const audit = JSON.parse(await fs.readFile(path.join(directory, "audit-sample.json"), "utf8")) as AuditManifest;
+  const mode = options.get("funnel-mode") ?? "cosine";
+  if (mode !== "cosine" && mode !== "cosine-fts") {
+    console.error("The --funnel-mode of the T2 is cosine or cosine-fts.");
+    return 2;
+  }
+  const kFrom = options.get("k-from");
+  const kOverride = kFrom === undefined ? undefined : await readKOverrideOf(kFrom);
+  const report = await runT2({ corpus: corpusName, capture, dataset, vectors, evidence, audit, mode, kOverride, curve: mode === "cosine" });
+  const suffix = mode === "cosine" ? "" : `-${mode}`;
+  await writeFileAtomically(path.join(directory, `t2-report${suffix}.json`), `${JSON.stringify(report, null, 2)}\n`);
+  await writeFileAtomically(path.join(directory, `t2-report${suffix}.md`), renderT2Markdown(report));
+  console.log(
+    `captureId=${captureId} mode=${mode} report=${path.join(directory, `t2-report${suffix}.md`)} survival=${report.survival.survived}/${report.survival.population} decisionRows=${report.decisions.length}`
+  );
+  return 0;
+}
+
+/** The K of each fold of a previous T2 report (the cosine run), so a second mode runs with the same K and its rule flag. */
+async function readKOverrideOf(file: string): Promise<Map<number, KChoice>> {
+  const report = JSON.parse(await fs.readFile(file, "utf8")) as T2Report;
+  return new Map(Object.entries(report.kByFold).map(([fold, choice]) => [Number(fold), choice] as const));
+}
+
+/** The evidence matches of each case, read from the case files of the capture. */
+async function readEvidenceOf(directory: string): Promise<Map<string, EvidenceMatch[]>> {
+  const names = (await fs.readdir(path.join(directory, "cases"))).filter((name) => name.endsWith(".json"));
+  const entries = await Promise.all(
+    names.map(async (name) => {
+      const file = JSON.parse(await fs.readFile(path.join(directory, "cases", name), "utf8")) as {
+        id: string;
+        evidence?: EvidenceMatch[];
+      };
+      return [file.id, file.evidence ?? []] as const;
+    })
+  );
+  return new Map(entries);
+}
+
 async function validateCommand(options: CommandOptions): Promise<number> {
   const corpusName = options.get("corpus") ?? "marc";
   const registration = CORPORA.get(corpusName);
@@ -270,8 +429,8 @@ async function validateCommand(options: CommandOptions): Promise<number> {
   }
   const dataset = await readDataset(corpusName, registration);
   if (dataset === undefined) return 2;
-  const { corpus, issues: pinnedIssues } = await validationCorpus(registration);
-  const { issues } = validateDataset(dataset, corpus);
+  const { corpus, issues: pinnedIssues, sources } = await validationCorpus(registration);
+  const { issues } = validateDataset(dataset, corpus, sources);
   const allIssues = [...pinnedIssues, ...issues];
   console.log(
     `corpus=${corpusName} cases=${dataset.cases.length} pinnedThreads=${corpus.size} issues=${allIssues.length}`
@@ -302,8 +461,8 @@ async function captureCommand(options: CommandOptions): Promise<number> {
   }
   const dataset = await readDataset(corpusName, registration);
   if (dataset === undefined) return 2;
-  const { corpus, issues: pinnedIssues } = await validationCorpus(registration);
-  const { issues } = validateDataset(dataset, corpus);
+  const { corpus, issues: pinnedIssues, sources } = await validationCorpus(registration);
+  const { issues } = validateDataset(dataset, corpus, sources);
   const allIssues = [...pinnedIssues, ...issues];
   if (allIssues.length > 0) {
     allIssues.forEach(printIssue);
@@ -318,7 +477,7 @@ async function captureCommand(options: CommandOptions): Promise<number> {
       source: {
         threadsRoot: registration.threadsPath,
         threadIds: pinned.threadIds,
-        rulesPath: registration.rulesPath
+        rulesPath: registration.rulesPath, documents: await documentsOf(registration)
       },
       outputRoot: path.join(REPOSITORY_ROOT, ".marc", "cache", "memory-eval"),
       repositoryRoot: REPOSITORY_ROOT,
@@ -333,12 +492,13 @@ async function captureCommand(options: CommandOptions): Promise<number> {
     console.log(`file=${layers.layersPath}`);
     return 0;
   }
-  const result = await captureMemoryEval({
+  const captureOptions: CaptureOptions = {
     dataset,
     source: {
       threadsRoot: registration.threadsPath,
       threadIds: pinned.threadIds,
-      rulesPath: registration.rulesPath
+      rulesPath: registration.rulesPath,
+      documents: await documentsOf(registration)
     },
     outputRoot: path.join(REPOSITORY_ROOT, ".marc", "cache", "memory-eval"),
     repositoryRoot: REPOSITORY_ROOT,
@@ -346,11 +506,66 @@ async function captureCommand(options: CommandOptions): Promise<number> {
     productionManifestPath: registration.productionManifestPath,
     resume: options.get("resume") === "true",
     log: (line) => process.stderr.write(`${line}\n`)
-  });
+  };
+  const groupsPath = options.get("complement-groups");
+  if (groupsPath !== undefined) {
+    return complementGroupsCommand({
+      corpusName,
+      captureId: options.get("capture"),
+      groupsPath,
+      countOnly: options.get("count-only") === "true",
+      modelInfo
+    });
+  }
+  if (options.get("count-only") === "true") return countCommand(captureOptions);
+  const judgmentsPath = options.get("complement");
+  if (judgmentsPath !== undefined) {
+    return complementCommand({ corpusName, captureId: options.get("capture"), judgmentsPath, modelInfo });
+  }
+  const result = await captureMemoryEval(captureOptions);
   console.log(
     `captureId=${result.captureId} dir=${result.captureDir} cases=${result.cases} executed=${result.executedCases} skipped=${result.skippedCases} durationMs=${result.durationMs.toFixed(0)}`
   );
   return 0;
+}
+
+/** Counts the pairs of every case before any scoring; exits with 1 when the count is above the limit. */
+async function countCommand(captureOptions: CaptureOptions): Promise<number> {
+  const count = await countCapture(captureOptions);
+  const pairs = count.perCase.map((item) => item.pairs).sort((left, right) => left - right);
+  const median = pairs[Math.floor(pairs.length / 2)] ?? 0;
+  console.log(
+    `captureId=${count.captureId} cases=${count.perCase.length} pairsMedian=${median} pairsMin=${pairs[0] ?? 0} pairsMax=${pairs[pairs.length - 1] ?? 0} pairs=${count.totalPairs} hours=${count.hours.toFixed(2)} productionRecallPairs=${count.totalProductionRecallPairs} hoursWithProductionRecall=${count.hoursWithProductionRecall.toFixed(2)} indexBuildMs=${count.indexBuildMs.toFixed(0)} limitHours=${count.limitHours} refused=${count.refused}`
+  );
+  return count.refused ? 1 : 0;
+}
+
+/** Appends the pairs of the groups that reach degree two or more in the given judgments. */
+async function complementCommand(input: {
+  corpusName: string;
+  captureId: string | undefined;
+  judgmentsPath: string;
+  modelInfo: WorkspaceInfo;
+}): Promise<number> {
+  if (input.captureId === undefined) {
+    console.error("Usage: memory:eval capture --complement <judgments.json> --capture <captureId>");
+    return 2;
+  }
+  const judged = JSON.parse(await fs.readFile(input.judgmentsPath, "utf8")) as EvalDataset;
+  const providers = createLocalProviders(input.modelInfo);
+  try {
+    const summary = await complementCapture({
+      captureDir: path.join(REPOSITORY_ROOT, ".marc", "cache", "memory-eval", input.corpusName, input.captureId),
+      targets: targetsOfJudged(judged),
+      reranker: providers.reranker
+    });
+    console.log(
+      `captureId=${input.captureId} round=${summary.round} addedPairs=${summary.addedPairs} cases=${summary.perCase.length}`
+    );
+    return 0;
+  } finally {
+    await disposeProviders(providers);
+  }
 }
 
 const DEFAULT_VARIANTS = "M0,D0,ORACLE_ADMISSION";
@@ -365,7 +580,7 @@ async function replayCommand(options: CommandOptions): Promise<number> {
   const captureId = options.get("capture");
   if (captureId === undefined) {
     console.error(
-      "Usage: memory:eval replay --capture <captureId> [--corpus marc] [--variants M0,D0,ORACLE_ADMISSION]"
+      "Usage: memory:eval replay --capture <captureId> [--corpus marc] [--variants M0,D0,ORACLE_ADMISSION] [--funnel-budget B --funnel-k K --funnel-mode cosine|cosine-fts] [--band-cuts cuts.json]"
     );
     return 2;
   }
@@ -404,7 +619,14 @@ async function replayCommand(options: CommandOptions): Promise<number> {
     variantIds,
     modelArgument: options.get("model")
   });
-  const result = await replayCapture({ capture, dataset, variantIds, ...inputs });
+  const vectors = capture.vectors === undefined ? undefined : await readVectors(captureDir, capture.vectors);
+  const funnelParams = await funnelParamsOf({
+    budget: options.get("funnel-budget"),
+    k: options.get("funnel-k"),
+    mode: options.get("funnel-mode"),
+    bandCutsPath: options.get("band-cuts")
+  });
+  const result = await replayCapture({ capture, dataset, variantIds, ...inputs, vectors, funnelParams });
   const outputPath = path.join(
     captureDir,
     `replay-${variantIds.join("-")}.json`
@@ -468,7 +690,22 @@ async function reportCommand(options: CommandOptions): Promise<number> {
     variantIds: reportVariants,
     modelArgument: options.get("model")
   });
-  const replay = await replayCapture({ capture, dataset, variantIds: reportVariants, ...reportInputs });
+  // The report loads the capture vectors and the funnel parameters, as the replay and the worksheet do.
+  const reportVectors = capture.vectors === undefined ? undefined : await readVectors(captureDirectoryOf(corpusName, captureId), capture.vectors);
+  const reportFunnel = await funnelParamsOf({
+    budget: options.get("funnel-budget"),
+    k: options.get("funnel-k"),
+    mode: options.get("funnel-mode"),
+    bandCutsPath: options.get("band-cuts")
+  });
+  const replay = await replayCapture({
+    capture,
+    dataset,
+    variantIds: reportVariants,
+    ...reportInputs,
+    vectors: reportVectors,
+    funnelParams: reportFunnel
+  });
   const ratersArgument = options.get("raters");
   const raters = ratersArgument === undefined
     ? undefined
@@ -488,6 +725,62 @@ function splitPair(argument: string): [string, string] {
   const [first, second] = argument.split(",").map((item) => item.trim());
   if (first === undefined || second === undefined) throw new Error("Expected two comma-separated files.");
   return [first, second];
+}
+
+/**
+ * Compares a candidate variant against a baseline variant on the common cases only (the cases that both captures hold
+ * with the same query). It writes the JSON and the Markdown next to the candidate capture.
+ */
+async function compareCommonCommand(options: CommandOptions): Promise<number> {
+  const corpusName = options.get("corpus") ?? "marc";
+  const registration = CORPORA.get(corpusName);
+  if (registration === undefined) {
+    console.error(`Unknown corpus: ${corpusName}`);
+    return 2;
+  }
+  const baseline = parseSide(options.get("baseline"));
+  const candidate = parseSide(options.get("candidate"));
+  if (baseline === undefined || candidate === undefined) {
+    console.error("Usage: memory:eval compare-common --baseline <captureId>:<variant> --candidate <captureId>:<variant> [--corpus marc]");
+    return 2;
+  }
+  const dataset = await readDataset(corpusName, registration);
+  if (dataset === undefined) return 2;
+  const baselineCapture = await readCaptureFileOf(corpusName, baseline.captureId);
+  const candidateCapture = await readCaptureFileOf(corpusName, candidate.captureId);
+  const baselineDirectory = captureDirectoryOf(corpusName, baseline.captureId);
+  const candidateDirectory = captureDirectoryOf(corpusName, candidate.captureId);
+  const baselineInputs = await replayInputsOf({
+    corpusName,
+    captureDir: baselineDirectory,
+    capture: baselineCapture,
+    variantIds: [baseline.variant]
+  });
+  const candidateInputs = await replayInputsOf({
+    corpusName,
+    captureDir: candidateDirectory,
+    capture: candidateCapture,
+    variantIds: [candidate.variant]
+  });
+  // The funnel reads the vectors of an E3 capture (DEPTH0 included); the E2 captures hold none.
+  const baselineVectors = baselineCapture.vectors === undefined ? undefined : await readVectors(baselineDirectory, baselineCapture.vectors);
+  const candidateVectors = candidateCapture.vectors === undefined ? undefined : await readVectors(candidateDirectory, candidateCapture.vectors);
+  const result = await compareCommonCases({
+    dataset,
+    baseline: { capture: baselineCapture, variant: baseline.variant, inputs: { ...baselineInputs, vectors: baselineVectors } },
+    candidate: { capture: candidateCapture, variant: candidate.variant, inputs: { ...candidateInputs, vectors: candidateVectors } }
+  });
+  const directory = candidateDirectory;
+  const stem = `compare-common-${baseline.captureId}-${baseline.variant}`;
+  await writeFileAtomically(path.join(directory, `${stem}.json`), `${JSON.stringify(result, null, 2)}\n`);
+  await writeFileAtomically(path.join(directory, `${stem}.md`), renderCompareCommonMarkdown(result));
+  console.log(
+    `verdict=${result.verdict} common=${result.cases.common.length} baseline=${baseline.captureId}:${baseline.variant} candidate=${candidate.captureId}:${candidate.variant} report=${path.join(directory, `${stem}.md`)}`
+  );
+  for (const row of result.rows) {
+    console.log(`${row.scope} ${row.metric} difference=${row.difference ?? "n/a"} lower=${row.lower ?? "n/a"} upper=${row.upper ?? "n/a"} term=${row.term ?? "n/a"}`);
+  }
+  return result.verdict === "compared" ? 0 : 1;
 }
 
 function parseSide(argument: string | undefined): { captureId: string; variant: string } | undefined {
@@ -543,6 +836,7 @@ async function compareCommand(options: CommandOptions): Promise<number> {
   );
   await writeFileAtomically(outputPath, JSON.stringify(result, null, 2));
   console.log(`verdict=${result.verdict} baseline=${baseline.captureId}:${baseline.variant} candidate=${candidate.captureId}:${candidate.variant} output=${outputPath}`);
+  console.log(`incomplete cases: baseline=${result.baseline.incompleteCaseIds.length} candidate=${result.candidate.incompleteCaseIds.length}`);
   for (const row of result.rows) {
     console.log(`${row.scope} ${row.metric} difference=${row.difference ?? "n/a"} term=${row.term ?? "n/a"}`);
   }
@@ -558,8 +852,9 @@ async function worksheetCommand(options: CommandOptions): Promise<number> {
     return 2;
   }
   const captureId = options.get("capture");
-  if (captureId === undefined) {
-    console.error("Usage: memory:eval worksheet --capture <captureId> [--corpus marc] [--variants v1,v2] [--model marc/<captureId>]");
+  const mergeReportPath = options.get("merge-report");
+  if (captureId === undefined || mergeReportPath === undefined) {
+    console.error("Usage: memory:eval worksheet --capture <captureId> --merge-report <merge-*.json> [--corpus marc] [--variants v1,v2] [--model marc/<captureId>] [--funnel-budget B --funnel-k k1,k2 --funnel-mode cosine,cosine-fts]");
     return 2;
   }
   const variants = splitList(options.get("variants"));
@@ -575,6 +870,19 @@ async function worksheetCommand(options: CommandOptions): Promise<number> {
     console.error("The dataset queries differ from the capture. Capture again before the worksheet.");
     return 1;
   }
+  const funnelNames = variants.filter((id) => isFunnelVariantName(id));
+  const baseVariants = [
+    ...new Set([...variants.filter((id) => !isFunnelVariantName(id)), ...AUDIT_DEPTH_VARIANTS])
+  ];
+  const grid = funnelNames.length === 0 ? [] : funnelWorksheetGridOf({
+    budget: options.get("funnel-budget"),
+    ks: options.get("funnel-k"),
+    modes: options.get("funnel-mode")
+  });
+  if (grid === undefined) {
+    console.error("The funnel variants need --funnel-budget, --funnel-k and --funnel-mode, each given, with lists for K and the mode.");
+    return 2;
+  }
   const worksheetVariants = [...new Set(["M0", "D0", ...variants])];
   const worksheetInputs = await replayInputsOf({
     corpusName,
@@ -583,12 +891,42 @@ async function worksheetCommand(options: CommandOptions): Promise<number> {
     variantIds: worksheetVariants,
     modelArgument: options.get("model")
   });
+  const directory = captureDirectoryOf(corpusName, captureId);
+  const vectors = capture.vectors === undefined ? undefined : await readVectors(directory, capture.vectors);
   const replay = await replayCapture({
     capture,
     dataset,
-    variantIds: worksheetVariants,
-    ...worksheetInputs
+    variantIds: [...new Set(["M0", "D0", ...baseVariants])],
+    ...worksheetInputs,
+    vectors
   });
+  const gridRuns: WorksheetRun[] = [];
+  for (const params of grid) {
+    const gridReplay = await replayCapture({
+      capture,
+      dataset,
+      variantIds: funnelNames,
+      ...worksheetInputs,
+      vectors,
+      funnelParams: params
+    });
+    gridRuns.push({ replay: gridReplay, variants: funnelNames });
+  }
+  const reaches = exhaustiveReachesOf({ capture, variants: funnelNames, grid, vectors });
+  const runs: WorksheetRun[] = [{ replay, variants: baseVariants }, ...gridRuns];
+  const mergeReport = mergeReportOf(JSON.parse(await fs.readFile(mergeReportPath, "utf8")));
+  const auditCases = auditCasesOf({ capture, dataset, report: mergeReport, replay, runs, reaches });
+  const manifest = await readOrCreateAuditManifest({
+    file: path.join(directory, "audit-sample.json"),
+    seed: AUDIT_SEED,
+    corpus: corpusName,
+    captureId,
+    cases: auditCases
+  });
+  await writeFileAtomically(
+    path.join(directory, "audit-verification.json"),
+    `${JSON.stringify({ schema: 1, corpus: corpusName, captureId, mergeReport: mergeReportPath, verifiedCases: auditCases.length, divergences: 0, alreadyPresent: mergeReport.alreadyPresent, conflicts: mergeReport.conflicts.length }, null, 2)}\n`
+  );
   const pinned = await readPinnedCorpus(registration.pinnedPath);
   const worksheet = await buildWorksheet({
     capture,
@@ -597,18 +935,35 @@ async function worksheetCommand(options: CommandOptions): Promise<number> {
     source: {
       threadsRoot: registration.threadsPath,
       threadIds: pinned.threadIds,
-      rulesPath: registration.rulesPath
+      rulesPath: registration.rulesPath, documents: await documentsOf(registration)
     },
-    variants
+    variants: baseVariants,
+    grid: gridRuns,
+    reaches,
+    vectors,
+    audited: sampledByCaseOf(manifest)
   });
-  const directory = captureDirectoryOf(corpusName, captureId);
   await writeFileAtomically(path.join(directory, "worksheet.md"), `${worksheet.markdown}\n`);
   await writeFileAtomically(
     path.join(directory, "worksheet-template.json"),
     `${JSON.stringify(worksheet.template, null, 2)}\n`
   );
+  await writeFileAtomically(
+    path.join(directory, "worksheet-meta.json"),
+    `${JSON.stringify({ schema: 1, corpus: corpusName, captureId, rows: worksheet.meta }, null, 2)}\n`
+  );
+  const auditText = await fs.readFile(path.join(directory, "audit-sample.json"), "utf8");
+  const groupsFile = complementGroupsOf({
+    corpus: corpusName,
+    captureId,
+    caseIds: dataset.cases.map((item) => item.id),
+    rows: worksheet.meta,
+    manifest,
+    auditSampleSha256: createHash("sha256").update(auditText).digest("hex")
+  });
+  await writeFileAtomically(path.join(directory, "complement-groups.json"), `${JSON.stringify(groupsFile, null, 2)}\n`);
   console.log(
-    `captureId=${captureId} pendingPairs=${worksheet.pending} worksheet=${path.join(directory, "worksheet.md")} template=${path.join(directory, "worksheet-template.json")}`
+    `captureId=${captureId} pendingPairs=${worksheet.pending} byLayer=0:${worksheet.pendingByLayer[0]},1:${worksheet.pendingByLayer[1]},2:${worksheet.pendingByLayer[2]} unscoredRows=${worksheet.unscored} auditPairs=${worksheet.audit.pairs} auditCells=${worksheet.audit.cells} medianExternals=${medianOf(manifest.cases.map((item) => item.externalCount))} saturationRemoved=${worksheet.saturationRemoved} worksheet=${path.join(directory, "worksheet.md")} template=${path.join(directory, "worksheet-template.json")}`
   );
   return 0;
 }
@@ -637,6 +992,7 @@ async function mergeCommand(options: CommandOptions): Promise<number> {
   const outcome = mergeJudgments({
     dataset,
     corpus: corpus.corpus,
+    sources: corpus.sources,
     raterA: await readJson(first),
     raterB: await readJson(second),
     consensus: consensusPath === undefined ? undefined : await readJson(consensusPath)
@@ -780,8 +1136,8 @@ async function latencyCommand(options: CommandOptions): Promise<number> {
   }
   const dataset = await readDataset(corpusName, registration);
   if (dataset === undefined) return 2;
-  const { corpus, issues: pinnedIssues } = await validationCorpus(registration);
-  const { issues } = validateDataset(dataset, corpus);
+  const { corpus, issues: pinnedIssues, sources } = await validationCorpus(registration);
+  const { issues } = validateDataset(dataset, corpus, sources);
   const allIssues = [...pinnedIssues, ...issues];
   if (allIssues.length > 0) {
     allIssues.forEach(printIssue);
@@ -795,7 +1151,7 @@ async function latencyCommand(options: CommandOptions): Promise<number> {
     source: {
       threadsRoot: registration.threadsPath,
       threadIds: pinned.threadIds,
-      rulesPath: registration.rulesPath
+      rulesPath: registration.rulesPath, documents: await documentsOf(registration)
     },
     outputRoot: path.join(REPOSITORY_ROOT, ".marc", "cache", "memory-eval"),
     repositoryRoot: REPOSITORY_ROOT,
@@ -1223,6 +1579,7 @@ async function choiceCommand(options: CommandOptions): Promise<number> {
 const COMMANDS: ReadonlyMap<string, CommandHandler> = new Map<string, CommandHandler>([
   ["validate", validateCommand],
   ["capture", captureCommand],
+  ["t2", t2Command],
   ["latency", latencyCommand],
   ["fit", fitCommand],
   ["calibrate", calibrateCommand],
@@ -1232,6 +1589,7 @@ const COMMANDS: ReadonlyMap<string, CommandHandler> = new Map<string, CommandHan
   ["replay", replayCommand],
   ["report", reportCommand],
   ["compare", compareCommand],
+  ["compare-common", compareCommonCommand],
   ["worksheet", worksheetCommand],
   ["merge-judgments", mergeCommand]
 ]);

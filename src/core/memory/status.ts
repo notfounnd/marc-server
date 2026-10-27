@@ -1,11 +1,12 @@
 import { MEMORY_RETRIEVAL_CONTRACT, MEMORY_SCHEMA_VERSION } from "./types.js";
+import type { MemorySource } from "./sources/contract.js";
+import { compareSourcesToManifest } from "./source-comparison.js";
 import type {
   EmbeddingProvider,
   MemoryManifest,
   MemoryMaintenance,
   MemoryStatus,
-  MemoryStatusState,
-  ThreadSummarySource
+  MemoryStatusState
 } from "./types.js";
 
 export type MemoryManifestComparison = {
@@ -17,7 +18,7 @@ export type MemoryManifestComparison = {
 
 export function buildMemoryStatus(
   status: MemoryStatusState,
-  sources: ThreadSummarySource[],
+  sources: readonly MemorySource[],
   manifest: MemoryManifest | undefined,
   models: {
     interpreterPrepared: boolean;
@@ -40,8 +41,11 @@ export function buildMemoryStatus(
     interpreterPrepared: models.interpreterPrepared,
     rebuildReady: models.retrieverPrepared && models.rerankerPrepared,
     searchReady: modelPrepared && (status === "ready" || status === "stale"),
-    summaryCount: sources.length,
-    indexedSummaryCount: manifest?.records.length ?? 0,
+    summaryCount: sources.filter((source) => source.sourceType === "summary")
+      .length,
+    indexedSummaryCount:
+      manifest?.records.filter((record) => record.sourceType === "summary")
+        .length ?? 0,
     missingSummaryIds: [],
     staleSummaryIds: [],
     extraSummaryIds: [],
@@ -67,30 +71,42 @@ export function memoryProvidersMatch(
   );
 }
 
+/**
+ * Status comparison over every indexed layer, by source path, with the rule of reconcile.
+ * Stale means reconcile has work to do. The summary ids report the summary part of it.
+ */
 export function compareMemoryManifestSources(
   manifest: MemoryManifest,
-  sources: ThreadSummarySource[]
+  sources: readonly MemorySource[]
 ): MemoryManifestComparison {
-  const sourceMap = new Map(sources.map((source) => [source.threadId, source]));
-  const manifestMap = new Map(
-    manifest.records.map((record) => [record.threadId, record])
+  const { changedPaths, removedPaths } = compareSourcesToManifest(
+    sources,
+    manifest
   );
-  const missingSummaryIds = sources
-    .filter((source) => !manifestMap.has(source.threadId))
+  const manifestPaths = new Set(
+    manifest.records.map((record) => record.sourcePath)
+  );
+  const summarySources = sources.filter(
+    (source) => source.sourceType === "summary"
+  );
+  const missingSummaryIds = summarySources
+    .filter((source) => !manifestPaths.has(source.sourcePath))
     .map((source) => source.threadId);
-  const staleSummaryIds = sources
+  const staleSummaryIds = summarySources
     .filter(
-      (source) => manifestMap.get(source.threadId)?.sha256 !== source.sha256
+      (source) =>
+        manifestPaths.has(source.sourcePath) &&
+        changedPaths.has(source.sourcePath)
     )
     .map((source) => source.threadId);
   const extraSummaryIds = manifest.records
-    .filter((record) => !sourceMap.has(record.threadId))
+    .filter(
+      (record) =>
+        record.sourceType === "summary" && removedPaths.has(record.sourcePath)
+    )
     .map((record) => record.threadId);
   return {
-    stale:
-      missingSummaryIds.length > 0 ||
-      staleSummaryIds.length > 0 ||
-      extraSummaryIds.length > 0,
+    stale: changedPaths.size > 0 || removedPaths.size > 0,
     missingSummaryIds,
     staleSummaryIds,
     extraSummaryIds

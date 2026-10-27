@@ -3,8 +3,8 @@ import { performance } from "node:perf_hooks";
 import type { WorkspaceInfo } from "../../src/core/types.js";
 import {
   semanticOnlyVectorOf
-} from "../../src/core/memory/scoring/features.js";
-import { judgeDocumentOf } from "../../src/core/memory/scoring/judge-document.js";
+} from "./features.js";
+import { judgeDocumentOf } from "./judge-document.js";
 import type { MemoryVectorRecord } from "../../src/core/memory/types.js";
 import type { CaptureFile, CapturedRecord } from "./capture-types.js";
 import { medianOf } from "./calibration.js";

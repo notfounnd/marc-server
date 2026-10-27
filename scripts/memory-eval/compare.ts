@@ -20,6 +20,8 @@ export type CompareSideSummary = {
   status: "complete" | "incomplete";
   pendingPairs: number;
   pending: PendingPair[];
+  /** Cases with a missing rerank score or no replay. A side with any is incomplete, never zero. */
+  incompleteCaseIds: string[];
 };
 
 export type CompareResult = {
@@ -96,6 +98,7 @@ function summaryOf(capture: CaptureFile, evaluation: VariantEvaluation): Compare
     variant: evaluation.variant,
     status: evaluation.status,
     pendingPairs: evaluation.pending.length,
-    pending: evaluation.pending
+    pending: evaluation.pending,
+    incompleteCaseIds: evaluation.incompleteCaseIds
   };
 }

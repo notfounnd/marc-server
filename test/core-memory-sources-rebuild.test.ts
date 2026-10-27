@@ -30,30 +30,32 @@ const ALL_SOURCE_TYPES: MemorySourceType[] = [
   "chat"
 ];
 
-test("default rebuild with extra sources present matches the summary-only rebuild", async () => {
-  const summaryOnly = await summaryWorkspace();
-  const withExtras = await summaryWorkspace();
-  await addExtraSources(withExtras);
-
-  const baseline = await rebuiltRows(summaryOnly);
-  const defaults = await rebuiltRows(withExtras);
-
-  assert.ok(baseline.length > 0);
-  assert.deepEqual(textsById(defaults), textsById(baseline));
-  assert.deepEqual(
-    defaults.map((row) => row.sourceType),
-    baseline.map((row) => row.sourceType)
-  );
-});
-
-test("explicit layer 0 matches the default rebuild", async () => {
+test("default rebuild indexes every configured layer, as the explicit rebuild of those layers does", async () => {
   const info = await summaryWorkspace();
   await addExtraSources(info);
 
   const defaults = await rebuiltRows(info);
-  const explicit = await rebuiltRows(info, [0]);
+  const explicit = await rebuiltRows(info, [0, 1, 2]);
 
-  assert.deepEqual(textsById(explicit), textsById(defaults));
+  assert.ok(defaults.some((row) => row.layer !== 0));
+  assert.deepEqual(textsById(defaults), textsById(explicit));
+  assert.deepEqual(
+    defaults.map((row) => row.sourceType),
+    explicit.map((row) => row.sourceType)
+  );
+});
+
+test("explicit layer 0 indexes only the summaries, as a summary-only workspace does", async () => {
+  const info = await summaryWorkspace();
+  await addExtraSources(info);
+  const summaryOnly = await summaryWorkspace();
+
+  const explicit = await rebuiltRows(info, [0]);
+  const baseline = await rebuiltRows(summaryOnly);
+
+  assert.ok(explicit.length > 0);
+  assert.ok(explicit.every((row) => row.layer === 0));
+  assert.deepEqual(textsById(explicit), textsById(baseline));
 });
 
 test("all layers include every source type with its own layer", async () => {

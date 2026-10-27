@@ -1,9 +1,11 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import { DEFAULT_SEARCH_LAYERS } from "../src/core/memory/sources/contract.js";
 import type {
   EmbeddingProvider,
   EmbeddingProviderMetadata,
+  MemoryLayer,
   MemoryLexicalField,
   MemoryLexicalSearchHit,
   MemorySearchHit,
@@ -229,11 +231,14 @@ export class ScoreOverrideStore implements MemoryVectorStore {
     options: {
       generation?: string;
       kind?: "identity" | "passage";
+      layers?: readonly MemoryLayer[];
       limit: number;
     }
   ): Promise<MemorySearchHit[]> {
     this.searchOptions.push(options);
+    const layers = options.layers ?? DEFAULT_SEARCH_LAYERS;
     const hits = this.records
+      .filter((record) => layers.includes(record.layer))
       .filter((record) => !this.excludedVectorThreadIds.has(record.threadId))
       .filter((record) => !options.kind || record.kind === options.kind)
       .map((record) => ({

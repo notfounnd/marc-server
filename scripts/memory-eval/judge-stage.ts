@@ -1,8 +1,8 @@
-import type { ThreadFeatures } from "../../src/core/memory/scoring/features.js";
+import type { ThreadFeatures } from "./features.js";
 import {
   featureVectorOf,
   semanticOnlyVectorOf
-} from "../../src/core/memory/scoring/features.js";
+} from "./features.js";
 import { logitOf } from "./calibration.js";
 import {
   admits,

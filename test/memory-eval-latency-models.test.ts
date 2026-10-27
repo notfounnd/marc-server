@@ -22,7 +22,7 @@ import { createRssSampler } from "../scripts/memory-eval/memory-sampling.js";
 import type {
   FeatureVector,
   ThreadFeatures
-} from "../src/core/memory/scoring/features.js";
+} from "../scripts/memory-eval/features.js";
 import { captureFixture } from "./memory-eval-capture-fixtures.js";
 
 const NO_CUTS: BandCuts = { high: null, medium: null, low: null };

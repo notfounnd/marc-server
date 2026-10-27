@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import type { MemoryVectorRecord } from "../types.js";
+import type { MemoryVectorRecord } from "../../src/core/memory/types.js";
 import type { RerankScores } from "./features.js";
 
 /** Token budget of the judged document, in the tokenizer of the judge model. */

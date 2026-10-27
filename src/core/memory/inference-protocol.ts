@@ -1,4 +1,5 @@
 import type { MemoryInferenceRole } from "./model-config.js";
+import type { RerankOrder } from "./rerank-order.js";
 
 export type MemoryInferenceRequest =
   | { action: "prepare" }
@@ -11,7 +12,13 @@ export type MemoryInferenceRequest =
       originalQuery: string;
       variants: string[];
     }
-  | { action: "rerank"; batchSize: number; documents: string[]; query: string }
+  | {
+      action: "rerank";
+      batchSize: number;
+      documents: string[];
+      order?: RerankOrder;
+      query: string;
+    }
   | {
       action: "splitPassages";
       maxTokens: number;

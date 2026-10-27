@@ -27,7 +27,14 @@ function merge(
   consensus?: unknown,
   input: EvalDataset = dataset
 ) {
-  return mergeJudgments({ dataset: input, corpus, raterA, raterB, consensus });
+  return mergeJudgments({
+    dataset: input,
+    corpus,
+    sources: new Map(),
+    raterA,
+    raterB,
+    consensus
+  });
 }
 
 async function temporaryFile(t: TestContext, name: string): Promise<string> {
@@ -60,7 +67,7 @@ test("concordant pairs are merged and divergent pairs wait for a consensus", () 
   const resolved = merge(divergent, other, { A2: { [THREAD_TOKEN]: 1 } });
   assert.equal(resolved.report.unresolved.length, 0);
   assert.deepEqual(resolved.report.written, [
-    { caseId: "A2", threadId: THREAD_TOKEN, grade: 1 }
+    { caseId: "A2", threadId: THREAD_TOKEN, layer: 0, grade: 1 }
   ]);
 });
 
@@ -88,7 +95,7 @@ test("an existing grade is never overwritten; a different one is listed as a con
     { A1: { [THREAD_TOKEN]: 2 } }
   );
   assert.deepEqual(outcome.report.conflicts, [
-    { caseId: "A1", threadId: THREAD_TOKEN, existing: 3, proposed: 2 }
+    { caseId: "A1", threadId: THREAD_TOKEN, layer: 0, existing: 3, proposed: 2 }
   ]);
   assert.equal(outcome.report.written.length, 0);
   assert.equal(outcome.merged.cases[0]?.judgments[THREAD_TOKEN], 3);
