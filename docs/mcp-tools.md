@@ -6,7 +6,7 @@ mARC exposes grouped MCP tool names in `{prefix}_{action}` format. Legacy aliase
 
 The MCP command runs over stdio and serves only protocol revision `2026-07-28` through the official `@modelcontextprotocol/server` SDK. It rejects legacy initialization. Discovery requests use an `_meta` envelope with `io.modelcontextprotocol/protocolVersion` and `io.modelcontextprotocol/clientCapabilities`; `clientInfo` is optional. Clients may call `tools/list` without discovering first.
 
-The server reports `name: "marc"` and the version from the package manifest. Discovery and tool-list results declare `resultType: "complete"`, `cacheScope: "private"`, and `ttlMs: 0`. All 25 tools are registered independently of bootstrap state. Bootstrap-gated calls return a JSON text result with `isError: true` and `error.code: "bootstrap_required"` until the caller confirms the current workspace bootstrap.
+The server reports `name: "marc"` and the version from the package manifest. Discovery and tool-list results declare `resultType: "complete"`, `cacheScope: "private"`, and `ttlMs: 0`. All 26 tools are registered independently of bootstrap state. Bootstrap-gated calls return a JSON text result with `isError: true` and `error.code: "bootstrap_required"` until the caller confirms the current workspace bootstrap.
 
 Unknown JSON-RPC methods or tool names use protocol errors. Tool input validation and domain failures return tool results with `isError: true` and sanitized error text. The process-wide limiter accepts up to 60 tool calls in each fixed one-second window; excess calls are rejected immediately and are not queued. See [the migration note](mcp-migration-2026-07-28.md) for wire examples and shutdown behavior.
 
@@ -93,6 +93,7 @@ The audit reports objective issues such as missing artifact files, artifact refe
 | `memory_status` | Check index health and model-file readiness without loading model weights. |
 | `memory_rebuild` | Reconcile the committed LanceDB summary-memory index by default. Pass `mode: "full"` only for an explicit full rebuild. |
 | `memory_recall` | Interpret a query, search historical thread summaries, and return relevant `marc://` references. Pass `queryMode: "literal"` to bypass correction. |
+| `memory_deep` | Return passages with provenance: the passages of one closed, indexed thread with `threadId`, or the passages of the groups that depth 2 admits without it. See [memory_deep in the memory guide](memory.md#memory_deep). |
 
 Summary memory is derived from `SUMMARY.md` only by default. Agents should use `memory_recall` before proposing or developing behavior that may overlap prior decisions, then read any strongly matched thread before reopening or contradicting the historical decision.
 
@@ -105,6 +106,37 @@ Every recall hit carries a heuristic confidence `band` (`high`, `medium`, or `lo
 Recall defaults to `limit: 5` and `depth: 0`. Depth accepts `0` through `2` and counts corpus layers: depth `d` searches every layer up to `d` (`0` summaries; `1` adds artifacts, rules, and documents; `2` adds chat messages). Depths `1` and `2` rerank the whole consolidated M0 pool of the layers they search (each group's identity record and up to three passages), with no funnel and no candidate budget. Depth `3` is rejected with the layer explanation. Depth does not relax semantic eligibility. Lexical matches cannot qualify a thread by themselves, but can reinforce ordering after semantic eligibility is established. `minScore` is not a supported recall input.
 
 Each result reports `groupId` and `groupKind` (`thread`, `rules`, or `document`). `threadId` and `summaryPath` appear only for thread groups. `reference` follows the best evidence: a summary links to the thread, a chat message to the message, an artifact to the message and its file, and rules or documents to their source path. `nextActions` follow the group kind, and only thread groups suggest reading the thread. The response reports `layersSearched`, the layers that ran, and `rerankPairs`, the pairs sent to the reranker. The production index has held layers `0`, `1`, and `2` since the rebuild of 2026-10-27, so depths `1` and `2` search the layers they name.
+
+### memory_deep
+
+`memory_deep` returns passages with provenance. It is gated by `workspace_bootstrap` like the other memory tools.
+
+Input:
+
+- `query` (required): a non-empty string.
+- `threadId` (optional): a full thread ID or an 8-character hexadecimal suffix. The thread must be closed and indexed. Without it, the call searches the depth-2 pool.
+- `sourceTypes` (optional): a non-empty list of `summary`, `artifact`, `rules`, `document` or `chat`. With `threadId`, only `summary`, `artifact` and `chat` are accepted.
+- `queryMode` (optional): `auto` (default) or `literal`, as in `memory_recall`.
+- `limit` (optional): an integer from 1 to 20. The default is 5.
+
+Output:
+
+- `mode`: `scoped` with `threadId`, or `unscoped` without it. `query`, `interpretation`, `indexStatus`, `layersSearched` and `rerankPairs` follow the `memory_recall` contract.
+- `results`: one hit per `passageId`. Each hit has `groupId`, `groupKind` (`thread`, `rules` or `document`), `sourceType`, `authority`, `passageId`, `recordId`, `reference`, `sourcePath`, `lineStart`, `lineEnd`, `passageOrdinal`, `matchedText` and `score`. It also has `threadId` for thread groups, and the optional `sectionTitle`, `messageId`, `agentId` and `artifactFileName` when the source has them. `groupBand` appears only in the unscoped mode. `score` is the reranker relevance, not a probability.
+- `nextActions`: one action per distinct authority among the hits. `decision` calls for `thread_read`, `rule` and `document` name the file and the lines to review or open, `artifact` names the artifact to open, and `conversation` marks chat text as intermediate context. A stale index adds a `memory_rebuild` action first.
+- `abstained`: unscoped mode only. It is `true` when the search ran and admitted no group.
+- `scopePassages` and `scopeTruncated`: scoped mode only. `scopePassages` counts the thread's passages after the `sourceTypes` filter and before the budget. `scopeTruncated` is `true` when there are more than 232 of them.
+
+Errors are returned as tool errors with `isError: true`:
+
+- `thread_not_found`, `ambiguous_thread_id` and `invalid_thread_id` come from thread resolution, as in `thread_read`.
+- `thread_not_closed`: the thread has no non-empty `SUMMARY.md`.
+- `thread_not_indexed`: the thread is missing from the index. Run `memory_rebuild`.
+- `invalid_source_types` and `invalid_limit`: the input is outside the allowed values.
+
+A call that cannot search, because the index or the models are not ready or another memory operation holds the lock, returns empty `results` with the reason in `nextActions`, not an error.
+
+With `threadId`, the reranking time grows with the passages reranked. In the E4 measurement, the 95th percentile of scoped calls was about 35 seconds on the reference machine ([ADR 0013](adrs/0013-memory-deep-scoped-passages.md)).
 
 `memory_rebuild` accepts an optional `mode` input. Omitted or `"incremental"` reconciles only added, changed, or removed summary records. `"full"` rebuilds the complete derived snapshot. Both modes use the workspace batch-size setting and the same per-workspace rebuild lock.
 

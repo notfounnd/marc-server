@@ -174,10 +174,10 @@ type RecallProbe = {
   interpretMs: number;
 };
 
-type ProbeHolder = { current?: RecallProbe };
+export type ProbeHolder = { current?: RecallProbe };
 
 /** One timed live recall. */
-type RecallSample = {
+export type RecallSample = {
   e2eMs: number;
   /** From the start of the recall to the query embedding: status, manifest and interpretation. */
   preEmbedMs: number;
@@ -407,7 +407,7 @@ async function readJson<T>(name: string): Promise<T> {
   ) as T;
 }
 
-function providersOf(modelInfo: WorkspaceInfo): CaptureProviders {
+export function providersOf(modelInfo: WorkspaceInfo): CaptureProviders {
   return {
     embedding: new LocalEmbeddingProvider(modelInfo),
     reranker: new LocalRerankingProvider(modelInfo),
@@ -573,7 +573,7 @@ function overriding<T extends object>(base: T, overrides: Partial<T>): T {
  * The production providers with timing overrides. Each override forwards to the base
  * provider, so the work is the production work; only the clock and the counters are added.
  */
-function instrumentedProviders(
+export function instrumentedProviders(
   base: CaptureProviders,
   holder: ProbeHolder,
   order?: RerankOrder
@@ -615,12 +615,35 @@ function instrumentedProviders(
 }
 
 /** One live recall, timed the way measureLatency times it, with its probe. */
-async function probedRecall(
+export async function probedRecall(
   context: CaptureContext,
   providers: CaptureProviders,
   holder: ProbeHolder,
   evalCase: EvalCase,
   depth: MemorySearchDepth = CAPTURE_DEPTH
+): Promise<RecallSample> {
+  return probedCall(holder, evalCase.id, () =>
+    recallMemoryInWorkspace(context.info, {
+      query: evalCase.query,
+      queryMode: evalCase.queryMode,
+      limit: LATENCY_RECALL_LIMIT,
+      depth,
+      provider: providers.embedding,
+      reranker: providers.reranker,
+      interpreter: providers.interpreter,
+      store: context.store
+    })
+  );
+}
+
+/**
+ * Times one call that goes through instrumented providers, with the probe of the recall: the end-to-end time,
+ * the time to the query embedding, the rerank time and the pairs. The label names the call in the error.
+ */
+export async function probedCall(
+  holder: ProbeHolder,
+  label: string,
+  run: () => Promise<unknown>
 ): Promise<RecallSample> {
   const probe: RecallProbe = {
     startedAt: performance.now(),
@@ -630,20 +653,11 @@ async function probedRecall(
     interpretMs: 0
   };
   holder.current = probe;
-  await recallMemoryInWorkspace(context.info, {
-    query: evalCase.query,
-    queryMode: evalCase.queryMode,
-    limit: LATENCY_RECALL_LIMIT,
-    depth,
-    provider: providers.embedding,
-    reranker: providers.reranker,
-    interpreter: providers.interpreter,
-    store: context.store
-  });
+  await run();
   const e2eMs = performance.now() - probe.startedAt;
   holder.current = undefined;
   if (probe.embedAt === undefined)
-    throw new Error(`The recall of ${evalCase.id} never embedded the query.`);
+    throw new Error(`The recall of ${label} never embedded the query.`);
   return {
     e2eMs,
     preEmbedMs: probe.embedAt - probe.startedAt,
@@ -669,7 +683,19 @@ type E2EPathSpec = {
 };
 
 /** The layers of the M0 reference copy: the order before E3 indexed layer 0 only. */
-const REFERENCE_LAYERS: readonly MemoryLayer[] = [0];
+export const REFERENCE_LAYERS: readonly MemoryLayer[] = [0];
+
+/**
+ * The M0 reference of E3: a temporary copy that holds layer 0 only, with no production check. The M0 path of the
+ * latency measurements opens its copy here, so that the preparation is the one the E3 measurement used.
+ */
+export async function openReferenceContext(
+  info: WorkspaceInfo,
+  providers: CaptureProviders,
+  threadIds: readonly string[]
+): Promise<CaptureContext> {
+  return openCaptureContext({ info, providers, threadIds, layers: REFERENCE_LAYERS });
+}
 
 /**
  * The end-to-end latency after the activation of the layers, in one execution. Two temporary copies of the
@@ -702,12 +728,7 @@ async function runLatencyE2e(): Promise<void> {
     withTemporaryWorkspace(source, async (indexedInfo) => {
       // The M0 copy holds layer 0 only, so the production check (which compares the whole production
       // manifest) is not applied to it; the indexed copy is checked against production.
-      const reference = await openCaptureContext({
-        info: referenceInfo,
-        providers: base,
-        threadIds,
-        layers: REFERENCE_LAYERS
-      });
+      const reference = await openReferenceContext(referenceInfo, base, threadIds);
       const indexed = await openCaptureContext({
         info: indexedInfo,
         providers: base,
@@ -1157,7 +1178,15 @@ async function main(): Promise<void> {
   await COMMANDS[name]();
 }
 
-main().catch((error: unknown) => {
-  console.error(error instanceof Error ? error.message : String(error));
-  process.exitCode = 1;
-});
+/** The study runs only as a script. Importing its helpers (the latency measurement of E4 does) must not run it. */
+function isEntrypoint(): boolean {
+  const invokedPath = process.argv[1];
+  if (invokedPath === undefined) return false;
+  return path.resolve(invokedPath) === fileURLToPath(import.meta.url);
+}
+
+if (isEntrypoint())
+  main().catch((error: unknown) => {
+    console.error(error instanceof Error ? error.message : String(error));
+    process.exitCode = 1;
+  });

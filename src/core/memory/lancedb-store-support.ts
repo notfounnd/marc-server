@@ -236,6 +236,11 @@ export function layerPredicate(layers: readonly MemoryLayer[]): string {
   return `layer IN (${layers.join(", ")})`;
 }
 
+/** Thread filter of a row read. The id is escaped as a SQL string, so quotes in an id stay literal. */
+export function threadPredicate(threadId: string): string {
+  return `threadId = ${sqlString(threadId)}`;
+}
+
 export function searchPredicate(options: {
   kind?: "identity" | "passage";
   layers: readonly MemoryLayer[];

@@ -13,10 +13,11 @@ import { INTERPRETATION_LAYERS } from "../../src/core/memory/search-depth.js";
 import { searchChannelsByDepth } from "./capture-layers.js";
 import {
   E3_K_MAX,
-  evidenceGroupIdsOf,
   knownGroupIdsOf,
+  scopeEvidenceGroupIdsOf,
   scopeRecordIdsOf
 } from "./capture-scope.js";
+import { corpusPathOf } from "./source-group.js";
 import type { CapturedIncomplete, CaptureContext } from "./capture-types.js";
 import type { EvalCase } from "./dataset.js";
 import { evidenceMatchesOf } from "./evidence-match.js";
@@ -73,8 +74,8 @@ export async function planCase(context: CaptureContext, evalCase: EvalCase): Pro
     channelsByDepth,
     rows: context.rows,
     knownGroupIds: knownGroupIdsOf(evalCase),
-    evidenceGroupIds: evidenceGroupIdsOf(evalCase),
-    kMax: E3_K_MAX
+    evidenceGroupIds: scopeEvidenceGroupIdsOf(evalCase),
+    kMax: context.kMax ?? E3_K_MAX
   });
   const evidence = evidenceMatchesOf({
     evidence: evalCase.evidence ?? [],
@@ -103,13 +104,6 @@ function passagesOf(context: CaptureContext): EvidencePassage[] {
   return context.rows
     .filter((row) => row.kind === "passage")
     .map((row) => ({ passageId: row.passageId, sourcePath: corpusPathOf(row.sourcePath), text: row.text }));
-}
-
-const MARC_PREFIX = ".marc/";
-
-function corpusPathOf(sourcePath: string): string {
-  if (!sourcePath.startsWith(MARC_PREFIX)) return sourcePath;
-  return sourcePath.slice(MARC_PREFIX.length);
 }
 
 /**

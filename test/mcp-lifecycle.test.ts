@@ -84,7 +84,7 @@ async function verifyModernStdioLifecycle(
     ttlMs: number;
     cacheScope: string;
   };
-  assert.equal(listingResult.tools.length, 25);
+  assert.equal(listingResult.tools.length, 26);
   assert.equal(listingResult.resultType, "complete");
   assert.equal(listingResult.ttlMs, 0);
   assert.equal(listingResult.cacheScope, "private");

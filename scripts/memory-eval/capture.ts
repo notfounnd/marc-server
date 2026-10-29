@@ -96,6 +96,8 @@ export type CaptureOptions = {
   syntheticQueries?: boolean;
   /** Hours above which the count refuses the capture. The command uses the 12 h limit; tests lower it. */
   countLimitHours?: number;
+  /** K_max of the closed scope. Absent means the E3 default of 30; the E4 corpus passes 0. */
+  kMax?: number;
 };
 
 export type CaptureResult = {
@@ -124,7 +126,8 @@ export async function captureMemoryEval(
     await corpusContentDigest(options.source),
     E3_INDEXED_LAYERS,
     E3_CAPTURE_CHANNELS,
-    E3_RERANK_ORDER
+    E3_RERANK_ORDER,
+    options.kMax
   );
   const captureDir = path.join(
     options.outputRoot,
@@ -178,7 +181,8 @@ async function captureWithProviders(
   });
   const context: CaptureContext = {
     ...index,
-    sourceTexts: await corpusSourceTexts(options.source)
+    sourceTexts: await corpusSourceTexts(options.source),
+    kMax: options.kMax
   };
   const cases = options.dataset.cases;
   const planned = await planCases(context, cases);

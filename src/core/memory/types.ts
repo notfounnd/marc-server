@@ -246,7 +246,7 @@ export type MemoryVectorStore = {
   readRows?(
     info: WorkspaceInfo,
     generation?: string,
-    options?: { layers?: readonly MemoryLayer[] }
+    options?: { layers?: readonly MemoryLayer[]; threadId?: string }
   ): Promise<MemoryVectorRow[]>;
   rebuild(
     info: WorkspaceInfo,

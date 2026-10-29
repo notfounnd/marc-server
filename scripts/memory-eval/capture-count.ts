@@ -59,7 +59,8 @@ export async function countCapture(options: CaptureOptions): Promise<CountFile> 
     await corpusContentDigest(options.source),
     E3_INDEXED_LAYERS,
     E3_CAPTURE_CHANNELS,
-    E3_RERANK_ORDER
+    E3_RERANK_ORDER,
+    options.kMax
   );
   const counted = await withTemporaryWorkspace(options.source, (info) =>
     countInWorkspace(options, info)
@@ -108,7 +109,11 @@ async function countInWorkspace(
       layers: E3_INDEXED_LAYERS
     });
     const indexBuildMs = performance.now() - started;
-    const context: CaptureContext = { ...index, sourceTexts: await corpusSourceTexts(options.source) };
+    const context: CaptureContext = {
+      ...index,
+      sourceTexts: await corpusSourceTexts(options.source),
+      kMax: options.kMax
+    };
     const plans = await planCases(context, options.dataset.cases);
     const perCase: CountedCase[] = [];
     for (const plan of plans) {

@@ -9,6 +9,7 @@ import {
 import { runDaemon } from "./daemon/server.js";
 import { runMcpServer } from "./mcp/server.js";
 import {
+  deepMemory,
   prepareMemory,
   purgeMemory,
   readMemoryStatus,
@@ -17,7 +18,8 @@ import {
 } from "./core/workspace-memory.js";
 import type {
   MemoryQueryMode,
-  MemoryRebuildMode
+  MemoryRebuildMode,
+  MemorySourceType
 } from "./core/memory/types.js";
 import type { DaemonConfig } from "./core/types.js";
 
@@ -72,6 +74,7 @@ function usage(): never {
   marc daemon [--host 127.0.0.1] [--port 4187] [--data-dir .marc-daemon] [--token <token>]
   marc daemon start|stop|restart|status [--host 127.0.0.1] [--port 4187] [--data-dir .marc-daemon]
   marc memory status|prepare|rebuild|recall|purge [--workspace <path>] [--mode incremental|full] [--query <text>] [--query-mode auto|literal] [--limit <n>] [--depth 0|1|2]
+  marc memory deep --query <text> [--thread <id>] [--source-types summary,artifact,chat,rules,document] [--limit <n>] [--query-mode auto|literal]
   marc mcp [--workspace <path>] [--daemon-url http://127.0.0.1:4187] [--token <token>]`);
   process.exit(1);
 }
@@ -128,6 +131,14 @@ const memoryCommandHandlers: Record<
       queryMode: memoryQueryMode(parsed),
       limit: numberValue(parsed.values, "limit"),
       depth: numberValue(parsed.values, "depth")
+    }),
+  deep: (parsed, workspaceRoot) =>
+    deepMemory(workspaceRoot, {
+      query: stringValue(parsed.values, "query") ?? "",
+      threadId: deepStringValue(parsed, "thread"),
+      sourceTypes: sourceTypesValue(parsed),
+      queryMode: deepQueryMode(parsed),
+      limit: deepLimitValue(parsed)
     })
 };
 
@@ -138,6 +149,9 @@ async function handleMemoryCommand(parsed: ParsedArgs): Promise<void> {
     usage();
   }
   if (action === "recall" && !stringValue(parsed.values, "query")) {
+    usage();
+  }
+  if (action === "deep" && !stringValue(parsed.values, "query")) {
     usage();
   }
   if (action === "recall" && stringValue(parsed.values, "min-score"))
@@ -153,6 +167,35 @@ function memoryRebuildMode(parsed: ParsedArgs): MemoryRebuildMode {
   if (mode === undefined || mode === "incremental") return "incremental";
   if (mode === "full") return mode;
   throw new Error("Memory rebuild mode must be incremental or full.");
+}
+
+/** The comma-separated source types. The core rejects any name that is not a source type. */
+function sourceTypesValue(parsed: ParsedArgs): MemorySourceType[] | undefined {
+  const value = deepStringValue(parsed, "source-types");
+  if (value === undefined) return undefined;
+  return value
+    .split(",")
+    .map((sourceType) => sourceType.trim()) as MemorySourceType[];
+}
+
+/**
+ * A deep option that takes a value. Given as a bare flag (`--thread` with no value), it is an error,
+ * never a silent fallback: a missing thread would otherwise run the call unscoped.
+ */
+function deepStringValue(parsed: ParsedArgs, key: string): string | undefined {
+  const value = parsed.values[key];
+  if (value === true) throw new Error(`--${key} needs a value.`);
+  return typeof value === "string" ? value : undefined;
+}
+
+function deepLimitValue(parsed: ParsedArgs): number | undefined {
+  const value = deepStringValue(parsed, "limit");
+  return value === undefined ? undefined : Number(value);
+}
+
+function deepQueryMode(parsed: ParsedArgs): MemoryQueryMode | undefined {
+  deepStringValue(parsed, "query-mode");
+  return memoryQueryMode(parsed);
 }
 
 function memoryQueryMode(parsed: ParsedArgs): MemoryQueryMode | undefined {

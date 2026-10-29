@@ -36,6 +36,16 @@ export {
   memoryRebuildActiveInWorkspace
 } from "./rebuild-coordination.js";
 export { BackgroundMemoryReconciler } from "./background.js";
+export { deepMemoryInWorkspace } from "./deep.js";
+export { MemoryDeepError } from "./deep-errors.js";
+export type { MemoryDeepErrorCode } from "./deep-errors.js";
+export { DEFAULT_DEEP_LIMIT, MAX_DEEP_LIMIT } from "./deep-input.js";
+export type {
+  MemoryDeepHit,
+  MemoryDeepInput,
+  MemoryDeepOptions,
+  MemoryDeepResult
+} from "./deep-types.js";
 export {
   readWorkspaceSettingsInWorkspace,
   updateWorkspaceSettingsInWorkspace,

@@ -225,10 +225,11 @@ Outputs:
 - Merge reports (`merge-<timestamp>.json`) are written to `.marc/cache/memory-eval/<corpus>/`.
 - Judgments are not stored in the capture folder. Committed judgments are written to `scripts/memory-eval/datasets/<corpus>.json`. Rater files and the consensus file are inputs kept next to the capture.
 
-Two corpora are available:
+Three corpora are available:
 
 - `marc`: 114 curated cases over a pinned set of 56 closed threads. Captures record the `corpusDigest` of the pinned threads.
 - `ledgerline-en`: a fictional English corpus of 40 cases over 30 closed threads, used as a second, independent check of the harness.
+- `marc-deep`: 14 cases over 62 closed threads, which include the 56 threads of `marc`. It evaluates `memory_deep` (see [memory_deep](#memory_deep) and [ADR 0013](adrs/0013-memory-deep-scoped-passages.md)).
 
 Aggregation:
 
@@ -291,6 +292,27 @@ Options and production check:
 - `capture.json` records `productionCheck` when a production manifest is given. Its mode is `record-ids` when the production manifest has the schema version of the code, and `thread-ids` otherwise. The `thread-ids` check requires every pinned thread in the production manifest and exactly the pinned threads in the temporary manifest. The record stores both schema versions. The field is optional, so captures written before it remain readable.
 - The capture id covers every TypeScript file under `src/core/memory/`, including `sources/`. The fingerprint keeps its own baseline, `[0]` (`DEFAULT_INDEXED_LAYERS` in `capture-fingerprint.ts`), not the production `INDEXED_LAYERS`: the indexed layers join the id only when they differ from `[0]`, so a capture with `[0, 1, 2]` names its layers in the id and the layer-0 baseline adds nothing. Captures made after the source layers therefore have new ids; captures made before them keep their ids but no longer match the current code.
 
+## memory_deep
+
+`memory_deep` returns passages with their provenance. An agent uses it when `memory_recall` points to a closed thread whose details are missing, before it reads the whole `CHAT.md`, or when it needs the exact passage it intends to cite. It has no `depth` parameter.
+
+It has two modes:
+
+- **With `threadId`** (a full ID or an 8-character hexadecimal suffix), it searches one closed, indexed thread. The thread's passages in the layers present form the scope, optionally filtered by `sourceTypes` (`summary`, `artifact` or `chat`). At most 232 passages reach the reranker. A thread with more passages keeps the 232 with the highest cosine similarity to the query, and the result sets `scopeTruncated` to `true`. The hits carry no `groupBand`.
+- **Without `threadId`**, it searches the depth-2 pool and returns the passages of the groups that the pool admits. Each hit carries its group's confidence `groupBand` (ADR 0011). `sourceTypes` filters the output only.
+
+`score` is the reranker's relevance, not a probability. Each passage appears once. Chat passages are intermediate context: confirm them in the thread `SUMMARY.md` or the final message before relying on them.
+
+The reranking time grows with the passages reranked. In the E4 measurement on the marc-deep corpus ([ADR 0013](adrs/0013-memory-deep-scoped-passages.md)), the 95th percentile of scoped calls was about 35 seconds on the reference machine.
+
+Limits and errors:
+
+- `limit` takes an integer from 1 to 20, with a default of 5.
+- With `threadId`, `sourceTypes` accepts only `summary`, `artifact` and `chat`. Rules and documents belong to their own groups.
+- The thread must be closed. A thread that is still open returns `thread_not_closed`. A closed thread that the index does not hold returns `thread_not_indexed`, and `memory_rebuild` fixes it.
+- Thread resolution reports `thread_not_found`, `ambiguous_thread_id` and `invalid_thread_id`, as the thread tools do.
+- When the index or the models are not ready, or another memory operation holds the lock, the call returns no results and the reason in `nextActions`, as `memory_recall` does.
+
 ## MCP tools
 
 | Tool | Use |
@@ -299,5 +321,6 @@ Options and production check:
 | `memory_status` | Check whether the committed memory index is ready, stale, missing, incompatible, or waiting for the local model. |
 | `memory_rebuild` | Rebuild `.marc/memory/` from `SUMMARY.md` files. |
 | `memory_recall` | Retrieve relevant historical summaries for a development intent. |
+| `memory_deep` | Return passages with provenance: the passages of one closed, indexed thread with `threadId`, or the passages of the groups that depth 2 admits without it. |
 
 All memory tools are gated by `workspace_bootstrap`.

@@ -35,6 +35,11 @@ const REFERENCE_BY_SOURCE: Readonly<
   document: (record) => record.sourcePath
 };
 
+/** The reference of a record by the type of its source. memory_deep uses it too, so both tools agree. */
+export function memoryReferenceOf(record: MemoryVectorRecord): string {
+  return REFERENCE_BY_SOURCE[record.sourceType](record);
+}
+
 function threadReference(threadId: string): string {
   return `marc://$${threadId}`;
 }
@@ -61,7 +66,7 @@ function recallHitOf(
     groupKind,
     title: record.title,
     closedAt: record.closedAt,
-    reference: REFERENCE_BY_SOURCE[record.sourceType](record),
+    reference: memoryReferenceOf(record),
     matchedText: record.text,
     score: eligibility,
     reason: semanticMatchReason(record),

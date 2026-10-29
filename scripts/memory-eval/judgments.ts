@@ -28,6 +28,17 @@ import { selectRerankPassages, type FunnelRow } from "../../src/core/memory/funn
 import { quadraticKappa } from "./statistics.js";
 import type { VariantResult } from "./variants.js";
 import type { MemorySearchDepth } from "../../src/core/memory/types.js";
+import {
+  checkPassageKey,
+  countPassageGrades,
+  isPassageKey,
+  mergePassageGrades,
+  passageKeyOf,
+  passageRaterOf,
+  withoutPassageKeys,
+  type PassageCell,
+  type PassageMergeReport
+} from "./judgments-passage.js";
 
 /**
  * One judged cell: a group in a layer. Layer 0 cells are the case's `judgments`; layers 1 and 2
@@ -37,8 +48,12 @@ export type Cell = { groupId: string; layer: JudgedLayer | 0 };
 
 const LAYERED_KEY = /^layer([12]):(.*)$/;
 
-/** Key of a cell in a rater file: the group id for layer 0, `layer<L>:<groupId>` otherwise. */
-export function cellKeyOf(cell: Cell): string {
+/**
+ * Key of a cell in a rater file: the group id for layer 0, `layer<L>:<groupId>` otherwise, and
+ * `passage:<passageId>` for a passage cell. Group keys are read by `cellOf`; `parseRater` checks passage keys apart.
+ */
+export function cellKeyOf(cell: Cell | PassageCell): string {
+  if ("passageId" in cell) return passageKeyOf(cell.passageId);
   if (cell.layer === 0) return cell.groupId;
   return `layer${cell.layer}:${cell.groupId}`;
 }
@@ -51,7 +66,8 @@ export function cellOf(key: string): Cell {
 }
 
 /** The grade that a case holds for a cell, when the cell is judged. */
-export function gradeOfCell(evalCase: EvalCase, cell: Cell): RelevanceGrade | undefined {
+export function gradeOfCell(evalCase: EvalCase, cell: Cell | PassageCell): RelevanceGrade | undefined {
+  if ("passageId" in cell) return evalCase.passageJudgments?.[cell.passageId];
   const judgments = cell.layer === 0 ? evalCase.judgments : (evalCase.layerJudgments?.[cell.layer] ?? {});
   return judgments[cell.groupId];
 }
@@ -156,6 +172,8 @@ export type MergeReport = {
   conflicts: Conflict[];
   issues: ValidationIssue[];
   flags: string[];
+  /** The passage grades of the merge. Present only when the raters hold passage keys. */
+  passages?: PassageMergeReport;
 };
 
 export type MergeOutcome = { report: MergeReport; merged: EvalDataset };
@@ -320,7 +338,13 @@ export async function buildWorksheet(input: {
 }
 
 /** Parses and checks a rater file: known cases, pinned threads and integer grades from 0 to 3. */
-export function parseRater(value: unknown, name: string, dataset: EvalDataset, corpus: CorpusIndex): Rater {
+export function parseRater(
+  value: unknown,
+  name: string,
+  dataset: EvalDataset,
+  corpus: CorpusIndex,
+  passageIds?: ReadonlySet<string>
+): Rater {
   if (!isRecord(value)) throw new Error(`${name} must be an object keyed by case id.`);
   const rater: Rater = {};
   for (const [caseId, threads] of Object.entries(value)) {
@@ -329,10 +353,8 @@ export function parseRater(value: unknown, name: string, dataset: EvalDataset, c
     if (!isRecord(threads)) throw new Error(`${name}: case ${caseId} must be an object keyed by thread id.`);
     rater[caseId] = {};
     for (const [key, grade] of Object.entries(threads)) {
-      const cell = cellOf(key);
-      // Layer 1 and 2 groups are checked against the pinned corpus by the dataset validation.
-      if (cell.layer === 0 && !corpus.has(cell.groupId))
-        throw new Error(`${name}: thread ${cell.groupId} is not in the pinned corpus.`);
+      if (isPassageKey(key)) checkPassageKey({ name, caseId, key, passageIds });
+      if (!isPassageKey(key)) checkGroupKey(name, key, corpus);
       if (!isGrade(grade))
         throw new Error(`${name}: invalid grade ${JSON.stringify(grade)} for ${caseId}/${key}; use an integer from 0 to 3.`);
       rater[caseId][key] = grade;
@@ -341,11 +363,19 @@ export function parseRater(value: unknown, name: string, dataset: EvalDataset, c
   return rater;
 }
 
+/** Layer 1 and 2 groups are checked against the pinned corpus by the dataset validation. */
+function checkGroupKey(name: string, key: string, corpus: CorpusIndex): void {
+  const cell = cellOf(key);
+  if (cell.layer === 0 && !corpus.has(cell.groupId))
+    throw new Error(`${name}: thread ${cell.groupId} is not in the pinned corpus.`);
+}
+
 /**
  * Merges two raters. Concordant pairs are written; divergences are listed and
  * only written when the consensus resolves them. An existing grade is never
  * overwritten: a different grade is reported as a conflict. The merged dataset
- * is validated before anything can be written.
+ * is validated before anything can be written. Passage keys are merged apart
+ * from the layer keys; `passageIds` is the set of captured passages, when known.
  */
 export function mergeJudgments(input: {
   dataset: EvalDataset;
@@ -355,12 +385,27 @@ export function mergeJudgments(input: {
   raterA: unknown;
   raterB: unknown;
   consensus?: unknown;
+  /** Captured passage ids. A passage key whose id is not here is refused. */
+  passageIds?: ReadonlySet<string>;
 }): MergeOutcome {
   const { dataset, corpus } = input;
-  const first = parseRater(input.raterA, "rater A", dataset, corpus);
-  const second = parseRater(input.raterB, "rater B", dataset, corpus);
-  const consensus =
-    input.consensus === undefined ? {} : parseRater(input.consensus, "consensus", dataset, corpus);
+  const parsedFirst = parseRater(input.raterA, "rater A", dataset, corpus, input.passageIds);
+  const parsedSecond = parseRater(input.raterB, "rater B", dataset, corpus, input.passageIds);
+  const parsedConsensus =
+    input.consensus === undefined
+      ? {}
+      : parseRater(input.consensus, "consensus", dataset, corpus, input.passageIds);
+  const first = withoutPassageKeys(parsedFirst);
+  const second = withoutPassageKeys(parsedSecond);
+  const consensus = withoutPassageKeys(parsedConsensus);
+  const passages = mergePassageGrades({
+    dataset,
+    first: passageRaterOf(parsedFirst),
+    second: passageRaterOf(parsedSecond),
+    consensus: passageRaterOf(parsedConsensus)
+  });
+  const hasPassages =
+    countPassageGrades(parsedFirst) + countPassageGrades(parsedSecond) + countPassageGrades(parsedConsensus) > 0;
 
   const pairs = pairsOf(first, second);
   const divergences = pairs.filter((pair) => pair.a !== pair.b);
@@ -384,7 +429,7 @@ export function mergeJudgments(input: {
   const written: MergeReport["written"] = [];
   const conflicts: Conflict[] = [];
   let alreadyPresent = 0;
-  const additions = new Map<string, Array<{ cell: Cell; grade: RelevanceGrade }>>();
+  const additions = new Map<string, Array<{ cell: Cell | PassageCell; grade: RelevanceGrade }>>();
   for (const item of finalGrades) {
     const cell: Cell = { groupId: item.threadId, layer: item.layer };
     const evalCase = dataset.cases.find((candidate) => candidate.id === item.caseId);
@@ -410,6 +455,9 @@ export function mergeJudgments(input: {
     });
   }
 
+  for (const [caseId, items] of passages.additions) {
+    additions.set(caseId, [...(additions.get(caseId) ?? []), ...items]);
+  }
   const merged: EvalDataset = {
     ...dataset,
     cases: dataset.cases.map((evalCase) => withCellGrades(evalCase, additions.get(evalCase.id) ?? []))
@@ -418,6 +466,8 @@ export function mergeJudgments(input: {
   const kappa = quadraticKappa(pairs.map((pair) => [pair.a, pair.b]));
   const flags: string[] = [];
   if (kappa !== null && kappa < KAPPA_THRESHOLD) flags.push("kappa_below_threshold");
+  if (passages.report.kappa !== null && passages.report.kappa < KAPPA_THRESHOLD)
+    flags.push("passage_kappa_below_threshold");
   return {
     report: {
       pairs: pairs.length,
@@ -429,7 +479,8 @@ export function mergeJudgments(input: {
       alreadyPresent,
       conflicts,
       issues,
-      flags
+      flags,
+      ...(hasPassages ? { passages: passages.report } : {})
     },
     merged
   };
@@ -446,16 +497,22 @@ export function serializeDataset(dataset: EvalDataset): string {
     cases: dataset.cases.map((evalCase) => ({
       ...evalCase,
       judgments: sortedJudgments(evalCase.judgments),
-      layerJudgments: withLayerGrades(evalCase.layerJudgments, [])
+      layerJudgments: withLayerGrades(evalCase.layerJudgments, []),
+      passageJudgments:
+        evalCase.passageJudgments === undefined ? undefined : sortedJudgments(evalCase.passageJudgments)
     }))
   };
   return `${JSON.stringify(canonical, null, 2)}\n`;
 }
 
-/** Writes the merged dataset only when validation passes and at least one pair is new. */
+/**
+ * Writes the merged dataset when it has something new: a thread or layer grade (`written`), or a passage grade
+ * (`passages.written`). It never writes a dataset with issues.
+ */
 export async function commitMerge(input: { datasetPath: string; outcome: MergeOutcome }): Promise<boolean> {
   const { report, merged } = input.outcome;
-  if (report.issues.length > 0 || report.written.length === 0) return false;
+  const written = report.written.length + (report.passages?.written.length ?? 0);
+  if (report.issues.length > 0 || written === 0) return false;
   await fs.writeFile(input.datasetPath, serializeDataset(merged));
   return true;
 }
@@ -852,13 +909,37 @@ function gradesOfLayer(
 /** The case with the added cells: layer 0 in `judgments`, layers 1 and 2 in `layerJudgments`. */
 function withCellGrades(
   evalCase: EvalCase,
-  additions: ReadonlyArray<{ cell: Cell; grade: RelevanceGrade }>
+  additions: ReadonlyArray<{ cell: Cell | PassageCell; grade: RelevanceGrade }>
 ): EvalCase {
-  const judgments = sortedJudgments({ ...evalCase.judgments, ...gradesOfLayer(additions, 0) });
-  const layerJudgments = withLayerGrades(evalCase.layerJudgments, additions);
-  return layerJudgments === undefined
-    ? { ...evalCase, judgments }
-    : { ...evalCase, judgments, layerJudgments };
+  const groupAdditions = additions.filter(isGroupAddition);
+  const judgments = sortedJudgments({ ...evalCase.judgments, ...gradesOfLayer(groupAdditions, 0) });
+  const layerJudgments = withLayerGrades(evalCase.layerJudgments, groupAdditions);
+  const withGroups =
+    layerJudgments === undefined
+      ? { ...evalCase, judgments }
+      : { ...evalCase, judgments, layerJudgments };
+  const passageJudgments = withPassageGrades(evalCase.passageJudgments, additions.filter(isPassageAddition));
+  return passageJudgments === undefined ? withGroups : { ...withGroups, passageJudgments };
+}
+
+type GroupAddition = { cell: Cell; grade: RelevanceGrade };
+
+function isGroupAddition(item: { cell: Cell | PassageCell }): item is GroupAddition {
+  return !("passageId" in item.cell);
+}
+
+function isPassageAddition(item: { cell: Cell | PassageCell }): item is { cell: PassageCell; grade: RelevanceGrade } {
+  return "passageId" in item.cell;
+}
+
+/** The passage grades of a case, sorted by passageId, with the additions applied. Undefined when there are none. */
+function withPassageGrades(
+  passageJudgments: Record<string, RelevanceGrade> | undefined,
+  additions: ReadonlyArray<{ cell: Cell | PassageCell; grade: RelevanceGrade }>
+): Record<string, RelevanceGrade> | undefined {
+  const added = additions.flatMap((item) => ("passageId" in item.cell ? [[item.cell.passageId, item.grade] as const] : []));
+  if (passageJudgments === undefined && added.length === 0) return undefined;
+  return sortedJudgments({ ...(passageJudgments ?? {}), ...Object.fromEntries(added) });
 }
 
 function capturedCaseOf(capture: CaptureFile, caseId: string): CapturedCase {

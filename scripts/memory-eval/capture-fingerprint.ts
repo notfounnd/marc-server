@@ -6,6 +6,7 @@ import {
   queryInterpretationProviderMetadata
 } from "../../src/core/memory/model-config.js";
 import type { MemoryLayer } from "../../src/core/memory/types.js";
+import { E3_K_MAX } from "./capture-scope.js";
 import type { EvalCase, EvalDataset } from "./dataset.js";
 
 export type CaptureModelIdentity = ReturnType<typeof modelIdentity>;
@@ -24,6 +25,8 @@ export type CaptureFingerprint = {
   captureChannels?: string;
   /** Order in which the reranker receives the documents (`length`). Present only when it is recorded. */
   rerankOrder?: string;
+  /** K_max of the closed scope. Present only when it differs from the E3 default of 30. */
+  kMax?: number;
 };
 
 /** The components that the captureId hashes. A capture.json stores them all. */
@@ -48,7 +51,8 @@ export async function computeCaptureFingerprint(
   corpusDigest: string,
   indexedLayers?: readonly MemoryLayer[],
   captureChannels?: string,
-  rerankOrder?: string
+  rerankOrder?: string,
+  kMax?: number
 ): Promise<CaptureFingerprint> {
   const components: FingerprintComponents = {
     queryFingerprint: sha256Json(queryFingerprintCases(dataset.cases)),
@@ -58,7 +62,8 @@ export async function computeCaptureFingerprint(
     corpusDigest,
     ...layersPart(indexedLayers),
     ...channelsPart(captureChannels),
-    ...orderPart(rerankOrder)
+    ...orderPart(rerankOrder),
+    ...kMaxPart(kMax)
   };
   return fingerprintOf(components);
 }
@@ -66,6 +71,12 @@ export async function computeCaptureFingerprint(
 function orderPart(rerankOrder: string | undefined): { rerankOrder?: string } {
   if (rerankOrder === undefined) return {};
   return { rerankOrder };
+}
+
+/** K_max joins the components only when it differs from the E3 default, so that E0 to E3 ids keep their value. */
+function kMaxPart(kMax: number | undefined): { kMax?: number } {
+  if (kMax === undefined || kMax === E3_K_MAX) return {};
+  return { kMax };
 }
 
 /**
@@ -81,7 +92,8 @@ export function fingerprintOf(components: FingerprintComponents): CaptureFingerp
     corpusDigest: components.corpusDigest,
     ...layersPart(components.indexedLayers),
     ...channelsPart(components.captureChannels),
-    ...orderPart(components.rerankOrder)
+    ...orderPart(components.rerankOrder),
+    ...kMaxPart(components.kMax)
   });
   return {
     captureId: fingerprint.slice(0, 12),
@@ -101,8 +113,15 @@ export function queryFingerprintCases(cases: readonly EvalCase[]) {
     id: evalCase.id,
     query: evalCase.query,
     queryMode: evalCase.queryMode,
-    expectedInterpretation: evalCase.expectedInterpretation ?? null
+    expectedInterpretation: evalCase.expectedInterpretation ?? null,
+    ...scopePart(evalCase)
   }));
+}
+
+/** The scope joins the query fingerprint only when the case declares one, so that the older datasets keep their ids. */
+function scopePart(evalCase: EvalCase): { scope?: EvalCase["scope"] } {
+  if (evalCase.scope === undefined) return {};
+  return { scope: evalCase.scope };
 }
 
 export function sha256(value: string): string {

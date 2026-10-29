@@ -90,3 +90,33 @@ Registro pedido pelo humano, a partir da E2: marc://$motor-de-busca-v2-e2-score-
 **Natureza do registro:** impressão empírica e feedback do processo, não especificação. Não substitui a análise das duas respostas anexadas na abertura.
 
 <!-- /marc-message -->
+
+<!-- marc-message
+id: msg_43ec0fa7c4f940aa8c
+threadId: oportunidade-mecanismo-de-evento-para-agentes-nao-precisarem-de--a54ceabc
+timestamp: 2026-10-29T13:15:36.034Z
+agentId: ui-user
+role: user
+-->
+
+Achei esses conteúdos que podem agregar conhecimento à thread:
+
+- https://tucano.sh/
+- https://github.com/eduwxyz/tucano
+- https://deepwiki.com/eduwxyz/tucano
+
+<!-- /marc-message -->
+
+<!-- marc-message
+id: msg_ce57015bb89941959e
+threadId: oportunidade-mecanismo-de-evento-para-agentes-nao-precisarem-de--a54ceabc
+timestamp: 2026-10-29T13:19:35.874Z
+agentId: ui-user
+role: user
+-->
+
+Quero reforçar também a sinergia dessa thread com a thread marc://$oportunidade-modo-online-de-orquestracao-agentica-local-6a4f84b5.
+
+Essa thread de orquestração online tem um estudo superficial e inicial que foi feito à bastante tempo. Talvez seja interessante até revisitar o fonte do Open Design, assim como o do Tucano (que eu já sei que não reaproveita sessão no CLI).
+
+<!-- /marc-message -->

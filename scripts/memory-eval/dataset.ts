@@ -1,7 +1,21 @@
 import type { MemorySearchDepth } from "../../src/core/memory/types.js";
+import type { MemorySourceType } from "../../src/core/memory/sources/contract.js";
 import { markdownToIndexText } from "../../src/core/memory/sources/markdown-text.js";
+import { DEEP_CASE_RULES } from "./dataset-deep.js";
+import { DOCUMENT_GROUP_PREFIX, RULES_GROUP, RULES_PATH } from "./source-group.js";
+
+export { DOCUMENT_GROUP_PREFIX, RULES_GROUP, RULES_PATH };
 
 export type RelevanceGrade = 0 | 1 | 2 | 3;
+
+/** The corpora that datasets can declare. `marc-deep` is the E4 corpus; it shares the threads of `marc`. */
+export type CorpusName = "marc" | "marc-deep" | "ledgerline-en";
+
+/** Scope of a `deep` case. With a thread it is the scoped mode; with only source types it filters the output. */
+export type EvalScope = {
+  threadId?: string;
+  sourceTypes?: MemorySourceType[];
+};
 
 /** Layers that carry judgments of their own. Layer 0 judgments are `EvalCase.judgments`. */
 export type JudgedLayer = 1 | 2;
@@ -20,7 +34,8 @@ export type EvalCaseStyle =
   | "overcorrection-control"
   | "negative"
   | "layer"
-  | "adaptive-trap";
+  | "adaptive-trap"
+  | "deep";
 
 /** A literal quote of the text that answers the query, found in one source file. */
 export type EvidenceQuote = {
@@ -46,12 +61,16 @@ export type EvalCase = {
   layerJudgments?: LayerJudgments;
   /** Required for the `layer` and `adaptive-trap` styles: where the answer lives. */
   evidence?: EvidenceQuote[];
+  /** Only `deep` cases: the scope of the search. Absent when the search is unscoped. */
+  scope?: EvalScope;
+  /** Only `deep` cases: grade of each passage that the search may return, keyed by passageId. */
+  passageJudgments?: Record<string, RelevanceGrade>;
   origin: string;
 };
 
 export type EvalDataset = {
   schemaVersion: 1;
-  corpus: "marc" | "ledgerline-en";
+  corpus: CorpusName;
   cases: EvalCase[];
 };
 
@@ -83,12 +102,14 @@ export type ValidationRule =
   | "quote-length"
   | "evidence-source-missing"
   | "quote-not-in-source"
-  | "layer-judgment-group-missing";
-
-/** Group ids of the layer-1 sources that are not threads. */
-export const RULES_GROUP = "@rules";
-export const RULES_PATH = "RULES.md";
-export const DOCUMENT_GROUP_PREFIX = "@document/";
+  | "layer-judgment-group-missing"
+  | "scope-only-deep"
+  | "scope-thread-not-closed"
+  | "scope-source-types-invalid"
+  | "deep-evidence-outside-scope"
+  | "passage-grade-out-of-range"
+  | "passage-judgment-key-invalid"
+  | "passage-judgment-unknown-source";
 
 /** `@rules` and `@document/<sourcePath>` are groups of the layer-1 sources, not threads. */
 export function isNonThreadGroup(groupId: string): boolean {
@@ -98,7 +119,7 @@ export function isNonThreadGroup(groupId: string): boolean {
 /** Frozen corpus of a memory-eval dataset: the thread ids that its captures and judgments refer to. */
 export type PinnedCorpus = {
   schemaVersion: 1;
-  corpus: "marc" | "ledgerline-en";
+  corpus: CorpusName;
   threadIds: string[];
 };
 
@@ -128,7 +149,7 @@ const INTERPRETATION_STYLES: ReadonlySet<EvalCaseStyle> = new Set([
   "typo",
   "overcorrection-control"
 ]);
-const EVIDENCE_STYLES: ReadonlySet<EvalCaseStyle> = new Set(["layer", "adaptive-trap"]);
+const EVIDENCE_STYLES: ReadonlySet<EvalCaseStyle> = new Set(["layer", "adaptive-trap", "deep"]);
 export const QUOTE_MIN_WORDS = 5;
 export const QUOTE_MAX_WORDS = 40;
 
@@ -255,7 +276,7 @@ function gradeRangeRule(evalCase: EvalCase): ValidationIssue[] {
 }
 
 function missingTargetRule(evalCase: EvalCase): ValidationIssue[] {
-  if (isNegative(evalCase)) return [];
+  if (isNegative(evalCase) || evalCase.style === "deep") return [];
   const hasTarget = allGradeEntries(evalCase).some(([, grade]) => grade === TARGET_GRADE);
   if (hasTarget) return [];
   return [
@@ -395,7 +416,8 @@ const CASE_RULES: readonly CaseRule[] = [
   missingEvidenceRule,
   quoteLengthRule,
   quoteInSourceRule,
-  layerJudgmentGroupRule
+  layerJudgmentGroupRule,
+  ...DEEP_CASE_RULES
 ];
 
 function duplicatedIdsOf(cases: readonly EvalCase[]): ReadonlySet<string> {

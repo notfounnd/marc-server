@@ -132,7 +132,7 @@ async function runVersionPinRequests(
   assert.equal(supportedListing.id, requestId);
   assert.ok("result" in supportedListing);
   assert.ok(Array.isArray(supportedListing.result.tools));
-  assert.equal(supportedListing.result.tools.length, 25);
+  assert.equal(supportedListing.result.tools.length, 26);
   requestId += 1;
 
   await server.send({

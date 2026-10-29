@@ -9,12 +9,8 @@ import type {
   MemorySearchDepth,
   MemoryVectorRow
 } from "../../src/core/memory/types.js";
-import {
-  DOCUMENT_GROUP_PREFIX,
-  RULES_GROUP,
-  RULES_PATH,
-  type EvalCase
-} from "./dataset.js";
+import type { EvalCase } from "./dataset.js";
+import { groupIdOfSource } from "./source-group.js";
 
 /**
  * K_max of the T0 study, the largest viable K of the budget B = 232 (grid 8 to 30). It bounds the
@@ -44,17 +40,21 @@ export function knownGroupIdsOf(evalCase: EvalCase): Set<string> {
   );
 }
 
-/** The group that owns a corpus file: its thread, `@rules`, or `@document/<path>`. */
-export function groupIdOfSource(sourcePath: string): string {
-  if (sourcePath === RULES_PATH) return RULES_GROUP;
-  const parts = sourcePath.split("/");
-  if (parts[0] === "threads" && parts.length > 2) return parts[1];
-  return `${DOCUMENT_GROUP_PREFIX}${sourcePath}`;
-}
-
 /** The groups that own the evidence quotes of a case. */
 export function evidenceGroupIdsOf(evalCase: EvalCase): Set<string> {
   return new Set((evalCase.evidence ?? []).map((item) => groupIdOfSource(item.sourcePath)));
+}
+
+/**
+ * The groups that the matrix scope keeps whole. A `deep` case with a scope thread adds that thread here,
+ * so that all its passages enter the scope. This set feeds only the scope: the evidence matches, the
+ * quotes and the incomplete reasons read the quotes alone.
+ */
+export function scopeEvidenceGroupIdsOf(evalCase: EvalCase): Set<string> {
+  const groups = evidenceGroupIdsOf(evalCase);
+  const threadId = evalCase.scope?.threadId;
+  if (threadId !== undefined) groups.add(threadId);
+  return groups;
 }
 
 export type ScopeInput = {

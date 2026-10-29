@@ -1,0 +1,404 @@
+{
+  "schemaVersion": 1,
+  "corpus": "marc-deep",
+  "cases": [
+    {
+      "id": "D01",
+      "family": "oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3",
+      "style": "deep",
+      "query": "por que a rotação de token não foi implementada?",
+      "queryMode": "auto",
+      "judgments": {},
+      "evidence": [
+        {
+          "sourcePath": "threads/oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3/SUMMARY.md",
+          "quote": "Essas capacidades não constituem uma ameaça prática demonstrada enquanto a API permanece local à máquina controlada pelo usuário."
+        },
+        {
+          "sourcePath": "threads/oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3/CHAT.md",
+          "quote": "Nao foi identificado valor para rotacao automatica, token por workspace, escopos de permissao ou mudanca da experiencia local."
+        }
+      ],
+      "origin": "approvers-e4-2026-10-28",
+      "passageJudgments": {
+        ".marc/threads/oportunidade-memory-deep-para-aprofundamento-em-threads-fechadas-f04c7cae/artifacts/oportunidade-memory-deep.md#7e2fcdb71ef968ef": 0,
+        ".marc/threads/oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3/CHAT.md#e6fbe4e8acc9f693": 3,
+        ".marc/threads/oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3/SUMMARY.md#ca26e1a88c5db1ef": 2,
+        ".marc/threads/oportunidade-modelo-de-seguranca-e-gestao-de-token-do-daemon-674632b3/SUMMARY.md#f624aa56566cc2be": 3,
+        ".marc/threads/oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb/artifacts/oportunidade-tuning-recall-ranking-memory.md#2c34d57f1bde6699": 1,
+        ".marc/threads/oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb/artifacts/plano-tuning-recall-ranking-memory.md#84d3aeeb1bfbb719": 0
+      }
+    },
+    {
+      "id": "D02",
+      "family": "oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb",
+      "style": "deep",
+      "query": "quais regras definem organização das informações na UI?",
+      "queryMode": "auto",
+      "judgments": {},
+      "evidence": [
+        {
+          "sourcePath": "threads/oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb/artifacts/experiencia-uso-memory-pesquisa-ui.md",
+          "quote": "cada informação deve ficar perto do seu dono semântico, não apenas onde é conveniente renderizar."
+        },
+        {
+          "sourcePath": "threads/oportunidade-esquemas-de-visualizacao-das-colunas-da-ui-604ad99b/SUMMARY.md",
+          "quote": "Marckers passou a ser uma visualização exclusiva da coluna do meio; a lista fixa de agentes abaixo das threads foi removida."
+        }
+      ],
+      "origin": "approvers-e4-2026-10-28",
+      "passageJudgments": {
+        ".marc/threads/oportunidade-memory-deep-para-aprofundamento-em-threads-fechadas-f04c7cae/artifacts/oportunidade-memory-deep.md#64f6fda2e3cb7774": 0,
+        ".marc/threads/oportunidade-memory-deep-para-aprofundamento-em-threads-fechadas-f04c7cae/artifacts/oportunidade-memory-deep.md#7e2fcdb71ef968ef": 0,
+        ".marc/threads/oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb/SUMMARY.md#da1eaab2c26cc9c5": 3,
+        ".marc/threads/oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb/artifacts/experiencia-uso-memory-pesquisa-ui.md#3cc89abdbb0fee28": 3,
+        ".marc/threads/oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb/artifacts/experiencia-uso-memory-pesquisa-ui.md#bb7021c9ea447add": 0
+      }
+    },
+    {
+      "id": "D03",
+      "family": "oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac",
+      "style": "deep",
+      "query": "qual foi o raciocínio para indexar apenas summaries na memory v1?",
+      "queryMode": "auto",
+      "judgments": {},
+      "evidence": [
+        {
+          "sourcePath": "threads/oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac/CHAT.md",
+          "quote": "Criar recuperação semântica e cronológica local sobre o histórico documentado, injetando no contexto do agente apenas evidências executivas relevantes à tarefa atual."
+        },
+        {
+          "sourcePath": "threads/oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac/SUMMARY.md",
+          "quote": "A motivacao central foi permitir que agentes em diferentes ferramentas, CLIs e IDEs consultem rapidamente decisoes historicas do projeto"
+        }
+      ],
+      "origin": "approvers-e4-2026-10-28",
+      "passageJudgments": {
+        ".marc/threads/oportunidade-banco-de-embeddings-quantizado-e-indice-estruturado-0e4dbaac/SUMMARY.md#c99b414e587201ec": 1,
+        ".marc/threads/oportunidade-memory-deep-para-aprofundamento-em-threads-fechadas-f04c7cae/artifacts/oportunidade-memory-deep.md#01b6ed5f0eac9e43": 1,
+        ".marc/threads/oportunidade-memory-deep-para-aprofundamento-em-threads-fechadas-f04c7cae/artifacts/oportunidade-memory-deep.md#7e2fcdb71ef968ef": 0,
+        ".marc/threads/oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682/artifacts/plano-rebuild-incremental-e-batches-limitados.md#cb86dc7dfa35169b": 1,
+        ".marc/threads/oportunidade-rebuild-incremental-e-batches-limitados-da-memory-3e422682/artifacts/proposta-rebuild-incremental-e-batches-limitados.md#ebadef1e17e25216": 1,
+        ".marc/threads/oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb/SUMMARY.md#c2d9832af59498a3": 1,
+        ".marc/threads/oportunidade-tuning-de-recall-e-ranking-da-memory-c147b8bb/artifacts/oportunidade-tuning-recall-ranking-memory.md#7329625005cd1a8a": 0
+      }
+    },
+    {
+      "id": "D04",
+      "family": "@rules",
+      "style": "deep",
+      "query": "quais regras operacionais dizem para preservar Markdown como fonte da verdade?",
+      "queryMode": "auto",
+      "judgments": {},
+      "evidence": [
+        {
+          "sourcePath": "RULES.md",
+          "quote": "keep Markdown authoritative for human-readable knowledge and coordination records, such as threads, messages, artifacts, and summaries."
+        },
+        {
+          "sourcePath": "threads/oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f/SUMMARY.md",
+          "quote": "Mantido Markdown como fonte de verdade; `thread-index.json` e locks em `cache/` permanecem controles derivados e reconstruíveis."
+        }
+      ],
+      "origin": "approvers-e4-2026-10-28",
+      "passageJudgments": {
+        ".marc/threads/oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894/artifacts/analise-coerencia-harness.md#d0d94d43e9b57ae7": 3,
+        ".marc/threads/oportunidade-memory-deep-para-aprofundamento-em-threads-fechadas-f04c7cae/artifacts/oportunidade-memory-deep.md#2d14067e69039b38": 2,
+        ".marc/threads/oportunidade-memory-deep-para-aprofundamento-em-threads-fechadas-f04c7cae/artifacts/oportunidade-memory-deep.md#7e2fcdb71ef968ef": 1,
+        ".marc/threads/oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f/artifacts/plano-politica-concorrencia-escritas-markdown.md#aa0f3315e2d9730c": 3,
+        ".marc/threads/oportunidade-reformatar-custom-rules-com-base-na-auditoria-894072be/SUMMARY.md#9f533b13977ee47a": 3,
+        ".marc/threads/oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9/artifacts/proposta-settings-json.md#316d893e72629f76": 2,
+        ".marc/threads/oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9/artifacts/proposta-settings-json.md#537f07ab314ec4c9": 2,
+        ".marc/threads/oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9/artifacts/proposta-settings-json.md#c98d315b67b1a013": 2
+      }
+    },
+    {
+      "id": "D05",
+      "family": "oportunidade-leitura-incremental-de-threads-por-cursor-3c45fa83",
+      "style": "deep",
+      "query": "o que a leitura incremental devolve quando o cursor da mensagem não é encontrado?",
+      "queryMode": "auto",
+      "judgments": {},
+      "evidence": [
+        {
+          "sourcePath": "threads/oportunidade-leitura-incremental-de-threads-por-cursor-3c45fa83/SUMMARY.md",
+          "quote": "Comportamento explícito de falha de cursor com `cursor_not_found` e `shouldReadFullThread: true`."
+        }
+      ],
+      "scope": {
+        "threadId": "oportunidade-leitura-incremental-de-threads-por-cursor-3c45fa83"
+      },
+      "origin": "approvers-e4-2026-10-28",
+      "passageJudgments": {
+        ".marc/threads/oportunidade-leitura-incremental-de-threads-por-cursor-3c45fa83/CHAT.md#873e8461d4f0ea82": 0,
+        ".marc/threads/oportunidade-leitura-incremental-de-threads-por-cursor-3c45fa83/CHAT.md#bae3f4cfd5c325cb": 1,
+        ".marc/threads/oportunidade-leitura-incremental-de-threads-por-cursor-3c45fa83/CHAT.md#bce616ade80fdf0a": 3,
+        ".marc/threads/oportunidade-leitura-incremental-de-threads-por-cursor-3c45fa83/CHAT.md#cb881a028d8e5a87": 3,
+        ".marc/threads/oportunidade-leitura-incremental-de-threads-por-cursor-3c45fa83/CHAT.md#ce3bb9fd49b7c230": 0,
+        ".marc/threads/oportunidade-leitura-incremental-de-threads-por-cursor-3c45fa83/SUMMARY.md#5c73ec25c31c5e8b": 3
+      }
+    },
+    {
+      "id": "D06",
+      "family": "oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686",
+      "style": "deep",
+      "query": "quais tools continuam funcionando sem a confirmação de bootstrap?",
+      "queryMode": "auto",
+      "judgments": {},
+      "evidence": [
+        {
+          "sourcePath": "threads/oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686/SUMMARY.md",
+          "quote": "Tools livres mantidas sem confirmação: `marc_helper`, `workspace_bootstrap` e `workspace_update_recommendations`."
+        }
+      ],
+      "scope": {
+        "threadId": "oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686"
+      },
+      "origin": "approvers-e4-2026-10-28",
+      "passageJudgments": {
+        ".marc/threads/oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686/CHAT.md#00393dce306fab0e": 3,
+        ".marc/threads/oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686/CHAT.md#67ee06d1bd670d5f": 3,
+        ".marc/threads/oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686/CHAT.md#c5afe23b9574e87b": 3,
+        ".marc/threads/oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686/SUMMARY.md#2b442d48f65f5324": 3,
+        ".marc/threads/oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686/SUMMARY.md#cd452c5aa8f0e2c8": 3,
+        ".marc/threads/oportunidade-bootstrap-obrigatorio-nas-tools-marc-d14fb686/artifacts/proposta-bootstrap-obrigatorio.md#9c1ac68e712031f3": 1
+      }
+    },
+    {
+      "id": "D07",
+      "family": "oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f",
+      "style": "deep",
+      "query": "que risco ficou aberto entre gravar um artifact e registrar o vínculo no transcript?",
+      "queryMode": "auto",
+      "judgments": {},
+      "evidence": [
+        {
+          "sourcePath": "threads/oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f/SUMMARY.md",
+          "quote": "A criação de um artifact e a publicação do vínculo em `CHAT.md` não formam uma transação multi-arquivo"
+        }
+      ],
+      "scope": {
+        "threadId": "oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f",
+        "sourceTypes": [
+          "summary",
+          "artifact"
+        ]
+      },
+      "origin": "approvers-e4-2026-10-28",
+      "passageJudgments": {
+        ".marc/threads/oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f/SUMMARY.md#a3ec9d7fcca606c9": 1,
+        ".marc/threads/oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f/SUMMARY.md#c6618d74a78f87ae": 3,
+        ".marc/threads/oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f/artifacts/plano-politica-concorrencia-escritas-markdown.md#14bf0ca00ceb8295": 2,
+        ".marc/threads/oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f/artifacts/plano-politica-concorrencia-escritas-markdown.md#5c743a34b9fad093": 3,
+        ".marc/threads/oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f/artifacts/plano-politica-concorrencia-escritas-markdown.md#aa0f3315e2d9730c": 0,
+        ".marc/threads/oportunidade-politica-de-concorrencia-e-escritas-no-markdown-sot-3d40719f/artifacts/plano-politica-concorrencia-escritas-markdown.md#ef2e32f0a36bffca": 1
+      }
+    },
+    {
+      "id": "D08",
+      "family": "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99",
+      "style": "deep",
+      "query": "o que acontece com um segundo pedido de rebuild enquanto outro processo já reconstrói a memory?",
+      "queryMode": "auto",
+      "judgments": {},
+      "evidence": [
+        {
+          "sourcePath": "threads/oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99/SUMMARY.md",
+          "quote": "Solicitacao concorrente nao fica enfileirada para refazer o indice; ela observa `rebuilding`."
+        }
+      ],
+      "scope": {
+        "threadId": "oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99"
+      },
+      "origin": "approvers-e4-2026-10-28",
+      "passageJudgments": {
+        ".marc/threads/oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99/SUMMARY.md#3a777d2066fab344": 0,
+        ".marc/threads/oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99/artifacts/plano-coordenacao-global-rebuild-memory.md#04072c4fd292c972": 3,
+        ".marc/threads/oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99/artifacts/plano-coordenacao-global-rebuild-memory.md#8c29470f9b50cf9d": 3,
+        ".marc/threads/oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99/artifacts/plano-coordenacao-global-rebuild-memory.md#b6ea2514cc1f0673": 3,
+        ".marc/threads/oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99/artifacts/plano-coordenacao-global-rebuild-memory.md#ede96373f7087539": 1,
+        ".marc/threads/oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99/artifacts/proposta-coordenacao-global-rebuild-memory.md#24230c8e4d50197e": 2,
+        ".marc/threads/oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99/artifacts/proposta-coordenacao-global-rebuild-memory.md#39b710560ca1a352": 2,
+        ".marc/threads/oportunidade-coordenacao-global-de-rebuild-da-memory-entre-proce-774d1e99/artifacts/proposta-coordenacao-global-rebuild-memory.md#9e561ef013e6d394": 2
+      }
+    },
+    {
+      "id": "D09",
+      "family": "oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa",
+      "style": "deep",
+      "query": "que falha da primeira implementação da busca por sufixo a revisão encontrou?",
+      "queryMode": "auto",
+      "judgments": {},
+      "evidence": [
+        {
+          "sourcePath": "threads/oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa/artifacts/atividade-leitura-mcp-por-sufixo.md",
+          "quote": "A revisão identificou que EACCES em uma thread não relacionada poderia quebrar uma consulta válida."
+        }
+      ],
+      "scope": {
+        "threadId": "oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa",
+        "sourceTypes": [
+          "artifact"
+        ]
+      },
+      "origin": "approvers-e4-2026-10-28",
+      "passageJudgments": {
+        ".marc/threads/oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa/artifacts/atividade-leitura-mcp-por-sufixo.md#6cf0bd7d2f925338": 2,
+        ".marc/threads/oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa/artifacts/atividade-leitura-mcp-por-sufixo.md#7bc8471029eab548": 0,
+        ".marc/threads/oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa/artifacts/atividade-leitura-mcp-por-sufixo.md#e9b9e295c6c6fcdc": 0,
+        ".marc/threads/oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa/artifacts/atividade-leitura-mcp-por-sufixo.md#ea604d5b43d503e4": 3,
+        ".marc/threads/oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa/artifacts/entrega-leitura-mcp-por-sufixo.md#372ed96b204af46e": 3,
+        ".marc/threads/oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa/artifacts/plano-leitura-mcp-por-sufixo.md#337e706fcba5fe92": 0,
+        ".marc/threads/oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa/artifacts/plano-leitura-mcp-por-sufixo.md#a88fb6933990d0a5": 0,
+        ".marc/threads/oportunidade-busca-mcp-de-thread-por-sufixo-de-id-1d4c0daa/artifacts/plano-testabilidade-resolucao-thread.md#87baa1eef2544150": 1
+      }
+    },
+    {
+      "id": "D10",
+      "family": "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7",
+      "style": "deep",
+      "query": "como o update de summary trata uma repetição com o mesmo conteúdo?",
+      "queryMode": "auto",
+      "judgments": {},
+      "evidence": [
+        {
+          "sourcePath": "threads/oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7/artifacts/entrega-summary-via-mcp-codex-dev.md",
+          "quote": "A repetição equivalente retorna unchanged antes de comparar a revisão e preserva bytes/mtime"
+        }
+      ],
+      "scope": {
+        "threadId": "oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7"
+      },
+      "origin": "approvers-e4-2026-10-28",
+      "passageJudgments": {
+        ".marc/threads/oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7/CHAT.md#7673c14b07379122": 0,
+        ".marc/threads/oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7/CHAT.md#b076683275f787db": 0,
+        ".marc/threads/oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7/SUMMARY.md#0e92d252de05a446": 3,
+        ".marc/threads/oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7/artifacts/entrega-summary-via-mcp-codex-dev.md#c0768dd9e47e3026": 3,
+        ".marc/threads/oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7/artifacts/oportunidade-summary-e-encerramento-via-mcp.md#920a3188980b22f7": 2,
+        ".marc/threads/oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7/artifacts/oportunidade-summary-e-encerramento-via-mcp.md#ec0c0ecbdf91f907": 2,
+        ".marc/threads/oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7/artifacts/plano-summary-via-mcp.md#74d17c3a9efc5901": 3,
+        ".marc/threads/oportunidade-tools-mcp-para-summary-e-encerramento-de-threads-2f441fa7/artifacts/summary-fixture-correction-delivery.md#d811231aaf075c56": 0
+      }
+    },
+    {
+      "id": "D11",
+      "family": "motor-de-busca-v2-e1-camada-de-fontes-e-representacao-1042e2b3",
+      "style": "deep",
+      "query": "por que as linhas da seção não bastavam para identificar uma passagem?",
+      "queryMode": "auto",
+      "judgments": {},
+      "evidence": [
+        {
+          "sourcePath": "threads/motor-de-busca-v2-e1-camada-de-fontes-e-representacao-1042e2b3/CHAT.md",
+          "quote": "a linha de proveniência da E1 determina que as passagens herdem o intervalo da seção. Isso serve para localizar a seção, mas não identifica cada passagem."
+        }
+      ],
+      "scope": {
+        "threadId": "motor-de-busca-v2-e1-camada-de-fontes-e-representacao-1042e2b3",
+        "sourceTypes": [
+          "chat"
+        ]
+      },
+      "origin": "approvers-e4-2026-10-28",
+      "passageJudgments": {
+        ".marc/threads/motor-de-busca-v2-e1-camada-de-fontes-e-representacao-1042e2b3/CHAT.md#21da4ea6af490401": 3,
+        ".marc/threads/motor-de-busca-v2-e1-camada-de-fontes-e-representacao-1042e2b3/CHAT.md#35254af5dd8cab9e": 3,
+        ".marc/threads/motor-de-busca-v2-e1-camada-de-fontes-e-representacao-1042e2b3/CHAT.md#35eb0e4ea8392397": 0,
+        ".marc/threads/motor-de-busca-v2-e1-camada-de-fontes-e-representacao-1042e2b3/CHAT.md#44964319e7eb3d5c": 0,
+        ".marc/threads/motor-de-busca-v2-e1-camada-de-fontes-e-representacao-1042e2b3/CHAT.md#939822857108f137": 0,
+        ".marc/threads/motor-de-busca-v2-e1-camada-de-fontes-e-representacao-1042e2b3/CHAT.md#a08be3537e38739b": 0,
+        ".marc/threads/motor-de-busca-v2-e1-camada-de-fontes-e-representacao-1042e2b3/CHAT.md#bfce69aff29ccb6b": 0,
+        ".marc/threads/motor-de-busca-v2-e1-camada-de-fontes-e-representacao-1042e2b3/CHAT.md#efd6863741973792": 3
+      }
+    },
+    {
+      "id": "D12",
+      "family": "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba",
+      "style": "deep",
+      "query": "que problema de concorrência foi corrigido no purge da memory?",
+      "queryMode": "auto",
+      "judgments": {},
+      "evidence": [
+        {
+          "sourcePath": "threads/oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba/SUMMARY.md",
+          "quote": "A revisão identificou uma corrida em que purge capturava o manifesto antes do lock e poderia preservar a geração errada."
+        }
+      ],
+      "scope": {
+        "threadId": "oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba"
+      },
+      "origin": "approvers-e4-2026-10-28",
+      "passageJudgments": {
+        ".marc/threads/oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba/CHAT.md#53cd2a13bf60cee6": 2,
+        ".marc/threads/oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba/SUMMARY.md#6d902a3ac8a32ef3": 3,
+        ".marc/threads/oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba/SUMMARY.md#818021e8a2766fb9": 2,
+        ".marc/threads/oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba/artifacts/plano-correcao-estrutural-busca-memory-schema-v4.md#11fa11467d26cc46": 1,
+        ".marc/threads/oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba/artifacts/plano-loop-correcao-purge-deep-e-harness.md#7e4b3900cb46862c": 3,
+        ".marc/threads/oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba/artifacts/plano-loop-correcao-purge-deep-e-harness.md#a0f3af4e2cb3d8ab": 0,
+        ".marc/threads/oportunidade-elegibilidade-semantica-e-candidatos-lexicais-da-me-834716ba/artifacts/revisao-integral-qualidade-e-pendencias.md#8a93892e3bd36043": 3
+      }
+    },
+    {
+      "id": "D13",
+      "family": "motor-de-busca-v2-e3-profundidade-em-camadas-e-funil-de-latencia-cd4a49b8",
+      "style": "deep",
+      "query": "quais casos perderam a evidência com a pré-seleção por cosseno?",
+      "queryMode": "auto",
+      "judgments": {},
+      "evidence": [
+        {
+          "sourcePath": "threads/motor-de-busca-v2-e3-profundidade-em-camadas-e-funil-de-latencia-cd4a49b8/artifacts/entrega-t2-e3-revisao.md",
+          "quote": "marc, cosine: 16 de 22 (0,727; IC [0,545; 0,909]). Perdas: Y01, Y03, Y06, Y08, Y11 e J04 (seis)."
+        }
+      ],
+      "scope": {
+        "threadId": "motor-de-busca-v2-e3-profundidade-em-camadas-e-funil-de-latencia-cd4a49b8",
+        "sourceTypes": [
+          "artifact"
+        ]
+      },
+      "origin": "approvers-e4-2026-10-28",
+      "passageJudgments": {
+        ".marc/threads/motor-de-busca-v2-e3-profundidade-em-camadas-e-funil-de-latencia-cd4a49b8/artifacts/casos-e-poder-e3.md#d33247606d157ca6": 0,
+        ".marc/threads/motor-de-busca-v2-e3-profundidade-em-camadas-e-funil-de-latencia-cd4a49b8/artifacts/entrega-1c-e3.md#f707237ce977aa8b": 0,
+        ".marc/threads/motor-de-busca-v2-e3-profundidade-em-camadas-e-funil-de-latencia-cd4a49b8/artifacts/entrega-t2-e3-revisao.md#0747783b53ebd465": 3,
+        ".marc/threads/motor-de-busca-v2-e3-profundidade-em-camadas-e-funil-de-latencia-cd4a49b8/artifacts/entrega-t2-e3.md#769f1a3e28d4932f": 1,
+        ".marc/threads/motor-de-busca-v2-e3-profundidade-em-camadas-e-funil-de-latencia-cd4a49b8/artifacts/entrega-t3-e3.md#59c9d77ca6947252": 0,
+        ".marc/threads/motor-de-busca-v2-e3-profundidade-em-camadas-e-funil-de-latencia-cd4a49b8/artifacts/plano-e3-profundidade-em-camadas-e-funil.md#5404fa647e84391b": 1,
+        ".marc/threads/motor-de-busca-v2-e3-profundidade-em-camadas-e-funil-de-latencia-cd4a49b8/artifacts/plano-e3-profundidade-em-camadas-e-funil.md#74bc05a8fa72dc09": 1,
+        ".marc/threads/motor-de-busca-v2-e3-profundidade-em-camadas-e-funil-de-latencia-cd4a49b8/artifacts/plano-e3-profundidade-em-camadas-e-funil.md#c3f96cd290d55384": 0
+      }
+    },
+    {
+      "id": "D14",
+      "family": "estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab",
+      "style": "deep",
+      "query": "quais fontes ficaram de fora da ablação de sumários e conversa?",
+      "queryMode": "auto",
+      "judgments": {},
+      "evidence": [
+        {
+          "sourcePath": "threads/estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab/artifacts/plano-estudo-2-sumarios-e-evidencias-da-conversa.md",
+          "quote": "Apenas SUMMARY e CHAT nesta ablação. Artifacts, RULES, código e docs externos não entram."
+        }
+      ],
+      "scope": {
+        "threadId": "estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab"
+      },
+      "origin": "approvers-e4-2026-10-28",
+      "passageJudgments": {
+        ".marc/threads/estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab/CHAT.md#0ca43421864773ab": 2,
+        ".marc/threads/estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab/artifacts/estudo-modelos-locais-contextuais-e-decisoes-tipadas.md#c23f5a056e478bad": 0,
+        ".marc/threads/estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab/artifacts/plano-estudo-2-sumarios-e-evidencias-da-conversa.md#37cdcdc6537ce271": 3,
+        ".marc/threads/estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab/artifacts/plano-estudo-2-sumarios-e-evidencias-da-conversa.md#aaf2e34ff0455ca1": 2,
+        ".marc/threads/estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab/artifacts/plano-estudo-2-sumarios-e-evidencias-da-conversa.md#bfcd94442c39a5c8": 0,
+        ".marc/threads/estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab/artifacts/registro-da-rota-do-motor-de-busca.md#00b4477a698f3582": 0,
+        ".marc/threads/estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab/artifacts/resultado-estudo-2-sumarios-e-evidencias-da-conversa.md#1e79dd2061c12204": 0,
+        ".marc/threads/estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab/artifacts/resultado-estudo-2-sumarios-e-evidencias-da-conversa.md#9de9cb5e6d4ac5cd": 0,
+        ".marc/threads/estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab/artifacts/resultado-estudo-2-sumarios-e-evidencias-da-conversa.md#a0a663066e1233c3": 0,
+        ".marc/threads/estudo-modelo-contextual-maior-para-interpretacao-e-reranking-da-57488bab/artifacts/resultado-estudo-2-sumarios-e-evidencias-da-conversa.md#bdf7d0265e7c319b": 0
+      }
+    }
+  ]
+}

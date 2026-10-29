@@ -42,7 +42,7 @@ test("modern tools/list does not require a prior discovery request", async (t) =
   const listing = await server.readMessage();
   assert.ok("result" in listing);
   const result = listing.result as { tools: unknown[] };
-  assert.equal(result.tools.length, 25);
+  assert.equal(result.tools.length, 26);
 });
 
 test("discovery reports missing and malformed metadata and pins the supported revision", async (t) => {
@@ -257,7 +257,7 @@ for (const entry of ["source", "dist"] as const) {
     assert.equal(serverInfo.name, "marc");
     assert.equal(serverInfo.version, packageInfo.version);
     const catalog = await client.listTools();
-    assert.equal(catalog.tools.length, 25);
+    assert.equal(catalog.tools.length, 26);
     const result = await client.callTool({
       name: "thread_list",
       arguments: {}

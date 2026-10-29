@@ -183,4 +183,6 @@ export type CaptureContext = {
   productionCheck?: ProductionCheckRecord;
   /** Text of every corpus file, by corpus path: the sources that evidence quotes are checked against. */
   sourceTexts?: ReadonlyMap<string, string>;
+  /** K_max of the closed scope. Absent means the E3 default (30). The E4 corpus uses 0. */
+  kMax?: number;
 };

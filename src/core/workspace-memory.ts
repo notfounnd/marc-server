@@ -3,6 +3,7 @@ import {
   LocalQueryInterpretationProvider,
   LocalRerankingProvider,
   defaultMemoryInferenceManager,
+  deepMemoryInWorkspace,
   isMemorySearchDepth,
   MEMORY_SEARCH_DEPTH_RANGE_MESSAGE,
   memoryRebuildActiveInWorkspace,
@@ -17,6 +18,8 @@ import {
   updateWorkspaceSettingsInWorkspace
 } from "./memory/index.js";
 import type {
+  MemoryDeepInput,
+  MemoryDeepResult,
   MemoryPurgeResult,
   MemoryQueryMode,
   MemoryRecallResult,
@@ -154,6 +157,23 @@ export async function recallMemory(
     queryMode: input.queryMode,
     limit: input.limit,
     depth: input.depth
+  });
+}
+
+export async function deepMemory(
+  workspaceRoot: string,
+  input: MemoryDeepInput
+): Promise<MemoryDeepResult> {
+  const info = await initWorkspace(workspaceRoot);
+  return deepMemoryInWorkspace(info, {
+    provider: new LocalEmbeddingProvider(info),
+    interpreter: new LocalQueryInterpretationProvider(info),
+    reranker: new LocalRerankingProvider(info),
+    query: input.query,
+    threadId: input.threadId,
+    sourceTypes: input.sourceTypes,
+    queryMode: input.queryMode,
+    limit: input.limit
   });
 }
 

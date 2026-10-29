@@ -21,7 +21,8 @@ import {
   recordIdPredicate,
   REQUIRED_LEXICAL_INDEXES,
   searchPredicate,
-  tableName
+  tableName,
+  threadPredicate
 } from "./lancedb-store-support.js";
 import { MEMORY_MANIFEST_FILE, memoryRootPath } from "./storage-paths.js";
 import {
@@ -65,16 +66,23 @@ export class LanceDbMemoryVectorStore implements MemoryVectorStore {
   async readRows(
     info: WorkspaceInfo,
     generation?: string,
-    options?: { layers?: readonly MemoryLayer[] }
+    options?: { layers?: readonly MemoryLayer[]; threadId?: string }
   ): Promise<MemoryVectorRow[]> {
     if (!(await this.exists(info, generation))) return [];
     const layers = options?.layers;
     if (layers && !layers.length) return [];
     const db = await connectLanceDb(info);
     const table = await db.openTable(tableName(generation));
-    const query = layers
-      ? table.query().where(layerPredicate(layers))
-      : table.query();
+    const predicates = [
+      layers === undefined ? undefined : layerPredicate(layers),
+      options?.threadId === undefined
+        ? undefined
+        : threadPredicate(options.threadId)
+    ].filter((predicate): predicate is string => predicate !== undefined);
+    const query =
+      predicates.length === 0
+        ? table.query()
+        : table.query().where(predicates.join(" AND "));
     return (await query.toArray()).map(memoryVectorRowFromStored);
   }
 

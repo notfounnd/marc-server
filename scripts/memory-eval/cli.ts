@@ -144,6 +144,11 @@ import {
   type PinnedCorpus,
   type ValidationIssue
 } from "./dataset.js";
+import { DEEP_BUDGET_DOMAIN_MESSAGE, isValidDeepBudget } from "./deep-protocol.js";
+import { describeLatencyReport, writeLatencyReport } from "./deep-latency-report.js";
+import { runDeepLatency } from "./deep-latency.js";
+import { loadDeepInputs, passageRecordsOf, runDeepReport, writeDeepReport } from "./deep-run.js";
+import { writeDeepWorksheet } from "./deep-worksheet.js";
 
 const MEMORY_EVAL_DIR = path.dirname(fileURLToPath(import.meta.url));
 const REPOSITORY_ROOT = path.resolve(MEMORY_EVAL_DIR, "..", "..");
@@ -156,6 +161,8 @@ type CorpusRegistration = {
   productionManifestPath?: string;
   /** Workspace settings whose `memory.documentSources` list the configured documents of the corpus. */
   settingsPath?: string;
+  /** K_max of the closed scope of the corpus. Absent means the E3 default. */
+  kMax?: number;
 };
 
 export const CORPORA: ReadonlyMap<string, CorpusRegistration> = new Map<
@@ -176,6 +183,18 @@ export const CORPORA: ReadonlyMap<string, CorpusRegistration> = new Map<
         "memory",
         "manifest.json"
       )
+    }
+  ],
+  [
+    "marc-deep",
+    {
+      datasetPath: path.join(MEMORY_EVAL_DIR, "datasets", "marc-deep.json"),
+      pinnedPath: path.join(MEMORY_EVAL_DIR, "datasets", "marc-deep.corpus.json"),
+      threadsPath: path.join(REPOSITORY_ROOT, ".marc", "threads"),
+      rulesPath: path.join(REPOSITORY_ROOT, ".marc", "RULES.md"),
+      settingsPath: path.join(REPOSITORY_ROOT, ".marc", "marc.config.json"),
+      productionManifestPath: path.join(REPOSITORY_ROOT, ".marc", "memory", "manifest.json"),
+      kMax: 0
     }
   ],
   [
@@ -504,6 +523,7 @@ async function captureCommand(options: CommandOptions): Promise<number> {
     repositoryRoot: REPOSITORY_ROOT,
     createProviders: () => createLocalProviders(modelInfo),
     productionManifestPath: registration.productionManifestPath,
+    kMax: registration.kMax,
     resume: options.get("resume") === "true",
     log: (line) => process.stderr.write(`${line}\n`)
   };
@@ -995,7 +1015,8 @@ async function mergeCommand(options: CommandOptions): Promise<number> {
     sources: corpus.sources,
     raterA: await readJson(first),
     raterB: await readJson(second),
-    consensus: consensusPath === undefined ? undefined : await readJson(consensusPath)
+    consensus: consensusPath === undefined ? undefined : await readJson(consensusPath),
+    passageIds: await passageIdsOfMerge(corpusName, options.get("capture"))
   });
   const committed = await commitMerge({ datasetPath: registration.datasetPath, outcome });
   const reportPath = await writeMergeReport(
@@ -1024,6 +1045,15 @@ function printMergeReport(report: MergeReport, committed: boolean, reportPath: s
   for (const flag of report.flags) console.log(`flag: ${flag}`);
   for (const conflict of report.conflicts) {
     console.log(`conflict ${conflict.caseId}/${conflict.threadId}: existing=${conflict.existing} proposed=${conflict.proposed}`);
+  }
+  const passages = report.passages;
+  if (passages !== undefined) {
+    console.log(
+      `passages pairs=${passages.pairs} concordant=${passages.concordant} kappa=${passages.kappa ?? "n/a"} divergences=${passages.divergences.length} unresolved=${passages.unresolved.length} written=${passages.written.length} alreadyPresent=${passages.alreadyPresent} conflicts=${passages.conflicts.length}`
+    );
+  }
+  for (const conflict of passages?.conflicts ?? []) {
+    console.log(`conflict passage ${conflict.caseId}/${conflict.passageId}: existing=${conflict.existing} proposed=${conflict.proposed}`);
   }
   for (const issue of report.issues) printIssue(issue);
   console.log(`report=${reportPath}`);
@@ -1379,7 +1409,7 @@ const JUDGE_IDENTITY: Readonly<Record<JudgeName, ModelIdentity>> = {
  * file is checked against its capture and its model, and a missing input stops the
  * command before any replay runs, naming the file to produce.
  */
-async function replayInputsOf(input: {
+export async function replayInputsOf(input: {
   corpusName: string;
   captureDir: string;
   capture: CaptureFile;
@@ -1591,8 +1621,94 @@ const COMMANDS: ReadonlyMap<string, CommandHandler> = new Map<string, CommandHan
   ["compare", compareCommand],
   ["compare-common", compareCommonCommand],
   ["worksheet", worksheetCommand],
-  ["merge-judgments", mergeCommand]
+  ["merge-judgments", mergeCommand],
+  ["deep-run", deepRunCommand],
+  ["deep-worksheet", deepWorksheetCommand],
+  ["deep-latency", deepLatencyCommand]
 ]);
+
+/** The captured passage ids that a merge may grade. Undefined without `--capture`, so the layer merge stays as it was. */
+async function passageIdsOfMerge(corpusName: string, captureId: string | undefined): Promise<ReadonlySet<string> | undefined> {
+  if (captureId === undefined) return undefined;
+  return new Set(passageRecordsOf(await readCaptureFileOf(corpusName, captureId)).keys());
+}
+
+/**
+ * The inputs of a deep command. The corpus is `marc-deep`, the capture is named by `--capture`, and
+ * `--deep-budget` gives the DEEP_BUDGET variant when present.
+ */
+function deepContextOf(
+  options: CommandOptions,
+  usage: string
+): { datasetPath: string; captureDir: string; deepBudget?: number } | undefined {
+  const corpusName = options.get("corpus") ?? "marc-deep";
+  const registration = CORPORA.get(corpusName);
+  const captureId = options.get("capture");
+  if (corpusName !== "marc-deep" || registration === undefined || captureId === undefined) {
+    console.error(usage);
+    return undefined;
+  }
+  const budget = options.get("deep-budget");
+  if (budget !== undefined && !isValidDeepBudget(Number(budget))) {
+    console.error(`--deep-budget: ${DEEP_BUDGET_DOMAIN_MESSAGE}.`);
+    return undefined;
+  }
+  return {
+    datasetPath: registration.datasetPath,
+    captureDir: captureDirectoryOf(corpusName, captureId),
+    deepBudget: budget === undefined ? undefined : Number(budget)
+  };
+}
+
+/** Runs the deep report of a marc-deep capture: every variant, the failure classes, the protocol and the gate. */
+async function deepRunCommand(options: CommandOptions): Promise<number> {
+  const context = deepContextOf(
+    options,
+    "Usage: memory:eval deep-run --corpus marc-deep --capture <captureId> [--deep-budget <n>]"
+  );
+  if (context === undefined) return 2;
+  const report = await runDeepReport(await loadDeepInputs(context), context.deepBudget);
+  const [jsonPath, markdownPath] = await writeDeepReport(context.captureDir, report);
+  console.log(
+    `captureId=${report.captureId} deepCases=${report.protocol.deepCases} protocolIncomplete=${report.protocol.protocolIncomplete} gate=${report.gate.passed ?? "not-applied"} report=${markdownPath} json=${jsonPath}`
+  );
+  return 0;
+}
+
+/** Writes the blind worksheet of the passages that still lack a grade, and its template. */
+async function deepWorksheetCommand(options: CommandOptions): Promise<number> {
+  const context = deepContextOf(
+    options,
+    "Usage: memory:eval deep-worksheet --corpus marc-deep --capture <captureId> [--deep-budget <n>]"
+  );
+  if (context === undefined) return 2;
+  const pending = await writeDeepWorksheet({
+    inputs: await loadDeepInputs(context),
+    captureDir: context.captureDir,
+    deepBudget: context.deepBudget
+  });
+  console.log(
+    `captureId=${options.get("capture") ?? ""} pendingPassages=${pending} worksheet=${path.join(context.captureDir, "deep-worksheet.md")}`
+  );
+  return 0;
+}
+
+/**
+ * The E4 latency of the deep paths over a marc-deep capture: M0 on its reference copy, the scoped path and the
+ * unscoped path on the production index, with the gate and, when the scoped path fails, the recuo measurement.
+ */
+async function deepLatencyCommand(options: CommandOptions): Promise<number> {
+  const captureId = options.get("capture");
+  if (options.get("corpus") !== "marc-deep" || captureId === undefined) {
+    console.error("Usage: memory:eval deep-latency --corpus marc-deep --capture <captureId>");
+    return 2;
+  }
+  const report = await runDeepLatency(captureDirectoryOf("marc-deep", captureId));
+  const target = await writeLatencyReport(report);
+  for (const line of describeLatencyReport(report)) console.log(line);
+  console.log(`report=${target}`);
+  return 0;
+}
 
 /** Runs one memory-eval command. Returns the process exit code. */
 export async function runCli(argv: readonly string[]): Promise<number> {

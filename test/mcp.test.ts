@@ -9,6 +9,7 @@ const expectedTools = [
   "agent_read_profile",
   "agent_register",
   "marc_helper",
+  "memory_deep",
   "memory_prepare",
   "memory_rebuild",
   "memory_recall",
@@ -37,7 +38,7 @@ test("public tools/list exposes the stable canonical catalog and gated schemas",
   t.after(() => session.close());
   const listing = await session.client.listTools();
 
-  assert.equal(listing.tools.length, 25);
+  assert.equal(listing.tools.length, 26);
   assert.deepEqual(
     listing.tools.map((tool) => tool.name).sort(),
     expectedTools

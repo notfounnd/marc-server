@@ -18,3 +18,4 @@ Architecture Decision Records (ADR) are intentionally short. They explain the de
 - [0010 - Memory source layers share one index per generation](0010-memory-source-layers.md)
 - [0011 - Memory confidence bands are heuristic, and calibration is deferred](0011-memory-confidence-bands.md)
 - [0012 - Memory depth counts corpus layers, and the funnel stays out of production](0012-memory-depth-as-corpus-layers.md)
+- [0013 - memory_deep returns scoped passages with a reranker budget of 232](0013-memory-deep-scoped-passages.md)

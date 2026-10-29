@@ -1,0 +1,74 @@
+[
+  {
+    "corpus": "marc",
+    "captureId": "87cd2e4d96f7",
+    "components": {
+      "queryFingerprint": "b782081f0d8ce1a077bde8218b772bf543d6fdc6353b26773bd1b481a4578bc3",
+      "models": {
+        "benchmarkProfile": "baseline",
+        "embedding": {
+          "providerId": "transformers-js-local-e5",
+          "model": "Xenova/multilingual-e5-small",
+          "modelFile": "model_int8.onnx",
+          "dimensions": 384,
+          "quantized": true
+        },
+        "reranking": {
+          "providerId": "transformers-js-local-mmarco",
+          "model": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+          "modelFile": "model_O4.onnx",
+          "quantized": false
+        },
+        "interpretation": {
+          "id": "transformers-js-local-lfm-query-interpreter",
+          "model": "onnx-community/LFM2.5-350M-ONNX/model_q4.onnx",
+          "version": "transformers-js-4.3.1",
+          "quantized": true
+        }
+      },
+      "packageVersion": "0.3.0",
+      "sourceHash": "c888a91cf39b86b88fd1fcd992f6aa1f677caa38691b52219fa2deeea81b574f",
+      "corpusDigest": "bae33c91cf67806703c4ab32bb220986aa83033faacbebfb7f8ee0dde7ed8bba",
+      "indexedLayers": [0, 1, 2],
+      "captureChannels": "e3-v2",
+      "rerankOrder": "length"
+    },
+    "fingerprint": "87cd2e4d96f791662c3d8e165712dba569a2384c22b7f7f24dc836aa1b1c6d6f"
+  },
+  {
+    "corpus": "ledgerline-en",
+    "captureId": "0d31bd4afd3f",
+    "components": {
+      "queryFingerprint": "25448535c8a1bd53756a260ed9c28c5e96c9d3b5fe89376910339bf3afb03c17",
+      "models": {
+        "benchmarkProfile": "baseline",
+        "embedding": {
+          "providerId": "transformers-js-local-e5",
+          "model": "Xenova/multilingual-e5-small",
+          "modelFile": "model_int8.onnx",
+          "dimensions": 384,
+          "quantized": true
+        },
+        "reranking": {
+          "providerId": "transformers-js-local-mmarco",
+          "model": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+          "modelFile": "model_O4.onnx",
+          "quantized": false
+        },
+        "interpretation": {
+          "id": "transformers-js-local-lfm-query-interpreter",
+          "model": "onnx-community/LFM2.5-350M-ONNX/model_q4.onnx",
+          "version": "transformers-js-4.3.1",
+          "quantized": true
+        }
+      },
+      "packageVersion": "0.3.0",
+      "sourceHash": "c888a91cf39b86b88fd1fcd992f6aa1f677caa38691b52219fa2deeea81b574f",
+      "corpusDigest": "44da053463b186544fc6d781f96204fbbfb9bd053ce72003b0e76bb872c9a535",
+      "indexedLayers": [0, 1, 2],
+      "captureChannels": "e3-v2",
+      "rerankOrder": "length"
+    },
+    "fingerprint": "0d31bd4afd3fc454bc7a6ede94bdbe576e6a1926f3afc6df64cffc9a5090e6e5"
+  }
+]

@@ -13,7 +13,8 @@ test("memory tools publish schemas and require bootstrap", async (t) => {
     "memory_prepare",
     "memory_status",
     "memory_rebuild",
-    "memory_recall"
+    "memory_recall",
+    "memory_deep"
   ]);
   const recallTool = listing.tools.find(
     (tool) => tool.name === "memory_recall"
@@ -71,6 +72,41 @@ test("memory status and recall report missing models without loading assets", as
     recallResult.nextActions.includes(
       "Run memory_prepare before using memory_recall."
     )
+  );
+});
+
+test("memory_deep requires bootstrap, rejects an invalid limit, and returns thread errors with their code", async (t) => {
+  const session = await startMcpTestClient();
+  t.after(() => session.close());
+  const blocked = await session.client.callTool({
+    name: "memory_deep",
+    arguments: { query: "test query" }
+  });
+  assert.equal(blocked.isError, true);
+  assert.equal(
+    toolJson<{ error: { code: string } }>(blocked).error.code,
+    "bootstrap_required"
+  );
+
+  await session.client.callTool({ name: "workspace_bootstrap", arguments: {} });
+  const badLimit = await session.client.callTool({
+    name: "memory_deep",
+    arguments: { query: "test query", limit: 21, bootstrapConfirmed: true }
+  });
+  assert.equal(badLimit.isError, true);
+
+  const missingThread = await session.client.callTool({
+    name: "memory_deep",
+    arguments: {
+      query: "test query",
+      threadId: "missing-thread",
+      bootstrapConfirmed: true
+    }
+  });
+  assert.equal(missingThread.isError, true);
+  assert.equal(
+    toolJson<{ error: { code: string } }>(missingThread).error.code,
+    "thread_not_found"
   );
 });
 
