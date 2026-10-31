@@ -181,7 +181,7 @@ The UI can search the same summary-memory index used by `memory_recall`. This is
 
 The search panel is available only when workspace memory is `ready` or `stale`. A stale index can still be queried, but the UI warns that recent summaries may be missing. `missing`, `model_missing`, `incompatible`, `preparing`, `rebuilding`, and `degraded` states block the search action.
 
-Results are grouped by their heuristic confidence band. `High confidence` and `Medium confidence` results appear in the main list. `Low confidence` results appear in a collapsed block labelled `Show less likely results`. The panel shows the bands and no score. An abstained search continues through the automatic depths like any other empty result, and ends with the `No results` state.
+Results are grouped by their heuristic confidence band. `High confidence` and `Medium confidence` results appear in the main list. `Low confidence` results appear in a collapsed block labelled `Show less likely results`. Each card shows its band as a signal icon in a row below the card text, aligned to the right: three bars for `high`, two for `medium`, and one for `low`, all in one neutral color. The band name (`High confidence`, `Medium confidence`, or `Low confidence`) is the native tooltip and the accessible name of the icon. The panel shows no score. An abstained search continues through the automatic depths like any other empty result, and ends with the `No results` state.
 
 Search runs only when the user presses Enter or the search button. It does not run on every keystroke because recall must generate an embedding for the query with the local provider. A persistent daemon can reuse the provider during the short idle window described above.
 

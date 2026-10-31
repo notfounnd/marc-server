@@ -36,3 +36,22 @@ test("a hit without a thread shows its path, never the selected state or an erro
   assert.match(panel, /key=\{hitKey\(hit\)\}/);
   assert.match(panel, /<FileText size=\{16\} \/>/);
 });
+
+test("shows the band as a signal icon in a row below the card text, not as a text label", () => {
+  const panel = fs.readFileSync("src/ui/memory-search-panel.tsx", "utf8");
+  const css = fs.readFileSync("src/ui/styles/shell-navigation.css", "utf8");
+
+  assert.match(panel, /<MemorySearchBandSignal band=\{hit\.band\} t=\{t\} \/>/);
+  assert.doesNotMatch(panel, /trailing=/);
+  assert.doesNotMatch(panel, /memory-search-band"/);
+  assert.doesNotMatch(panel, /BAND_LABEL_KEYS/);
+  assert.doesNotMatch(css, /\.memory-search-results \.nav-trailing/);
+  assert.match(
+    css,
+    /\.memory-search-signal-row\s*{[\s\S]*?justify-content: flex-end;/
+  );
+  assert.match(
+    css,
+    /\.memory-search-signal\s*{[\s\S]*?color: var\(--ink-muted\);/
+  );
+});

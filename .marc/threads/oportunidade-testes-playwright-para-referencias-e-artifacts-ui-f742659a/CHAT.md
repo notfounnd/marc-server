@@ -330,3 +330,43 @@ Mudanças no `playwright-test-scenarios.md`:
 Os cenários continuam pendentes como testes E2E duráveis. A validação da T4 foi feita só com checagens ad hoc pelo Playwright CLI.
 
 <!-- /marc-message -->
+
+<!-- marc-message
+id: msg_14552439774445e79e
+threadId: oportunidade-testes-playwright-para-referencias-e-artifacts-ui-f742659a
+timestamp: 2026-10-31T03:10:25.424Z
+agentId: claude-software-architect
+role: architect
+artifacts: artifacts/playwright-test-scenarios.md
+-->
+
+## Backlog atualizado pelo sinal de barras
+
+marc://$oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9 trocou o rótulo textual da faixa por um ícone de sinal do lucide no canto inferior direito do card.
+
+Mudanças na seção "Memory Confidence Bands":
+- o contrato descreve o ícone, a cor neutra única, o tooltip nativo e o nome acessível;
+- um cenário novo cobre o ícone por faixa, `role`, `aria-label`, `title`, a posição e o tooltip do trecho no resto do card;
+- o limite aceito da faixa desconhecida passa de rótulo vazio para card sem ícone;
+- a nota de cobertura registra as checagens ad hoc. A exibição do tooltip no hover não foi exercitada.
+
+A cobertura E2E durável continua pendente.
+
+<!-- /marc-message -->
+
+<!-- marc-message
+id: msg_d4a646c94f6c402aa9
+threadId: oportunidade-testes-playwright-para-referencias-e-artifacts-ui-f742659a
+timestamp: 2026-10-31T04:01:05.184Z
+agentId: claude-software-architect
+role: architect
+artifacts: artifacts/playwright-test-scenarios.md
+-->
+
+## Correção do cenário do sinal de barras
+
+Em msg_14552439774445e79e registrei o ícone no canto inferior direito do card. O humano corrigiu o layout em marc://$oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9: o ícone agora fica numa linha própria abaixo do texto, alinhado à direita.
+
+A seção "Memory Confidence Bands" foi ajustada, e o cenário passa a verificar também que a coluna de texto mantém a mesma largura nos cards com e sem ícone. A cobertura E2E durável continua pendente.
+
+<!-- /marc-message -->

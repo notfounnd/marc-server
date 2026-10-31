@@ -1,6 +1,7 @@
 import { Archive, CircleAlert, FileText } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button, EmptyState, NavItem } from "./common.js";
+import { MemorySearchBandSignal } from "./memory-search-signal.js";
 import {
   findMemorySearchThread,
   isMemorySearchAvailable,
@@ -10,7 +11,6 @@ import {
   splitMemorySearchBands
 } from "./memory-search.js";
 import type {
-  MemoryBand,
   MemoryIndexHealth,
   MemoryRecallHit,
   MemoryRecallResult,
@@ -260,20 +260,13 @@ function MemorySearchResultCard({
       title={title}
       tooltip={memorySearchTooltip(hit, title)}
     >
-      <span className="memory-search-band">{t(BAND_LABEL_KEYS[hit.band])}</span>
       {hit.matchedText.trim() ? (
         <span className="memory-search-match">{hit.matchedText}</span>
       ) : null}
+      <MemorySearchBandSignal band={hit.band} t={t} />
     </NavItem>
   );
 }
-
-/** Translation keys of the band labels. Labels state relative confidence, never a percentage. */
-const BAND_LABEL_KEYS: Readonly<Record<MemoryBand, string>> = {
-  high: "High confidence",
-  medium: "Medium confidence",
-  low: "Low confidence"
-};
 
 function searchResultSlug(hit: MemoryRecallHit): string {
   return hit.reference.replace(/^marc:\/\/\$/, "");

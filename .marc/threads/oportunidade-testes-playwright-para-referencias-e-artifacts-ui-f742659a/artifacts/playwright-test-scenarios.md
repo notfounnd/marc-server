@@ -193,17 +193,18 @@ Current contract (E3, ADR 0012): the UI runs one search at depth 0 and sends no 
 Source thread: marc://$motor-de-busca-v2-e2-score-calibrado-faixas-e-sugestao-de-correc-c34cf4a2  
 Priority: high
 
-Current contract: each recall hit carries a heuristic `band` (high, medium, or low) derived from eligibility. It orders confidence relative to other results and is not a probability. `abstained` is true only when the search ran and admitted no thread; it does not depend on `limit`. The panel never shows the score.
+Current contract: each recall hit carries a heuristic `band` (high, medium, or low) derived from eligibility. It orders confidence relative to other results and is not a probability. `abstained` is true only when the search ran and admitted no thread; it does not depend on `limit`. The panel never shows the score. Since marc://$oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9, each card shows its band as a lucide signal icon (`SignalHigh`, `SignalMedium`, or `SignalLow`) in its own row below the card text, aligned to the right, in one neutral color, with the band name as native tooltip and accessible name instead of a text label.
 
-- [ ] Return hits in all three bands; verify high and medium render in the main list with their High confidence and Medium confidence labels, and low renders only inside the collapsed "Show less likely results" block.
+- [ ] Return hits in all three bands; verify high and medium render in the main list and low renders only inside the collapsed "Show less likely results" block.
+- [ ] For each band, verify the card shows the matching signal icon (`lucide-signal-high`, `lucide-signal-medium`, `lucide-signal-low`) in a row below the matched text, right-aligned with the text column, the text column keeps the same width on cards with and without an icon, the icon is in `--ink-muted` for every band, with `role="img"`, `aria-label` and `title` set to High confidence, Medium confidence, or Low confidence, and no visible band text; hover the icon and verify the band tooltip, and hover elsewhere on the card and verify the matched-text tooltip remains.
 - [ ] Open and close the collapsed block by pointer and keyboard; verify low hits appear and disappear, focus stays on the summary control, and the main list does not reorder.
 - [ ] Return only low hits; verify the main list is empty, the collapsed block is still offered, and the empty state does not claim that nothing was found.
 - [ ] Verify no score, percentage, or probability text is rendered for any band, in desktop and 390x844 viewports.
 - [ ] Return `abstained: true`; verify the single search ends in "No results", exactly as an empty unsearched result does.
 - [ ] Reload after a banded result; verify the schema 7 snapshot restores bands and the collapsed block, and a stored snapshot with an invalid band is discarded.
-- [ ] Return a live response with an unknown band value; record the current behavior (empty label) as the accepted limit until the UI validates live responses.
+- [ ] Return a live response with an unknown band value; record the current behavior (the card renders with no signal icon) as the accepted limit until the UI validates live responses.
 
-Coverage note: ad hoc Playwright CLI checks with an intercepted recall covered the three bands, the collapsed block opening and closing, absence of the score, and abstained depth continuation to "No results", with no console errors. Durable browser tests and a combined browser/daemon run remain pending; these checks do not mark the scenarios implemented.
+Coverage note: ad hoc Playwright CLI checks with an intercepted recall covered the three bands, the collapsed block opening and closing, absence of the score, and abstained depth continuation to "No results", with no console errors. For 214864b9, ad hoc Playwright CLI checks with an intercepted recall covered the icon per band, `role`, `aria-label`, `title`, the neutral color, the icon row below the text with the text column at full width in desktop and 390x844 without horizontal scroll, which `title` applies over the icon and over the text, no icon row for an unknown band, and no console errors; the native tooltip display on hover was not exercised. Durable browser tests and a combined browser/daemon run remain pending; these checks do not mark the scenarios implemented.
 
 ## Memory Query Interpretation Links
 

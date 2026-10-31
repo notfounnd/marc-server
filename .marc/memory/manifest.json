@@ -1,7 +1,7 @@
 {
   "schemaVersion": 7,
-  "builtAt": "2026-10-29T20:59:16.943Z",
-  "generation": "20261029205915892_b4b4ae38",
+  "builtAt": "2026-10-31T04:16:31.810Z",
+  "generation": "20261031041630653_73c44f27",
   "embeddingProvider": {
     "id": "transformers-js-local-e5",
     "name": "Transformers.js local multilingual E5 retrieval",
@@ -771,6 +771,27 @@
       "layer": 0,
       "authority": "decision",
       "sourcePath": ".marc/threads/oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b/SUMMARY.md"
+    },
+    {
+      "threadId": "oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9",
+      "title": "Oportunidade - Indicador de sinal em barras para a faixa de confiança nos cards da busca",
+      "closedAt": "2026-10-31T04:14:46.366Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9/SUMMARY.md",
+      "reference": "marc://$oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9",
+      "sha256": "1014f885318f4401d514d9ba282d28a87a3dbe9da2d33406fa02dc79a4a8002d",
+      "mtimeMs": 1793420086377.317,
+      "recordIds": [
+        "oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9:identity",
+        "oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9:source:decisao:passage:001",
+        "oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9:source:entrega:passage:001",
+        "oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9:source:validacao:passage:001",
+        "oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9:source:limites-e-continuidade:passage:001"
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-indicador-visual-de-memory-na-interface-174c48b6",
@@ -6829,6 +6850,76 @@
       "sourcePath": ".marc/threads/oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b/artifacts/relatorio-validacao-proporcional-entrega.md"
     },
     {
+      "threadId": "oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9",
+      "title": "Oportunidade - Indicador de sinal em barras para a faixa de confiança nos cards da busca / entrega-sinal-de-barras.md",
+      "closedAt": "2026-10-31T04:14:46.366Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9/SUMMARY.md",
+      "reference": "marc://$oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9",
+      "sha256": "c03aef4bcab7790877d464756fe09b4383e6ad4792b476c3191bb697e1088b49",
+      "mtimeMs": 1793419236521.4326,
+      "recordIds": [
+        "oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9:artifact:entrega-sinal-de-barras.md:source:escopo:passage:001",
+        "oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9:artifact:entrega-sinal-de-barras.md:source:mudancas-por-arquivo:passage:001",
+        "oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9:artifact:entrega-sinal-de-barras.md:source:mudancas-por-arquivo:passage:002",
+        "oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9:artifact:entrega-sinal-de-barras.md:source:mudancas-por-arquivo:passage:003",
+        "oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9:artifact:entrega-sinal-de-barras.md:source:checks-e-resultados:passage:001",
+        "oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9:artifact:entrega-sinal-de-barras.md:source:desvio-do-brief:passage:001",
+        "oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9:artifact:entrega-sinal-de-barras.md:source:riscos-e-limites:passage:001",
+        "oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9:artifact:entrega-sinal-de-barras.md:source:pendente-de-revisao-do-principal:passage:001"
+      ],
+      "sourceType": "artifact",
+      "layer": 1,
+      "authority": "artifact",
+      "sourcePath": ".marc/threads/oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9/artifacts/entrega-sinal-de-barras.md"
+    },
+    {
+      "threadId": "oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9",
+      "title": "Oportunidade - Indicador de sinal em barras para a faixa de confiança nos cards da busca / plano-sinal-de-barras.md",
+      "closedAt": "2026-10-31T04:14:46.366Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9/SUMMARY.md",
+      "reference": "marc://$oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9",
+      "sha256": "c4680671b9cc3626a38c022aa99e6f30769fbfb81b171d7a41a1d1efa8d6818a",
+      "mtimeMs": 1793419241389.8513,
+      "recordIds": [
+        "oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9:artifact:plano-sinal-de-barras.md:source:resumo:passage:001",
+        "oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9:artifact:plano-sinal-de-barras.md:source:decisoes:passage:001",
+        "oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9:artifact:plano-sinal-de-barras.md:source:desenho:passage:001",
+        "oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9:artifact:plano-sinal-de-barras.md:source:desenho:passage:002",
+        "oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9:artifact:plano-sinal-de-barras.md:source:escopo-de-escrita:passage:001",
+        "oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9:artifact:plano-sinal-de-barras.md:source:testes:passage:001",
+        "oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9:artifact:plano-sinal-de-barras.md:source:execucao-e-validacao:passage:001"
+      ],
+      "sourceType": "artifact",
+      "layer": 1,
+      "authority": "artifact",
+      "sourcePath": ".marc/threads/oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9/artifacts/plano-sinal-de-barras.md"
+    },
+    {
+      "threadId": "oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9",
+      "title": "Oportunidade - Indicador de sinal em barras para a faixa de confiança nos cards da busca / revisao-final-sinal-de-barras.md",
+      "closedAt": "2026-10-31T04:14:46.366Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9/SUMMARY.md",
+      "reference": "marc://$oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9",
+      "sha256": "9827ab1135e20a9ef21190b0dd36e3dcbbc2ba2f8110e44ab6b9c0386371428d",
+      "mtimeMs": 1793419242665.2102,
+      "recordIds": [
+        "oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9:artifact:revisao-final-sinal-de-barras.md:source:veredito:passage:001",
+        "oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9:artifact:revisao-final-sinal-de-barras.md:source:escopo-e-fontes-revisados:passage:001",
+        "oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9:artifact:revisao-final-sinal-de-barras.md:source:criterios-e-evidencia:passage:001",
+        "oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9:artifact:revisao-final-sinal-de-barras.md:source:criterios-e-evidencia:passage:002",
+        "oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9:artifact:revisao-final-sinal-de-barras.md:source:criterios-e-evidencia:passage:003",
+        "oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9:artifact:revisao-final-sinal-de-barras.md:source:validacao:passage:001",
+        "oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9:artifact:revisao-final-sinal-de-barras.md:source:achados-e-limites:passage:001"
+      ],
+      "sourceType": "artifact",
+      "layer": 1,
+      "authority": "artifact",
+      "sourcePath": ".marc/threads/oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9/artifacts/revisao-final-sinal-de-barras.md"
+    },
+    {
       "threadId": "oportunidade-indicador-visual-de-memory-na-interface-174c48b6",
       "title": "Oportunidade - Indicador visual de memory na interface / oportunidade-indicador-visual-memory.md",
       "closedAt": "2026-07-07T05:16:41.873Z",
@@ -9585,6 +9676,27 @@
       "layer": 2,
       "authority": "conversation",
       "sourcePath": ".marc/threads/oportunidade-gate-de-validacao-proporcional-ao-impacto-da-entreg-054fd58b/CHAT.md"
+    },
+    {
+      "threadId": "oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9",
+      "title": "Oportunidade - Indicador de sinal em barras para a faixa de confiança nos cards da busca",
+      "closedAt": "2026-10-31T04:14:46.366Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9/SUMMARY.md",
+      "reference": "marc://$oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9",
+      "sha256": "7f01fa5d054577c923f775117da487693cc8ef442184ee7841408267825abf4e",
+      "mtimeMs": 1793419256439.956,
+      "recordIds": [
+        "oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9:chat:msg_ff7737b898e14eef9e:passage:001",
+        "oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9:chat:msg_402c751b7ce44fca9d:passage:001",
+        "oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9:chat:msg_c60859acf3ef41fa83:passage:001",
+        "oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9:chat:msg_a9e2d6f1d69f4da98f:passage:001",
+        "oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9:chat:msg_988e58e07dad4dabb5:passage:001"
+      ],
+      "sourceType": "chat",
+      "layer": 2,
+      "authority": "conversation",
+      "sourcePath": ".marc/threads/oportunidade-indicador-de-sinal-em-barras-para-a-faixa-de-confia-214864b9/CHAT.md"
     },
     {
       "threadId": "oportunidade-indicador-visual-de-memory-na-interface-174c48b6",
