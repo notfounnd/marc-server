@@ -1,5 +1,5 @@
 import fs from "node:fs/promises";
-import { newId, slugify } from "./ids.js";
+import { newId, slugify, threadSlug } from "./ids.js";
 import { MESSAGE_STYLE_GUIDE, validateMessageBody } from "./guards.js";
 import { parseMessages, renderChatHeader, renderMessage } from "./markdown.js";
 import { safeJoin } from "./paths.js";
@@ -33,7 +33,7 @@ export async function createThreadInWorkspace(
   title: string
 ): Promise<ThreadInfo> {
   const createdAt = new Date().toISOString();
-  const id = `${slugify(title)}-${newId("thread").slice(-8)}`;
+  const id = `${threadSlug(title)}-${newId("thread").slice(-8)}`;
   const threadPath = safeJoin(info.marcPath, "threads", id);
   await fs.mkdir(safeJoin(threadPath, "artifacts"), { recursive: true });
   await writeFileAtomically(

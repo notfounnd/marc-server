@@ -148,6 +148,126 @@ test("revision-checks updates, preserves close time, and accepts an equivalent r
   );
 });
 
+test("creates a writable thread ID when title truncation ends in a separator", async (t) => {
+  const workspace = await tempWorkspace();
+  t.after(() => fs.rm(workspace, { recursive: true, force: true }));
+  const title = "a".repeat(63) + " b";
+  const thread = await createThread(workspace, title);
+
+  assert.match(thread.id, /^a{63}-[a-f0-9]{8}$/);
+  const summary = await writeThreadSummary(workspace, {
+    threadId: thread.id,
+    body: "Generated thread ID."
+  });
+
+  assert.equal(summary.reference, "marc://$" + thread.id);
+  assert.equal(summary.status, "closed");
+});
+
+test("writes historical thread IDs with a doubled truncation separator", async (t) => {
+  const workspace = await tempWorkspace();
+  t.after(() => fs.rm(workspace, { recursive: true, force: true }));
+  const thread = await createThread(workspace, "Historical summary");
+  const historicalId = "example--12345678";
+  const historicalPath = path.join(workspace, ".marc", "threads", historicalId);
+  await fs.rename(thread.path, historicalPath);
+  const chatPath = path.join(historicalPath, "CHAT.md");
+  const chat = await fs.readFile(chatPath, "utf8");
+  const rewrittenChat = chat.replace(
+    /^Thread:.*$/m,
+    "Thread: `" + historicalId + "`"
+  );
+  assert.notEqual(rewrittenChat, chat);
+  await fs.writeFile(chatPath, rewrittenChat, "utf8");
+
+  const body = "Historical thread summary.";
+  const created = await writeThreadSummary(workspace, {
+    threadId: historicalId,
+    body
+  });
+  const summaryPath = getSummaryPath(workspace, historicalId);
+  const createdMarkdown = await fs.readFile(summaryPath, "utf8");
+  const createdMtime = (await fs.stat(summaryPath)).mtimeMs;
+
+  assert.equal(created.reference, "marc://$" + historicalId);
+  assert.equal(created.status, "closed");
+  assert.equal(created.outcome, "created");
+  assert.equal(
+    createdMarkdown.includes("Thread: marc://$" + historicalId),
+    true
+  );
+  assert.equal(
+    (await readThreadInfo(workspace, historicalId)).status,
+    "closed"
+  );
+
+  const retry = await writeThreadSummary(workspace, {
+    threadId: historicalId,
+    body
+  });
+  assert.equal(retry.outcome, "unchanged");
+  assert.equal(retry.closedAt, created.closedAt);
+  assert.equal(retry.summaryRevision, created.summaryRevision);
+  assert.equal(await fs.readFile(summaryPath, "utf8"), createdMarkdown);
+  assert.equal((await fs.stat(summaryPath)).mtimeMs, createdMtime);
+
+  const updated = await writeThreadSummary(workspace, {
+    threadId: historicalId,
+    mode: "update",
+    expectedSummaryRevision: created.summaryRevision,
+    body: "Updated historical summary."
+  });
+  assert.equal(updated.outcome, "updated");
+  assert.equal(updated.reference, "marc://$" + historicalId);
+  assert.equal(updated.closedAt, created.closedAt);
+  const updatedMarkdown = await fs.readFile(summaryPath, "utf8");
+  const updatedMtime = (await fs.stat(summaryPath)).mtimeMs;
+
+  await assert.rejects(
+    writeThreadSummary(workspace, {
+      threadId: historicalId,
+      mode: "update",
+      expectedSummaryRevision: created.summaryRevision,
+      body: "Conflicting historical update."
+    }),
+    (error: unknown) =>
+      error instanceof ThreadSummaryError && error.code === "revision_conflict"
+  );
+  assert.equal(await fs.readFile(summaryPath, "utf8"), updatedMarkdown);
+  assert.equal((await fs.stat(summaryPath)).mtimeMs, updatedMtime);
+});
+
+test("rejects malformed doubled separators without creating summaries", async (t) => {
+  const workspace = await tempWorkspace();
+  t.after(() => fs.rm(workspace, { recursive: true, force: true }));
+  const thread = await createThread(workspace, "Invalid ID fixture");
+  const invalidThreadIds = [
+    "example---12345678",
+    "a--b-12345678",
+    "--12345678",
+    "example--1234567",
+    "EXAMPLE--12345678",
+    "../example--12345678"
+  ];
+
+  await Promise.all(
+    invalidThreadIds.map(async (threadId) => {
+      await assert.rejects(
+        writeThreadSummary(workspace, {
+          threadId,
+          body: "Rejected."
+        }),
+        (error: unknown) =>
+          error instanceof ThreadSummaryError && error.code === "invalid_thread"
+      );
+      await assert.rejects(fs.access(getSummaryPath(workspace, threadId)));
+    })
+  );
+  assert.deepEqual(await fs.readdir(path.join(workspace, ".marc", "threads")), [
+    thread.id
+  ]);
+});
+
 test("readers retain compatibility with existing noncanonical thread directory IDs", async (t) => {
   const workspace = await tempWorkspace();
   t.after(() => fs.rm(workspace, { recursive: true, force: true }));

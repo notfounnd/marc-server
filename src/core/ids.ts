@@ -12,6 +12,10 @@ export function slugify(value: string): string {
   return slug || "item";
 }
 
+export function threadSlug(title: string): string {
+  return slugify(title).replace(/-+$/, "");
+}
+
 export function shortHash(value: string): string {
   return createHash("sha256").update(value).digest("hex").slice(0, 10);
 }

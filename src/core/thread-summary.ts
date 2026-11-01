@@ -270,7 +270,8 @@ function isRevision(revision: string | undefined): revision is string {
 }
 
 function isCanonicalWriteThreadId(threadId: string): boolean {
-  return /^[a-z0-9]+(?:-[a-z0-9]+)*-[a-f0-9]{8}$/.test(threadId);
+  // Historical IDs may have been truncated after a trailing slug hyphen.
+  return /^[a-z0-9]+(?:-[a-z0-9]+)*-{1,2}[a-f0-9]{8}$/.test(threadId);
 }
 
 async function refreshSummaryProjections(
