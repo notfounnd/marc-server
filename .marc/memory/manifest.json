@@ -1,7 +1,7 @@
 {
   "schemaVersion": 7,
-  "builtAt": "2026-11-01T14:40:26.847Z",
-  "generation": "20261101144025453_3b70c3bd",
+  "builtAt": "2026-11-02T05:13:30.054Z",
+  "generation": "20261102051329119_6dba02c9",
   "embeddingProvider": {
     "id": "transformers-js-local-e5",
     "name": "Transformers.js local multilingual E5 retrieval",
@@ -147,6 +147,29 @@
       "layer": 0,
       "authority": "decision",
       "sourcePath": ".marc/threads/bug-workspace-audit-ignora-referencias-marc-em-inline-code-72461180/SUMMARY.md"
+    },
+    {
+      "threadId": "correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae",
+      "title": "Correção - CLI de memória não encerra e descrições MCP desatualizadas",
+      "closedAt": "2026-11-02T05:08:01.274Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae\\SUMMARY.md",
+      "relativeSummaryPath": "threads/correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae/SUMMARY.md",
+      "reference": "marc://$correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae",
+      "sha256": "2579bf60b9c39ac9772a2fcdbf4abc63672b5440c83e209199deb6627fb1e2c5",
+      "mtimeMs": 1793596324195.7573,
+      "recordIds": [
+        "correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae:identity",
+        "correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae:source:objetivo:passage:001",
+        "correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae:source:decisoes:passage:001",
+        "correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae:source:implementacao:passage:001",
+        "correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae:source:implementacao:passage:002",
+        "correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae:source:validacao:passage:001",
+        "correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae:source:limites-e-continuidade:passage:001"
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae/SUMMARY.md"
     },
     {
       "threadId": "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684",
@@ -1910,6 +1933,55 @@
       "layer": 1,
       "authority": "artifact",
       "sourcePath": ".marc/threads/bug-workspace-audit-ignora-referencias-marc-em-inline-code-72461180/artifacts/plano-correcao-inline-code-references.md"
+    },
+    {
+      "threadId": "correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae",
+      "title": "Correção - CLI de memória não encerra e descrições MCP desatualizadas / plano-correcao-cli-e-descricoes-mcp.md",
+      "closedAt": "2026-11-02T05:08:01.274Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae\\SUMMARY.md",
+      "relativeSummaryPath": "threads/correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae/SUMMARY.md",
+      "reference": "marc://$correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae",
+      "sha256": "97d7b41c54918af3ca64d64400011a8e96ea014d029c6466e46cf0639717677b",
+      "mtimeMs": 1793592643971.9087,
+      "recordIds": [
+        "correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae:artifact:plano-correcao-cli-e-descricoes-mcp.md:source:resumo:passage:001",
+        "correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae:artifact:plano-correcao-cli-e-descricoes-mcp.md:source:item-1-o-cli-nao-encerra:passage:001",
+        "correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae:artifact:plano-correcao-cli-e-descricoes-mcp.md:source:item-1-o-cli-nao-encerra:passage:002",
+        "correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae:artifact:plano-correcao-cli-e-descricoes-mcp.md:source:item-2-descricoes-das-ferramentas-mcp:passage:001",
+        "correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae:artifact:plano-correcao-cli-e-descricoes-mcp.md:source:item-3-documentacao-e-validacao:passage:001",
+        "correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae:artifact:plano-correcao-cli-e-descricoes-mcp.md:source:escopo-de-escrita-desenvolvedor:passage:001",
+        "correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae:artifact:plano-correcao-cli-e-descricoes-mcp.md:source:testes-declarados-sem-if-else-switch-ternario:passage:001",
+        "correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae:artifact:plano-correcao-cli-e-descricoes-mcp.md:source:criterios-de-aceite:passage:001",
+        "correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae:artifact:plano-correcao-cli-e-descricoes-mcp.md:source:execucao:passage:001",
+        "correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae:artifact:plano-correcao-cli-e-descricoes-mcp.md:source:fora-do-escopo:passage:001"
+      ],
+      "sourceType": "artifact",
+      "layer": 1,
+      "authority": "artifact",
+      "sourcePath": ".marc/threads/correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae/artifacts/plano-correcao-cli-e-descricoes-mcp.md"
+    },
+    {
+      "threadId": "correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae",
+      "title": "Correção - CLI de memória não encerra e descrições MCP desatualizadas / revisao-final-cli-e-descricoes-mcp.md",
+      "closedAt": "2026-11-02T05:08:01.274Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae\\SUMMARY.md",
+      "relativeSummaryPath": "threads/correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae/SUMMARY.md",
+      "reference": "marc://$correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae",
+      "sha256": "ba99cb031a7c9d156cbe68bdee9cfac868aab9dcd9cb6e3b5e822b0388363238",
+      "mtimeMs": 1793594662209.0713,
+      "recordIds": [
+        "correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae:artifact:revisao-final-cli-e-descricoes-mcp.md:source:veredito:passage:001",
+        "correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae:artifact:revisao-final-cli-e-descricoes-mcp.md:source:escopo-revisado:passage:001",
+        "correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae:artifact:revisao-final-cli-e-descricoes-mcp.md:source:criterios:passage:001",
+        "correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae:artifact:revisao-final-cli-e-descricoes-mcp.md:source:revisao-tecnica:passage:001",
+        "correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae:artifact:revisao-final-cli-e-descricoes-mcp.md:source:achados:passage:001",
+        "correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae:artifact:revisao-final-cli-e-descricoes-mcp.md:source:limites:passage:001",
+        "correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae:artifact:revisao-final-cli-e-descricoes-mcp.md:source:depois-do-encerramento-autorizado:passage:001"
+      ],
+      "sourceType": "artifact",
+      "layer": 1,
+      "authority": "artifact",
+      "sourcePath": ".marc/threads/correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae/artifacts/revisao-final-cli-e-descricoes-mcp.md"
     },
     {
       "threadId": "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684",
@@ -9448,6 +9520,25 @@
       "layer": 2,
       "authority": "conversation",
       "sourcePath": ".marc/threads/bug-workspace-audit-ignora-referencias-marc-em-inline-code-72461180/CHAT.md"
+    },
+    {
+      "threadId": "correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae",
+      "title": "Correção - CLI de memória não encerra e descrições MCP desatualizadas",
+      "closedAt": "2026-11-02T05:08:01.274Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae\\SUMMARY.md",
+      "relativeSummaryPath": "threads/correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae/SUMMARY.md",
+      "reference": "marc://$correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae",
+      "sha256": "ab014b181ba7d654789c25a304ff0d6c7cc9ff18edea281fcd09eeebf0117faf",
+      "mtimeMs": 1793594671507.7034,
+      "recordIds": [
+        "correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae:chat:msg_4f9dfeb9fb034d53ab:passage:001",
+        "correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae:chat:msg_6fc82a5450f24487a1:passage:001",
+        "correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae:chat:msg_48600eb781a548d290:passage:001"
+      ],
+      "sourceType": "chat",
+      "layer": 2,
+      "authority": "conversation",
+      "sourcePath": ".marc/threads/correcao-cli-de-memoria-nao-encerra-e-descricoes-mcp-desatualiza-d6466eae/CHAT.md"
     },
     {
       "threadId": "correcao-do-fluxo-de-agentes-para-independencia-de-fornecedores--dd4a5684",

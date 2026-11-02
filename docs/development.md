@@ -56,7 +56,7 @@ pnpm test:benchmark ./performance/<file>.benchmark.mjs
 
 `performance/thread-index.benchmark.mjs` reports direct scans, JSON rebuilds, warm JSON reads, and stale reads while a background rebuild is running.
 
-Summary-memory evaluation is an opt-in offline suite run with `pnpm memory:eval <command> --corpus <name>`. The commands and their order are described in [Memory](memory.md#evaluation-harness-memoryeval).
+Memory evaluation is an opt-in offline suite run with `pnpm memory:eval <command> --corpus <name>`. The commands and their order are described in [Memory](memory.md#evaluation-harness-memoryeval).
 
 ## Build
 

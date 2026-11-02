@@ -32,7 +32,7 @@ export function registerMemoryTools(
     server,
     coordinator,
     "memory_prepare",
-    "Prepare the local summary-memory query interpretation, retrieval, and reranking model caches without rebuilding the committed memory index.",
+    "Prepare the local memory query interpretation, retrieval, and reranking model caches without rebuilding the committed memory index.",
     gatedSchema({}),
     async (input) =>
       withBootstrap(input, async () => prepareMemory(workspaceRoot))
@@ -41,7 +41,7 @@ export function registerMemoryTools(
     server,
     coordinator,
     "memory_status",
-    "Read summary-memory index health without loading local interpretation, retrieval, or reranking models.",
+    "Read memory index health without loading local interpretation, retrieval, or reranking models.",
     gatedSchema({}),
     async (input) =>
       withBootstrap(input, async () => readMemoryStatus(workspaceRoot))
@@ -50,7 +50,7 @@ export function registerMemoryTools(
     server,
     coordinator,
     "memory_rebuild",
-    "Reconcile the committed summary-memory index by default. Pass mode full to explicitly rebuild every closed thread summary.",
+    "Reconcile the committed memory index by default. Pass mode full to explicitly rebuild every indexed source.",
     gatedSchema({ mode: z.enum(["incremental", "full"]).optional() }),
     async (input) =>
       withBootstrap(input, async () =>
@@ -61,7 +61,7 @@ export function registerMemoryTools(
     server,
     coordinator,
     "memory_recall",
-    "Interpret a development intent when requested and recall relevant historical thread summaries before proposing or changing behavior. Each result has a heuristic confidence band (high, medium or low) that only orders results relative to each other; it is not a probability. abstained is true only when the search ran and admitted no thread.",
+    "Interpret a development intent when requested and recall relevant history before proposing or changing behavior. It reads closed-thread summaries by default; depth 1 adds artifacts, rules, and documents, and depth 2 adds chat messages. Each result has a heuristic confidence band (high, medium or low) that only orders results relative to each other; it is not a probability. abstained is true only when the search ran and admitted no thread; it does not prove that no decision exists.",
     gatedSchema({
       query: z.string().min(1),
       queryMode: z.enum(["auto", "literal"]).optional(),
@@ -88,7 +88,7 @@ export function registerMemoryTools(
     server,
     coordinator,
     "memory_deep",
-    "Return passages with full provenance after memory_recall, when a recalled thread is closed and its details are missing, before reading the whole CHAT.md. With threadId, search one closed, indexed thread (sources summary, artifact and chat); at most 232 passages of that thread reach the reranker, and the reranking time grows with the passages reranked. In the E4 measurement, the 95th percentile of scoped calls was about 35 seconds on the reference machine. Without threadId, return the passages of the groups that depth 2 admits. score is the reranker's relevance, not a probability. abstained is true only when the search ran and admitted no group. Chat passages are intermediate context to confirm in the thread summary or final message.",
+    "Return passages with full provenance after memory_recall, when a recalled thread is closed and its details are missing, before reading the whole CHAT.md. With threadId, search one closed, indexed thread (sources summary, artifact and chat); at most 232 passages of that thread reach the reranker, and the reranking time grows with the passages reranked. In the marc-deep measurement, the 95th percentile of scoped calls was about 35 seconds on the reference machine. Without threadId, return the passages of the groups that depth 2 admits. score is the reranker's relevance, not a probability. abstained is true only when the search ran and admitted no group. Chat passages are intermediate context to confirm in the thread summary or final message.",
     gatedSchema({
       query: z.string().min(1),
       threadId: z

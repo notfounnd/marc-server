@@ -124,3 +124,54 @@ test("memory rebuild reports preparation requirement without downloading models"
   assert.equal(result.status, "model_missing");
   assert.equal(result.modelPrepared, false);
 });
+
+test("memory tool descriptions describe the current memory, not the summary-only memory", async (t) => {
+  const session = await startMcpTestClient();
+  t.after(() => session.close());
+  const listing = await session.client.listTools();
+
+  assert.doesNotMatch(
+    listedDescription(listing, "memory_prepare"),
+    /summary-memory/
+  );
+  assert.doesNotMatch(
+    listedDescription(listing, "memory_status"),
+    /summary-memory/
+  );
+  assert.doesNotMatch(
+    listedDescription(listing, "memory_rebuild"),
+    /summary-memory/
+  );
+  assert.doesNotMatch(
+    listedDescription(listing, "memory_rebuild"),
+    /every closed thread summary/
+  );
+  assert.doesNotMatch(
+    listedDescription(listing, "memory_recall"),
+    /summary-memory/
+  );
+  assert.match(listedDescription(listing, "memory_recall"), /depth 1/);
+  assert.match(
+    listedDescription(listing, "memory_recall"),
+    /does not prove that no decision exists/
+  );
+  assert.doesNotMatch(
+    listedDescription(listing, "memory_deep"),
+    /summary-memory/
+  );
+  assert.doesNotMatch(listedDescription(listing, "memory_deep"), /E4/);
+  assert.match(
+    listedDescription(listing, "memory_deep"),
+    /In the marc-deep measurement/
+  );
+});
+
+function listedDescription(
+  listing: { tools: Array<{ name: string; description?: string }> },
+  name: string
+): string {
+  const tool = listing.tools.find((item) => item.name === name);
+  assert.ok(tool, `${name} is not listed`);
+  assert.ok(tool.description, `${name} has no description`);
+  return tool.description;
+}

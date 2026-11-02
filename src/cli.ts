@@ -10,12 +10,14 @@ import { runDaemon } from "./daemon/server.js";
 import { runMcpServer } from "./mcp/server.js";
 import {
   deepMemory,
+  disposeMemoryProviders,
   prepareMemory,
   purgeMemory,
   readMemoryStatus,
   rebuildMemory,
   recallMemory
 } from "./core/workspace-memory.js";
+import { runMemoryCommand } from "./cli-memory-command.js";
 import type {
   MemoryQueryMode,
   MemoryRebuildMode,
@@ -159,7 +161,11 @@ async function handleMemoryCommand(parsed: ParsedArgs): Promise<void> {
 
   const workspaceRoot =
     stringValue(parsed.values, "workspace") ?? process.cwd();
-  printResult(await handler(parsed, workspaceRoot));
+  await runMemoryCommand({
+    run: () => handler(parsed, workspaceRoot),
+    print: printResult,
+    dispose: disposeMemoryProviders
+  });
 }
 
 function memoryRebuildMode(parsed: ParsedArgs): MemoryRebuildMode {

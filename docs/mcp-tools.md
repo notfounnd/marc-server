@@ -74,7 +74,7 @@ If a gated tool is called without the flag, it returns `bootstrap_required` and 
 | `workspace_unregister` | Remove this workspace from the daemon registry without deleting `.marc/`. |
 | `workspace_info` | Return the workspace bound to this MCP process. |
 | `workspace_read_rules` | Read `.marc/RULES.md`. |
-| `workspace_status` | Read workspace health, including thread index and summary-memory state. |
+| `workspace_status` | Read workspace health, including thread index and memory state. |
 | `workspace_audit` | Audit mARC workspace content for structural compliance across rules, messages, artifacts, references, agents, and preflight checks. |
 
 `workspace_audit` is an on-demand compliance tool. It does not run automatically for every message, it does not fix files, and it does not judge semantic quality. Use it before critical plans, before development, before conclusion, before closing a thread, or when a user asks for a structural quality check.
@@ -91,21 +91,21 @@ The audit reports objective issues such as missing artifact files, artifact refe
 |---|---|
 | `memory_prepare` | Prepare and validate all three local retrieval, reranking, and query-interpretation model caches without rebuilding the index. |
 | `memory_status` | Check index health and model-file readiness without loading model weights. |
-| `memory_rebuild` | Reconcile the committed LanceDB summary-memory index by default. Pass `mode: "full"` only for an explicit full rebuild. |
-| `memory_recall` | Interpret a query, search historical thread summaries, and return relevant `marc://` references. Pass `queryMode: "literal"` to bypass correction. |
+| `memory_rebuild` | Reconcile the committed LanceDB memory index by default. Pass `mode: "full"` only for an explicit full rebuild. |
+| `memory_recall` | Interpret a query, search the indexed history, and return relevant references. It reads thread summaries by default, and `depth` adds the other layers. Pass `queryMode: "literal"` to bypass correction. |
 | `memory_deep` | Return passages with provenance: the passages of one closed, indexed thread with `threadId`, or the passages of the groups that depth 2 admits without it. See [memory_deep in the memory guide](memory.md#memory_deep). |
 
-Summary memory is derived from `SUMMARY.md` only by default. Agents should use `memory_recall` before proposing or developing behavior that may overlap prior decisions, then read any strongly matched thread before reopening or contradicting the historical decision.
+Memory is derived from closed-thread summaries, artifacts, and chat messages, the workspace rules, and configured documents (see [source layers](memory.md#source-layers-and-provenance)). Agents should use `memory_recall` before proposing or developing behavior that may overlap prior decisions, then read any strongly matched thread before reopening or contradicting the historical decision.
 
-Each recall hit may carry `sourceType`, `sourcePath`, and `authority`. These fields are optional and additive: clients that ignore unknown fields are unaffected. With the default index every hit is a summary, so `sourceType` is `summary`.
+Each recall hit may carry `sourceType`, `sourcePath`, and `authority`. These fields are optional and additive: clients that ignore unknown fields are unaffected. At the default depth `0` every hit is a summary, so `sourceType` is `summary`.
 
-Every recall hit carries a heuristic confidence `band` (`high`, `medium`, or `low`). The band orders results relative to each other; it is not a probability of relevance. The response carries `abstained`, which is `true` only when the search ran and admitted no thread. It reflects admission and does not depend on `limit`. A recall that did not search, such as one on an unready index, reports `abstained: false`.
+Every recall hit carries a heuristic confidence `band` (`high`, `medium`, or `low`). The band orders results relative to each other; it is not a probability of relevance. The response carries `abstained`, which is `true` only when the search ran and admitted no thread. It reflects admission and does not depend on `limit`. A recall that did not search, such as one on an unready index, reports `abstained: false`. An abstained search does not prove that no decision exists (see [search limits](memory.md#search-limits)).
 
 `memory_recall` defaults to `queryMode: "auto"`. The response reports the original and effective queries. Automatic interpretation selects only from corpus-derived typo candidates and falls back to the original query on any model or protocol failure. Use `queryMode: "literal"` when the original spelling must be preserved.
 
-Recall defaults to `limit: 5` and `depth: 0`. Depth accepts `0` through `2` and counts corpus layers: depth `d` searches every layer up to `d` (`0` summaries; `1` adds artifacts, rules, and documents; `2` adds chat messages). Depths `1` and `2` rerank the whole consolidated M0 pool of the layers they search (each group's identity record and up to three passages), with no funnel and no candidate budget. Depth `3` is rejected with the layer explanation. Depth does not relax semantic eligibility. Lexical matches cannot qualify a thread by themselves, but can reinforce ordering after semantic eligibility is established. `minScore` is not a supported recall input.
+Recall defaults to `limit: 5` and `depth: 0`. Depth accepts `0` through `2` and counts corpus layers: depth `d` searches every layer up to `d` (`0` summaries; `1` adds artifacts, rules, and documents; `2` adds chat messages). Depths `1` and `2` rerank the whole consolidated pool of the layers they search (each group's identity record and up to three passages), with no candidate budget. Depth `3` is rejected with the layer explanation. Depth does not relax semantic eligibility. Lexical matches cannot qualify a thread by themselves, but can reinforce ordering after semantic eligibility is established. `minScore` is not a supported recall input.
 
-Each result reports `groupId` and `groupKind` (`thread`, `rules`, or `document`). `threadId` and `summaryPath` appear only for thread groups. `reference` follows the best evidence: a summary links to the thread, a chat message to the message, an artifact to the message and its file, and rules or documents to their source path. `nextActions` follow the group kind, and only thread groups suggest reading the thread. The response reports `layersSearched`, the layers that ran, and `rerankPairs`, the pairs sent to the reranker. The production index has held layers `0`, `1`, and `2` since the rebuild of 2026-10-27, so depths `1` and `2` search the layers they name.
+Each result reports `groupId` and `groupKind` (`thread`, `rules`, or `document`). `threadId` and `summaryPath` appear only for thread groups. `reference` follows the best evidence: a summary links to the thread, a chat message to the message, an artifact to the message and its file, and rules or documents to their source path. `nextActions` follow the group kind, and only thread groups suggest reading the thread. The response reports `layersSearched`, the layers that ran, and `rerankPairs`, the pairs sent to the reranker. A layer that the index does not hold is skipped.
 
 ### memory_deep
 
@@ -136,9 +136,9 @@ Errors are returned as tool errors with `isError: true`:
 
 A call that cannot search, because the index or the models are not ready or another memory operation holds the lock, returns empty `results` with the reason in `nextActions`, not an error.
 
-With `threadId`, the reranking time grows with the passages reranked. In the E4 measurement, the 95th percentile of scoped calls was about 35 seconds on the reference machine ([ADR 0013](adrs/0013-memory-deep-scoped-passages.md)).
+With `threadId`, the reranking time grows with the passages reranked. In the marc-deep measurement, the 95th percentile of scoped calls was about 35 seconds on the reference machine ([ADR 0013](adrs/0013-memory-deep-scoped-passages.md)).
 
-`memory_rebuild` accepts an optional `mode` input. Omitted or `"incremental"` reconciles only added, changed, or removed summary records. `"full"` rebuilds the complete derived snapshot. Both modes use the workspace batch-size setting and the same per-workspace rebuild lock.
+`memory_rebuild` accepts an optional `mode` input. Omitted or `"incremental"` reconciles only added, changed, or removed sources in every indexed layer. `"full"` rebuilds the complete derived snapshot. Both modes use the workspace batch-size setting and the same per-workspace rebuild lock.
 
 Memory uses schema version `7` and retrieval contract `source-layers-v1`. An index built with schema `6` reports `incompatible`, and incremental rebuild refuses it until one full rebuild migrates it. Incremental rebuild requires a compatible generation; an absent or incompatible generation needs an explicit full rebuild. Rebuild readiness requires the retriever and reranker, while recall additionally requires the interpreter and an index in `ready` or `stale` state. Model preparation does not rebuild the index. Purge is available through the CLI and HTTP API, not as an MCP tool; it preserves the active memory generation and configured production models while removing unused data.
 

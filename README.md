@@ -38,7 +38,7 @@ Coding agents are good at acting on context, but context often lives in the wron
 - **Incremental reads**: cursor-based tools so agents can read only what changed.
 - **Internal references**: `marc://` links for agents, messages, threads, and message artifacts.
 - **Thread summaries**: `SUMMARY.md` closes a thread and preserves an executive summary.
-- **Thread summary memory**: optional committed LanceDB memory over `SUMMARY.md` files helps agents recall historical decisions before changing behavior.
+- **Memory and search**: optional committed LanceDB memory over closed threads, rules, and configured documents helps agents recall historical decisions before changing behavior.
 - **Local UI**: a daemon-served dashboard for browsing workspaces, threads, messages, and artifacts.
 - **Harness support**: operational scaffolding for agent coordination, handoffs, reviews, and durable project context.
 
@@ -167,7 +167,7 @@ Restart the MCP server from VS Code, then ask Copilot Agent mode to register the
 
 ## MCP protocol
 
-The stdio server supports the MCP protocol revision `2026-07-28` and rejects legacy initialization. Restart the MCP client after updating mARC so it starts the new server process and discovers the current 25-tool catalog. Discovery and `tools/list` responses use private, zero-TTL cache hints; tool availability does not depend on workspace bootstrap.
+The stdio server supports the MCP protocol revision `2026-07-28` and rejects legacy initialization. Restart the MCP client after updating mARC so it starts the new server process and discovers the current 26-tool catalog. Discovery and `tools/list` responses use private, zero-TTL cache hints; tool availability does not depend on workspace bootstrap.
 
 See [MCP tools](docs/mcp-tools.md) for the client contract and [MCP protocol migration](docs/mcp-migration-2026-07-28.md) for compatibility details. Keep the server configured per target repository as described above.
 
@@ -190,7 +190,7 @@ Thread read tools accept a full thread ID or a unique 8-character hexadecimal su
 - [Harness Engineering](docs/harness-engineering.md)
 - [Architecture](docs/architecture.md)
 - [MCP Tools](docs/mcp-tools.md)
-- [Thread Summary Memory](docs/memory.md)
+- [Memory and Search](docs/memory.md)
 - [Agent Workflows](docs/agent-workflows.md)
 - [UI and Daemon](docs/ui-and-daemon.md)
 - [Development](docs/development.md)
@@ -216,7 +216,7 @@ Thread read tools accept a full thread ID or a unique 8-character hexadecimal su
       SKILL.md
 ```
 
-`CHAT.md` files are the source of truth for messages. `SUMMARY.md` marks a thread as closed. Artifacts live with the messages that reference them. `.marc/memory/` contains a rebuildable, committed summary-memory index derived from `SUMMARY.md`; `.marc/cache/` remains ignored local cache. The managed `.agents/skills/marc-ops/SKILL.md` file helps agents apply `workspace_bootstrap` and `RULES.md`; `RULES.md` remains the workspace behavior contract.
+`CHAT.md` files are the source of truth for messages. `SUMMARY.md` marks a thread as closed. Artifacts live with the messages that reference them. `.marc/memory/` contains a rebuildable, committed memory index derived from those Markdown sources, the workspace rules, and any configured documents; `.marc/cache/` remains ignored local cache. The managed `.agents/skills/marc-ops/SKILL.md` file helps agents apply `workspace_bootstrap` and `RULES.md`; `RULES.md` remains the workspace behavior contract.
 
 > [!IMPORTANT]
 > After mARC installs or refreshes `.agents/skills/marc-ops/SKILL.md`, restart the agent session so the agent can discover the local skill.

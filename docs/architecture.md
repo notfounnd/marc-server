@@ -29,6 +29,7 @@ Markdown is the source of truth.
       CHAT.md
       SUMMARY.md
       artifacts/
+  memory/
   cache/
     thread-index.json
     write-locks/
@@ -45,6 +46,7 @@ Markdown is the source of truth.
 - `threads/*/CHAT.md` stores structured message blocks.
 - `threads/*/SUMMARY.md` marks a thread as closed and stores its executive summary.
 - `threads/*/artifacts/` stores Markdown artifacts linked from messages.
+- `memory/` stores the committed, rebuildable memory index; it is not the source of truth.
 - `cache/` stores rebuildable indexes and cooperative lock controls; it is not the source of truth.
 
 The daemon stores its own local runtime data separately from project threads:
@@ -58,7 +60,7 @@ The daemon stores its own local runtime data separately from project threads:
 
 An MCP client starts `marc mcp` over stdio. The agent calls `workspace_bootstrap`, receives the current workspace contract, then calls gated tools with `bootstrapConfirmed: true`.
 
-The stdio server uses the official MCP server SDK's modern serving API and advertises only protocol revision `2026-07-28`. Legacy initialization is rejected. `server/discover` and `tools/list` explicitly advertise private cache scope with a zero-millisecond TTL, and the 25-tool catalog remains available before and after bootstrap. The SDK's JSON text content remains the tool-result contract.
+The stdio server uses the official MCP server SDK's modern serving API and advertises only protocol revision `2026-07-28`. Legacy initialization is rejected. `server/discover` and `tools/list` explicitly advertise private cache scope with a zero-millisecond TTL, and the 26-tool catalog remains available before and after bootstrap. The SDK's JSON text content remains the tool-result contract.
 
 The server applies one fixed one-second, process-wide window for tool calls and rejects excess calls immediately. Shutdown on stdin EOF, process signals, or transport closure stops new calls, waits for active handlers and heartbeat work, and then disposes shared memory providers. Request cancellation is checked before a tool begins domain work; cancellation does not dispose a provider shared by other requests.
 
@@ -92,6 +94,10 @@ Architecture Decision Records (ADR) document the major decisions behind mARC's c
 - [RULES.md uses a managed baseline and Custom Rules boundary](adrs/0007-rules-managed-baseline-and-custom-rules.md).
 - [Localization is scoped to the browser UI](adrs/0008-ui-only-localization-boundary.md).
 - [Markdown writes use cooperative locks and atomic file replacement](adrs/0009-cooperative-locks-and-atomic-markdown-writes.md).
+- [Memory source layers share one index per generation](adrs/0010-memory-source-layers.md).
+- [Memory confidence bands are heuristic, and calibration is deferred](adrs/0011-memory-confidence-bands.md).
+- [Memory depth counts corpus layers, and the funnel stays out of production](adrs/0012-memory-depth-as-corpus-layers.md).
+- [memory_deep returns scoped passages with a reranker budget of 232](adrs/0013-memory-deep-scoped-passages.md).
 
 ## Thread lifecycle
 
@@ -118,7 +124,7 @@ The UI renders these as compact labels. Agents can use the raw links to understa
 
 The project treats cache files as rebuildable controls. If the thread index is missing or stale, mARC can rebuild it from `.marc/threads`, `CHAT.md`, and `SUMMARY.md`. The `write-locks/` directory contains disposable cooperative coordination state for mARC writers.
 
-Summary memory is a derived LanceDB index built from closed-thread `SUMMARY.md` files. Its manifest uses schema version `6` and retrieval contract `field-aware-hybrid-v2`. The index keeps thread identity and content passages as separate dense-retrieval records, alongside full-text indexes for title, summary text, and title prefixes. Recall is a read-time projection over this snapshot; it does not change the Markdown source of truth. See [Thread Summary Memory](memory.md) for the retrieval and lifecycle details.
+Memory is a derived LanceDB index built from source layers: closed-thread summaries, then artifacts, rules, and configured documents, then closed-thread chat messages. Its manifest uses schema version `7` and retrieval contract `source-layers-v1`. The index keeps group identity and content passages as separate dense-retrieval records, alongside full-text indexes for title, passage text, and title prefixes. Recall is a read-time projection over this snapshot; it does not change the Markdown source of truth. See [Memory and search](memory.md) for the retrieval and lifecycle details.
 
 SQLite may be used as an optional local registry/index when available in the Node runtime. It is not required for correctness and does not replace the Markdown source of truth.
 
