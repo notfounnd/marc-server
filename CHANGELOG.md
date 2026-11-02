@@ -1,5 +1,42 @@
 # Changelog
 
+## 0.4.0 (2026-10-31)
+
+### Breaking Changes
+
+* Moved the memory index to schema version `7` and retrieval contract `source-layers-v1`. An index built with schema `6` reports `incompatible`, and incremental rebuilds refuse it. Run `marc memory rebuild --mode full` once after updating.
+* Redefined recall `depth` as the number of corpus layers searched. It now accepts `0` through `2` instead of expanding the candidate pool, and the CLI, MCP, and HTTP surfaces reject depth `3`.
+* Removed automatic search retries, `Deep retry`, and the search-depth setting from the UI, which now runs one search at depth `0`. A `memory.searchRetryDepth` key left in `.marc/marc.config.json` is ignored on read and removed on the next settings write.
+
+### Features
+
+* Added source layers to memory, so one index now holds closed-thread summaries in layer 0, artifacts, workspace rules, and configured documents in layer 1, and closed-thread chat messages in layer 2. Rebuilds index every layer, and default searches still read summaries only.
+* Added provenance to indexed records and recall hits, including source type, source path, and authority. Recall results also report `groupId`, `groupKind`, `layersSearched`, and `rerankPairs`, and `threadId` and `summaryPath` appear only for thread groups.
+* Added the `memory_deep` MCP tool and the `marc memory deep` command, which return passages with provenance for one closed thread or for the groups admitted at depth 2.
+* Added opt-in indexing of Markdown documents through `memory.documentSources` in `.marc/marc.config.json`.
+* Added heuristic confidence bands (`high`, `medium`, `low`) to recall hits and an `abstained` flag to recall results. Bands order results relative to each other and are not probabilities of relevance.
+* Grouped UI search results by confidence band, collapsed low-confidence results under `Show less likely results`, and showed each band as a signal icon with a tooltip.
+* Added the loaded UI version to the content footer.
+
+### Bug Fixes
+
+* Allowed `thread_write_summary` to accept thread IDs that contain a double hyphen before the suffix, and removed trailing hyphens from the slugs of new threads.
+* Displayed raw HTML in rendered Markdown as escaped source text, preserving line breaks and wrapping long lines, without interpreting it.
+* Made incremental rebuilds refuse an embedding provider that does not match the memory manifest and ask for a full rebuild.
+* Made one-shot `marc memory` commands exit when they finish instead of waiting for the idle timeout of the inference workers.
+
+### Documentation
+
+* Added ADRs for memory source layers, heuristic confidence bands, depth as corpus layers, and scoped `memory_deep` passages.
+* Documented source layers, provenance, text normalization, `memory_deep`, confidence bands, search limits, and the evaluation harness.
+* Added `memory_deep` guidance to the generated `marc-ops` skill.
+* Updated the memory MCP tool descriptions to cover source layers and to state that an abstained search does not prove that no decision exists.
+
+### Misc
+
+* Added the opt-in `memory:eval` harness with judged corpora, capture and replay, and paired reports. It replaces the `memory:quality` and `memory:benchmark` scripts.
+* Updated `@huggingface/transformers` to `^4.3.1`.
+
 ## 0.3.0 (2026-10-12)
 
 ### Breaking Changes
