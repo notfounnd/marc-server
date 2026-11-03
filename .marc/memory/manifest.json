@@ -1,7 +1,7 @@
 {
   "schemaVersion": 7,
-  "builtAt": "2026-11-03T16:04:51.224Z",
-  "generation": "20261103160446540_04245ee6",
+  "builtAt": "2026-11-03T23:14:33.075Z",
+  "generation": "20261103231431405_d5cb8041",
   "embeddingProvider": {
     "id": "transformers-js-local-e5",
     "name": "Transformers.js local multilingual E5 retrieval",
@@ -78,6 +78,27 @@
       "layer": 0,
       "authority": "decision",
       "sourcePath": ".marc/threads/ativacao-por-mencao-f0-provas-de-cliente-97415aaf/SUMMARY.md"
+    },
+    {
+      "threadId": "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1",
+      "title": "Ativação por menção - F1 Núcleo e marc wait manual",
+      "closedAt": "2026-11-03T23:13:04.603Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1\\SUMMARY.md",
+      "relativeSummaryPath": "threads/ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1/SUMMARY.md",
+      "reference": "marc://$ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1",
+      "sha256": "15a2a0e7fc79dfe4a5744799baa97d7ad6a09fe1e4f06ca5620ecaabc4a9290c",
+      "mtimeMs": 1793747584608.2175,
+      "recordIds": [
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:identity",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:source:overview:passage:001",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:source:overview:passage:002",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:source:overview:passage:003",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:source:overview:passage:004"
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1/SUMMARY.md"
     },
     {
       "threadId": "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7",
@@ -2133,6 +2154,86 @@
       "layer": 1,
       "authority": "artifact",
       "sourcePath": ".marc/threads/ativacao-por-mencao-f0-provas-de-cliente-97415aaf/artifacts/roteiro-humano-f0.md"
+    },
+    {
+      "threadId": "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1",
+      "title": "Ativação por menção - F1 Núcleo e marc wait manual / entrega-f1-marc-wait.md",
+      "closedAt": "2026-11-03T23:13:04.603Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1\\SUMMARY.md",
+      "relativeSummaryPath": "threads/ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1/SUMMARY.md",
+      "reference": "marc://$ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1",
+      "sha256": "65dc9f9a13e8f506d0cbece9394d97c4d09502b05212381bbd6338bea468118c",
+      "mtimeMs": 1793724842515.7317,
+      "recordIds": [
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:artifact:entrega-f1-marc-wait.md:source:escopo:passage:001",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:artifact:entrega-f1-marc-wait.md:source:arquivos-novos:passage:001",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:artifact:entrega-f1-marc-wait.md:source:arquivos-alterados:passage:001",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:artifact:entrega-f1-marc-wait.md:source:arquivos-alterados:passage:002",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:artifact:entrega-f1-marc-wait.md:source:testes-novos:passage:001",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:artifact:entrega-f1-marc-wait.md:source:desvios-declarados:passage:001",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:artifact:entrega-f1-marc-wait.md:source:checks-executados:passage:001",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:artifact:entrega-f1-marc-wait.md:source:validacao-manual-com-o-cli-construido:passage:001",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:artifact:entrega-f1-marc-wait.md:source:limites-e-riscos:passage:001",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:artifact:entrega-f1-marc-wait.md:source:pendente:passage:001"
+      ],
+      "sourceType": "artifact",
+      "layer": 1,
+      "authority": "artifact",
+      "sourcePath": ".marc/threads/ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1/artifacts/entrega-f1-marc-wait.md"
+    },
+    {
+      "threadId": "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1",
+      "title": "Ativação por menção - F1 Núcleo e marc wait manual / plano-f1-nucleo-e-marc-wait.md",
+      "closedAt": "2026-11-03T23:13:04.603Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1\\SUMMARY.md",
+      "relativeSummaryPath": "threads/ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1/SUMMARY.md",
+      "reference": "marc://$ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1",
+      "sha256": "42fe4b9001faab84d4e936a8beb9b6297dd12715db13ee8a52f21f6296b0aaeb",
+      "mtimeMs": 1793723049887.4585,
+      "recordIds": [
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:artifact:plano-f1-nucleo-e-marc-wait.md:source:1-resumo:passage:001",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:artifact:plano-f1-nucleo-e-marc-wait.md:source:2-contrato-do-comando:passage:001",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:artifact:plano-f1-nucleo-e-marc-wait.md:source:2-contrato-do-comando:passage:002",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:artifact:plano-f1-nucleo-e-marc-wait.md:source:2-contrato-do-comando:passage:003",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:artifact:plano-f1-nucleo-e-marc-wait.md:source:3-descoberta-do-comando:passage:001",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:artifact:plano-f1-nucleo-e-marc-wait.md:source:4-escopo-de-arquivos:passage:001",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:artifact:plano-f1-nucleo-e-marc-wait.md:source:4-escopo-de-arquivos:passage:002",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:artifact:plano-f1-nucleo-e-marc-wait.md:source:5-skill:passage:001",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:artifact:plano-f1-nucleo-e-marc-wait.md:source:6-testes:passage:001",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:artifact:plano-f1-nucleo-e-marc-wait.md:source:7-execucao-e-validacao:passage:001",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:artifact:plano-f1-nucleo-e-marc-wait.md:source:8-decisoes-e-pendencias:passage:001"
+      ],
+      "sourceType": "artifact",
+      "layer": 1,
+      "authority": "artifact",
+      "sourcePath": ".marc/threads/ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1/artifacts/plano-f1-nucleo-e-marc-wait.md"
+    },
+    {
+      "threadId": "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1",
+      "title": "Ativação por menção - F1 Núcleo e marc wait manual / revisao-integrada-f1.md",
+      "closedAt": "2026-11-03T23:13:04.603Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1\\SUMMARY.md",
+      "relativeSummaryPath": "threads/ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1/SUMMARY.md",
+      "reference": "marc://$ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1",
+      "sha256": "bccc884651832dbc6951f48f2d64684ead9bb0280af69df7b52ba8ac68af0ae9",
+      "mtimeMs": 1793746780430.5642,
+      "recordIds": [
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:artifact:revisao-integrada-f1.md:source:1-escopo-e-metodo:passage:001",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:artifact:revisao-integrada-f1.md:source:2-criterios-e-evidencia:passage:001",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:artifact:revisao-integrada-f1.md:source:2-criterios-e-evidencia:passage:002",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:artifact:revisao-integrada-f1.md:source:2-criterios-e-evidencia:passage:003",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:artifact:revisao-integrada-f1.md:source:2-criterios-e-evidencia:passage:004",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:artifact:revisao-integrada-f1.md:source:3-achados:passage:001",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:artifact:revisao-integrada-f1.md:source:3-achados:passage:002",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:artifact:revisao-integrada-f1.md:source:4-limites:passage:001",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:artifact:revisao-integrada-f1.md:source:5-veredito:passage:001",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:artifact:revisao-integrada-f1.md:source:6-complemento-parecer-do-codex-e-reavaliacao:passage:001",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:artifact:revisao-integrada-f1.md:source:6-complemento-parecer-do-codex-e-reavaliacao:passage:002"
+      ],
+      "sourceType": "artifact",
+      "layer": 1,
+      "authority": "artifact",
+      "sourcePath": ".marc/threads/ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1/artifacts/revisao-integrada-f1.md"
     },
     {
       "threadId": "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7",
@@ -9828,6 +9929,32 @@
       "layer": 2,
       "authority": "conversation",
       "sourcePath": ".marc/threads/ativacao-por-mencao-f0-provas-de-cliente-97415aaf/CHAT.md"
+    },
+    {
+      "threadId": "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1",
+      "title": "Ativação por menção - F1 Núcleo e marc wait manual",
+      "closedAt": "2026-11-03T23:13:04.603Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1\\SUMMARY.md",
+      "relativeSummaryPath": "threads/ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1/SUMMARY.md",
+      "reference": "marc://$ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1",
+      "sha256": "964ccdf3c04f5af93c3ab5607b55b72a2caca903068e89c9b600e7a4e93ffcba",
+      "mtimeMs": 1793747355197.7239,
+      "recordIds": [
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:chat:msg_5d6c101c1a9045be9a:passage:001",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:chat:msg_10efc10371aa484895:passage:001",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:chat:msg_20835786ec5b4344b2:passage:001",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:chat:msg_1008341742c0447a9f:passage:001",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:chat:msg_862b370d0cb04214bd:passage:001",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:chat:msg_862b370d0cb04214bd:passage:002",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:chat:msg_862b370d0cb04214bd:passage:003",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:chat:msg_641f996a1be646f9b0:passage:001",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:chat:msg_f0153ff4bffb45b6ab:passage:001",
+        "ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1:chat:msg_f0153ff4bffb45b6ab:passage:002"
+      ],
+      "sourceType": "chat",
+      "layer": 2,
+      "authority": "conversation",
+      "sourcePath": ".marc/threads/ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1/CHAT.md"
     },
     {
       "threadId": "bug-agent-register-nao-sinaliza-agente-existente-9e4e6ab7",

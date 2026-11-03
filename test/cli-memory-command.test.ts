@@ -53,11 +53,14 @@ test("the CLI runs memory commands through runMemoryCommand with disposeMemoryPr
 
   assert.match(
     source,
-    /import \{ runMemoryCommand \} from "\.\/cli-memory-command\.js";/
+    /const \{ runMemoryCommand \} = await import\("\.\/cli-memory-command\.js"\);/
   );
-  assert.match(source, /^ {2}disposeMemoryProviders,$/m);
   assert.match(
     source,
-    /await runMemoryCommand\(\{\s*run: \(\) => handler\(parsed, workspaceRoot\),\s*print: printResult,\s*dispose: disposeMemoryProviders\s*\}\);/
+    /const memory = await import\("\.\/core\/workspace-memory\.js"\);/
+  );
+  assert.match(
+    source,
+    /await runMemoryCommand\(\{\s*run: \(\) => handler\(parsed, workspaceRoot\),\s*print: printResult,\s*dispose: memory\.disposeMemoryProviders\s*\}\);/
   );
 });

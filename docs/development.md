@@ -88,6 +88,7 @@ Current test areas include:
 - MCP tool behavior through the public client SDK using isolated temporary workspaces;
 - UI i18n catalog boundaries;
 - mARC reference parsing;
+- mention reconciliation, the `marc wait` loop and command, and the `listening` helper and skill section;
 - UI link rendering utilities.
 
 Run type checking separately:

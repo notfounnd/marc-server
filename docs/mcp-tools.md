@@ -262,8 +262,11 @@ messages
 artifacts
 incremental_reading
 ui_daemon
+listening
 all
 ```
+
+The `listening` topic adds a `command` field. It is the `marc wait` command built from this server's Node runtime and workspace, ready to run in the background to listen for a mention of a profile. Its exit codes and rules are in [Listening for mentions](agent-workflows.md#listening-for-mentions).
 
 ## Also see
 

@@ -1,29 +1,15 @@
 #!/usr/bin/env node
-import { loadDaemonConfig } from "./daemon/config.js";
-import {
-  getDaemonStatus,
-  restartDetachedDaemon,
-  startDetachedDaemon,
-  stopDaemon
-} from "./daemon/lifecycle.js";
-import { runDaemon } from "./daemon/server.js";
-import { runMcpServer } from "./mcp/server.js";
-import {
-  deepMemory,
-  disposeMemoryProviders,
-  prepareMemory,
-  purgeMemory,
-  readMemoryStatus,
-  rebuildMemory,
-  recallMemory
-} from "./core/workspace-memory.js";
-import { runMemoryCommand } from "./cli-memory-command.js";
+// Daemon, MCP, and memory modules load on demand inside their handlers. The static
+// imports below are the wait path only, which must not load core/memory.
+import { runWaitCommand } from "./cli-wait-command.js";
 import type {
   MemoryQueryMode,
   MemoryRebuildMode,
   MemorySourceType
 } from "./core/memory/types.js";
 import type { DaemonConfig } from "./core/types.js";
+
+type MemoryModule = typeof import("./core/workspace-memory.js");
 
 type ParsedArgs = {
   command?: string;
@@ -77,7 +63,8 @@ function usage(): never {
   marc daemon start|stop|restart|status [--host 127.0.0.1] [--port 4187] [--data-dir .marc-daemon]
   marc memory status|prepare|rebuild|recall|purge [--workspace <path>] [--mode incremental|full] [--query <text>] [--query-mode auto|literal] [--limit <n>] [--depth 0|1|2]
   marc memory deep --query <text> [--thread <id>] [--source-types summary,artifact,chat,rules,document] [--limit <n>] [--query-mode auto|literal]
-  marc mcp [--workspace <path>] [--daemon-url http://127.0.0.1:4187] [--token <token>]`);
+  marc mcp [--workspace <path>] [--daemon-url http://127.0.0.1:4187] [--token <token>]
+  marc wait --thread <id> --mention <agent-id> --since <messageId> [--workspace <path>] [--max-chain <n>] [--timeout-minutes <n>] [--session <id>]`);
   process.exit(1);
 }
 
@@ -87,15 +74,24 @@ function printResult(value: unknown): void {
 
 type DaemonCommandHandler = (config: DaemonConfig) => Promise<unknown>;
 
-const daemonCommandHandlers: Record<string, DaemonCommandHandler> = {
-  start: (config) => startDetachedDaemon({ ...config, mode: "detached" }),
-  stop: (config) => stopDaemon({ ...config, mode: "detached" }),
-  restart: (config) => restartDetachedDaemon({ ...config, mode: "detached" }),
-  status: (config) => getDaemonStatus({ ...config, mode: "detached" })
-};
+async function daemonCommandHandlers(): Promise<
+  Record<string, DaemonCommandHandler>
+> {
+  const lifecycle = await import("./daemon/lifecycle.js");
+  return {
+    start: (config) =>
+      lifecycle.startDetachedDaemon({ ...config, mode: "detached" }),
+    stop: (config) => lifecycle.stopDaemon({ ...config, mode: "detached" }),
+    restart: (config) =>
+      lifecycle.restartDetachedDaemon({ ...config, mode: "detached" }),
+    status: (config) =>
+      lifecycle.getDaemonStatus({ ...config, mode: "detached" })
+  };
+}
 
 async function handleDaemonCommand(parsed: ParsedArgs): Promise<void> {
   const action = parsed.args[0];
+  const { loadDaemonConfig } = await import("./daemon/config.js");
   const config = await loadDaemonConfig({
     host: stringValue(parsed.values, "host"),
     port: numberValue(parsed.values, "port"),
@@ -105,7 +101,7 @@ async function handleDaemonCommand(parsed: ParsedArgs): Promise<void> {
     autoIdleMs: numberValue(parsed.values, "auto-idle-ms")
   });
 
-  const handler = action ? daemonCommandHandlers[action] : undefined;
+  const handler = action ? (await daemonCommandHandlers())[action] : undefined;
   if (handler) {
     printResult(await handler(config));
     return;
@@ -115,38 +111,47 @@ async function handleDaemonCommand(parsed: ParsedArgs): Promise<void> {
     usage();
   }
 
+  const { runDaemon } = await import("./daemon/server.js");
   await runDaemon(config);
 }
 
-const memoryCommandHandlers: Record<
-  string,
-  (parsed: ParsedArgs, workspaceRoot: string) => Promise<unknown>
-> = {
-  status: (_parsed, workspaceRoot) => readMemoryStatus(workspaceRoot),
-  prepare: (_parsed, workspaceRoot) => prepareMemory(workspaceRoot),
-  purge: (_parsed, workspaceRoot) => purgeMemory(workspaceRoot),
-  rebuild: (parsed, workspaceRoot) =>
-    rebuildMemory(workspaceRoot, memoryRebuildMode(parsed)),
-  recall: (parsed, workspaceRoot) =>
-    recallMemory(workspaceRoot, {
-      query: stringValue(parsed.values, "query") ?? "",
-      queryMode: memoryQueryMode(parsed),
-      limit: numberValue(parsed.values, "limit"),
-      depth: numberValue(parsed.values, "depth")
-    }),
-  deep: (parsed, workspaceRoot) =>
-    deepMemory(workspaceRoot, {
-      query: stringValue(parsed.values, "query") ?? "",
-      threadId: deepStringValue(parsed, "thread"),
-      sourceTypes: sourceTypesValue(parsed),
-      queryMode: deepQueryMode(parsed),
-      limit: deepLimitValue(parsed)
-    })
-};
+type MemoryCommandHandler = (
+  parsed: ParsedArgs,
+  workspaceRoot: string
+) => Promise<unknown>;
+
+function memoryCommandHandlers(
+  memory: MemoryModule
+): Record<string, MemoryCommandHandler> {
+  return {
+    status: (_parsed, workspaceRoot) => memory.readMemoryStatus(workspaceRoot),
+    prepare: (_parsed, workspaceRoot) => memory.prepareMemory(workspaceRoot),
+    purge: (_parsed, workspaceRoot) => memory.purgeMemory(workspaceRoot),
+    rebuild: (parsed, workspaceRoot) =>
+      memory.rebuildMemory(workspaceRoot, memoryRebuildMode(parsed)),
+    recall: (parsed, workspaceRoot) =>
+      memory.recallMemory(workspaceRoot, {
+        query: stringValue(parsed.values, "query") ?? "",
+        queryMode: memoryQueryMode(parsed),
+        limit: numberValue(parsed.values, "limit"),
+        depth: numberValue(parsed.values, "depth")
+      }),
+    deep: (parsed, workspaceRoot) =>
+      memory.deepMemory(workspaceRoot, {
+        query: stringValue(parsed.values, "query") ?? "",
+        threadId: deepStringValue(parsed, "thread"),
+        sourceTypes: sourceTypesValue(parsed),
+        queryMode: deepQueryMode(parsed),
+        limit: deepLimitValue(parsed)
+      })
+  };
+}
 
 async function handleMemoryCommand(parsed: ParsedArgs): Promise<void> {
   const action = parsed.args[0];
-  const handler = action ? memoryCommandHandlers[action] : undefined;
+  const memory = await import("./core/workspace-memory.js");
+  const { runMemoryCommand } = await import("./cli-memory-command.js");
+  const handler = action ? memoryCommandHandlers(memory)[action] : undefined;
   if (!handler) {
     usage();
   }
@@ -164,7 +169,7 @@ async function handleMemoryCommand(parsed: ParsedArgs): Promise<void> {
   await runMemoryCommand({
     run: () => handler(parsed, workspaceRoot),
     print: printResult,
-    dispose: disposeMemoryProviders
+    dispose: memory.disposeMemoryProviders
   });
 }
 
@@ -219,7 +224,16 @@ async function main(): Promise<void> {
     return;
   }
 
+  if (parsed.command === "wait") {
+    process.exitCode = await runWaitCommand(parsed.values, {
+      sessionDefault: process.env.CLAUDE_CODE_SESSION_ID,
+      print: (line) => console.log(line)
+    });
+    return;
+  }
+
   if (parsed.command === "mcp") {
+    const { runMcpServer } = await import("./mcp/server.js");
     await runMcpServer({
       workspace: stringValue(parsed.values, "workspace"),
       daemonUrl: stringValue(parsed.values, "daemon-url"),

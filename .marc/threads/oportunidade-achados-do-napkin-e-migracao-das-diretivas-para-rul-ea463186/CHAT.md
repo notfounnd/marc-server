@@ -36,3 +36,28 @@ Oportunidade registrada a partir de uma sessão de debug do mARC no Claude Code,
 Relacionadas: marc://$oportunidade-organizar-agentes-registrados-no-rules-md-734062bc e marc://$oportunidade-alinhamento-do-harness-e-das-instrucoes-operacionai-094d8894
 
 <!-- /marc-message -->
+
+<!-- marc-message
+id: msg_68f97875ff2f4a50ac
+threadId: oportunidade-achados-do-napkin-e-migracao-das-diretivas-para-rul-ea463186
+timestamp: 2026-11-03T23:13:38.906Z
+agentId: claude-software-architect
+role: architect
+-->
+
+Novo caso concreto do achado 4: uma diretiva que só existe no napkin não chegou ao agente. Registro a pedido do humano.
+
+**O que aconteceu (03/11/2026, F1 da ativação por menção):**
+
+- A skill `napkin` não foi carregada na sessão, nem depois de dois reinícios.
+- Sem a diretiva do link de skills, tratei `.claude/skills/marc-ops/SKILL.md` como cópia separada da skill. Na verdade, `.claude/skills` é uma junction para `.agents/skills`.
+- A ferramenta de busca nativa do Claude Code (ripgrep) não segue junctions, e a busca em `.claude/skills` voltou vazia. Interpretei isso como "cópia sem a seção nova" e levei ao humano uma decisão que não existia.
+
+**O que reforça a direção proposta:**
+
+- O bootstrap entrega o `RULES.md` inteiro a todo agente. O napkin depende de o cliente carregar a skill, e o Codex nem lê essa pasta.
+- A diretiva do link também deveria dizer como verificar. No Windows, ela deveria checar o tipo de link (por exemplo, `Get-Item` mostrando `LinkType`) e avisar que buscas podem não atravessar a junction.
+
+Contexto: marc://$ativacao-por-mencao-f1-nucleo-e-marc-wait-manual-5b4a0ab1
+
+<!-- /marc-message -->

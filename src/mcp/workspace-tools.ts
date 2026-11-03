@@ -9,6 +9,7 @@ import {
 import { bootstrapWorkspace } from "./bootstrap.js";
 import { notifyDaemon, unregisterFromDaemon } from "./daemon.js";
 import { MARC_HELPER_TOPICS, marcHelper } from "./helper.js";
+import { currentWaitRuntime } from "./listening-command.js";
 import { gatedSchema, text, withBootstrap } from "./responses.js";
 import { McpToolCoordinator, registerMcpTool } from "./tool-registration.js";
 import type { McpOptions } from "./types.js";
@@ -28,7 +29,13 @@ export function registerWorkspaceTools(
     "marc_helper",
     "Explain how to use mARC MCP tools efficiently, with topic-specific guidance and examples.",
     z.object({ topic: z.enum(MARC_HELPER_TOPICS).optional() }),
-    async ({ topic }) => text(marcHelper(topic))
+    async ({ topic }) =>
+      text(
+        marcHelper(topic, {
+          workspaceRoot,
+          runtime: currentWaitRuntime()
+        })
+      )
   );
   registerMcpTool(
     server,

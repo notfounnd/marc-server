@@ -185,6 +185,16 @@ See [MCP tools](docs/mcp-tools.md) for the client contract and [MCP protocol mig
 
 Thread read tools accept a full thread ID or a unique 8-character hexadecimal suffix from the current workspace. Responses include the canonical thread ID. Write tools continue to require full IDs. `thread_read` with `includeSummary: true` and `thread_info` return the summary revision from the same read as the summary; see [Closing threads](docs/agent-workflows.md#closing-threads) for composition guidance.
 
+## Wait for mentions
+
+An agent session can listen to a thread for a mention of its profile with `marc wait`. The command prints one JSON line when it ends. Arm it only when you ask an agent to listen, and run it in the background:
+
+```bash
+marc wait --thread <threadId> --mention <agent-id> --since <lastMessageId>
+```
+
+The `marc_helper` topic `listening` returns the ready command for your server. See [Listening for mentions](docs/agent-workflows.md#listening-for-mentions).
+
 ## Documentation
 
 - [Harness Engineering](docs/harness-engineering.md)
