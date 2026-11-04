@@ -4,6 +4,18 @@ import path from "node:path";
 import type { DaemonConfig } from "../core/types.js";
 import { getCurrentDaemonFingerprint } from "./lifecycle.js";
 
+/** The default address of the daemon. `marc open` and the copy commands use the same values. */
+export const DEFAULT_DAEMON_HOST = "127.0.0.1";
+export const DEFAULT_DAEMON_PORT = 4187;
+export const DEFAULT_DAEMON_URL = daemonUrlFor(
+  DEFAULT_DAEMON_HOST,
+  DEFAULT_DAEMON_PORT
+);
+
+export function daemonUrlFor(host: string, port: number): string {
+  return `http://${host}:${port}`;
+}
+
 async function exists(filePath: string): Promise<boolean> {
   try {
     await fs.access(filePath);
@@ -33,8 +45,8 @@ export async function loadDaemonConfig(
 
   return {
     dataDir,
-    host: options.host ?? process.env.MARC_HOST ?? "127.0.0.1",
-    port: options.port ?? Number(process.env.MARC_PORT ?? 4187),
+    host: options.host ?? process.env.MARC_HOST ?? DEFAULT_DAEMON_HOST,
+    port: options.port ?? Number(process.env.MARC_PORT ?? DEFAULT_DAEMON_PORT),
     token,
     tokenPath,
     mode: options.mode ?? "foreground",

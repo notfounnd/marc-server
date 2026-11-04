@@ -1,0 +1,258 @@
+.sessions-trigger {
+  position: relative;
+}
+
+.sessions-count {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border: 1px solid var(--ink);
+  background: var(--main);
+  color: var(--main-foreground);
+  font-size: 11px;
+  line-height: 16px;
+  text-align: center;
+}
+
+.sessions-menu {
+  width: min(380px, calc(100vw - 48px));
+  max-height: 480px;
+  overflow: auto;
+  padding: 8px;
+  background: var(--background);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+}
+
+.sessions-menu-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 2px 4px 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line-strong);
+  color: var(--ink-muted);
+  font-size: 12px;
+}
+
+.sessions-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sessions-chip-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface-muted);
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.sessions-count-chip {
+  padding: 0 5px;
+  background: var(--teal);
+  color: var(--background);
+}
+
+.sessions-body {
+  display: grid;
+  gap: 12px;
+  padding: 0 4px 4px;
+}
+
+.sessions-status {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 13px;
+}
+
+.sessions-status-error {
+  display: grid;
+  gap: 4px;
+  color: var(--red);
+}
+
+.sessions-status-error p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.sessions-eyebrow {
+  color: var(--ink-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sessions-group,
+.sessions-section {
+  display: grid;
+  gap: 8px;
+}
+
+/* Every group lists its rows through this list and row, so the spacing matches in each one. */
+.sessions-list {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sessions-row {
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+}
+
+.sessions-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--line-strong);
+}
+
+.sessions-dot[data-tone="online"] {
+  background: var(--green);
+}
+
+.sessions-dot[data-tone="attention"] {
+  background: var(--amber);
+}
+
+.sessions-dot[data-tone="posted"] {
+  background: transparent;
+  border: 2px solid var(--amber);
+}
+
+.sessions-name {
+  display: grid;
+  min-width: 0;
+}
+
+.sessions-profile,
+.sessions-sub {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.sessions-profile {
+  font-weight: 600;
+}
+
+.sessions-sub {
+  color: var(--ink-muted);
+  font-size: 12px;
+}
+
+.sessions-toggle {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.sessions-copy,
+.sessions-go {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  color: var(--ink-muted);
+  cursor: pointer;
+}
+
+.sessions-copy:hover:not(:disabled),
+.sessions-go:hover,
+.sessions-copy:focus-visible,
+.sessions-go:focus-visible {
+  color: var(--teal);
+}
+
+.sessions-copy:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.sessions-copy:focus-visible,
+.sessions-go:focus-visible,
+.sessions-toggle:focus-visible,
+.sessions-chip-toggle:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+}
+
+.sessions-pending-list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sessions-pending-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.sessions-two-line {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.sessions-line-head,
+.sessions-line-detail {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.sessions-line-head {
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.sessions-line-detail {
+  color: var(--ink-muted);
+  font-size: 12px;
+}
+
+.sessions-notice {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 12px;
+}

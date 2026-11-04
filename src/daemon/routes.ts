@@ -28,6 +28,7 @@ import {
   postWorkspaceMemoryRecall,
   postWorkspaceSettings
 } from "./memory-routes.js";
+import { SESSION_ROUTES, type SessionServices } from "./session-routes.js";
 import type { DaemonStore } from "./store.js";
 import { postWorkspaceThreadCreation } from "./thread-routes.js";
 
@@ -36,6 +37,7 @@ type RouteContext = {
   memoryRecall: typeof recallMemory;
   request: http.IncomingMessage;
   response: http.ServerResponse;
+  sessions: SessionServices;
   store: DaemonStore;
   url: URL;
 };
@@ -295,7 +297,8 @@ const routes: Route[] = [
     pattern:
       /^\/api\/workspaces\/([^/]+)\/threads\/([^/]+)\/messages\/([^/]+)\/artifacts$/,
     handle: postArtifact
-  }
+  },
+  ...SESSION_ROUTES
 ];
 
 export async function handleDaemonRoute(

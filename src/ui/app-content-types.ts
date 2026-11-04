@@ -1,5 +1,6 @@
 import type {
   Agent,
+  ApiGet,
   ArtifactMenuItem,
   MarkdownLinkHandler,
   Message,
@@ -11,6 +12,7 @@ import type {
 } from "./types.js";
 
 export type AppContentProps = {
+  api: ApiGet;
   statusKind: StatusKind;
   lastSyncedAt?: Date;
   selectedThreadIndexHealth?: ThreadIndexHealth;

@@ -10,13 +10,20 @@ import {
 import { Button } from "./common.js";
 import type {
   Agent,
+  ApiGet,
   ArtifactMenuItem,
   MarkdownLinkHandler,
   Thread,
   Workspace
 } from "./types.js";
+import {
+  PRESSED_TRIGGER_CLASS,
+  ThreadSessionsMenu
+} from "./thread-sessions-menu.js";
 
 export function ContentHeaderActions({
+  api,
+  lastSyncedAt,
   selectedAgent,
   selectedThread,
   selectedThreadArtifacts,
@@ -27,6 +34,8 @@ export function ContentHeaderActions({
   onShowArtifactMenuChange,
   onShowWorkspaceSettingsChange
 }: {
+  api: ApiGet;
+  lastSyncedAt?: Date;
   selectedAgent?: Agent;
   selectedThread?: Thread;
   selectedThreadArtifacts: ArtifactMenuItem[];
@@ -39,13 +48,22 @@ export function ContentHeaderActions({
 }) {
   return (
     <div className="content-actions">
-      <ThreadArtifactMenu
-        selectedThread={selectedThread}
-        selectedThreadArtifacts={selectedThreadArtifacts}
-        showArtifactMenu={showArtifactMenu}
-        onOpenLink={onOpenLink}
-        onShowArtifactMenuChange={onShowArtifactMenuChange}
-      />
+      <div className="content-action-row">
+        <ThreadArtifactMenu
+          selectedThread={selectedThread}
+          selectedThreadArtifacts={selectedThreadArtifacts}
+          showArtifactMenu={showArtifactMenu}
+          onOpenLink={onOpenLink}
+          onShowArtifactMenuChange={onShowArtifactMenuChange}
+        />
+        <ThreadSessionsSlot
+          api={api}
+          lastSyncedAt={lastSyncedAt}
+          selectedThread={selectedThread}
+          selectedWorkspace={selectedWorkspace}
+          onOpenLink={onOpenLink}
+        />
+      </div>
       <WorkspaceSettingsMenu
         selectedAgent={selectedAgent}
         selectedThread={selectedThread}
@@ -54,6 +72,32 @@ export function ContentHeaderActions({
         onShowWorkspaceSettingsChange={onShowWorkspaceSettingsChange}
       />
     </div>
+  );
+}
+
+function ThreadSessionsSlot({
+  api,
+  lastSyncedAt,
+  selectedThread,
+  selectedWorkspace,
+  onOpenLink
+}: {
+  api: ApiGet;
+  lastSyncedAt?: Date;
+  selectedThread?: Thread;
+  selectedWorkspace?: Workspace;
+  onOpenLink: MarkdownLinkHandler;
+}) {
+  if (!selectedThread || !selectedWorkspace) return null;
+
+  return (
+    <ThreadSessionsMenu
+      api={api}
+      workspace={selectedWorkspace}
+      thread={selectedThread}
+      syncMark={lastSyncedAt}
+      onOpenLink={onOpenLink}
+    />
   );
 }
 
@@ -78,11 +122,12 @@ function ThreadArtifactMenu({
       <DropdownMenu
         open={showArtifactMenu}
         onOpenChange={onShowArtifactMenuChange}
+        modal={false}
       >
         <DropdownMenuTrigger asChild>
           <Button
             variant={showArtifactMenu ? "primary" : "secondary"}
-            className="button-icon"
+            className={`button-icon ${PRESSED_TRIGGER_CLASS}`}
             title={t("Show thread artifacts")}
           >
             <Paperclip size={14} />

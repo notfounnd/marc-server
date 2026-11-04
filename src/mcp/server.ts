@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import os from "node:os";
 import { McpServer } from "@modelcontextprotocol/server";
 import {
   StdioServerTransport,
@@ -8,6 +9,10 @@ import { disposeMemoryProviders } from "../core/workspace-memory.js";
 import { registerAgentTools } from "./agent-tools.js";
 import { startDaemonLeaseHeartbeat } from "./daemon.js";
 import { registerMemoryTools } from "./memory-tools.js";
+import {
+  createSessionIdentity,
+  type SessionIdentity
+} from "./session-identity.js";
 import { registerThreadTools } from "./thread-tools.js";
 import { McpToolCoordinator } from "./tool-registration.js";
 import type { McpOptions } from "./types.js";
@@ -45,7 +50,8 @@ class ProtocolVersionGuidanceTransport extends StdioServerTransport {
 
 export function buildMcpServer(
   options: McpOptions = {},
-  coordinator = new McpToolCoordinator()
+  coordinator = new McpToolCoordinator(),
+  identity: SessionIdentity = createProcessIdentity()
 ): McpServer {
   const workspaceRoot = options.workspace ?? process.cwd();
   const server = new McpServer(
@@ -59,16 +65,26 @@ export function buildMcpServer(
     }
   );
 
-  registerWorkspaceTools(server, coordinator, options);
-  registerThreadTools(server, coordinator, workspaceRoot);
+  registerWorkspaceTools(server, coordinator, options, identity);
+  registerThreadTools(server, coordinator, workspaceRoot, options, identity);
   registerAgentTools(server, coordinator, workspaceRoot);
   registerMemoryTools(server, workspaceRoot, coordinator);
   return server;
 }
 
+function createProcessIdentity(): SessionIdentity {
+  return createSessionIdentity({
+    env: process.env,
+    pid: process.pid,
+    ppid: process.ppid,
+    hostId: os.hostname()
+  });
+}
+
 export async function runMcpServer(options: McpOptions = {}): Promise<void> {
   const coordinator = new McpToolCoordinator();
-  const cleanupHeartbeat = await startDaemonLeaseHeartbeat(options);
+  const identity = createProcessIdentity();
+  const cleanupHeartbeat = await startDaemonLeaseHeartbeat(options, identity);
   const transport = new ProtocolVersionGuidanceTransport();
   let shutdown: Promise<void> | undefined;
   let resolveClosed: () => void = () => undefined;
@@ -103,11 +119,14 @@ export async function runMcpServer(options: McpOptions = {}): Promise<void> {
   process.stdin.once("close", stop);
   process.once("SIGINT", stop);
   process.once("SIGTERM", stop);
-  const handle = serveStdio(() => buildMcpServer(options, coordinator), {
-    legacy: "reject",
-    transport,
-    onerror: () => process.stderr.write("mARC MCP stdio transport error\n")
-  });
+  const handle = serveStdio(
+    () => buildMcpServer(options, coordinator, identity),
+    {
+      legacy: "reject",
+      transport,
+      onerror: () => process.stderr.write("mARC MCP stdio transport error\n")
+    }
+  );
   const sdkOnMessage = transport.onmessage;
   transport.onmessage = (message) => {
     const unsupported = getUnsupportedProtocolVersion(message);

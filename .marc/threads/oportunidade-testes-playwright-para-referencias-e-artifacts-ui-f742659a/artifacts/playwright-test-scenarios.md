@@ -297,6 +297,21 @@ Priority: medium
 
 Coverage note: ad hoc Playwright CLI checks exercised development and production UI, responsive layout, the loaded version, and shortcut activation. The separator follow-up was visually checked at desktop and 320 px. Durable browser tests remain pending; these checks do not mark the scenarios implemented.
 
+## Thread Sessions Menu And Message Arrival
+
+Source thread: marc://$ativacao-por-mencao-f2-vinculo-presenca-posse-e-menu-134b5983
+Priority: high
+
+- [ ] With a temporary daemon and workspace whose profiles are online, ended, unbound with posts, unbound, and a Codex (`gpt-*` model) profile, open the sessions menu. Verify the header, the Pending chip with count, the Active, Ended, and collapsed "Other profiles · N" groups, one 40 px row per profile, and a status dot plus a short sub-line.
+- [ ] Verify Copy for the ended profile puts `claude --resume <id>` on the clipboard and Copy for the unbound profile puts `claude '<prompt>'`. Online, unknown, conflict, and Codex rows keep Copy disabled with their tooltip; the Codex tooltip reads "Only Claude Code sessions are supported for now.". Neither the clipboard nor the DOM may contain the daemon token.
+- [ ] Open the sessions menu, then the artifacts menu, with one click each; verify each trigger stays pressed while its menu is open with the pointer elsewhere.
+- [ ] In a thread long enough to scroll, scroll to the top, open Pending, and activate a go-to arrow; verify the menu closes, the scroller reaches the target message (same position as an equivalent marc:// link), focus lands on the message, and the trigger does not pull the scroll back.
+- [ ] Verify the arrival stripe appears on the target message for both the go-to arrow and a marc:// message link, fades over 3 s without shifting layout, and restarts on a repeated go-to. With `prefers-reduced-motion: reduce`, verify the stripe is static and removed after 3 s.
+- [ ] Close the menu with Escape and by an outside click; verify focus returns to the trigger.
+- [ ] Verify each pending item shows two single-line truncated texts, each with its own tooltip, and that a long profile name or detail does not wrap.
+
+Coverage note: ad hoc Playwright CLI checks on temporary daemons exercised the layout, Copy commands and disabled states, pressed triggers, the go-to scroll and focus fix with before and after evidence, the arrival stripe (2 s at the time, now 3 s), reduced motion, and the Codex block. Durable browser tests remain pending.
+
 ## Maintenance Notes
 
 - This backlog should grow as UI features are added.

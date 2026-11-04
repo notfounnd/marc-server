@@ -10,16 +10,22 @@ import {
   writeThreadSummary
 } from "../core/workspace.js";
 import { ThreadSummaryError } from "../core/thread-summary.js";
+import type { ChatMessage } from "../core/types.js";
+import { observeSessionActivity } from "./daemon.js";
 import { gatedSchema, toolError, withBootstrap } from "./responses.js";
 import { resolveThreadId } from "./thread-resolution.js";
+import type { SessionIdentity } from "./session-identity.js";
 import { McpToolCoordinator, registerMcpTool } from "./tool-registration.js";
-import type { McpServer } from "@modelcontextprotocol/server";
+import type { McpOptions } from "./types.js";
+import type { CallToolResult, McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
 
 export function registerThreadTools(
   server: McpServer,
   coordinator: McpToolCoordinator,
-  workspaceRoot: string
+  workspaceRoot: string,
+  options: McpOptions,
+  identity: SessionIdentity
 ): void {
   registerMcpTool(
     server,
@@ -76,15 +82,26 @@ export function registerThreadTools(
       role: z.string().optional(),
       artifacts: z.array(z.string()).optional()
     }),
-    async (input) =>
-      withBootstrap(input, async () =>
-        appendMessage(workspaceRoot, input.threadId, {
+    async (input) => {
+      const posted: { message?: ChatMessage } = {};
+      const result = await withBootstrap(input, async () => {
+        posted.message = await appendMessage(workspaceRoot, input.threadId, {
           agentId: input.agentId,
           body: input.body,
           role: input.role,
           artifacts: input.artifacts
-        })
-      )
+        });
+        return posted.message;
+      });
+      reportPostedActivity(result, {
+        workspaceRoot,
+        message: posted.message,
+        agentId: input.agentId,
+        options,
+        identity
+      });
+      return result;
+    }
   );
   registerMcpTool(
     server,
@@ -200,6 +217,28 @@ export function registerThreadTools(
         threadId
       }))
   );
+}
+
+/**
+ * Fire and forget: a failed or slow observation never changes the tool result.
+ * The thread ID is the canonical one from the stored message, not the input.
+ */
+function reportPostedActivity(
+  result: CallToolResult,
+  activity: {
+    workspaceRoot: string;
+    message: ChatMessage | undefined;
+    agentId: string;
+    options: McpOptions;
+    identity: SessionIdentity;
+  }
+): void {
+  if (result.isError === true || activity.message === undefined) return;
+  void observeSessionActivity(activity.options, activity.identity, {
+    workspaceRoot: activity.workspaceRoot,
+    threadId: activity.message.threadId,
+    agentId: activity.agentId
+  }).catch(() => undefined);
 }
 
 async function withResolvedThread<Result>(

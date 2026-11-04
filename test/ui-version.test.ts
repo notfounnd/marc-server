@@ -33,6 +33,7 @@ test("renders the package version after the developer credit and before shortcut
       AppContent: React.ComponentType<AppContentProps>;
     };
     const props: AppContentProps = {
+      api: () => Promise.reject(new Error("not used by this render")),
       statusKind: "idle",
       selectedThreadArtifacts: [],
       showArtifactMenu: false,

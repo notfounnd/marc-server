@@ -39,7 +39,7 @@ Coding agents are good at acting on context, but context often lives in the wron
 - **Internal references**: `marc://` links for agents, messages, threads, and message artifacts.
 - **Thread summaries**: `SUMMARY.md` closes a thread and preserves an executive summary.
 - **Memory and search**: optional committed LanceDB memory over closed threads, rules, and configured documents helps agents recall historical decisions before changing behavior.
-- **Local UI**: a daemon-served dashboard for browsing workspaces, threads, messages, and artifacts.
+- **Local UI**: a daemon-served dashboard for browsing workspaces, threads, messages, and artifacts, with a thread sessions menu that shows each profile's session state and copies its native Claude command: `claude --resume` for an ended session, or a new session with the profile prompt.
 - **Harness support**: operational scaffolding for agent coordination, handoffs, reviews, and durable project context.
 
 ## Requirements
@@ -194,6 +194,41 @@ marc wait --thread <threadId> --mention <agent-id> --since <lastMessageId>
 ```
 
 The `marc_helper` topic `listening` returns the ready command for your server. See [Listening for mentions](docs/agent-workflows.md#listening-for-mentions).
+
+## Open a Claude Code session
+
+`marc open` starts Claude Code for a thread and profile. The daemon owns the slot while the client runs:
+
+```bash
+marc open --thread <threadId> --profile <agent-id> [--workspace <path>] [--data-dir <path>] [--daemon-url <url>] [--tool-shell bash|default] [--new] [--dry-run]
+```
+
+- It requires a running daemon, and `marc open` never starts one. It finds the daemon in this order:
+  - **URL:** `--daemon-url` or `MARC_DAEMON_URL`; then the URL in `daemon.json`; then `http://127.0.0.1:4187`.
+  - **Token:** the token file that `daemon.json` names; then `<data-dir>/token`; then `MARC_TOKEN` as the last resort. The foreground daemon writes its token file into its data directory and no `daemon.json`, so the second step finds it.
+  - `--data-dir` defaults to `MARC_DAEMON_DIR`; then the workspace's `.marc-daemon`, when that directory exists; then `.marc-daemon` in the current directory, as `marc daemon start` created it.
+  - Before it reads any slot, `marc open` calls `/api/status` with the token. A daemon that does not answer, a missing token, or a refused token each stop the command with exit 9.
+- The short command the thread sessions view carries names `--data-dir` and `--daemon-url` only when they differ from the defaults, so it opens the daemon that produced it, and never the token. Its short form starts from `node dist/cli.js` or a `marc` on `PATH` when either exists, with no dev loader.
+- The thread sessions menu copies the native Claude command, not this one. The copy is disabled while the session is open, and copying bypasses mARC ownership: it is detection, not prevention. `marc open` is the CLI path that keeps the ownership.
+- It supports Claude Code only. A profile whose `Model` does not start with `claude-` is refused with exit code 5 before any reservation, and the command writes one line to stderr. `claude` must be on `PATH`. `marc open` starts it without a shell, so a `.cmd` shim is not found; install the native `claude.exe`.
+- A new session receives one prompt that names the thread and the profile and asks the agent to call `workspace_bootstrap` and read the thread. A resume receives no prompt.
+- While the client runs, the ownership is renewed every 15 seconds. The client owns Ctrl+C: `marc open` ignores SIGINT and SIGTERM until the client ends, then releases the ownership.
+- `--new` lets an unbound slot start a new session when the profile already posted in the thread but the daemon has no binding for it.
+- `--dry-run` prints the launch plan as one JSON line and changes nothing.
+- The owner token never appears in output, errors, or arguments. `marc open` may read `MARC_TOKEN` as its last resort, but the client never inherits `MARC_TOKEN` or any inherited `CLAUDE*` variable from the caller's environment.
+
+| Exit code | Meaning |
+| --- | --- |
+| The client's code | The session ended. A client that ends by signal exits with 0. |
+| 4 | The thread is closed. |
+| 5 | Input, read, or spawn error, such as `claude` not found. |
+| 6 | The slot has a live owner (`online` or `reserved`). Nothing opens. |
+| 8 | Conflict, unknown owner, unknown continuity, or a generation change. |
+| 9 | The daemon does not answer (`daemon_unreachable`), no token is found (`token_missing`), the token is refused (`token_rejected`), or the daemon state cannot be read. |
+
+A refusal or error prints one JSON line with `status`, `exitCode`, `reason`, and `next`.
+
+Sessions and conflicts are detected, not prevented: a raw `claude --resume` outside `marc open` is not stopped, but mARC records the conflict. See [Sessions and ownership](docs/agent-workflows.md#sessions-and-ownership).
 
 ## Documentation
 

@@ -1,11 +1,17 @@
 import assert from "node:assert/strict";
+import path from "node:path";
 import test from "node:test";
 import { WORKSPACE_SKILL } from "../src/core/marc-ops-skill.js";
 import { MARC_HELPER_TOPICS, marcHelper } from "../src/mcp/helper.js";
 import {
+  buildMarcCommand,
   buildWaitCommand,
   currentWaitRuntime,
   posixQuote,
+  productionRuntimeProbes,
+  shortMarcRuntime,
+  type MarcRuntime,
+  type RuntimeProbes,
   type WaitCommandInput
 } from "../src/mcp/listening-command.js";
 
@@ -184,4 +190,141 @@ test("the managed skill has the listening section before Audit Discipline", () =
   assert.ok(listening < audit);
   assert.match(WORKSPACE_SKILL, /Never stop a waiter by process name\./);
   assert.match(WORKSPACE_SKILL, /marc_helper` with topic `listening`/);
+});
+
+const SOURCE_RUNTIME: MarcRuntime = {
+  execPath: "/usr/bin/node",
+  execArgv: ["--import", "tsx"],
+  script: path.join("/srv/marc", "src", "cli.ts")
+};
+
+const BUILT_CLI = path.join("/srv/marc", "dist", "cli.js");
+const MARC_ON_PATH = path.join("/usr/local/bin", "marc");
+
+/** Probes with the given files, executables and PATH folders; the rest is fixed for the test. */
+function probesWith(options: {
+  files?: string[];
+  executables?: string[];
+  pathFolders?: string[];
+  platform?: NodeJS.Platform;
+}): RuntimeProbes {
+  const files = options.files ?? [];
+  const executables = options.executables ?? [];
+  return {
+    platform: options.platform ?? "linux",
+    pathFolders: options.pathFolders ?? [],
+    isFile: (filePath) => files.includes(filePath),
+    isExecutable: (filePath) => executables.includes(filePath)
+  };
+}
+
+test("a source entry with a built dist/cli.js runs that build with plain node and no execArgv", () => {
+  const runtime = shortMarcRuntime(
+    SOURCE_RUNTIME,
+    probesWith({ files: [BUILT_CLI] })
+  );
+  const command = buildMarcCommand({
+    runtime,
+    subcommand: "open",
+    args: ["--thread", "134b5983"]
+  });
+
+  assert.deepEqual(runtime, {
+    execPath: "/usr/bin/node",
+    execArgv: [],
+    script: BUILT_CLI
+  });
+  assert.deepEqual(command.argv, [
+    "/usr/bin/node",
+    BUILT_CLI,
+    "open",
+    "--thread",
+    "134b5983"
+  ]);
+  assert.equal(command.shell.includes("tsx"), false);
+});
+
+test("a runtime without a built entry or a marc on PATH keeps its runtime, and a built entry is kept as it is", () => {
+  const built: MarcRuntime = {
+    execPath: "/usr/bin/node",
+    execArgv: [],
+    script: BUILT_CLI
+  };
+
+  assert.deepEqual(
+    shortMarcRuntime(SOURCE_RUNTIME, probesWith({})),
+    SOURCE_RUNTIME
+  );
+  assert.deepEqual(
+    shortMarcRuntime(built, probesWith({ files: [BUILT_CLI] })),
+    built
+  );
+});
+
+test("an executable marc on PATH is run by name, with no script and no execArgv", () => {
+  const runtime = shortMarcRuntime(
+    SOURCE_RUNTIME,
+    probesWith({
+      pathFolders: ["/bin", "/usr/local/bin"],
+      executables: [MARC_ON_PATH]
+    })
+  );
+  const command = buildMarcCommand({
+    runtime,
+    subcommand: "open",
+    args: ["--profile", "claude-dev"]
+  });
+
+  assert.deepEqual(runtime, { execPath: "marc", execArgv: [] });
+  assert.deepEqual(command.argv, ["marc", "open", "--profile", "claude-dev"]);
+  assert.equal(command.shell, "'marc' 'open' '--profile' 'claude-dev'");
+});
+
+test("the built entry wins over a marc on PATH, because the rules run in order", () => {
+  const runtime = shortMarcRuntime(
+    SOURCE_RUNTIME,
+    probesWith({
+      files: [BUILT_CLI],
+      pathFolders: ["/usr/local/bin"],
+      executables: [MARC_ON_PATH]
+    })
+  );
+
+  assert.deepEqual(runtime.script, BUILT_CLI);
+});
+
+test("on Windows marc.cmd and marc.exe on PATH count as marc", () => {
+  const folder = "C:\\tools";
+  const found = (name: string) =>
+    shortMarcRuntime(
+      SOURCE_RUNTIME,
+      probesWith({
+        platform: "win32",
+        pathFolders: [folder],
+        executables: [path.join(folder, name)]
+      })
+    );
+
+  assert.deepEqual(found("marc.cmd"), { execPath: "marc", execArgv: [] });
+  assert.deepEqual(found("marc.exe"), { execPath: "marc", execArgv: [] });
+});
+
+test("a file named marc.cmd does not count outside Windows, and a missing marc keeps the runtime", () => {
+  const onLinux = probesWith({
+    platform: "linux",
+    pathFolders: ["/usr/local/bin"],
+    executables: [path.join("/usr/local/bin", "marc.cmd")]
+  });
+
+  assert.deepEqual(shortMarcRuntime(SOURCE_RUNTIME, onLinux), SOURCE_RUNTIME);
+});
+
+test("PATH folders are split on the platform delimiter, and empty entries are dropped", () => {
+  const probes = productionRuntimeProbes(
+    { PATH: ["/x", "", "/y"].join(path.delimiter) },
+    "linux"
+  );
+
+  assert.deepEqual(probes.pathFolders, ["/x", "/y"]);
+  assert.equal(probes.platform, "linux");
 });

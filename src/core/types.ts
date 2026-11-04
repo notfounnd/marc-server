@@ -303,6 +303,12 @@ export type DaemonLease = {
   startedAt: string;
   lastSeenAt: string;
   expiresAt: string;
+  nativeSessionId?: string;
+  client?: "claude-code";
+  pid?: number;
+  ppid?: number;
+  hostId?: string;
+  identifiedAt?: string;
 };
 
 export type DaemonRuntimeState = {

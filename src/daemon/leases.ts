@@ -8,7 +8,15 @@ type LeasePayload = {
   workspaceId?: unknown;
   clientType?: unknown;
   ttlMs?: unknown;
+  nativeSessionId?: unknown;
+  client?: unknown;
+  pid?: unknown;
+  ppid?: unknown;
+  hostId?: unknown;
+  identifiedAt?: unknown;
 };
+
+const MAX_IDENTITY_LENGTH = 255;
 
 type LeaseRequestInput = {
   request: http.IncomingMessage;
@@ -106,8 +114,39 @@ function upsertLease(
         : "unknown",
     startedAt: previous?.startedAt ?? now.toISOString(),
     lastSeenAt: now.toISOString(),
-    expiresAt: new Date(now.getTime() + ttlMs).toISOString()
+    expiresAt: new Date(now.getTime() + ttlMs).toISOString(),
+    ...identityFields(body)
   };
   leases.set(clientId, lease);
   return lease;
+}
+
+/** Invalid identity values are dropped, so a lease never carries a malformed identity. */
+function identityFields(body: LeasePayload): Partial<DaemonLease> {
+  return {
+    nativeSessionId: validText(body.nativeSessionId),
+    client: body.client === "claude-code" ? "claude-code" : undefined,
+    pid: validPid(body.pid),
+    ppid: validPid(body.ppid),
+    hostId: validText(body.hostId),
+    identifiedAt: validDate(body.identifiedAt)
+  };
+}
+
+function validText(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  if (value.length === 0 || value.length > MAX_IDENTITY_LENGTH)
+    return undefined;
+  return value;
+}
+
+function validPid(value: unknown): number | undefined {
+  if (!Number.isInteger(value) || (value as number) <= 0) return undefined;
+  return value as number;
+}
+
+function validDate(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  if (Number.isNaN(Date.parse(value))) return undefined;
+  return value;
 }

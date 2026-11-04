@@ -208,6 +208,37 @@ Use messages for concise status, decisions, and handoffs. Use artifacts for long
 
 Artifact paths are resolved inside the workspace's `.marc/` directory. Attempts to escape that root are rejected.
 
+## Session identity and presence
+
+The daemon keeps a local view of which Claude Code session speaks for which profile in a thread. This view is observational in this phase: nothing is activated automatically.
+
+**Process identity in the lease.** Each MCP process reports its identity in the daemon lease, `PUT /api/leases/:clientId`:
+
+- `nativeSessionId`, read from `CLAUDE_CODE_SESSION_ID`, and `client`, which is `claude-code` when that variable is present;
+- `pid` and `ppid` of the MCP process, and `hostId`, the host name;
+- `identifiedAt`, set when `workspace_bootstrap` succeeds. The lease renews at once after that point, not on the next 15-second tick.
+
+The identity never contains a daemon or owner token. Invalid identity values are dropped from the lease.
+
+**Adoption after `message_post`.** After a successful `message_post`, the MCP process sends `POST /api/sessions/observe` in the background. The payload has `workspaceId`, `threadId`, `agentId`, `observedAt` (taken when the tool ran), and the identity. The tool result never waits for this call and never changes because of it. Adoption is best effort: a lost observation is resent by the next `message_post`.
+
+**Adoption rules.** The daemon resolves the profile role from the workspace profile registry, not from the message `role` field:
+
+- `developer` and `user` profiles, and profiles not in the registry, never adopt;
+- a free slot is adopted with a new generation;
+- the same verified instance refreshes the owner. After `/clear` it reconciles to the new session ID, keeping the generation and the owner token, and records `previousSessionId` and `sessionChangedAt`. The generation changes only when the owner changes (acquire or adoption), never on a session-ID change inside the same owner;
+- another session while the owner is active records a conflict and keeps the owner;
+- the single process that carries the bound session takes the owner once the previous owner is proven gone (`resumed`): a new generation, the previous owner token is dropped, and no conflict is recorded. Two processes with the session, an unverified identity, or a live reservation never resume;
+- an observation older than the slot's last change is ignored.
+
+**Authority and derived state.** `sessions.json` in the daemon data directory is the local authority for the link between a thread and profile and its native session. It is not a cache. Presence and slot state are derived from it and from live sources. The daemon is the only writer, through a serialized queue and an atomic rename. An unreadable or invalid file fails closed: every slot reads `unknown` with reason `registry_invalid`, writes are refused, and the file is never rewritten. A missing `sessions.json` beside its `sessions.meta.json` marker is a lost registry: the view reports status `invalid` with reason `registry_lost`, the slots read as above, and nothing is recreated until the human recovers it, as described in Sessions and ownership in the agent workflows guide.
+
+**Scope of `claude agents --json`.** The daemon runs `claude agents --json` without `--all` and without a folder filter. The output lists all active Claude Code sessions of the user on this host, interactive and background. Entries without a `pid` are not live processes and are ignored.
+
+**Slot states.** `unbound`, `online` (the owner's pid, startedAt and session match), `reserved` (acquired but no client yet), `ended` (only with proof that the owner and its session are gone), `unknown` (missing source, other host, or unproven identity), and `conflict`. A recorded conflict on an active owner wins over `online`.
+
+**Routes.** `GET /api/workspaces/:id/threads/:threadId/sessions` returns the slots, warnings (`pending_mention`, `chain_limit`, `awaiting_human`), and source status. `awaiting_human` carries `askedBy`, the author of its last request to the human. Each slot carries `openCommand`, the short `marc open` command, and `copyCommand`, the native Claude command the menu copies, for an ended or unbound slot only. A profile whose client is not supported has neither, and `copyBlockedReason` (`unsupported_client`) names why Copy is disabled. It never returns an owner token. `POST /api/sessions/acquire` returns the owner token only to the caller that acquires the slot. `heartbeat` and `release` require the owner token and generation; a refusal returns `409` and changes nothing. Adoption rules above apply to `observe`, which always answers `200`.
+
 ## Efficient reading pattern
 
 For a new thread:

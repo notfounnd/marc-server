@@ -162,3 +162,83 @@ export type ArtifactMenuItem = {
   artifact: string;
   href: string;
 };
+
+export type ApiGet = <T>(path: string) => Promise<T>;
+
+/** The translate function a presentational sessions component receives from its container. */
+export type Translate = (
+  key: string,
+  variables?: Record<string, string | number>
+) => string;
+
+/** Mirrors the daemon session view. The UI reads it and never acquires, opens or kills a session. */
+export type SessionStateName =
+  | "unbound"
+  | "online"
+  | "reserved"
+  | "ended"
+  | "unknown"
+  | "conflict";
+
+export type SessionCommand = {
+  argv: string[];
+  shell: string;
+};
+
+export type SessionDetails = {
+  busy: boolean;
+  listening: boolean;
+  reason: string;
+  pastConflict: boolean;
+};
+
+export type SessionBindingSummary = {
+  origin: "open" | "adopted";
+  generation: number;
+  client: string;
+  hostId: string;
+  boundAt: string;
+  endedAt?: string;
+  conflicts: Array<{ sessionId: string; at: string }>;
+};
+
+export type ThreadSessionSlot = {
+  profile: string;
+  role?: string;
+  state: SessionStateName;
+  details: SessionDetails;
+  sources: {
+    agents: "available" | "unavailable";
+    mcpLease: boolean;
+    listening: boolean;
+  };
+  binding: SessionBindingSummary | null;
+  profileHasMessages: boolean;
+  /** Absent for a client that is not supported, so no open path starts that session. */
+  openCommand?: SessionCommand;
+  /** The native Claude command the Copy button copies. Only an ended or an unbound slot has one. */
+  copyCommand?: { text: string };
+  /** Why Copy is disabled by the client rather than the state. Only unsupported_client today. */
+  copyBlockedReason?: "unsupported_client";
+};
+
+export type ThreadSessionWarning =
+  | { kind: "pending_mention"; profile: string; messageIds: string[] }
+  | { kind: "chain_limit"; length: number; messageIds: string[] }
+  | {
+      kind: "awaiting_human";
+      profile: string;
+      messageIds: string[];
+      askedBy: string;
+    };
+
+export type ThreadSessionsView = {
+  registry: { status: "ready" | "invalid"; reason?: string };
+  slots: ThreadSessionSlot[];
+  warnings: ThreadSessionWarning[];
+  sources: {
+    agents: "available" | "unavailable";
+    mcpLeases: number;
+    listening: "available";
+  };
+};

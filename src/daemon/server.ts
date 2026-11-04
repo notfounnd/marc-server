@@ -5,6 +5,11 @@ import {
   disposeMemoryProviders,
   recallMemory
 } from "../core/workspace-memory.js";
+import {
+  currentMarcRuntime,
+  type MarcRuntime
+} from "../mcp/listening-command.js";
+import { daemonUrlFor } from "./config.js";
 import { UiEventBus } from "./events.js";
 import { authorized, json, serveStatic, text } from "./http.js";
 import {
@@ -19,6 +24,15 @@ import {
   pruneExpiredLeases
 } from "./leases.js";
 import { handleDaemonRoute } from "./routes.js";
+import {
+  createSessionPresence,
+  type PresenceDependencies
+} from "./presence.js";
+import {
+  createSessionRegistry,
+  type RegistryDependencies
+} from "./session-registry.js";
+import type { SessionServices } from "./session-routes.js";
 import { daemonStatus } from "./status.js";
 import { DaemonStore } from "./store.js";
 import { renderUi } from "./ui.js";
@@ -26,6 +40,10 @@ import { renderUi } from "./ui.js";
 /** Behavior the daemon routes call that tests may replace. Production uses the defaults. */
 export type DaemonServerDependencies = {
   memoryRecall: typeof recallMemory;
+  presence?: Partial<PresenceDependencies>;
+  registry?: Partial<RegistryDependencies>;
+  /** The runtime the copied `marc open` commands start from. Production reads this process. */
+  marcRuntime?: () => MarcRuntime;
 };
 
 const DEFAULT_DAEMON_DEPENDENCIES: DaemonServerDependencies = {
@@ -38,6 +56,15 @@ export async function createDaemonServer(
 ): Promise<http.Server> {
   const store = await DaemonStore.open(config.dataDir);
   const leases = new Map<string, DaemonLease>();
+  const sessions: SessionServices = {
+    registry: createSessionRegistry(config.dataDir, dependencies.registry),
+    presence: createSessionPresence(dependencies.presence),
+    leases,
+    dataDir: config.dataDir,
+    daemonUrl: () =>
+      daemonUrlFor(config.host, listeningPort(server, config.port)),
+    marcRuntime: dependencies.marcRuntime ?? currentMarcRuntime
+  };
   const startedAt = new Date().toISOString();
   let lastActivityAt = startedAt;
   let lastExternalActivityAt = startedAt;
@@ -149,6 +176,7 @@ export async function createDaemonServer(
         memoryRecall: dependencies.memoryRecall,
         request,
         response,
+        sessions,
         store,
         url
       });
@@ -178,6 +206,13 @@ export async function createDaemonServer(
     void disposeMemoryProviders().catch(() => undefined);
   });
   return server;
+}
+
+/** The port the server listens on. Port 0 asks the system for one, so the bound address is read. */
+function listeningPort(server: http.Server, configured: number): number {
+  const address = server.address();
+  if (address === null || typeof address === "string") return configured;
+  return address.port;
 }
 
 export async function runDaemon(config: DaemonConfig): Promise<http.Server> {

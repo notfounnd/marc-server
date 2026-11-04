@@ -64,7 +64,8 @@ function usage(): never {
   marc memory status|prepare|rebuild|recall|purge [--workspace <path>] [--mode incremental|full] [--query <text>] [--query-mode auto|literal] [--limit <n>] [--depth 0|1|2]
   marc memory deep --query <text> [--thread <id>] [--source-types summary,artifact,chat,rules,document] [--limit <n>] [--query-mode auto|literal]
   marc mcp [--workspace <path>] [--daemon-url http://127.0.0.1:4187] [--token <token>]
-  marc wait --thread <id> --mention <agent-id> --since <messageId> [--workspace <path>] [--max-chain <n>] [--timeout-minutes <n>] [--session <id>]`);
+  marc wait --thread <id> --mention <agent-id> --since <messageId> [--workspace <path>] [--max-chain <n>] [--timeout-minutes <n>] [--session <id>]
+  marc open --thread <id|suffix> --profile <agent-id> [--workspace <path>] [--data-dir <path>] [--daemon-url <url>] [--tool-shell bash|default] [--new] [--dry-run]`);
   process.exit(1);
 }
 
@@ -228,6 +229,15 @@ async function main(): Promise<void> {
     process.exitCode = await runWaitCommand(parsed.values, {
       sessionDefault: process.env.CLAUDE_CODE_SESSION_ID,
       print: (line) => console.log(line)
+    });
+    return;
+  }
+
+  if (parsed.command === "open") {
+    const { runOpenCommand } = await import("./cli-open-command.js");
+    process.exitCode = await runOpenCommand(parsed.values, {
+      print: (line) => console.log(line),
+      writeWarning: (line) => console.error(line)
     });
     return;
   }

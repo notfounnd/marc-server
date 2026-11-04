@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { getWorkspaceInfo } from "../core/workspace.js";
 import type { WorkspaceInfo } from "../core/types.js";
+import type { IdentityFields, SessionIdentity } from "./session-identity.js";
 import type { McpOptions } from "./types.js";
 
 type DaemonConnection = {
@@ -54,7 +55,8 @@ export async function unregisterFromDaemon(
 }
 
 export async function startDaemonLeaseHeartbeat(
-  options: McpOptions
+  options: McpOptions,
+  identity: SessionIdentity
 ): Promise<() => Promise<void>> {
   const connection = daemonConnection(options);
   if (!connection) return async () => undefined;
@@ -63,19 +65,24 @@ export async function startDaemonLeaseHeartbeat(
   const clientId = `mcp-${process.pid}-${randomUUID()}`;
   const pending = new Set<Promise<void>>();
   const renew = () => {
-    const operation = renewDaemonLease(connection, clientId, workspace).catch(
-      () => undefined
-    );
+    const operation = renewDaemonLease(
+      connection,
+      clientId,
+      workspace,
+      identity.fields()
+    ).catch(() => undefined);
     pending.add(operation);
     void operation.finally(() => pending.delete(operation));
   };
   renew();
   const timer = setInterval(renew, 15_000);
   timer.unref();
+  const unsubscribe = identity.onIdentified(renew);
   let cleanup: Promise<void> | undefined;
   return () => {
     if (cleanup) return cleanup;
     clearInterval(timer);
+    unsubscribe();
     cleanup = (async () => {
       await Promise.all([...pending]);
       try {
@@ -110,10 +117,48 @@ function requiredDaemonConnection(options: McpOptions): DaemonConnection {
   throw new Error("Cannot unregister workspace without daemonUrl and token.");
 }
 
+/**
+ * Reports one thread activity to the daemon, which adopts or flags the session
+ * slot. The caller must not await it: the tool result never depends on it.
+ */
+export async function observeSessionActivity(
+  options: McpOptions,
+  identity: SessionIdentity,
+  activity: { workspaceRoot: string; threadId: string; agentId: string }
+): Promise<void> {
+  const connection = daemonConnection(options);
+  const nativeSessionId = identity.nativeSessionId;
+  if (!connection || nativeSessionId === undefined) return;
+
+  const observedAt = new Date().toISOString();
+  const workspace = await getWorkspaceInfo(activity.workspaceRoot);
+  await fetch(new URL("/api/sessions/observe", connection.daemonUrl), {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      authorization: `Bearer ${connection.token}`
+    },
+    signal: AbortSignal.timeout(5_000),
+    body: JSON.stringify({
+      workspaceId: workspace.id,
+      threadId: activity.threadId,
+      agentId: activity.agentId,
+      observedAt,
+      identity: {
+        nativeSessionId,
+        pid: identity.pid,
+        ppid: identity.ppid,
+        hostId: identity.hostId
+      }
+    })
+  });
+}
+
 async function renewDaemonLease(
   connection: DaemonConnection,
   clientId: string,
-  workspace: WorkspaceInfo
+  workspace: WorkspaceInfo,
+  identity: IdentityFields
 ): Promise<void> {
   await fetch(
     new URL(
@@ -130,7 +175,8 @@ async function renewDaemonLease(
       body: JSON.stringify({
         workspaceId: workspace.id,
         clientType: "mcp",
-        ttlMs: 45_000
+        ttlMs: 45_000,
+        ...identity
       })
     }
   );

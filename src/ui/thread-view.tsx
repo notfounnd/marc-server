@@ -64,6 +64,7 @@ export function ThreadView({
             className="message-card"
             id={`message-${message.id}`}
             key={message.id}
+            tabIndex={-1}
           >
             <div className="message-card-head">
               <div className="message-meta">

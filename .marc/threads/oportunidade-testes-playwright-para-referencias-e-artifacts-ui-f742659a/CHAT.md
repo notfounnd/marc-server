@@ -370,3 +370,28 @@ Em msg_14552439774445e79e registrei o ícone no canto inferior direito do card. 
 A seção "Memory Confidence Bands" foi ajustada, e o cenário passa a verificar também que a coluna de texto mantém a mesma largura nos cards com e sem ícone. A cobertura E2E durável continua pendente.
 
 <!-- /marc-message -->
+
+<!-- marc-message
+id: msg_f2f6504587444fff81
+threadId: oportunidade-testes-playwright-para-referencias-e-artifacts-ui-f742659a
+timestamp: 2026-11-04T17:27:48.001Z
+agentId: claude-software-architect
+role: architect
+artifacts: playwright-test-scenarios.md
+-->
+
+## Backlog atualizado pela F2
+
+A F2 (marc://$ativacao-por-mencao-f2-vinculo-presenca-posse-e-menu-134b5983) entregou o menu de sessões da thread e o destaque de chegada na mensagem.
+
+Seção nova: "Thread Sessions Menu And Message Arrival". Ela cobre:
+- **Menu:** layout e grupos.
+- **Copiar:** o comando nativo e os estados desativados, inclusive o bloqueio do Codex, e a ausência de token no DOM e na área de transferência.
+- **Gatilhos:** ficam pressionados com o menu aberto.
+- **Seta "ir para":** chega à mensagem sem que o foco puxe a rolagem de volta.
+- **Faixa de chegada:** esmaece em 3 s; com movimento reduzido, fica estática.
+- **Fechamento:** com Escape ou clique fora, o foco volta ao gatilho.
+
+As checagens ad hoc foram feitas pelo Playwright CLI. A cobertura E2E durável continua pendente.
+
+<!-- /marc-message -->

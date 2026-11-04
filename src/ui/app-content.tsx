@@ -9,6 +9,7 @@ import type { AppContentProps } from "./app-content-types.js";
 import { WorkspaceOverview } from "./workspace-overview.js";
 
 export function AppContent({
+  api,
   statusKind,
   lastSyncedAt,
   selectedThreadIndexHealth,
@@ -42,6 +43,7 @@ export function AppContent({
     <main className="content">
       <div className="content-scroll">
         <ContentHeader
+          api={api}
           statusKind={statusKind}
           lastSyncedAt={lastSyncedAt}
           selectedAgent={selectedAgent}

@@ -46,6 +46,13 @@
   gap: 6px;
 }
 
+.content-action-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
 .middle-mode-actions {
   display: flex;
   align-items: center;
@@ -300,6 +307,36 @@
 
 .message-card:target {
   border-color: var(--teal);
+}
+
+/*
+ * The arrival stripe is an inset shadow, so it never shifts the layout. The keyframes keep the
+ * card's own shadow, so the drop shadow does not blink while the stripe fades.
+ */
+.message-card.message-arrival {
+  animation: message-arrival 3s ease-out forwards;
+}
+
+@keyframes message-arrival {
+  from {
+    box-shadow:
+      inset 4px 0 0 0 var(--main),
+      var(--app-shadow);
+  }
+  to {
+    box-shadow:
+      inset 4px 0 0 0 transparent,
+      var(--app-shadow);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .message-card.message-arrival {
+    animation: none;
+    box-shadow:
+      inset 4px 0 0 0 var(--main),
+      var(--app-shadow);
+  }
 }
 
 .message-card-head {

@@ -243,6 +243,7 @@ export function App() {
         onGoHome={appActions.goHome}
       />
       <AppContent
+        api={api}
         statusKind={statusKind}
         lastSyncedAt={lastSyncedAt}
         selectedThreadIndexHealth={selectedThreadIndexHealth}

@@ -46,3 +46,24 @@ A proposta anexa foi atualizada no lugar com a decisão do humano e o retorno da
 Base: marc://$ativacao-por-mencao-f0-provas-de-cliente-97415aaf.
 
 <!-- /marc-message -->
+
+<!-- marc-message
+id: msg_b2d0e722bcaa438091
+threadId: oportunidade-terminal-embarcado-para-abrir-agentes-pela-ui-2d4c2799
+timestamp: 2026-11-04T05:23:06.273Z
+agentId: claude-software-architect
+role: architect
+-->
+
+## Botão Play do menu de sessões
+
+Decisão do humano na F2 (marc://$ativacao-por-mencao-f2-vinculo-presenca-posse-e-menu-134b5983): cada perfil do menu de sessões teria um ícone Play, que abre a sessão pelo `marc open`, com posse. Ele saiu da F2 e fica para esta oportunidade, porque precisa funcionar igual em Windows, Linux e macOS.
+
+- **Destino natural:** o Play abre a sessão no terminal embarcado (node-pty + xterm.js), com o mesmo `marc open` curto montado pelo daemon.
+- **Alternativa levantada pelo humano:** abrir um terminal externo configurado pelo usuário ou detectado automaticamente.
+  - **Matriz:** os terminais que aceitam comando têm sintaxes diferentes (Windows Terminal, iTerm, kitty, GNOME Terminal, Konsole). No Linux não há padrão, e o Terminal do macOS só aceita comando por AppleScript.
+  - **Segurança:** um modelo de comando configurável executa o que estiver nele a cada clique. Ele teria de ficar só na pasta local do daemon, nunca nas configurações da workspace, que vão para o repositório.
+  - Pode servir de passo intermediário antes do terminal embarcado.
+- **Na F2:** o menu fica só com Copiar, que entrega o comando nativo do Claude e fica desativado com a sessão aberta, e com o ícone de ir para a mensagem.
+
+<!-- /marc-message -->

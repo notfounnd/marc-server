@@ -11,6 +11,7 @@ import { notifyDaemon, unregisterFromDaemon } from "./daemon.js";
 import { MARC_HELPER_TOPICS, marcHelper } from "./helper.js";
 import { currentWaitRuntime } from "./listening-command.js";
 import { gatedSchema, text, withBootstrap } from "./responses.js";
+import type { SessionIdentity } from "./session-identity.js";
 import { McpToolCoordinator, registerMcpTool } from "./tool-registration.js";
 import type { McpOptions } from "./types.js";
 import type { McpServer } from "@modelcontextprotocol/server";
@@ -19,7 +20,8 @@ import { z } from "zod";
 export function registerWorkspaceTools(
   server: McpServer,
   coordinator: McpToolCoordinator,
-  options: McpOptions
+  options: McpOptions,
+  identity: SessionIdentity
 ): void {
   const workspaceRoot = options.workspace ?? process.cwd();
 
@@ -43,7 +45,11 @@ export function registerWorkspaceTools(
     "workspace_bootstrap",
     "Bootstrap this mARC workspace for the current session. Call this before any gated mARC tool.",
     z.object({}),
-    async () => text(await bootstrapWorkspace(workspaceRoot))
+    async () => {
+      const result = text(await bootstrapWorkspace(workspaceRoot));
+      identity.markIdentified();
+      return result;
+    }
   );
   registerMcpTool(
     server,

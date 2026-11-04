@@ -16,6 +16,53 @@ type ApiGet = <T>(path: string) => Promise<T>;
 type Translation = (key: string, options?: Record<string, string>) => string;
 type Ref<T> = { current: T };
 
+const ARRIVAL_CLASS = "message-arrival";
+const ARRIVAL_MS = 3000;
+let arrival: { element: HTMLElement; timer: number } | undefined;
+
+/** Scrolls to the message, takes focus without scrolling, and marks where the navigation landed. */
+function arriveAt(message: HTMLElement | null): void {
+  if (!message) return;
+  message.scrollIntoView({ behavior: "smooth", block: "center" });
+  message.focus({ preventScroll: true });
+  markArrival(message);
+}
+
+/**
+ * Removing the class, reading the layout and adding it again restarts the fade, so a repeated
+ * arrival on the same message shows the stripe again. Only one arrival is marked at a time.
+ */
+function markArrival(element: HTMLElement): void {
+  clearArrival();
+  element.classList.remove(ARRIVAL_CLASS);
+  void element.offsetWidth;
+  element.classList.add(ARRIVAL_CLASS);
+  const timer = window.setTimeout(clearArrival, ARRIVAL_MS);
+  arrival = { element, timer };
+}
+
+function clearArrival(): void {
+  if (!arrival) return;
+  window.clearTimeout(arrival.timer);
+  arrival.element.classList.remove(ARRIVAL_CLASS);
+  arrival = undefined;
+}
+
+/**
+ * Radix returns focus to the trigger when the sessions menu closes, and that focus scrolls the thread
+ * back toward the header while the smooth scroll to the message runs. After a go-to the flag suppresses
+ * that return, and the message takes focus instead. Escape and outside closes keep Radix's return.
+ */
+export function keepFocusAfterGoTo(navigating: {
+  current: boolean;
+}): (event: Event) => void {
+  return (event) => {
+    if (!navigating.current) return;
+    event.preventDefault();
+    navigating.current = false;
+  };
+}
+
 export function createAppReferenceActions({
   t,
   selectedWorkspace,
@@ -70,9 +117,7 @@ export function createAppReferenceActions({
 
   function scrollToMessage(messageId: string) {
     window.setTimeout(() => {
-      document
-        .getElementById(`message-${messageId}`)
-        ?.scrollIntoView({ behavior: "smooth", block: "center" });
+      arriveAt(document.getElementById(`message-${messageId}`));
     }, 0);
   }
 
