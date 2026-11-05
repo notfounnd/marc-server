@@ -18,7 +18,7 @@ export type SlotKey = {
   profile: string;
 };
 
-export type BindingOrigin = "open" | "adopted";
+export type BindingOrigin = "open" | "adopted" | "supervisor";
 
 /** A reservation holds an ownerToken and no clientStartedAt; a heartbeat may already carry clientPid. */
 export type BindingOwner = {
@@ -51,6 +51,8 @@ export type SessionBinding = {
   observedAt?: string;
   endedAt?: string;
   conflicts: BindingConflict[];
+  /** The session's total cost as the last supervised turn reported it. The next turn's cost is the delta. */
+  lastCostUsd?: number;
 };
 
 export type RegistryFile = {

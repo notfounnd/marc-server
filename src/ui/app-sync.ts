@@ -125,6 +125,30 @@ export function useAppSync({
     [t, token, tokenLocked]
   );
 
+  const apiPut = useCallback(
+    async <T>(path: string, body: unknown): Promise<T> => {
+      if (!tokenLocked || !token.trim()) {
+        throw new Error(t("Lock the daemon token first."));
+      }
+
+      const response = await fetch(path, {
+        method: "PUT",
+        headers: {
+          authorization: `Bearer ${token.trim()}`,
+          "content-type": "application/json"
+        },
+        body: JSON.stringify(body)
+      });
+
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
+
+      return response.json() as Promise<T>;
+    },
+    [t, token, tokenLocked]
+  );
+
   function markConnected() {
     setStatusKind("ok");
     setStatus(t("Connected"));
@@ -289,5 +313,5 @@ export function useAppSync({
     };
   }, [refresh, token, tokenLocked]);
 
-  return { api, apiPost, refresh };
+  return { api, apiPost, apiPut, refresh };
 }

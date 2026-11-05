@@ -1,6 +1,5 @@
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
-import path from "node:path";
 import test from "node:test";
 import {
   ARCHITECT,
@@ -70,9 +69,9 @@ test("writes are atomic on the real filesystem and leave no temporary files", as
   const stored = await h.readRegistry();
   assert.equal(stored.version, 1);
   assert.equal(stored.generation, 1);
-  assert.deepEqual((await fs.readdir(h.dataDir)).sort(), [
-    "sessions.json",
-    "sessions.meta.json"
+  assert.deepEqual((await fs.readdir(h.threadDir)).sort(), [
+    "thread-1.json",
+    "thread-1.meta.json"
   ]);
 });
 
@@ -82,10 +81,7 @@ test("the first write creates the meta marker with the initialization time", asy
     { slot: ARCHITECT, expectedGeneration: 0, hostId: HOST },
     h.probe
   );
-  const marker = await fs.readFile(
-    path.join(h.dataDir, "sessions.meta.json"),
-    "utf8"
-  );
+  const marker = await fs.readFile(h.markerFile, "utf8");
   assert.deepEqual(JSON.parse(marker), { version: 1, initializedAt: iso(NOW) });
 });
 
@@ -95,8 +91,8 @@ test("a lost registry refuses writes, is never recreated, and starts fresh only 
     { slot: ARCHITECT, expectedGeneration: 0, hostId: HOST },
     h.probe
   );
-  await fs.rm(path.join(h.dataDir, "sessions.json"));
-  const listing = (await fs.readdir(h.dataDir)).sort();
+  await fs.rm(h.threadFile);
+  const listing = (await fs.readdir(h.threadDir)).sort();
 
   assert.deepEqual(await h.registry.read(), {
     status: "invalid",
@@ -125,9 +121,9 @@ test("a lost registry refuses writes, is never recreated, and starts fresh only 
     await h.registry.recordConflict({ slot: ARCHITECT, sessionId: SESSION_B }),
     { decision: "refused", reason: "registry_invalid" }
   );
-  assert.deepEqual((await fs.readdir(h.dataDir)).sort(), listing);
+  assert.deepEqual((await fs.readdir(h.threadDir)).sort(), listing);
 
-  await fs.rm(path.join(h.dataDir, "sessions.meta.json"));
+  await fs.rm(h.markerFile);
   assert.deepEqual(await h.registry.read(), {
     status: "ready",
     file: { version: 1, generation: 0, slots: {} }

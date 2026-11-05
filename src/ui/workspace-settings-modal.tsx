@@ -9,7 +9,11 @@ import type { MemoryIndexHealth, Workspace } from "./types.js";
 export function WorkspaceSettingsModal({
   health,
   workspace,
+  cyclesPerStage,
+  turnTimeoutMinutes,
   onAutoRebuildChange,
+  onCyclesPerStageChange,
+  onTurnTimeoutMinutesChange,
   onEmbeddingBatchSizeChange,
   onClose,
   onPrepareModel,
@@ -18,7 +22,11 @@ export function WorkspaceSettingsModal({
 }: {
   health?: MemoryIndexHealth;
   workspace: Workspace;
+  cyclesPerStage?: number;
+  turnTimeoutMinutes?: number;
   onAutoRebuildChange: (autoRebuild: boolean) => void;
+  onCyclesPerStageChange?: (cycles: number) => Promise<void>;
+  onTurnTimeoutMinutesChange?: (minutes: number) => Promise<void>;
   onEmbeddingBatchSizeChange: (embeddingBatchSize: number) => void;
   onClose: () => void;
   onPrepareModel: () => void;
@@ -51,7 +59,11 @@ export function WorkspaceSettingsModal({
           <WorkspaceSettingsPanel
             health={health}
             t={t}
+            cyclesPerStage={cyclesPerStage}
+            turnTimeoutMinutes={turnTimeoutMinutes}
             onAutoRebuildChange={onAutoRebuildChange}
+            onCyclesPerStageChange={onCyclesPerStageChange}
+            onTurnTimeoutMinutesChange={onTurnTimeoutMinutesChange}
             onEmbeddingBatchSizeChange={onEmbeddingBatchSizeChange}
             onPrepareModel={onPrepareModel}
             onPurge={onPurge}

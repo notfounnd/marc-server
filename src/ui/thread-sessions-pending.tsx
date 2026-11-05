@@ -1,5 +1,6 @@
 import * as React from "react";
-import { SquareArrowOutUpRight } from "lucide-react";
+import { GoToButton } from "./go-to-button.js";
+import { PanelEyebrow } from "./panel-primitives.js";
 import type {
   MarkdownLinkHandler,
   ThreadSessionWarning,
@@ -69,9 +70,9 @@ export function PendingList({
   onOpenLink: MarkdownLinkHandler;
 }) {
   return (
-    <section className="sessions-section">
-      <span className="sessions-eyebrow">{t("Pending")}</span>
-      <ul className="sessions-pending-list">
+    <section className="popover-section">
+      <PanelEyebrow>{t("Pending")}</PanelEyebrow>
+      <ul className="panel-list">
         {warnings.map((warning, index) => (
           <PendingItem
             key={`${warning.kind}-${index}`}
@@ -95,6 +96,7 @@ function PendingItem({
   onOpenLink: MarkdownLinkHandler;
 }) {
   const lines = pendingLines(t, warning);
+  const reference = goReference(warning);
   return (
     <li className="sessions-pending-item">
       <span className="sessions-two-line">
@@ -105,36 +107,14 @@ function PendingItem({
           {lines.detail}
         </span>
       </span>
-      <GoButton
-        reference={goReference(warning)}
-        label={lines.goLabel}
-        onOpenLink={onOpenLink}
-      />
+      {reference === undefined ? null : (
+        <GoToButton
+          reference={reference}
+          label={lines.goLabel}
+          onOpenLink={onOpenLink}
+        />
+      )}
     </li>
-  );
-}
-
-function GoButton({
-  reference,
-  label,
-  onOpenLink
-}: {
-  reference: string | undefined;
-  label: string;
-  onOpenLink: MarkdownLinkHandler;
-}) {
-  if (reference === undefined) return null;
-  return (
-    <button
-      type="button"
-      className="sessions-go"
-      title={label}
-      aria-label={label}
-      data-reference={reference}
-      onClick={() => void onOpenLink(reference)}
-    >
-      <SquareArrowOutUpRight size={14} aria-hidden="true" />
-    </button>
   );
 }
 

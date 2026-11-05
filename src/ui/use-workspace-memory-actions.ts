@@ -1,9 +1,19 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import i18n from "./i18n.js";
 import { showNotification } from "./notifications.js";
-import type { MemoryIndexHealth, StatusKind, Workspace } from "./types.js";
+import type {
+  ApiGet,
+  MemoryIndexHealth,
+  StatusKind,
+  Workspace
+} from "./types.js";
 
 type ApiPost = <T>(path: string, body: unknown) => Promise<T>;
+
+/** The part of the workspace settings view this hook reads and writes. */
+type WorkspaceSettingsView = {
+  activation: { cyclesPerStage: number; turnTimeoutMinutes: number };
+};
 type Refresh = (options?: {
   force?: boolean;
   includeThread?: boolean;
@@ -19,6 +29,7 @@ function errorText(error: unknown): string {
 }
 
 export function useWorkspaceMemoryActions({
+  api,
   apiPost,
   refresh,
   selectedMemoryHealth,
@@ -26,6 +37,7 @@ export function useWorkspaceMemoryActions({
   setStatus,
   setStatusKind
 }: {
+  api: ApiGet;
   apiPost: ApiPost;
   refresh: Refresh;
   selectedMemoryHealth?: MemoryIndexHealth;
@@ -33,6 +45,29 @@ export function useWorkspaceMemoryActions({
   setStatus: (status: string) => void;
   setStatusKind: (kind: StatusKind) => void;
 }) {
+  const workspaceId = selectedWorkspace?.id;
+  const [cyclesPerStage, setCyclesPerStage] = useState<number | undefined>();
+  const [turnTimeoutMinutes, setTurnTimeoutMinutes] = useState<
+    number | undefined
+  >();
+
+  useEffect(() => {
+    if (!workspaceId) return;
+    let active = true;
+    void api<WorkspaceSettingsView>(
+      `/api/workspaces/${encodeURIComponent(workspaceId)}/settings`
+    )
+      .then((settings) => {
+        if (!active) return;
+        setCyclesPerStage(settings.activation.cyclesPerStage);
+        setTurnTimeoutMinutes(settings.activation.turnTimeoutMinutes);
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, [api, workspaceId]);
+
   useEffect(() => {
     const memoryBusy =
       selectedMemoryHealth?.preparing || selectedMemoryHealth?.rebuilding;
@@ -84,7 +119,29 @@ export function useWorkspaceMemoryActions({
     updateWorkspaceAutoRebuild: (autoRebuild: boolean) =>
       postWorkspace("/settings", { memory: { autoRebuild } }),
     updateWorkspaceEmbeddingBatchSize: (embeddingBatchSize: number) =>
-      postWorkspace("/settings", { memory: { embeddingBatchSize } })
+      postWorkspace("/settings", { memory: { embeddingBatchSize } }),
+    settings: {
+      cycles: {
+        value: cyclesPerStage,
+        save: async (cycles: number): Promise<void> => {
+          const saved = await postWorkspace<WorkspaceSettingsView>(
+            "/settings",
+            { activation: { cyclesPerStage: cycles } }
+          );
+          if (saved) setCyclesPerStage(cycles);
+        }
+      },
+      turnTimeout: {
+        value: turnTimeoutMinutes,
+        save: async (minutes: number): Promise<void> => {
+          const saved = await postWorkspace<WorkspaceSettingsView>(
+            "/settings",
+            { activation: { turnTimeoutMinutes: minutes } }
+          );
+          if (saved) setTurnTimeoutMinutes(minutes);
+        }
+      }
+    }
   };
 }
 

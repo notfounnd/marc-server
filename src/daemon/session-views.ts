@@ -1,4 +1,5 @@
 import { marcDir } from "../core/paths.js";
+import type { ProcessTablePort } from "./process-table-os.js";
 import {
   deriveSlotState,
   slotKey,
@@ -24,6 +25,7 @@ import { listAgentProfiles, readThread } from "../core/workspace.js";
 import type { SessionPresence } from "./presence.js";
 import type { RegistryView } from "./session-file.js";
 import type { SessionProbe, SessionRegistry } from "./session-registry.js";
+import type { ThreadScope } from "./thread-store.js";
 import { launchPart } from "./session-launch.js";
 
 export { openCommandFor } from "./session-launch.js";
@@ -43,6 +45,10 @@ export type SessionServices = {
   dataDir: string;
   daemonUrl: () => string;
   marcRuntime: () => MarcRuntime;
+  /** Whether the thread is closed. Without it a thread counts as open, so its warnings stay. */
+  isClosed?: (scope: ThreadScope) => Promise<boolean>;
+  /** The process table the waiter's identity and the turns' liveness read. Absent means the operating system's. */
+  processes?: ProcessTablePort;
 };
 
 /** What the open command needs from the services, so it can be built without a registry. */
@@ -104,7 +110,10 @@ export async function buildThreadSessionsView(
   const thread = await readThread(workspace.rootPath, threadId);
   const messages: ChatMessage[] = thread.messages ?? [];
   const profiles = await listAgentProfiles(workspace.rootPath);
-  const registry = await services.registry.read();
+  const registry = await services.registry.read({
+    workspaceId: workspace.id,
+    threadId
+  });
   // One view reads the runtime once, so the PATH scan is not repeated for every slot.
   const runtime = services.marcRuntime();
   const viewServices = { ...services, marcRuntime: () => runtime };
@@ -122,7 +131,7 @@ export async function buildThreadSessionsView(
         )
       )
   );
-  const warnings: SessionWarning[] = deriveSessionWarnings({
+  const warnings = await sessionWarningsFor(services, workspace, threadId, {
     messages,
     profiles
   });
@@ -141,6 +150,30 @@ export async function buildThreadSessionsView(
       listening: "available"
     }
   };
+}
+
+/**
+ * A closed thread shows no pending warnings: its mentions and handoffs ended with it, and its
+ * session links are gone. The slots stay, so the view keeps its shape.
+ */
+async function sessionWarningsFor(
+  services: SessionServices,
+  workspace: WorkspaceInfo,
+  threadId: string,
+  input: Parameters<typeof deriveSessionWarnings>[0]
+): Promise<SessionWarning[]> {
+  const closed = await isThreadClosed(services, workspace, threadId);
+  if (closed) return [];
+  return deriveSessionWarnings(input);
+}
+
+async function isThreadClosed(
+  services: SessionServices,
+  workspace: WorkspaceInfo,
+  threadId: string
+): Promise<boolean> {
+  if (!services.isClosed) return false;
+  return services.isClosed({ workspaceId: workspace.id, threadId });
 }
 
 /** The same derivation serves the GET view and the acquire and observe decisions. */

@@ -111,34 +111,34 @@ export function App() {
     setShowWorkspaceSettings
   });
 
-  const { api, apiPost, refresh, openThreadCreation, threadCreation } =
-    useAppDataActions({
-      t,
-      token,
-      tokenLocked,
-      busyRef,
-      lastRefreshAtRef,
-      selectedWorkspaceIdRef,
-      selectedThreadIdRef,
-      liveRefreshTimerRef,
-      autocompleteThreadPayloadRef,
-      setBusy,
-      setThreadIndexHealthByWorkspace,
-      setMemoryHealthByWorkspace,
-      setWorkspaces,
-      setSelectedWorkspaceId,
-      setSelectedThreadId,
-      setSelectedAgentId,
-      setThreads,
-      setClosedThreads,
-      setMiddleMode,
-      setAgents,
-      setRules,
-      setThreadPayload,
-      setStatusKind,
-      setStatus,
-      setLastSyncedAt
-    });
+  const sync = useAppDataActions({
+    t,
+    token,
+    tokenLocked,
+    busyRef,
+    lastRefreshAtRef,
+    selectedWorkspaceIdRef,
+    selectedThreadIdRef,
+    liveRefreshTimerRef,
+    autocompleteThreadPayloadRef,
+    setBusy,
+    setThreadIndexHealthByWorkspace,
+    setMemoryHealthByWorkspace,
+    setWorkspaces,
+    setSelectedWorkspaceId,
+    setSelectedThreadId,
+    setSelectedAgentId,
+    setThreads,
+    setClosedThreads,
+    setMiddleMode,
+    setAgents,
+    setRules,
+    setThreadPayload,
+    setStatusKind,
+    setStatus,
+    setLastSyncedAt
+  });
+  const { api, apiPost, refresh, openThreadCreation, threadCreation } = sync;
 
   const modalOpen = Boolean(
     artifactDraft ||
@@ -201,6 +201,7 @@ export function App() {
   });
 
   const workspaceMemoryActions = useWorkspaceMemoryActions({
+    api,
     apiPost,
     refresh,
     selectedMemoryHealth,
@@ -244,6 +245,8 @@ export function App() {
       />
       <AppContent
         api={api}
+        apiPost={apiPost}
+        apiPut={sync.apiPut}
         statusKind={statusKind}
         lastSyncedAt={lastSyncedAt}
         selectedThreadIndexHealth={selectedThreadIndexHealth}
@@ -297,6 +300,7 @@ export function App() {
         onWorkspaceEmbeddingBatchSizeChange={
           workspaceMemoryActions.updateWorkspaceEmbeddingBatchSize
         }
+        workspaceSettings={workspaceMemoryActions.settings}
       />
       <Toaster closeLabel={t("Close toast")} regionLabel={t("Notifications")} />
     </div>

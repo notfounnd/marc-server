@@ -88,7 +88,7 @@ Architecture Decision Records (ADR) document the major decisions behind mARC's c
 - [Markdown is the source of truth](adrs/0001-markdown-source-of-truth.md).
 - [MCP is configured per target repository](adrs/0002-mcp-per-target-repository.md).
 - [Bootstrap gates mARC workspace tools](adrs/0003-bootstrap-gates-workspace-tools.md).
-- [mARC does not route agent work automatically](adrs/0004-no-automatic-agent-routing.md).
+- [mARC does not route agent work automatically](adrs/0004-no-automatic-agent-routing.md), superseded in part by [0014 - Policy-gated mention activation](adrs/0014-policy-gated-mention-activation.md).
 - [`marc://` is the canonical reference scheme](adrs/0005-marc-reference-scheme.md).
 - [The daemon is optional infrastructure for MCP](adrs/0006-daemon-optional-for-mcp.md).
 - [RULES.md uses a managed baseline and Custom Rules boundary](adrs/0007-rules-managed-baseline-and-custom-rules.md).

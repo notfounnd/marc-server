@@ -115,7 +115,7 @@ export function AppSidebarMiddle({
             {middleHeader.icon}
             <h2>{middleHeader.title}</h2>
           </span>
-          <div className="middle-mode-actions">{middleActions[middleMode]}</div>
+          <div className="action-row">{middleActions[middleMode]}</div>
         </div>
         <div className="stack">{content}</div>
       </section>

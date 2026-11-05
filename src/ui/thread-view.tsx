@@ -4,15 +4,24 @@ import { Card } from "@/components/ui/card";
 import { messageArtifactReference } from "../core/marc-references.js";
 import { Badge, Button, EmptyState } from "./common.js";
 import { MarkdownPanel } from "./markdown-panel.js";
-import type { MarkdownLinkHandler, Message, ThreadPayload } from "./types.js";
+import { ThreadMessageStamp } from "./thread-message-stamp.js";
+import type {
+  ActivationStageId,
+  MarkdownLinkHandler,
+  Message,
+  ThreadPayload
+} from "./types.js";
 
 export function ThreadView({
   payload,
+  advanceMarks,
   onAttachArtifact,
   onLink,
   onCopyReference
 }: {
   payload?: ThreadPayload;
+  /** The stage each advancing message moved the thread to, from the loaded activation view. */
+  advanceMarks: ReadonlyMap<string, ActivationStageId>;
   onAttachArtifact: (message: Message) => void;
   onLink: MarkdownLinkHandler;
   onCopyReference: (reference: string) => void | Promise<void>;
@@ -84,6 +93,11 @@ export function ThreadView({
                   #{message.id}
                 </button>
                 <Badge>{new Date(message.timestamp).toLocaleString()}</Badge>
+                <ThreadMessageStamp
+                  message={message}
+                  advancedTo={advanceMarks.get(message.id)}
+                  t={t}
+                />
               </div>
               <div className="message-actions">
                 {message.role === "user" ? (

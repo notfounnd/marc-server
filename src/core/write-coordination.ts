@@ -23,7 +23,18 @@ export type AtomicRename = (
 
 export type AtomicWriteOptions = {
   rename?: AtomicRename;
+  /** Waits between rename retries. Production uses a timer; tests inject a no-op. */
+  wait?: (durationMs: number) => Promise<void>;
 };
+
+/**
+ * Bounded backoff for a rename that Windows refuses while another handle still has the target
+ * open (a waiter reading policy.json, an indexer reading a cache). Ten attempts over about one second.
+ */
+const RENAME_RETRY_DELAYS_MS: readonly number[] = [
+  10, 20, 40, 80, 120, 150, 150, 150, 150
+];
+const RETRYABLE_RENAME_CODES: readonly string[] = ["EPERM", "EACCES", "EBUSY"];
 
 export function threadWriteResource(threadId: string): string {
   return `thread:${threadId}`;
@@ -109,10 +120,46 @@ export async function writeFileAtomically(
 
   try {
     await fs.writeFile(temporaryPath, content, "utf8");
-    await (options.rename ?? fs.rename)(temporaryPath, filePath);
+    await renameWithRetry(
+      options.rename ?? fs.rename,
+      temporaryPath,
+      filePath,
+      options.wait ?? delay
+    );
   } finally {
     await fs.rm(temporaryPath, { force: true }).catch(() => undefined);
   }
+}
+
+/**
+ * Retries a refused rename with the bounded delays. A final failure, or any error that is not
+ * transient, rethrows the original error at once. The caller removes the temporary file.
+ */
+async function renameWithRetry(
+  rename: AtomicRename,
+  sourcePath: string,
+  destinationPath: string,
+  wait: (durationMs: number) => Promise<void>,
+  delaysMs: readonly number[] = RENAME_RETRY_DELAYS_MS
+): Promise<void> {
+  try {
+    await rename(sourcePath, destinationPath);
+  } catch (error) {
+    const [nextDelay, ...laterDelays] = delaysMs;
+    if (!isRetryableRenameError(error) || nextDelay === undefined) throw error;
+    await wait(nextDelay);
+    return renameWithRetry(
+      rename,
+      sourcePath,
+      destinationPath,
+      wait,
+      laterDelays
+    );
+  }
+}
+
+function isRetryableRenameError(error: unknown): boolean {
+  return RETRYABLE_RENAME_CODES.some((code) => hasErrorCode(error, code));
 }
 
 async function acquireWorkspaceWriteLock(

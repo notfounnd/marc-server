@@ -1,14 +1,8 @@
 import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { Users } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
 import { keepFocusAfterGoTo } from "./app-reference-actions.js";
-import { Button } from "./common.js";
+import { HeaderMenu, closeThen } from "./header-menu.js";
 import { showNotification } from "./notifications.js";
 import { DegradedNotice } from "./thread-sessions-row.js";
 import { PendingPanel } from "./thread-sessions-pending.js";
@@ -26,13 +20,6 @@ import type {
   Translate,
   Workspace
 } from "./types.js";
-
-/**
- * The pressed look of a header trigger while its menu is open. The artifact trigger uses it too,
- * so both header buttons stay pressed. It is a trigger class, not a Button variant.
- */
-export const PRESSED_TRIGGER_CLASS =
-  "data-[state=open]:translate-x-boxShadowX data-[state=open]:translate-y-boxShadowY data-[state=open]:shadow-none";
 
 /** Which collapsible sections are open. Both start collapsed. */
 export type Expansion = { pending: boolean; other: boolean };
@@ -75,53 +62,34 @@ export function ThreadSessionsMenu({
   }, onOpenLink);
 
   return (
-    <div className="header-artifacts">
-      <DropdownMenu open={open} onOpenChange={setOpen} modal={false}>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant={open ? "primary" : "secondary"}
-            className={`button-icon sessions-trigger ${PRESSED_TRIGGER_CLASS}`}
-            title={label}
-            aria-label={label}
-          >
-            <Users size={14} />
-            {count > 0 ? <span className="sessions-count">{count}</span> : null}
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent
-          align="end"
-          className="sessions-menu"
-          onCloseAutoFocus={keepFocusAfterGoTo(navigating)}
-        >
-          <ThreadSessionsHead
-            count={count}
-            expanded={expanded.pending}
-            onToggle={() => toggle("pending")}
-            t={t}
-          />
-          <ThreadSessionsBody
-            sessions={sessions}
-            t={t}
-            onOpenLink={goTo}
-            onCopy={(text) => copyCommand(text, t)}
-            expanded={expanded}
-            onToggle={toggle}
-          />
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+    <HeaderMenu
+      icon={Users}
+      label={label}
+      title={t("Thread sessions")}
+      headSlot={
+        <PendingChip
+          count={count}
+          expanded={expanded.pending}
+          onToggle={() => toggle("pending")}
+          t={t}
+        />
+      }
+      count={count}
+      open={open}
+      onOpenChange={setOpen}
+      triggerClassName="sessions-trigger"
+      onCloseAutoFocus={keepFocusAfterGoTo(navigating)}
+    >
+      <ThreadSessionsBody
+        sessions={sessions}
+        t={t}
+        onOpenLink={goTo}
+        onCopy={(text) => copyCommand(text, t)}
+        expanded={expanded}
+        onToggle={toggle}
+      />
+    </HeaderMenu>
   );
-}
-
-/** A go-to action closes the menu first, so the page scrolls to the message and the menu does not cover it. */
-export function closeThen(
-  close: () => void,
-  onOpenLink: MarkdownLinkHandler
-): MarkdownLinkHandler {
-  return (href) => {
-    close();
-    return onOpenLink(href);
-  };
 }
 
 /** The pending count on the button. It is zero until the first view arrives. */
@@ -135,35 +103,8 @@ export function triggerLabel(t: Translate, count: number): string {
   return t("Thread sessions, pending: {{count}}", { count });
 }
 
-/** The menu header: the title, and the Pending chip when something waits. */
-export function ThreadSessionsHead({
-  count,
-  expanded,
-  onToggle,
-  t
-}: {
-  count: number;
-  expanded: boolean;
-  onToggle: () => void;
-  t: Translate;
-}) {
-  return (
-    <DropdownMenuLabel className="sessions-menu-head">
-      <span className="sessions-title">
-        <Users size={14} />
-        <span>{t("Thread sessions")}</span>
-      </span>
-      <PendingChip
-        count={count}
-        expanded={expanded}
-        onToggle={onToggle}
-        t={t}
-      />
-    </DropdownMenuLabel>
-  );
-}
-
-function PendingChip({
+/** The Pending chip in the menu header. It is hidden at zero, and shows the count and its state otherwise. */
+export function PendingChip({
   count,
   expanded,
   onToggle,
@@ -202,11 +143,9 @@ const BODY_RENDERERS: Record<
   ThreadSessionsStatus,
   (props: BodyProps) => React.ReactNode
 > = {
-  loading: ({ t }) => (
-    <p className="sessions-status">{t("Loading sessions")}</p>
-  ),
+  loading: ({ t }) => <p className="panel-status">{t("Loading sessions")}</p>,
   error: ({ t, sessions }) => (
-    <div className="sessions-status sessions-status-error">
+    <div className="panel-status panel-status-error">
       <strong>{t("Sessions unavailable")}</strong>
       {sessions.reason ? <p>{sessions.reason}</p> : null}
     </div>
@@ -226,7 +165,7 @@ const BODY_RENDERERS: Record<
 /** Presentational body, so the rendering can be tested without the dropdown. */
 export function ThreadSessionsBody(props: BodyProps) {
   return (
-    <div className="sessions-body">
+    <div className="popover-body">
       {BODY_RENDERERS[props.sessions.status](props)}
     </div>
   );

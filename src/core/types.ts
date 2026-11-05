@@ -5,6 +5,10 @@ export type WorkspaceInfo = {
   marcPath: string;
 };
 
+/** Clients a profile may name in its optional `Client:` line. Only claude-code has a launch adapter so far. */
+export const AGENT_CLIENT_NAMES = ["claude-code", "codex"] as const;
+export type AgentClientName = (typeof AGENT_CLIENT_NAMES)[number];
+
 export type AgentProfile = {
   id: string;
   role: string;
@@ -12,6 +16,7 @@ export type AgentProfile = {
   description: string;
   displayName?: string;
   notes?: string;
+  client?: AgentClientName;
 };
 
 export type AgentRegistrationResult = {
@@ -27,6 +32,8 @@ export type AgentProfileSummary = {
   role?: string;
   model?: string;
   description?: string;
+  /** The raw `Client:` value as the file holds it; unknown values are reported by the audit. */
+  client?: string;
   markdown?: string;
 };
 
@@ -50,6 +57,10 @@ export type ChatMessage = {
   timestamp: string;
   agentId: string;
   role?: string;
+  /** Activation stage stamped by the daemon through the trusted append path only. */
+  stage?: string;
+  /** Activation cycle number, a positive integer, stamped with the stage. Agents cannot set it. */
+  cycle?: number;
   body: string;
   artifacts: string[];
 };
@@ -261,19 +272,19 @@ export type WorkspaceDocumentSource = {
   authority: "normative" | "reference";
 };
 
+/** activation.cyclesPerStage: the value in force, the file's value or the default when absent or invalid. */
 export type WorkspaceSettings = {
   memory: {
     autoRebuild: boolean;
     embeddingBatchSize: number;
     documentSources: WorkspaceDocumentSource[];
   };
+  activation: { cyclesPerStage: number };
 };
 
 export type WorkspaceSettingsInput = {
-  memory?: {
-    autoRebuild?: boolean;
-    embeddingBatchSize?: number;
-  };
+  memory?: { autoRebuild?: boolean; embeddingBatchSize?: number };
+  activation?: { cyclesPerStage?: number };
 };
 
 export type WorkspaceStatus = {

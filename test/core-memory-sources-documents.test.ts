@@ -229,7 +229,8 @@ function settingsFor(
       autoRebuild: true,
       embeddingBatchSize: 4,
       documentSources
-    }
+    },
+    activation: { cyclesPerStage: 5 }
   };
 }
 

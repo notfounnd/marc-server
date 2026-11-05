@@ -1,4 +1,5 @@
-import type { WorkspaceAuditFinding } from "../types.js";
+import { clientLineOf } from "../agents.js";
+import { AGENT_CLIENT_NAMES, type WorkspaceAuditFinding } from "../types.js";
 import { agentField, finding, type AuditContext } from "./support.js";
 
 function missingAgentMetadataFinding(
@@ -51,6 +52,26 @@ function weakAgentDescriptionFinding(
   });
 }
 
+function unknownClientFinding(
+  client: string | undefined,
+  location: string
+): WorkspaceAuditFinding | undefined {
+  if (client === undefined) return undefined;
+  if (isKnownClient(client)) return undefined;
+  return finding({
+    severity: "warning",
+    scope: "agents",
+    code: "agent_client_unknown",
+    location,
+    message: `Agent profile names an unknown client \`${client}\`.`,
+    suggestion: `Use one of the known clients: ${AGENT_CLIENT_NAMES.join(", ")}.`
+  });
+}
+
+function isKnownClient(client: string): boolean {
+  return (AGENT_CLIENT_NAMES as readonly string[]).includes(client);
+}
+
 export async function auditAgents(
   context: AuditContext
 ): Promise<WorkspaceAuditFinding[]> {
@@ -62,6 +83,7 @@ export async function auditAgents(
     const model = agentField(agent.markdown, "Model");
     const description = agentField(agent.markdown, "Description");
     const location = `marc://@${agent.id}`;
+    const client = clientLineOf(agent.markdown);
     const metadataFindings = Object.entries({
       ID: id,
       Role: role,
@@ -77,7 +99,8 @@ export async function auditAgents(
     findings.push(
       ...[
         agentIdMismatchFinding(id, agent.id, location),
-        weakAgentDescriptionFinding(description, location)
+        weakAgentDescriptionFinding(description, location),
+        unknownClientFinding(client, location)
       ].filter((item): item is WorkspaceAuditFinding => Boolean(item))
     );
   }

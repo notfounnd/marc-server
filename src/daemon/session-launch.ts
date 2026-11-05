@@ -1,5 +1,5 @@
 import {
-  clientForModel,
+  clientOf,
   copyCommandFor,
   type CopyContext
 } from "../core/agent-launch.js";
@@ -54,7 +54,7 @@ export function openCommandFor(
   });
 }
 
-/** Only a profile whose client is supported gets commands; the client comes from its model. */
+/** Only a profile whose client is supported gets commands; the client comes from clientOf. */
 export function launchPart(
   services: OpenServices,
   workspace: WorkspaceInfo,
@@ -62,7 +62,7 @@ export function launchPart(
   input: LaunchInput
 ): LaunchPart {
   const { profile, state, posted, binding } = input;
-  if (clientForModel(profile.model) === undefined) {
+  if (clientOf(profile) === undefined) {
     return { copyBlockedReason: "unsupported_client" };
   }
   return {

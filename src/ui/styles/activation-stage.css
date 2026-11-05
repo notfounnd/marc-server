@@ -1,0 +1,154 @@
+/* The stage section of the activation panel, the waiting section beneath it, and the lead marks. */
+.activation-stage-label {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 8px;
+  border: 2px solid var(--border);
+  border-radius: 2px;
+  background: var(--surface-strong);
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.activation-cycles {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* The waiting section: one row per request, start, failure, turn or wait, colored by its tone. */
+.activation-card {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 7px 8px;
+  border-left: 4px solid var(--amber);
+  background: color-mix(in srgb, var(--amber) 12%, var(--background));
+  font-size: 12px;
+}
+
+.activation-card[data-tone="run"] {
+  border-left-color: var(--teal);
+  background: color-mix(in srgb, var(--teal) 10%, var(--background));
+}
+
+.activation-card[data-tone="fail"] {
+  border-left-color: var(--red);
+  background: color-mix(in srgb, var(--red) 10%, var(--background));
+}
+
+.activation-card[data-tone="info"] {
+  border-left-color: var(--line-strong);
+  background: var(--surface-muted);
+}
+
+.activation-card strong {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.activation-card code {
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+.activation-detail {
+  color: var(--ink-muted);
+  font-size: 11px;
+}
+
+/* The count on the section title: only the rows that ask for an action. */
+.activation-count {
+  padding: 0 5px;
+  border-radius: 2px;
+  background: var(--amber);
+  color: var(--background);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* An open permission request: a dashed box under its running turn. */
+.activation-perm {
+  display: grid;
+  gap: 4px;
+  padding: 6px;
+  border: 1px dashed var(--line-strong);
+  background: var(--background);
+}
+
+.activation-danger {
+  color: var(--red);
+}
+
+/* The go-to button of a row: pushed to the far right of its line, clear of the action buttons before it. */
+.activation-card .icon-button {
+  margin-left: auto;
+}
+
+/* A row line that ends in the go-to button: its text first, and the button at the far right. */
+.activation-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* At the limit the used segments turn amber, so the exhausted state shows by shape and colour. */
+.activation-bar[data-exhausted="true"] i[data-used="true"] {
+  background: var(--amber);
+}
+
+/* Cancel in the advance choice is quiet: no fill and no shadow, so only the first stage reads as primary. */
+.activation-advance .activation-quiet {
+  box-shadow: none;
+  border-color: var(--line-strong);
+  background: transparent;
+  color: var(--ink-muted);
+}
+
+.activation-advance {
+  display: grid;
+  gap: 6px;
+  padding: 8px;
+  border: 2px dashed var(--line-strong);
+  background: var(--surface-muted);
+}
+
+.activation-advance-title {
+  font-size: 12px;
+}
+
+.activation-advance .activation-actions {
+  margin: 0;
+}
+
+.activation-leads {
+  padding: 0 5px;
+  border: 1px solid var(--teal);
+  border-radius: 2px;
+  color: var(--teal);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.activation-participant .activation-make-lead {
+  height: auto;
+  padding: 0;
+  border: 0;
+  box-shadow: none;
+  background: transparent;
+  color: var(--teal);
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.activation-participant .activation-make-lead:disabled {
+  cursor: not-allowed;
+}

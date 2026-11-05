@@ -5,11 +5,17 @@ import { Composer } from "./composer.js";
 import { ContentHeader } from "./content-header.js";
 import { MarkdownPanel } from "./markdown-panel.js";
 import { ThreadView } from "./thread-view.js";
+import { ThreadActivationProvider } from "./thread-activation-context.js";
+import { advanceMarksOf } from "./thread-message-marks.js";
+import { useThreadActivation } from "./use-thread-activation.js";
+import { ThreadPausedBanner } from "./workspace-pause-control.js";
 import type { AppContentProps } from "./app-content-types.js";
 import { WorkspaceOverview } from "./workspace-overview.js";
 
 export function AppContent({
   api,
+  apiPost,
+  apiPut,
   statusKind,
   lastSyncedAt,
   selectedThreadIndexHealth,
@@ -38,84 +44,107 @@ export function AppContent({
   onShowShortcuts
 }: AppContentProps) {
   const { t } = useTranslation();
+  const activation = useThreadActivation({
+    api,
+    workspaceId: selectedWorkspace?.id ?? "",
+    threadId: selectedThread?.id ?? "",
+    syncMark: lastSyncedAt,
+    enabled: Boolean(selectedWorkspace && selectedThread)
+  });
 
   return (
-    <main className="content">
-      <div className="content-scroll">
-        <ContentHeader
-          api={api}
-          statusKind={statusKind}
-          lastSyncedAt={lastSyncedAt}
-          selectedAgent={selectedAgent}
-          selectedThread={selectedThread}
-          selectedThreadArtifacts={selectedThreadArtifacts}
-          selectedThreadIndexHealth={selectedThreadIndexHealth}
-          selectedWorkspace={selectedWorkspace}
-          showArtifactMenu={showArtifactMenu}
-          showWorkspaceSettings={showWorkspaceSettings}
-          onCopyReference={onCopyReference}
-          onOpenLink={onOpenLink}
-          onShowArtifactMenuChange={onShowArtifactMenuChange}
-          onShowWorkspaceSettingsChange={onShowWorkspaceSettingsChange}
-        />
+    <ThreadActivationProvider
+      value={{
+        state: activation.state,
+        replace: activation.replace,
+        reload: activation.reload,
+        messages: threadPayload?.messages ?? []
+      }}
+    >
+      <main className="content">
+        <div className="content-scroll">
+          <ContentHeader
+            api={api}
+            apiPost={apiPost}
+            apiPut={apiPut}
+            statusKind={statusKind}
+            lastSyncedAt={lastSyncedAt}
+            selectedAgent={selectedAgent}
+            selectedThread={selectedThread}
+            selectedThreadArtifacts={selectedThreadArtifacts}
+            selectedThreadIndexHealth={selectedThreadIndexHealth}
+            selectedWorkspace={selectedWorkspace}
+            showArtifactMenu={showArtifactMenu}
+            showWorkspaceSettings={showWorkspaceSettings}
+            onCopyReference={onCopyReference}
+            onOpenLink={onOpenLink}
+            onShowArtifactMenuChange={onShowArtifactMenuChange}
+            onShowWorkspaceSettingsChange={onShowWorkspaceSettingsChange}
+          />
 
-        {selectedThread ? (
-          <>
-            <ThreadView
-              payload={threadPayload}
-              onAttachArtifact={onAttachArtifact}
+          {selectedThread ? (
+            <>
+              <ThreadPausedBanner
+                apiPost={apiPost}
+                workspace={selectedWorkspace}
+              />
+              <ThreadView
+                payload={threadPayload}
+                advanceMarks={advanceMarksOf(activation.state.view)}
+                onAttachArtifact={onAttachArtifact}
+                onLink={onOpenLink}
+                onCopyReference={onCopyReference}
+              />
+              <Composer
+                agentId={uiAgentId}
+                body={composerBody}
+                agents={agents}
+                threads={allWorkspaceThreads}
+                messages={threadPayload?.messages ?? []}
+                sending={sending}
+                onAgentIdChange={onAgentIdChange}
+                onBodyChange={onBodyChange}
+                onSend={onSendMessage}
+                loadThreadMessages={onLoadThreadMessages}
+              />
+            </>
+          ) : selectedAgent ? (
+            <MarkdownPanel
+              markdown={selectedAgent.markdown}
+              preserveLineBreaks
               onLink={onOpenLink}
-              onCopyReference={onCopyReference}
             />
-            <Composer
-              agentId={uiAgentId}
-              body={composerBody}
-              agents={agents}
-              threads={allWorkspaceThreads}
-              messages={threadPayload?.messages ?? []}
-              sending={sending}
-              onAgentIdChange={onAgentIdChange}
-              onBodyChange={onBodyChange}
-              onSend={onSendMessage}
-              loadThreadMessages={onLoadThreadMessages}
+          ) : selectedWorkspace ? (
+            <WorkspaceOverview rules={rules} onLink={onOpenLink} />
+          ) : (
+            <EmptyState
+              title={t("No workspace selected")}
+              detail={t(
+                "Save the daemon token and select a workspace from the sidebar."
+              )}
             />
-          </>
-        ) : selectedAgent ? (
-          <MarkdownPanel
-            markdown={selectedAgent.markdown}
-            preserveLineBreaks
-            onLink={onOpenLink}
-          />
-        ) : selectedWorkspace ? (
-          <WorkspaceOverview rules={rules} onLink={onOpenLink} />
-        ) : (
-          <EmptyState
-            title={t("No workspace selected")}
-            detail={t(
-              "Save the daemon token and select a workspace from the sidebar."
-            )}
-          />
-        )}
-      </div>
-      <footer className="content-footer">
-        <span className="content-footer-credit">
-          {t("Developed by Júnior Sbrissa")}
-        </span>
-        <span className="content-footer-divider" aria-hidden="true" />
-        <span className="content-footer-version">v{__MARC_VERSION__}</span>
-        <span className="content-footer-divider" aria-hidden="true" />
-        <a
-          href="#keyboard-shortcuts"
-          className="content-footer-link"
-          onClick={(event) => {
-            event.preventDefault();
-            onShowShortcuts();
-          }}
-          title={t("Keyboard shortcuts")}
-        >
-          <Keyboard size={15} />
-        </a>
-      </footer>
-    </main>
+          )}
+        </div>
+        <footer className="content-footer">
+          <span className="content-footer-credit">
+            {t("Developed by Júnior Sbrissa")}
+          </span>
+          <span className="content-footer-divider" aria-hidden="true" />
+          <span className="content-footer-version">v{__MARC_VERSION__}</span>
+          <span className="content-footer-divider" aria-hidden="true" />
+          <a
+            href="#keyboard-shortcuts"
+            className="content-footer-link"
+            onClick={(event) => {
+              event.preventDefault();
+              onShowShortcuts();
+            }}
+            title={t("Keyboard shortcuts")}
+          >
+            <Keyboard size={15} />
+          </a>
+        </footer>
+      </main>
+    </ThreadActivationProvider>
   );
 }

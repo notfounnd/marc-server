@@ -192,24 +192,40 @@ export function reserveBinding(
     nativeSessionId: string;
     ownerToken: string;
     now: string;
-  }
+  },
+  origin: SessionBinding["origin"] = "open"
 ): { file: RegistryFile; generation: number } {
   const generation = file.generation + 1;
+  const previous: SessionBinding | undefined = file.slots[key];
   const binding: SessionBinding = {
     ...slot,
     client: "claude-code",
     nativeSessionId: reservation.nativeSessionId,
     hostId: reservation.hostId,
-    origin: "open",
+    origin,
     generation,
     owner: { ownerToken: reservation.ownerToken, reservedAt: reservation.now },
     boundAt: reservation.now,
-    conflicts: []
+    conflicts: [],
+    ...carriedCostOf(previous, reservation.nativeSessionId)
   };
   return {
     file: withSlot({ ...file, generation }, key, binding),
     generation
   };
+}
+
+/**
+ * A session that continues keeps the total its last supervised turn reported, so the next turn costs only
+ * the delta. A new session starts without one.
+ */
+function carriedCostOf(
+  previous: SessionBinding | undefined,
+  nativeSessionId: string
+): { lastCostUsd?: number } {
+  if (previous?.nativeSessionId !== nativeSessionId) return {};
+  if (previous.lastCostUsd === undefined) return {};
+  return { lastCostUsd: previous.lastCostUsd };
 }
 
 /** Owner check order: a released binding, then the token, then the generation. */

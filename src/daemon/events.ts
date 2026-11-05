@@ -17,11 +17,31 @@ type UiEventBusOptions = {
   readMemoryRebuildActive?: MemoryRebuildActivityReader;
 };
 
+/**
+ * Internal subscriber for any change inside a thread folder. It is not a client event, and
+ * the subscriber decides what to do: an atomic SUMMARY.md write is reported on Windows under
+ * its temporary name, so the subscriber checks for the summary itself.
+ */
+export type ThreadFolderListener = (
+  workspace: WorkspaceInfo,
+  threadId: string
+) => void;
+
+/** The thread id when a changed path (relative to the .marc folder) lies inside a thread folder. */
+export function threadFolderOf(
+  filename: string | Buffer | null
+): string | undefined {
+  const name = filename === null ? "" : filename.toString();
+  return /^threads[\\/]([^\\/]+)[\\/]/.exec(name)?.[1];
+}
+
 export class UiEventBus {
   private readonly clients = new Set<http.ServerResponse>();
   private readonly workspaces = new Map<string, WorkspaceInfo>();
   private readonly watchers = new Map<string, FSWatcher>();
   private readonly debounceTimers = new Map<string, NodeJS.Timeout>();
+  private readonly threadFolderListeners = new Set<ThreadFolderListener>();
+  private readonly background = new Set<Promise<unknown>>();
   private readonly revalidateTimers = new Map<string, NodeJS.Timeout>();
   private readonly lastRevalidateAt = new Map<string, number>();
   private readonly memoryRebuildStates = new Map<string, boolean>();
@@ -78,6 +98,15 @@ export class UiEventBus {
     }
   }
 
+  /** The refresh event of a thread whose state changed, whatever wrote the change. The panel reloads on it. */
+  workspaceChanged(workspaceId: string, threadId: string): void {
+    this.send("workspace-changed", {
+      workspaceId,
+      threadId,
+      at: new Date().toISOString()
+    });
+  }
+
   async watchWorkspace(workspace: WorkspaceInfo): Promise<void> {
     this.workspaces.set(workspace.id, workspace);
     this.memoryRebuildStates.delete(workspace.id);
@@ -91,6 +120,7 @@ export class UiEventBus {
         workspace.marcPath,
         { recursive: true },
         (_eventType, filename) => {
+          this.notifyThreadFolder(workspace, filename);
           if (isIgnorableWorkspaceChange(filename)) return;
 
           const current = this.debounceTimers.get(workspace.id);
@@ -110,6 +140,17 @@ export class UiEventBus {
     }
   }
 
+  /** Tracks a background job until it settles, so shutdown can wait for its writes. */
+  private trackBackground(job: Promise<unknown>): void {
+    this.background.add(job);
+    void job.finally(() => this.background.delete(job));
+  }
+
+  /** Resolves once every background rebuild started before this call has finished writing. */
+  async idle(): Promise<void> {
+    await Promise.allSettled([...this.background]);
+  }
+
   scheduleThreadIndexRebuild(workspace: WorkspaceInfo, delayMs = 0): void {
     const current = this.revalidateTimers.get(workspace.id);
     if (current) clearTimeout(current);
@@ -117,12 +158,14 @@ export class UiEventBus {
       workspace.id,
       setTimeout(() => {
         this.lastRevalidateAt.set(workspace.id, Date.now());
-        void rebuildThreadIndexInBackground(workspace.rootPath)
-          .catch(() => undefined)
-          .finally(() => {
-            this.revalidateTimers.delete(workspace.id);
-            this.sendWorkspaceChanged(workspace.id);
-          });
+        this.trackBackground(
+          rebuildThreadIndexInBackground(workspace.rootPath)
+            .catch(() => undefined)
+            .finally(() => {
+              this.revalidateTimers.delete(workspace.id);
+              this.sendWorkspaceChanged(workspace.id);
+            })
+        );
       }, delayMs)
     );
   }
@@ -135,6 +178,25 @@ export class UiEventBus {
     )
       return;
     this.scheduleThreadIndexRebuild(workspace, 0);
+  }
+
+  /** Registers an internal listener for thread folder changes and returns the function that removes it. */
+  onThreadFolderChange(listener: ThreadFolderListener): () => void {
+    this.threadFolderListeners.add(listener);
+    return () => {
+      this.threadFolderListeners.delete(listener);
+    };
+  }
+
+  private notifyThreadFolder(
+    workspace: WorkspaceInfo,
+    filename: string | Buffer | null
+  ): void {
+    const threadId = threadFolderOf(filename);
+    if (!threadId) return;
+    for (const listener of this.threadFolderListeners) {
+      listener(workspace, threadId);
+    }
   }
 
   unwatchWorkspace(workspaceId: string): void {

@@ -1,4 +1,5 @@
 import * as React from "react";
+import { PanelEyebrow } from "./panel-primitives.js";
 import { ThreadSessionRow } from "./thread-sessions-row.js";
 import type {
   SessionStateName,
@@ -33,7 +34,7 @@ export function SlotGroups({
   onToggleOther: () => void;
 }) {
   if (slots.length === 0) {
-    return <p className="sessions-status">{t("No agent profiles to show.")}</p>;
+    return <p className="panel-status">{t("No agent profiles to show.")}</p>;
   }
   return (
     <>
@@ -81,8 +82,8 @@ function SlotGroup({
 }) {
   if (slots.length === 0) return null;
   return (
-    <section className="sessions-group">
-      <span className="sessions-eyebrow">{t(title)}</span>
+    <section className="popover-section">
+      <PanelEyebrow>{t(title)}</PanelEyebrow>
       <ul className="sessions-list">
         {slots.map((slot) => (
           <ThreadSessionRow
@@ -112,7 +113,7 @@ function OtherGroup({
 }) {
   if (slots.length === 0) return null;
   return (
-    <section className="sessions-group">
+    <section className="popover-section">
       <button
         type="button"
         className="sessions-toggle"

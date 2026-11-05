@@ -3,6 +3,10 @@ import type {
   ThreadSummaryWriteResult,
   WorkspaceInfo
 } from "./types.js";
+import {
+  renderActivitySection,
+  type ActivityRecord
+} from "./thread-activity-markdown.js";
 import { ThreadSummaryError } from "./thread-summary-error.js";
 import {
   normalizeSummaryBody,
@@ -35,6 +39,8 @@ export type ThreadSummaryWriteInput = {
   body: string;
   mode?: "create" | "update";
   expectedSummaryRevision?: string;
+  /** Create mode only. The update path keeps the Activity block that the header already has. */
+  activity?: ActivityRecord;
 };
 
 export type ThreadSummaryWriteDependencies = {
@@ -55,6 +61,7 @@ type WriteContext = {
   body: string;
   dependencies: ThreadSummaryWriteDependencies;
   existing?: ExistingSummary;
+  activity?: ActivityRecord;
 };
 
 type SummaryCommit = Omit<ThreadSummaryWriteResult, "projections">;
@@ -132,7 +139,8 @@ export async function writeThreadSummaryInWorkspace(
           summaryPath: `threads/${threadId}/SUMMARY.md`,
           body,
           dependencies,
-          existing
+          existing,
+          activity: input.activity
         };
         return modeWriter(context, input.expectedSummaryRevision);
       }
@@ -182,7 +190,8 @@ async function createNewSummary(context: WriteContext): Promise<SummaryCommit> {
     context.title,
     context.reference,
     context.body,
-    closedAt
+    closedAt,
+    renderActivitySection(context.activity)
   );
   await persistSummary(context, markdown);
   return commitResult(
@@ -219,7 +228,8 @@ async function updateSummary(
     context.title,
     context.reference,
     context.body,
-    parsed.summary.closedAt
+    parsed.summary.closedAt,
+    parsed.summary.activity
   );
   await persistSummary(context, markdown);
   return commitResult(

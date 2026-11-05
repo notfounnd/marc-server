@@ -13,7 +13,6 @@ import {
 import { writeFileAtomically } from "../src/core/write-coordination.js";
 import {
   createSessionRegistry,
-  REGISTRY_FILE_NAME,
   type SessionProbe,
   type SessionRegistry
 } from "../src/daemon/session-registry.js";
@@ -51,6 +50,10 @@ export function entry(
 
 export type RegistryHarness = {
   dataDir: string;
+  /** The thread state file of ARCHITECT's thread, and its folder and marker. */
+  threadDir: string;
+  threadFile: string;
+  markerFile: string;
   registry: SessionRegistry;
   probe: SessionProbe;
   clock: { value: number };
@@ -80,7 +83,9 @@ export async function createRegistryHarness(): Promise<RegistryHarness> {
     newOwnerToken: () => `token-${++counter}`,
     writeAtomic: (filePath, content) => writer.run(filePath, content)
   });
-  const filePath = path.join(dataDir, REGISTRY_FILE_NAME);
+  const threadDir = path.join(dataDir, "threads", ARCHITECT.workspaceId);
+  const filePath = path.join(threadDir, `${ARCHITECT.threadId}.json`);
+  const markerFile = path.join(threadDir, `${ARCHITECT.threadId}.meta.json`);
   const probe: SessionProbe = async (binding) =>
     deriveSlotState(
       binding,
@@ -90,6 +95,9 @@ export async function createRegistryHarness(): Promise<RegistryHarness> {
 
   return {
     dataDir,
+    threadDir,
+    threadFile: filePath,
+    markerFile,
     registry,
     probe,
     clock,
@@ -110,7 +118,10 @@ export async function createRegistryHarness(): Promise<RegistryHarness> {
     readFile: () => fs.readFile(filePath, "utf8"),
     readRegistry: async () =>
       JSON.parse(await fs.readFile(filePath, "utf8")) as RegistryFile,
-    writeRaw: (content) => fs.writeFile(filePath, content, "utf8"),
+    writeRaw: async (content) => {
+      await fs.mkdir(threadDir, { recursive: true });
+      await fs.writeFile(filePath, content, "utf8");
+    },
     cleanup: () => fs.rm(dataDir, { recursive: true, force: true })
   };
 }

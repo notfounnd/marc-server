@@ -15,10 +15,19 @@ import {
   type MemoryRebuildMode
 } from "../core/memory/index.js";
 import type { WorkspaceInfo, WorkspaceSettingsInput } from "../core/types.js";
+import { cyclesValueOf } from "../core/activation-cycles.js";
+import {
+  activationSettingsInputOf,
+  type ActivationSettingsInput
+} from "../core/activation-settings-input.js";
+import { DEFAULT_TURN_TIMEOUT_MINUTES } from "../core/activation-turn-timeout.js";
+import type { ActivationServices } from "./activation-routes.js";
+import type { TurnTimeoutRead } from "./activation-turn-timeout-ledger.js";
 import { json, readBody, text } from "./http.js";
 import type { DaemonStore } from "./store.js";
 
 type MemoryRouteContext = {
+  activation: ActivationServices;
   events: {
     send(event: string, payload: unknown): void;
   };
@@ -40,6 +49,9 @@ type WorkspaceSettingsBody = Partial<{
   memory: Partial<{
     autoRebuild: boolean;
     embeddingBatchSize: number;
+  }>;
+  activation: Partial<{
+    cyclesPerStage: number;
   }>;
 }>;
 
@@ -78,9 +90,24 @@ export async function getWorkspaceSettings(
   const workspace = await workspaceOr404(context, workspaceId);
   if (!workspace) return;
 
-  json(context.response, 200, await readWorkspaceSettings(workspace.rootPath));
+  const settings = await readWorkspaceSettings(workspace.rootPath);
+  const cycles = await context.activation.ledger.cyclesState(workspace);
+  const turnTimeout =
+    await context.activation.ledger.turnTimeoutState(workspace);
+  json(context.response, 200, {
+    ...settings,
+    activation: {
+      cyclesPerStage: cyclesValueOf(cycles),
+      turnTimeoutMinutes: turnTimeoutValueOf(turnTimeout)
+    }
+  });
 }
 
+/**
+ * Saves the settings. The file is written first; the cycles and the time limit values then record the
+ * UI authorization. A memory-only save records nothing and keeps the activation section as is.
+ * If an authorization is refused, the file is left unauthorized, so enabled threads pause.
+ */
 export async function postWorkspaceSettings(
   context: MemoryRouteContext,
   workspaceId: string
@@ -88,13 +115,25 @@ export async function postWorkspaceSettings(
   const workspace = await workspaceOr404(context, workspaceId);
   if (!workspace) return;
 
-  const input = workspaceSettingsInput(await readBody(context.request));
-  if (!input) {
+  const save = workspaceSettingsInput(await readBody(context.request));
+  if (!save) {
     text(context.response, 400, "Invalid workspace settings payload");
     return;
   }
 
-  const settings = await updateWorkspaceSettings(workspace.rootPath, input);
+  const settings = await updateWorkspaceSettings(
+    workspace.rootPath,
+    save.input
+  );
+  const refusal = await authorizeActivation(
+    context,
+    workspace,
+    save.activation
+  );
+  if (refusal) {
+    json(context.response, 409, refusal);
+    return;
+  }
   context.events.send("workspace-changed", {
     workspaceId: workspace.id,
     at: new Date().toISOString()
@@ -216,9 +255,16 @@ async function workspaceOr404(
   return undefined;
 }
 
-function workspaceSettingsInput(
-  body: unknown
-): WorkspaceSettingsInput | undefined {
+/** An authorization outcome. Only a refused one is an answer; the reason says why. */
+type Outcome = { decision: string; reason?: string };
+
+/** A settings save: the input the core writes, and the activation keys the daemon must authorize. */
+type SettingsSave = {
+  input: WorkspaceSettingsInput;
+  activation: ActivationSettingsInput | undefined;
+};
+
+function workspaceSettingsInput(body: unknown): SettingsSave | undefined {
   if (!isRecord(body)) return undefined;
   const input = body as WorkspaceSettingsBody;
   const memory = isRecord(input.memory) ? input.memory : undefined;
@@ -231,7 +277,50 @@ function workspaceSettingsInput(
     !isMemoryEmbeddingBatchSize(embeddingBatchSize)
   )
     return undefined;
-  return { memory: { autoRebuild, embeddingBatchSize } };
+  const activation = activationSettingsInputOf(input.activation);
+  if (activation === "invalid") return undefined;
+  return {
+    input: {
+      memory: { autoRebuild, embeddingBatchSize },
+      ...(activation === undefined ? {} : { activation })
+    },
+    activation
+  };
+}
+
+/**
+ * Records the UI authorization of each activation value that was saved. An absent value records nothing.
+ * Both are attempted, and the first refusal is returned.
+ */
+async function authorizeActivation(
+  context: MemoryRouteContext,
+  workspace: WorkspaceInfo,
+  activation: ActivationSettingsInput | undefined
+): Promise<Outcome | undefined> {
+  const { ledger } = context.activation;
+  const cycles =
+    activation?.cyclesPerStage === undefined
+      ? undefined
+      : await ledger.authorizeCycles(workspace, activation.cyclesPerStage);
+  const turnTimeout =
+    activation?.turnTimeoutMinutes === undefined
+      ? undefined
+      : await ledger.authorizeTurnTimeout(
+          workspace,
+          activation.turnTimeoutMinutes
+        );
+  return refusalOf(cycles) ?? refusalOf(turnTimeout);
+}
+
+function refusalOf(outcome: Outcome | undefined): Outcome | undefined {
+  if (outcome === undefined || outcome.decision !== "refused") return undefined;
+  return outcome;
+}
+
+/** The authorized time limit, or the default when the state cannot be read. */
+function turnTimeoutValueOf(read: TurnTimeoutRead): number {
+  if ("turnTimeoutMinutes" in read) return read.turnTimeoutMinutes;
+  return DEFAULT_TURN_TIMEOUT_MINUTES;
 }
 
 function memoryRebuildMode(body: unknown): MemoryRebuildMode | undefined {

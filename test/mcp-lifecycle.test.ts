@@ -84,14 +84,15 @@ async function verifyModernStdioLifecycle(
     ttlMs: number;
     cacheScope: string;
   };
-  assert.equal(listingResult.tools.length, 26);
+  assert.equal(listingResult.tools.length, 27);
   assert.equal(listingResult.resultType, "complete");
   assert.equal(listingResult.ttlMs, 0);
   assert.equal(listingResult.cacheScope, "private");
   const ungatedTools = new Set([
     "marc_helper",
     "workspace_bootstrap",
-    "workspace_update_recommendations"
+    "workspace_update_recommendations",
+    "permission_prompt"
   ]);
   assert.ok(
     listingResult.tools.every(

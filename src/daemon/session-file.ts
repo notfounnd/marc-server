@@ -1,20 +1,24 @@
-import fs from "node:fs/promises";
-import path from "node:path";
 import {
   slotKey,
   type RegistryFile,
   type SessionBinding
 } from "../core/session-slots.js";
+import { isThreadExtras } from "./activation-file.js";
+import { readMarked, type MarkedSpec } from "./marked-file.js";
+import {
+  markerPathFor,
+  readOptionalFile,
+  serializeMarker
+} from "./registry-file.js";
 
 /**
- * Reads, validates and serializes sessions.json. An unreadable or invalid file
- * is reported as invalid and is never rewritten by a reader. The meta marker is
- * written before the first registry. Its presence without sessions.json means the
- * registry was lost, which fails closed until a human recovers it.
+ * Reads and validates one thread state file (or the legacy sessions.json). An
+ * unreadable or invalid file is reported as invalid and is never rewritten by a
+ * reader. The marker is written before the data file. Its presence without the
+ * data file means the state was lost, which fails closed until a human recovers it.
  */
 export const REGISTRY_FILE_NAME = "sessions.json";
 export const REGISTRY_META_FILE_NAME = "sessions.meta.json";
-const UNPARSEABLE = Symbol("unparseable");
 
 export type RegistryView =
   | { status: "ready"; file: RegistryFile }
@@ -24,19 +28,21 @@ export function emptyRegistryFile(): RegistryFile {
   return { version: 1, generation: 0, slots: {} };
 }
 
+export const REGISTRY_SPEC: MarkedSpec<RegistryFile> = {
+  validate: isRegistryFile,
+  lostReason: "registry_lost"
+};
+
 export async function readRegistryView(
   filePath: string
 ): Promise<RegistryView> {
-  const content = await readOptionalFile(filePath);
-  if (content !== undefined) return parseRegistry(content);
-  if (await registryMetaExists(filePath)) {
-    return { status: "invalid", reason: "registry_lost" };
-  }
-  return { status: "ready", file: emptyRegistryFile() };
+  const view = await readMarked(filePath, REGISTRY_SPEC);
+  if (view.status === "invalid") return view;
+  return { status: "ready", file: view.file ?? emptyRegistryFile() };
 }
 
 export function registryMetaPath(filePath: string): string {
-  return path.join(path.dirname(filePath), REGISTRY_META_FILE_NAME);
+  return markerPathFor(filePath);
 }
 
 export async function registryMetaExists(filePath: string): Promise<boolean> {
@@ -45,7 +51,7 @@ export async function registryMetaExists(filePath: string): Promise<boolean> {
 }
 
 export function serializeRegistryMeta(initializedAt: string): string {
-  return `${JSON.stringify({ version: 1, initializedAt }, null, 2)}\n`;
+  return serializeMarker(initializedAt);
 }
 
 export function serializeRegistry(file: RegistryFile): string {
@@ -57,36 +63,9 @@ export function isRegistryFile(value: unknown): value is RegistryFile {
   return (
     value.version === 1 &&
     isCount(value.generation) &&
-    isSlotRecord(value.slots)
+    isSlotRecord(value.slots) &&
+    isThreadExtras(value)
   );
-}
-
-async function readOptionalFile(filePath: string): Promise<string | undefined> {
-  try {
-    return await fs.readFile(filePath, "utf8");
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === "ENOENT") return undefined;
-    throw error;
-  }
-}
-
-function parseRegistry(content: string): RegistryView {
-  const parsed = parseJson(content);
-  if (parsed === UNPARSEABLE) {
-    return { status: "invalid", reason: "unreadable_json" };
-  }
-  if (!isRegistryFile(parsed)) {
-    return { status: "invalid", reason: "invalid_shape" };
-  }
-  return { status: "ready", file: parsed };
-}
-
-function parseJson(content: string): unknown {
-  try {
-    return JSON.parse(content) as unknown;
-  } catch {
-    return UNPARSEABLE;
-  }
 }
 
 function isSlotRecord(value: unknown): value is Record<string, SessionBinding> {
@@ -108,14 +87,22 @@ function isBinding(value: unknown): value is SessionBinding {
     isOptionalText(value.previousSessionId) &&
     isOptionalText(value.sessionChangedAt) &&
     isText(value.hostId) &&
-    (value.origin === "open" || value.origin === "adopted") &&
+    (value.origin === "open" ||
+      value.origin === "adopted" ||
+      value.origin === "supervisor") &&
     isCount(value.generation) &&
     isOwner(value.owner) &&
     isText(value.boundAt) &&
     isOptionalText(value.observedAt) &&
     isOptionalText(value.endedAt) &&
-    isConflicts(value.conflicts)
+    isConflicts(value.conflicts) &&
+    isOptionalCost(value.lastCostUsd)
   );
+}
+
+function isOptionalCost(value: unknown): boolean {
+  if (value === undefined) return true;
+  return typeof value === "number" && Number.isFinite(value) && value >= 0;
 }
 
 function isOwner(value: unknown): boolean {

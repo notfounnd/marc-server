@@ -1,0 +1,131 @@
+/* The primitives of the thread popovers: the container, its body and sections, the header, and the rows. */
+
+/* The container of every popover: the default width, one height limit, one scroll for the whole panel, and a stable gutter. */
+.popover-menu {
+  width: min(420px, calc(100vw - 48px));
+  max-height: min(560px, calc(100vh - 160px));
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  padding: 8px;
+  background: var(--background);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+}
+
+/* The body of a popover: a grid with the gap between its sections. */
+.popover-body {
+  display: grid;
+  gap: 12px;
+  padding: 0 4px 4px;
+}
+
+/* A section or a group inside a popover body: a grid of its own rows. */
+.popover-section {
+  display: grid;
+  gap: 8px;
+}
+
+/* The header of a thread menu: the title at the left, and a slot at the right for what sits beside it. */
+.menu-head {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 2px 4px 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line-strong);
+  color: var(--ink-muted);
+  font-size: 12px;
+}
+
+.menu-head-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.menu-head-slot {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-muted);
+  font-size: 11px;
+}
+
+/* The small uppercase label that heads a group of rows. */
+.panel-eyebrow {
+  color: var(--ink-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* A status line of a panel, and the error variant that replaces it in the same place. */
+.panel-status {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 13px;
+}
+
+.panel-status-error {
+  display: grid;
+  gap: 4px;
+  color: var(--red);
+}
+
+.panel-status-error p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+/* A status dot. Its tone comes from the domain that shows it. */
+.panel-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--line-strong);
+}
+
+/* A quiet 26px icon button: muted until it is hovered or focused. */
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  color: var(--ink-muted);
+  cursor: pointer;
+}
+
+.icon-button:hover:not(:disabled),
+.icon-button:focus-visible {
+  color: var(--teal);
+}
+
+.icon-button:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+}
+
+.icon-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* A list of panel rows: a grid of rows with no bullets. */
+.panel-list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}

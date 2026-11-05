@@ -46,17 +46,9 @@
   gap: 6px;
 }
 
+/* The thread header row sits at the right edge of its column. */
 .content-action-row {
-  display: flex;
-  align-items: center;
   justify-content: flex-end;
-  gap: 6px;
-}
-
-.middle-mode-actions {
-  display: flex;
-  align-items: center;
-  gap: 6px;
 }
 
 .thread-reference-row {
@@ -92,29 +84,26 @@
   text-underline-offset: 3px;
 }
 
-.header-artifacts {
+/* The wrapper of a header button, and the trigger that anchors its count badge. */
+.header-action,
+.count-trigger {
   position: relative;
 }
 
-.artifact-menu {
-  width: min(420px, calc(100vw - 48px));
-  max-height: 360px;
-  overflow: auto;
-  padding: 8px;
-  background: var(--background);
-  color: var(--ink);
-  box-shadow: var(--shadow);
-}
-
-.artifact-menu-head {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--ink-muted);
-  font-size: 12px;
-  margin: 2px 4px 8px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--line-strong);
+/* The count of a trigger: it hangs off the top-right corner of the button. */
+.count-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border: 1px solid var(--ink);
+  background: var(--main);
+  color: var(--main-foreground);
+  font-size: 11px;
+  line-height: 16px;
+  text-align: center;
 }
 
 .artifact-menu-list {
@@ -158,6 +147,8 @@
   min-width: 0;
 }
 
+/* The action rows of the header and the sidebar, and the rows of the workspace settings, share one row rule. */
+.action-row,
 .workspace-settings-head,
 .workspace-settings-toggle-row,
 .workspace-settings-actions {
@@ -200,6 +191,37 @@
 
 .workspace-settings-batch-row [data-slot="label"] span {
   color: var(--ink-muted);
+}
+
+.workspace-settings-cycles-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+}
+
+.workspace-settings-cycles-text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.workspace-settings-cycles-text small {
+  color: var(--ink-muted);
+  font-size: 11px;
+}
+
+.workspace-settings-cycles-row .workspace-settings-cycles-input {
+  flex: none;
+  width: 64px;
+}
+
+.workspace-settings-error {
+  color: var(--red);
+  font-size: 11px;
 }
 
 .workspace-settings-status {

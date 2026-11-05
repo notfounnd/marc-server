@@ -20,6 +20,8 @@ import {
 /** Components load dynamically, as the markdown panel test does, so the typecheck never reaches JSX. */
 const menuUrl = new URL("../src/ui/thread-sessions-menu.tsx", import.meta.url)
   .href;
+const headerMenuUrl = new URL("../src/ui/header-menu.tsx", import.meta.url)
+  .href;
 const pendingUrl = new URL(
   "../src/ui/thread-sessions-pending.tsx",
   import.meta.url
@@ -32,21 +34,22 @@ type HeadProps = {
   t: Translate;
 };
 
-const {
-  ThreadSessionsHead,
-  PRESSED_TRIGGER_CLASS,
-  closeThen,
-  triggerLabel,
-  warningCountOf
-} = (await import(menuUrl)) as {
-  ThreadSessionsHead: React.ComponentType<HeadProps>;
+const { PendingChip, triggerLabel, warningCountOf } = (await import(
+  menuUrl
+)) as {
+  PendingChip: React.ComponentType<HeadProps>;
+  triggerLabel: (t: Translate, count: number) => string;
+  warningCountOf: (sessions: ThreadSessionsState) => number;
+};
+const { PRESSED_TRIGGER_CLASS, closeThen, HeaderMenu } = (await import(
+  headerMenuUrl
+)) as {
   PRESSED_TRIGGER_CLASS: string;
   closeThen: (
     close: () => void,
     onOpenLink: MarkdownLinkHandler
   ) => MarkdownLinkHandler;
-  triggerLabel: (t: Translate, count: number) => string;
-  warningCountOf: (sessions: ThreadSessionsState) => number;
+  HeaderMenu: React.ComponentType<Record<string, unknown>>;
 };
 const { goReference } = (await import(pendingUrl)) as {
   goReference: (warning: ThreadSessionWarning) => string | undefined;
@@ -54,7 +57,7 @@ const { goReference } = (await import(pendingUrl)) as {
 
 function headHtml(count: number, expanded = false): string {
   return renderToStaticMarkup(
-    React.createElement(ThreadSessionsHead, {
+    React.createElement(PendingChip, {
       count,
       expanded,
       onToggle: () => undefined,
@@ -109,9 +112,28 @@ test("the pressed trigger classes are on the sessions trigger and the artifact t
   ].forEach((cls) => {
     assert.ok(PRESSED_TRIGGER_CLASS.includes(cls), cls);
   });
-  const menu = fs.readFileSync("src/ui/thread-sessions-menu.tsx", "utf8");
-  const header = fs.readFileSync("src/ui/content-header-actions.tsx", "utf8");
+  const trigger = renderToStaticMarkup(
+    React.createElement(HeaderMenu, {
+      icon: () => null,
+      label: "Thread sessions",
+      title: "Thread sessions",
+      open: false,
+      onOpenChange: () => undefined,
+      children: null
+    })
+  );
 
-  assert.ok(menu.includes("${PRESSED_TRIGGER_CLASS}"));
-  assert.ok(header.includes("${PRESSED_TRIGGER_CLASS}"));
+  assert.ok(trigger.includes(PRESSED_TRIGGER_CLASS));
+});
+
+test("the three header menus mount their trigger through HeaderMenu, not on their own", () => {
+  [
+    "src/ui/content-header-actions.tsx",
+    "src/ui/thread-activation-menu.tsx",
+    "src/ui/thread-sessions-menu.tsx"
+  ].forEach((file) => {
+    const source = fs.readFileSync(file, "utf8");
+    assert.ok(source.includes("<HeaderMenu"), file);
+    assert.equal(source.includes("DropdownMenuTrigger"), false, file);
+  });
 });

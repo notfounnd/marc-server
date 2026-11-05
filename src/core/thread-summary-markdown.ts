@@ -3,17 +3,27 @@ import type { ExistingSummary } from "./thread-summary-paths.js";
 export type ParsedSummary = {
   closedAt: string;
   body: string;
+  /** The Activity block as stored in the header, kept verbatim so an update preserves it. */
+  activity?: string;
 };
 
 export type ParsedSummaryResult =
   | { ok: true; summary: ParsedSummary }
   | { ok: false };
 
+const ACTIVITY_HEADING = "## Activity";
+
+/**
+ * Renders the core-owned header and then the caller's body. The activity block, when
+ * present, sits inside the header, before the separator. The body starts after it,
+ * so a caller body can never write or alter the header.
+ */
 export function renderSummary(
   title: string,
   reference: string,
   body: string,
-  closedAt: string
+  closedAt: string,
+  activity?: string
 ): string {
   return [
     `# ${title}`,
@@ -22,6 +32,7 @@ export function renderSummary(
     "",
     `Closed: \`${closedAt}\``,
     "",
+    ...(activity ? [activity, ""] : []),
     "---",
     "",
     body,
@@ -55,7 +66,8 @@ export function parseExistingSummary(
     ok: true,
     summary: {
       closedAt,
-      body: normalizeSummaryBody(lines.slice(boundary.bodyStart).join("\n"))
+      body: normalizeSummaryBody(lines.slice(boundary.bodyStart).join("\n")),
+      ...(boundary.activity ? { activity: boundary.activity } : {})
     }
   };
 }
@@ -74,24 +86,55 @@ export function parseChatThreadId(markdown: string): string | undefined {
   return reference ?? thread;
 }
 
+/** The header ends at the first separator after the metadata. An Activity block inside it is skipped. */
 function findSummaryBodyStart(lines: string[]): {
   bodyStart: number;
   headerEnd: number;
+  activity?: string;
 } {
   const hasHeading = /^#\s+.+$/.test(lines[0] ?? "");
   let index = hasHeading ? 1 : 0;
   let sawMetadata = false;
+  let activityStart: number | undefined;
   while (index < lines.length && !lines[index]!.trim()) index += 1;
   while (index < lines.length) {
     if ((hasHeading || sawMetadata) && lines[index]!.trim() === "---") {
-      return { bodyStart: index + 1, headerEnd: index };
+      return {
+        bodyStart: index + 1,
+        headerEnd: index,
+        activity: activityText(lines, activityStart, index)
+      };
     }
-    if (!/^(?:Thread|Closed):\s*/.test(lines[index]!)) break;
-    sawMetadata = true;
-    index += 1;
-    while (index < lines.length && !lines[index]!.trim()) index += 1;
+    if (lines[index]!.trim() === ACTIVITY_HEADING) {
+      activityStart = index;
+      index += 1;
+      continue;
+    }
+    if (
+      activityStart === undefined &&
+      /^(?:Thread|Closed):\s*/.test(lines[index]!)
+    ) {
+      sawMetadata = true;
+      index += 1;
+      while (index < lines.length && !lines[index]!.trim()) index += 1;
+      continue;
+    }
+    if (activityStart !== undefined) {
+      index += 1;
+      continue;
+    }
+    break;
   }
   return { bodyStart: index, headerEnd: index };
+}
+
+function activityText(
+  lines: string[],
+  start: number | undefined,
+  end: number
+): string | undefined {
+  if (start === undefined) return undefined;
+  return lines.slice(start, end).join("\n").trim();
 }
 
 function matchesThreadReference(value: string, threadId: string): boolean {

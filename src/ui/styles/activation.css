@@ -1,0 +1,277 @@
+/* The line runs between sections only. The first one has none: the popover header already draws its line. */
+.activation-section + .activation-section {
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.activation-status-row,
+.activation-stage-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.activation-pill {
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.activation-pill[data-tone="muted"] {
+  color: var(--ink-muted);
+}
+
+.activation-pill[data-tone="on"] {
+  color: var(--green);
+}
+
+.activation-pill[data-tone="warn"] {
+  color: var(--amber);
+}
+
+.activation-pill[data-tone="stop"] {
+  color: var(--red);
+}
+
+.activation-switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.activation-note {
+  color: var(--ink-muted);
+  font-size: 11px;
+}
+
+.activation-line {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.activation-line[data-tone="warn"] {
+  color: var(--amber);
+}
+
+.activation-line[data-tone="stop"] {
+  color: var(--red);
+}
+
+.activation-bar {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 2px;
+  height: 10px;
+  padding: 1px;
+  border: 2px solid var(--border);
+  background: var(--surface-muted);
+}
+
+.activation-bar i {
+  background: var(--surface-strong);
+}
+
+.activation-bar i[data-used="true"] {
+  background: var(--teal);
+}
+
+.activation-confirm,
+.activation-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.activation-participants {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.activation-participant {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 24px;
+  font-size: 12px;
+}
+
+.activation-check-name,
+.activation-exit,
+.activation-stage strong {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.activation-role {
+  flex: none;
+  color: var(--ink-muted);
+  font-size: 11px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.activation-stages {
+  display: grid;
+  gap: 6px;
+}
+
+.activation-stage {
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  font-size: 12px;
+}
+
+.activation-stage[data-invalid="true"] {
+  outline: 2px solid var(--red);
+  outline-offset: 2px;
+}
+
+.activation-stage-name {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.activation-stage-new {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  gap: 4px;
+}
+
+.activation-exit {
+  color: var(--ink-muted);
+  font-size: 11px;
+}
+
+.activation-input {
+  width: 56px;
+  height: 28px;
+  padding: 2px 6px;
+  font-size: 12px;
+}
+
+.activation-stage-new .activation-input {
+  width: 100%;
+}
+
+/* A text link, not a filled button: teal, underlined, with a small plus. */
+.activation-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--teal);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.activation-add:hover,
+.activation-add:focus-visible {
+  color: var(--teal-dark);
+}
+
+.activation-tooltip {
+  max-width: 260px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* The footer sticks to the bottom of the scrolling popover, so Save and the revision hint stay in view. */
+.activation-footer {
+  position: sticky;
+  bottom: 0;
+  display: grid;
+  gap: 8px;
+  padding: 10px 4px 4px;
+  border-top: 1px solid var(--line-strong);
+  background: var(--background);
+}
+
+.activation-hint {
+  color: var(--ink-muted);
+  font-size: 11px;
+}
+
+.activation-errors {
+  display: grid;
+  gap: 4px;
+  color: var(--red);
+  font-size: 12px;
+}
+
+.activation-errors:empty {
+  display: none;
+}
+
+.activation-errors p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.button-icon.activation-pause-on {
+  background: var(--amber);
+  border-color: var(--amber);
+  color: var(--background);
+  box-shadow: none;
+  transform: translate(2px, 2px);
+}
+
+.activation-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding: 8px 12px;
+  border: 2px solid var(--amber);
+  background: color-mix(in srgb, var(--amber) 12%, var(--background));
+  color: var(--ink);
+  font-size: 12px;
+}
+
+.activation-banner span {
+  flex: 1;
+  min-width: 0;
+}
+
+.activation-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.activation-trigger:focus-visible,
+.activation-link:focus-visible,
+.activation-pause:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+}

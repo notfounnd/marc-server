@@ -17,6 +17,7 @@ import { ContentHeaderActions } from "./content-header-actions.js";
 import type {
   Agent,
   ApiGet,
+  ApiWrite,
   ArtifactMenuItem,
   MarkdownLinkHandler,
   StatusKind,
@@ -36,6 +37,8 @@ type HeaderIdentity = {
 
 export function ContentHeader({
   api,
+  apiPost,
+  apiPut,
   statusKind,
   lastSyncedAt,
   selectedAgent,
@@ -51,6 +54,8 @@ export function ContentHeader({
   onShowWorkspaceSettingsChange
 }: {
   api: ApiGet;
+  apiPost: ApiWrite;
+  apiPut: ApiWrite;
   statusKind: StatusKind;
   lastSyncedAt?: Date;
   selectedAgent?: Agent;
@@ -131,6 +136,8 @@ export function ContentHeader({
         />
         <ContentHeaderActions
           api={api}
+          apiPost={apiPost}
+          apiPut={apiPut}
           lastSyncedAt={lastSyncedAt}
           selectedAgent={selectedAgent}
           selectedThread={selectedThread}

@@ -1,6 +1,7 @@
 import type {
   Agent,
   ApiGet,
+  ApiWrite,
   ArtifactMenuItem,
   MarkdownLinkHandler,
   Message,
@@ -13,6 +14,8 @@ import type {
 
 export type AppContentProps = {
   api: ApiGet;
+  apiPost: ApiWrite;
+  apiPut: ApiWrite;
   statusKind: StatusKind;
   lastSyncedAt?: Date;
   selectedThreadIndexHealth?: ThreadIndexHealth;

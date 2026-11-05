@@ -2,6 +2,7 @@ import fs from "node:fs/promises";
 import { newId, slugify, threadSlug } from "./ids.js";
 import { MESSAGE_STYLE_GUIDE, validateMessageBody } from "./guards.js";
 import { parseMessages, renderChatHeader, renderMessage } from "./markdown.js";
+import type { MessageStamp } from "./activation-reservation-records.js";
 import { safeJoin } from "./paths.js";
 import { readThreadSummarySnapshotInWorkspace } from "./thread-summary.js";
 import {
@@ -56,10 +57,60 @@ export function listThreadsInWorkspace(
   return reconciler.list(options);
 }
 
-export async function appendMessageInWorkspace(
+export function appendMessageInWorkspace(
   info: WorkspaceInfo,
   threadId: string,
   input: MessageInput
+): Promise<ChatMessage> {
+  return appendWithStamp(info, threadId, input, undefined);
+}
+
+/**
+ * The only writer that copies a stage and a cycle. Its caller is the trusted post path, which
+ * gets the stamp from the daemon's prepare step. MessageInput has no stage or cycle field.
+ */
+export function appendStampedMessageInWorkspace(
+  info: WorkspaceInfo,
+  threadId: string,
+  input: MessageInput,
+  stamp: MessageStamp
+): Promise<ChatMessage> {
+  return appendWithStamp(info, threadId, input, stamp);
+}
+
+/** The messages of a thread, read from CHAT.md. A missing file has no messages. */
+export async function messagesOfThreadInWorkspace(
+  info: WorkspaceInfo,
+  threadId: string
+): Promise<ChatMessage[]> {
+  const chatPath = safeJoin(info.marcPath, "threads", threadId, "CHAT.md");
+  return parseMessages(await readChatOrEmpty(chatPath));
+}
+
+async function readChatOrEmpty(chatPath: string): Promise<string> {
+  try {
+    return await fs.readFile(chatPath, "utf8");
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return "";
+    throw error;
+  }
+}
+
+function stampFields(
+  stamp: MessageStamp | undefined
+): Pick<ChatMessage, "stage" | "cycle"> {
+  if (stamp === undefined) return {};
+  return {
+    stage: stamp.stage,
+    ...(stamp.cycle === undefined ? {} : { cycle: stamp.cycle })
+  };
+}
+
+async function appendWithStamp(
+  info: WorkspaceInfo,
+  threadId: string,
+  input: MessageInput,
+  stamp: MessageStamp | undefined
 ): Promise<ChatMessage> {
   const guard = validateMessageBody(input.body);
   if (!guard.ok) {
@@ -84,7 +135,8 @@ export async function appendMessageInWorkspace(
         agentId: slugify(input.agentId),
         role: input.role,
         body: input.body,
-        artifacts: input.artifacts ?? []
+        artifacts: input.artifacts ?? [],
+        ...stampFields(stamp)
       };
       await fs.appendFile(chatPath, renderMessage(message));
       return message;

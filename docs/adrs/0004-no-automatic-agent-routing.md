@@ -1,5 +1,7 @@
 # 0004 - mARC does not route agent work automatically
 
+> Superseded in part by [0014 - Policy-gated mention activation](0014-policy-gated-mention-activation.md). The routing decision is replaced by a per-thread policy that the human enables. Choosing a recipient by similarity, text, or an LLM remains forbidden.
+
 ## Decision
 
 mARC records directed mentions and references, but it does not decide which agent should act.

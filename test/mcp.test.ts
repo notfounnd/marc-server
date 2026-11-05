@@ -16,6 +16,7 @@ const expectedTools = [
   "memory_status",
   "message_attach_artifact",
   "message_post",
+  "permission_prompt",
   "thread_create",
   "thread_info",
   "thread_list",
@@ -38,7 +39,7 @@ test("public tools/list exposes the stable canonical catalog and gated schemas",
   t.after(() => session.close());
   const listing = await session.client.listTools();
 
-  assert.equal(listing.tools.length, 26);
+  assert.equal(listing.tools.length, 27);
   assert.deepEqual(
     listing.tools.map((tool) => tool.name).sort(),
     expectedTools

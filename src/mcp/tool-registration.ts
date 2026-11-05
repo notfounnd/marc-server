@@ -2,6 +2,11 @@ import type {
   McpServer,
   StandardSchemaWithJSON
 } from "@modelcontextprotocol/server";
+import {
+  NO_DEADLINE,
+  withDeadline,
+  type DeadlineSource
+} from "./deadline-notice.js";
 import { text, toolError } from "./responses.js";
 
 const WINDOW_MS = 1_000;
@@ -36,7 +41,11 @@ export class McpToolCoordinator {
   private accepting = true;
   private readonly active = new Set<Promise<unknown>>();
 
-  constructor(readonly limiter = new ToolCallLimiter()) {}
+  /** The deadline source answers the notice of this server's turn; a server with no turn uses none. */
+  constructor(
+    readonly limiter = new ToolCallLimiter(),
+    readonly deadline: DeadlineSource = NO_DEADLINE
+  ) {}
 
   execute(handler: () => Promise<unknown>): Promise<ReturnType<typeof text>> {
     if (!this.accepting) {
@@ -97,7 +106,7 @@ export function registerMcpTool<Input, Output>(
       if (context.mcpReq.signal.aborted) {
         return toolError("request_cancelled", "The request was cancelled.");
       }
-      return handler(input);
+      return withDeadline(await handler(input), await coordinator.deadline());
     })
   );
 }

@@ -3,6 +3,7 @@ import {
   readAgentProfile,
   registerAgent
 } from "../core/workspace.js";
+import { AGENT_CLIENT_NAMES } from "../core/types.js";
 import { gatedSchema, withBootstrap } from "./responses.js";
 import { McpToolCoordinator, registerMcpTool } from "./tool-registration.js";
 import type { McpServer } from "@modelcontextprotocol/server";
@@ -23,7 +24,8 @@ export function registerAgentTools(
       role: z.string().min(1),
       model: z.string().min(1),
       description: z.string().min(1),
-      displayName: z.string().optional()
+      displayName: z.string().optional(),
+      client: z.enum(AGENT_CLIENT_NAMES).optional()
     }),
     async (input) =>
       withBootstrap(input, async () => registerAgent(workspaceRoot, input))

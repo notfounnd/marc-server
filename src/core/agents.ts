@@ -28,7 +28,9 @@ export async function registerAgentInWorkspace(
       const agentPath = safeJoin(info.marcPath, "agents", `${agentId}.md`);
       const alreadyExists = await exists(agentPath);
       const current = await readTextIfExists(agentPath);
-      const body = `${renderAgentProfile(agentId, profile)}${agentProfileManualContext(current)}`;
+      const client = profile.client ?? clientLineOf(current);
+      const rendered = renderAgentProfile(agentId, profile, client);
+      const body = `${rendered}${agentProfileManualContext(current)}`;
       const updated = body !== current;
 
       if (updated) {
@@ -119,7 +121,11 @@ function agentProfileField(
   return markdown.match(new RegExp(`^${field}:\\s+(.+)$`, "m"))?.[1]?.trim();
 }
 
-function renderAgentProfile(agentId: string, profile: AgentProfile): string {
+function renderAgentProfile(
+  agentId: string,
+  profile: AgentProfile,
+  client: string | undefined
+): string {
   const description = normalizeAgentDescription(profile.description);
   if (!description) {
     throw new Error("Agent description is required.");
@@ -131,9 +137,28 @@ function renderAgentProfile(agentId: string, profile: AgentProfile): string {
     `ID: \`${agentId}\``,
     `Role: ${normalizeProfileToken(profile.role)}`,
     `Model: ${normalizeProfileToken(profile.model, { preserveDot: true })}`,
+    ...clientLine(client),
     `Description: ${description}`,
     ""
   ].join("\n");
+}
+
+/** The optional `Client:` line. Absent when neither the input nor the file names a client. */
+function clientLine(client: string | undefined): string[] {
+  if (client === undefined) return [];
+  return [`Client: ${client}`];
+}
+
+/** The header is everything before the Description line, so a `Client:` line in the manual context is never read. */
+function headerOf(markdown: string): string {
+  const descriptionMatch = /^Description:\s+.*$/m.exec(markdown);
+  if (!descriptionMatch) return markdown;
+  return markdown.slice(0, descriptionMatch.index);
+}
+
+/** The raw `Client:` value of a profile header, as the file holds it. */
+export function clientLineOf(markdown: string): string | undefined {
+  return agentProfileField(headerOf(markdown), "Client");
 }
 
 function agentProfileManualContext(markdown: string): string {
@@ -158,6 +183,11 @@ function summarizeAgentProfile(
     model: agentProfileField(markdown, "Model"),
     description: agentProfileField(markdown, "Description")
   };
+
+  const client = clientLineOf(markdown);
+  if (client !== undefined) {
+    summary.client = client;
+  }
 
   if (options.includeMarkdown) {
     summary.markdown = markdown;

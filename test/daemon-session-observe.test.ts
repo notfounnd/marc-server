@@ -106,8 +106,10 @@ test("an unknown workspace is 404 and an invalid registry reports every slot unk
     assert.equal(missing.status, 404);
 
     await registered(daemon, ws.info);
+    const threadDir = path.join(daemon.dataDir, "threads", ws.info.id);
+    await fs.mkdir(threadDir, { recursive: true });
     await fs.writeFile(
-      path.join(daemon.dataDir, "sessions.json"),
+      path.join(threadDir, `${ws.threadId}.json`),
       "{ broken",
       "utf8"
     );

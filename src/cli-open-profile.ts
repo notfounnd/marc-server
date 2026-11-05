@@ -1,4 +1,4 @@
-import { clientForModel } from "./core/agent-launch.js";
+import { clientOf } from "./core/agent-launch.js";
 import type { AgentProfileSummary, WorkspaceInfo } from "./core/types.js";
 import { guard, OpenError } from "./cli-open-output.js";
 
@@ -21,6 +21,6 @@ export async function requireProfile(
   if (!profile) throw new OpenError("input_error", "profile_unknown");
   if (profile.role === "user")
     throw new OpenError("input_error", "user_profile");
-  if (clientForModel(profile.model) === undefined)
+  if (clientOf(profile) === undefined)
     throw new OpenError("input_error", "unsupported_client");
 }

@@ -154,7 +154,7 @@ Inspect the bootstrap `agents.registered` inventory or call `agent_list` first, 
 
 `agent_register` writes canonical profile metadata. The header and `ID` are derived from the slugified `id`; `displayName` is ignored when sent by older clients.
 
-Registration requires `id`, `role`, `model`, and `description`. `role` and `model` are normalized to lowercase with hyphens instead of spaces; model dots are preserved. `description` writes the first input line up to 160 characters. The result includes `id`, `status`, `created`, `alreadyExists`, and `updated`.
+Registration requires `id`, `role`, `model`, and `description`. An optional `client` (`claude-code` or `codex`) writes the profile's `Client:` line, which chooses the client adapter of a supervised turn; without it, the model prefix decides. `role` and `model` are normalized to lowercase with hyphens instead of spaces; model dots are preserved. `description` writes the first input line up to 160 characters. The result includes `id`, `status`, `created`, `alreadyExists`, and `updated`.
 
 ```markdown
 # <profile-id>
@@ -179,7 +179,27 @@ Structured reads treat profile metadata as line-based fields. Additional manual 
 | `thread_tail` | Read the last N messages. |
 | `thread_write_summary` | Create a caller-authored summary to close a thread, or update an existing summary with a revision check. |
 
+### Advancing the stage with `message_post`
+
+The lead of a thread is its focal point: the first architect author in `CHAT.md`, unless the human recorded another lead in the UI. Only the lead advances the stage, and it does so while posting: `message_post` takes an optional `advanceTo`, a fixed stage strictly ahead of the current one (`planning`, `execution` or `review`). The three stages are the macro fit of the RULES phases; the mARC gives the mechanism and the RULES give the process.
+
+The MCP sends the identity fields of its session (`identity.fields()`), and the daemon verifies them against the lead's slot: the live process at the client's pid, the same start time, an online slot. The daemon judges everything inside the thread's queue: the policy and its authorization, the lead, the identity, the stage the agent saw, the budget of that stage, and the destination. A granted advance stamps the message with the destination and no cycle. The advance can skip stages; a skipped stage keeps its budget unused, which is not transferred. The last stage cannot be advanced, and an exhausted stage refuses the agent, but never the human.
+
+The post is never blocked. The result carries `warnings`, an array with every warning of the post in order: the advance warning first, then a failed confirmation, each listed once. It also carries an `advance` field: `{ decision: "advanced", stage, reference }`, where `reference` is the message that carries the move, `{ decision: "refused", reason }`, or `{ decision: "unknown" }`. The warnings are:
+
+- `stage_advance_refused`, with the reason in `advance.reason`: for example `not_lead`, `identity_unverified`, `stage_changed`, `stage_exhausted`, `not_ahead`, `last_stage`, or `policy_disabled` when the thread has no enabled policy. The message is written with its normal stamp, and no advance is confirmed.
+- `stage_advance_unknown`, when the daemon does not answer within the 5-second limit or cannot be reached. The message is written with the stamp of the stage the thread stood on, and neither the post nor the advance is repeated.
+- `activation_confirm_failed`, when a confirmation fails after the write. The message stays, and an advance whose confirmation failed reports `reference: null`.
+
+The `advanceTo` value is free text in the schema on purpose: a value that is not a stage is refused by the daemon with a warning, so it never blocks the post. The `reference` of a granted advance is audit evidence, not proof of consensus: the architects still agree on the plan in the thread.
+
+### Activation stamps on `message_post`
+
+In a thread whose activation policy is enabled, `message_post` stamps the message with the stage and, when the author holds a granted reservation, its cycle. The stamp is prepared before the append and confirmed after it, with a 1.5-second limit on each daemon call. A granted advance replaces the stage with the destination and carries no cycle; the reservation of the earlier stage still stays debited and is answered by that message. The post is never blocked by the daemon. When the stamp cannot be prepared, the message is written without a stamp and the result carries `activation_stamp_unavailable` in `warnings`. When the stamp confirmation fails, the stamp stays and the result carries `activation_confirm_failed` in `warnings`. The input schema has no `stage` or `cycle` field: an agent never sets them. A thread without an enabled policy never contacts the daemon for a post.
+
 ### Thread summaries
+
+When `thread_write_summary` creates the summary, it first asks the daemon for the thread's activity, with a 2-second limit, and records the answer in an `## Activity` section inside the core-owned header, before the separator. If a configured daemon cannot answer in time, the section says that the activity was not recorded, and the closure still goes through. With no daemon configured there is no section. An update keeps the section. The caller's body is placed after the separator and cannot change the header. The tool has no input for the activity: it is read from the daemon, not from the caller.
 
 `thread_write_summary` accepts a full `threadId`, a non-empty Markdown `body`, and an optional `mode` (`create` by default or `update`). `body` contains only caller-authored content. The core owns the title from `CHAT.md`, canonical `Thread` and `Closed` metadata, and the header separator before the body. Creation writes that header and closes the thread; use create only after the human authorizes closure. See [Closing threads](agent-workflows.md#closing-threads) for canonical composition and closure guidance. Updates require `expectedSummaryRevision`, the lowercase SHA-256 revision returned by `thread_info` or `thread_read` with `includeSummary: true`. An update with an equivalent body returns `outcome: "unchanged"` before checking the supplied revision; a changed body must match the current revision. Create retries with the same body are unchanged; attempting to create different content over an existing summary returns `summary_exists`.
 
@@ -196,6 +216,12 @@ The result includes the canonical `threadId` and `reference`, relative `summaryP
 Resolution scans thread directories in the current workspace, including open and closed threads. A candidate must be a directory with a regular `CHAT.md` file. Symbolic-link directories and symbolic-link `CHAT.md` files are excluded. The resolver does not use the derived thread index. Successful results include the canonical ID in `result.threadId`; `thread_info` also preserves its existing `id` field. This ID is present on `cursor_not_found` results as well.
 
 The read tools return `isError: true` with `thread_not_found` when there is no match, `ambiguous_thread_id` when a suffix matches multiple threads, or `invalid_thread_id` when the input contains path separators or traversal segments. Ambiguity details include sorted canonical IDs in `error.details.candidates`. `message_post` and `message_attach_artifact` continue to require full IDs.
+
+## Supervisor tools
+
+`permission_prompt` is the permission prompt tool of a supervised Claude Code turn: the turn names `mcp__mcp-marc__permission_prompt` in `--permission-prompt-tool`. No agent calls it. It is registered outside the bootstrap envelope, so its answer is the client's own contract: one text block whose JSON is `{"behavior":"allow"}` or `{"behavior":"deny","message":...}`, with no mARC envelope and no `structuredContent`.
+
+The tool finds its turn through the MCP process. The run identifier comes from the turn's environment (`MARC_SUPERVISOR_RUN_ID`), and the daemon checks that the caller is the turn's own child process. The tool sends the tool name and input to the activation panel and waits for the human's decision there. It never decides on its own. It denies with `timeout` after 10 minutes without an answer, with `denied by the user` when the human denies, and with `daemon_unavailable` when the daemon cannot be reached. A call outside a supervised turn is denied with `not a supervised turn`.
 
 ## Message and artifact tools
 

@@ -1,3 +1,5 @@
+import type { ActivationSupervisionCard } from "./activation-supervision-view.js";
+
 export type Workspace = {
   id: string;
   name: string;
@@ -26,6 +28,8 @@ export type Message = {
   timestamp: string;
   agentId: string;
   role?: string;
+  stage?: string;
+  cycle?: number;
   body: string;
   artifacts: string[];
 };
@@ -193,7 +197,7 @@ export type SessionDetails = {
 };
 
 export type SessionBindingSummary = {
-  origin: "open" | "adopted";
+  origin: "open" | "adopted" | "supervisor";
   generation: number;
   client: string;
   hostId: string;
@@ -241,4 +245,115 @@ export type ThreadSessionsView = {
     mcpLeases: number;
     listening: "available";
   };
+};
+
+/** The JSON write helper of the app. PUT and POST share its shape and its error text. */
+export type ApiWrite = <T>(path: string, body: unknown) => Promise<T>;
+
+/** Mirrors the daemon activation contract. The panel edits only the switch and the two limits. */
+export type ActivationPolicy = {
+  version: 2;
+  revision: string;
+  enabled: boolean;
+  mode: "confirm";
+  attemptCap: number;
+  pendingTtlMinutes: number;
+  updatedAt: string;
+};
+
+export type ActivationWarning =
+  | "budget_last_cycle"
+  | "budget_exhausted"
+  | "revision_mismatch"
+  | "ledger_restored"
+  | "policy_tampered"
+  | "settings_tampered"
+  | "policy_outdated"
+  | "ledger_lost"
+  | "ledger_invalid";
+
+/** The three fixed stages. Their ids are not user data. */
+export type ActivationStageId = "planning" | "execution" | "review";
+
+export type ActivationBudget = {
+  currentStage: ActivationStageId;
+  /** Null while the thread state file is lost or invalid. */
+  cyclesUsed: number | null;
+  cyclesPerStage: number;
+  granted: number;
+  max: number;
+  remaining: number | null;
+  warnings: ActivationWarning[];
+};
+
+/** The thread activation view: the saved policy or none, the live participants, the budget and the warnings. */
+export type ThreadActivationView = {
+  threadId: string;
+  policyState: "none" | "outdated" | "ready" | "invalid";
+  policy: ActivationPolicy | null;
+  /** The stored switch, readable even for an outdated policy. False when no policy is readable. */
+  enabled: boolean;
+  policyErrors?: ActivationValidationError[];
+  participants: string[];
+  budget: ActivationBudget | null;
+  /** An F3a stage the thread still stands on. A save asks the human to map it to planning. */
+  legacyStage: string | null;
+  paused: boolean | null;
+  threadPaused: boolean;
+  warnings: ActivationWarning[];
+  /** The lead: the recorded human choice, else the first architect in CHAT.md. Null until one exists. */
+  lead?: string | null;
+  /** Human changes of the lead, oldest first. */
+  leadChanges?: ActivationLeadChange[];
+  /** The fixed stages strictly ahead of the current one: where a human advance can go. */
+  nextStages?: ActivationStageId[];
+  /** Reservations retained by a hold. */
+  holds?: ActivationHoldView[];
+  /** Stage moves, oldest first. */
+  stageHistory?: ActivationStageMove[];
+  /** The supervisor's cards still on the panel. No run id, pid, host or session id. */
+  supervision?: ActivationSupervisionCard[];
+};
+
+export type {
+  ActivationPermissionView,
+  ActivationSupervisionCard,
+  ActivationSupervisionStatus
+} from "./activation-supervision-view.js";
+
+/** One human change of the lead. `from` is absent when the thread had no lead yet. */
+export type ActivationLeadChange = {
+  at: string;
+  from?: string;
+  to: string;
+  by: "human";
+};
+
+/** A retained reservation, as the panel lists it. */
+export type ActivationHoldView = {
+  messageId: string;
+  recipient: string;
+  stage: string;
+  reason: string;
+};
+
+/** One stage move. `by` says who moved it; an agent move names its agent. */
+export type ActivationStageMove = {
+  at: string;
+  from: ActivationStageId;
+  to: ActivationStageId;
+  by: "human" | "agent";
+  agentId?: string;
+  /** The message that advanced the thread, when an agent or a human advance named one. */
+  messageId?: string;
+  droppedHolds: number;
+};
+
+/** One validation error of a saved form, as the daemon reports it with status 400. */
+export type ActivationValidationError = { field: string; code: string };
+
+/** The workspace pause, read alone by the workspace view. */
+export type WorkspaceActivationView = {
+  paused: boolean;
+  pausedAt: string | null;
 };

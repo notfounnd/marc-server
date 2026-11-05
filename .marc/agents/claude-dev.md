@@ -3,6 +3,7 @@
 ID: `claude-dev`
 Role: developer
 Model: claude-haiku-5-5
+Client: claude-code
 Description: Shared developer profile for Claude Code subagents implementing bounded tasks and reporting validation evidence to the principal architect.
 
 ## Responsibilities

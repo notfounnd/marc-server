@@ -144,6 +144,7 @@ dist
 ### mARC ###
 .marc/cache
 .marc-daemon
+.marc/threads/*/policy.json
 
 ### AI ###
 .claude/*

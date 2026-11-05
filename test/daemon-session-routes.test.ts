@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { appendMessage } from "../src/core/workspace.js";
+import { appendMessage, writeThreadSummary } from "../src/core/workspace.js";
 import {
   ARCHITECT,
   get,
@@ -45,6 +45,52 @@ test("GET sessions lists one slot per assignable profile with warnings and no ow
       ]
     );
     assert.ok(!reply.text.includes("ownerToken"));
+  } finally {
+    await daemon.close();
+  }
+});
+
+type SessionsView = {
+  slots: Array<{ profile: string }>;
+  warnings: Array<{ kind: string; profile?: string; messageIds: string[] }>;
+};
+
+function viewOf(text: string): SessionsView {
+  return JSON.parse(text) as SessionsView;
+}
+
+test("a closed thread's sessions view has no warnings, and its slots keep their shape", async () => {
+  const daemon = await startDaemon();
+  const ws = await workspaceWithThread();
+  try {
+    await registered(daemon, ws.info);
+    const mention = await appendMessage(ws.root, ws.threadId, {
+      agentId: ARCHITECT,
+      role: "architect",
+      body: "Revise marc://@claude-dev e avise marc://@ui-user"
+    });
+    const url = `/api/workspaces/${ws.info.id}/threads/${ws.threadId}/sessions`;
+    const open = await get(daemon.baseUrl, url);
+    assert.equal(open.status, 200);
+    assert.deepEqual(
+      viewOf(open.text).warnings.map((warning) => [
+        warning.kind,
+        warning.profile,
+        warning.messageIds
+      ]),
+      [
+        ["pending_mention", "claude-dev", [mention.id]],
+        ["awaiting_human", "ui-user", [mention.id]]
+      ]
+    );
+    await writeThreadSummary(ws.root, { threadId: ws.threadId, body: "Done." });
+    const closed = await get(daemon.baseUrl, url);
+    assert.equal(closed.status, 200);
+    assert.deepEqual(viewOf(closed.text).warnings, []);
+    assert.deepEqual(
+      viewOf(closed.text).slots.map((slot) => slot.profile),
+      ["claude-dev", ARCHITECT]
+    );
   } finally {
     await daemon.close();
   }

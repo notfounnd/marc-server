@@ -3,6 +3,7 @@
 ID: `codex-dev`
 Role: developer
 Model: gpt-6-luna
+Client: codex
 Description: Shared developer profile for Codex subagents implementing bounded tasks and reporting validation evidence to the principal architect.
 
 ## Responsibilities

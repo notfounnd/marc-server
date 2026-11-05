@@ -4,6 +4,8 @@ import {
   KeyboardShortcutsModal
 } from "./modals.js";
 import { WorkspaceSettingsModal } from "./workspace-settings-modal.js";
+import type { WorkspaceCycles } from "./workspace-settings-cycles.js";
+import type { WorkspaceTurnTimeout } from "./workspace-settings-turn-timeout.js";
 import { ThreadCreateModal } from "./thread-create-modal.js";
 import type { ThreadCreationController } from "./use-thread-creation.js";
 import type {
@@ -33,7 +35,8 @@ export function AppModals({
   onShowWorkspaceSettingsChange,
   onShortcutsClose,
   onWorkspaceAutoRebuildChange,
-  onWorkspaceEmbeddingBatchSizeChange
+  onWorkspaceEmbeddingBatchSizeChange,
+  workspaceSettings
 }: {
   artifactDraft?: ArtifactDraft;
   artifactView?: ArtifactView;
@@ -54,6 +57,10 @@ export function AppModals({
   onShortcutsClose: () => void;
   onWorkspaceAutoRebuildChange: (autoRebuild: boolean) => void;
   onWorkspaceEmbeddingBatchSizeChange: (embeddingBatchSize: number) => void;
+  workspaceSettings: {
+    cycles: WorkspaceCycles;
+    turnTimeout: WorkspaceTurnTimeout;
+  };
 }) {
   return (
     <>
@@ -77,6 +84,10 @@ export function AppModals({
         <WorkspaceSettingsModal
           health={selectedMemoryHealth}
           workspace={selectedWorkspace}
+          cyclesPerStage={workspaceSettings.cycles.value}
+          onCyclesPerStageChange={workspaceSettings.cycles.save}
+          turnTimeoutMinutes={workspaceSettings.turnTimeout.value}
+          onTurnTimeoutMinutesChange={workspaceSettings.turnTimeout.save}
           onAutoRebuildChange={onWorkspaceAutoRebuildChange}
           onEmbeddingBatchSizeChange={onWorkspaceEmbeddingBatchSizeChange}
           onClose={() => onShowWorkspaceSettingsChange(false)}

@@ -4,12 +4,18 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Button, classNames } from "./common.js";
+import { CyclesPerStageField } from "./workspace-settings-cycles.js";
+import { TurnTimeoutField } from "./workspace-settings-turn-timeout.js";
 import type { MemoryIndexHealth } from "./types.js";
 
 export function WorkspaceSettingsPanel({
   health,
   t,
+  cyclesPerStage,
+  turnTimeoutMinutes,
   onAutoRebuildChange,
+  onCyclesPerStageChange,
+  onTurnTimeoutMinutesChange,
   onEmbeddingBatchSizeChange,
   onPrepareModel,
   onPurge,
@@ -17,7 +23,11 @@ export function WorkspaceSettingsPanel({
 }: {
   health?: MemoryIndexHealth;
   t: (key: string, options?: Record<string, string | number>) => string;
+  cyclesPerStage?: number;
+  turnTimeoutMinutes?: number;
   onAutoRebuildChange: (autoRebuild: boolean) => void;
+  onCyclesPerStageChange?: (cycles: number) => Promise<void>;
+  onTurnTimeoutMinutesChange?: (minutes: number) => Promise<void>;
   onEmbeddingBatchSizeChange: (embeddingBatchSize: number) => void;
   onPrepareModel: () => void;
   onPurge: () => void;
@@ -54,6 +64,20 @@ export function WorkspaceSettingsPanel({
 
   return (
     <div className="workspace-settings-panel">
+      {cyclesPerStage !== undefined && onCyclesPerStageChange ? (
+        <CyclesPerStageField
+          cyclesPerStage={cyclesPerStage}
+          onSave={onCyclesPerStageChange}
+          t={t}
+        />
+      ) : null}
+      {turnTimeoutMinutes !== undefined && onTurnTimeoutMinutesChange ? (
+        <TurnTimeoutField
+          turnTimeoutMinutes={turnTimeoutMinutes}
+          onSave={onTurnTimeoutMinutesChange}
+          t={t}
+        />
+      ) : null}
       <div className="workspace-settings-head">
         <Database size={14} />
         <span>{t("Memory")}</span>

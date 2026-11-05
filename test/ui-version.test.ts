@@ -34,6 +34,8 @@ test("renders the package version after the developer credit and before shortcut
     };
     const props: AppContentProps = {
       api: () => Promise.reject(new Error("not used by this render")),
+      apiPost: () => Promise.reject(new Error("not used by this render")),
+      apiPut: () => Promise.reject(new Error("not used by this render")),
       statusKind: "idle",
       selectedThreadArtifacts: [],
       showArtifactMenu: false,

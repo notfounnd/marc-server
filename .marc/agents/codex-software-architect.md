@@ -3,6 +3,7 @@
 ID: `codex-software-architect`
 Role: architect
 Model: gpt-6.1-sol
+Client: codex
 Description: Principal architect responsible for planning, developer orchestration, independent review, and technical approval.
 
 ## Responsibilities

@@ -5,6 +5,10 @@ import os from "node:os";
 import path from "node:path";
 import { loadDaemonConfig } from "../src/daemon/config.js";
 import { createDaemonServer } from "../src/daemon/server.js";
+import {
+  OS_PROCESS_TABLE,
+  type ProcessTablePort
+} from "../src/daemon/process-table-os.js";
 import { recallMemory } from "../src/core/workspace-memory.js";
 import {
   createThread,
@@ -31,8 +35,23 @@ export type Started = {
   close: () => Promise<void>;
 };
 
-/** A daemon with a fixed clock and an agents runner that reports no live process. */
-export async function startDaemon(): Promise<Started> {
+/** The live client processes the agents runner reports. Empty by default: no live process. */
+export type LiveProcess = {
+  pid: number;
+  sessionId: string;
+  startedAt: number;
+  status?: string;
+};
+
+/**
+ * A daemon with a fixed clock and an agents runner. By default it reports no live process; a test
+ * passes the live client processes it wants the presence to resolve, and nothing else changes. The process
+ * table is the operating system's unless a test passes its own.
+ */
+export async function startDaemon(
+  live: readonly LiveProcess[] = [],
+  processes: ProcessTablePort = OS_PROCESS_TABLE
+): Promise<Started> {
   const dataDir = await fs.mkdtemp(
     path.join(os.tmpdir(), "marc-session-routes-")
   );
@@ -42,14 +61,15 @@ export async function startDaemon(): Promise<Started> {
     presence: {
       hostId: HOST,
       now: () => NOW,
-      runAgents: async () => "[]"
+      runAgents: async () => JSON.stringify(live)
     },
     registry: {
       now: () => iso(NOW),
       newOwnerToken: () => "route-owner-token",
       newSessionId: () => "route-session"
     },
-    marcRuntime: () => MARC_RUNTIME
+    marcRuntime: () => MARC_RUNTIME,
+    processes
   });
   await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
   const address = server.address();
@@ -59,8 +79,10 @@ export async function startDaemon(): Promise<Started> {
     dataDir,
     close: () =>
       new Promise<void>((resolve) => {
+        // The close callback runs after the server's close handler has stopped the watchers, so no new
+        // background work can start. The drain then waits for the rebuilds that are already writing.
         server.close(() => resolve());
-      })
+      }).then(() => server.drainBackground())
   };
 }
 

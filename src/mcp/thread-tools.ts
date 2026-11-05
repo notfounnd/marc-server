@@ -1,5 +1,4 @@
 import {
-  appendMessage,
   attachArtifact,
   createThread,
   listThreads,
@@ -11,9 +10,10 @@ import {
 } from "../core/workspace.js";
 import { ThreadSummaryError } from "../core/thread-summary.js";
 import type { ChatMessage } from "../core/types.js";
-import { observeSessionActivity } from "./daemon.js";
+import { fetchThreadActivity, observeSessionActivity } from "./daemon.js";
 import { gatedSchema, toolError, withBootstrap } from "./responses.js";
-import { resolveThreadId } from "./thread-resolution.js";
+import { postMessageWithActivation } from "./message-post-stamp.js";
+import { withResolvedThread } from "./resolved-thread.js";
 import type { SessionIdentity } from "./session-identity.js";
 import { McpToolCoordinator, registerMcpTool } from "./tool-registration.js";
 import type { McpOptions } from "./types.js";
@@ -59,7 +59,15 @@ export function registerThreadTools(
             threadId: input.threadId,
             body: input.body,
             mode: input.mode,
-            expectedSummaryRevision: input.expectedSummaryRevision
+            expectedSummaryRevision: input.expectedSummaryRevision,
+            activity:
+              input.mode === "update"
+                ? undefined
+                : await fetchThreadActivity(
+                    options,
+                    workspaceRoot,
+                    input.threadId
+                  )
           })
         );
       } catch (error) {
@@ -74,23 +82,37 @@ export function registerThreadTools(
     server,
     coordinator,
     "message_post",
-    "Append a structured Markdown message to a thread. Keep messages simple, direct, and short or medium length; attach long detail as artifacts.",
+    "Append a structured Markdown message to a thread. Keep messages simple, direct, and short or medium length; attach long detail as artifacts. In a governed thread, the lead can pass advanceTo, a later stage, to advance the stage with this message; a refused advance still posts the message and reports why in the result.",
     gatedSchema({
       threadId: z.string().min(1),
       agentId: z.string().min(1),
       body: z.string().min(1),
       role: z.string().optional(),
-      artifacts: z.array(z.string()).optional()
+      artifacts: z.array(z.string()).optional(),
+      advanceTo: z
+        .string()
+        .optional()
+        .describe(
+          "Optional. A fixed stage strictly ahead of the current one: planning, execution or review. Only the lead's post advances. Free text is accepted here and refused by the daemon, so the message is never blocked."
+        )
     }),
     async (input) => {
       const posted: { message?: ChatMessage } = {};
       const result = await withBootstrap(input, async () => {
-        posted.message = await appendMessage(workspaceRoot, input.threadId, {
-          agentId: input.agentId,
-          body: input.body,
-          role: input.role,
-          artifacts: input.artifacts
-        });
+        posted.message = await postMessageWithActivation(
+          options,
+          workspaceRoot,
+          input.threadId,
+          {
+            agentId: input.agentId,
+            body: input.body,
+            role: input.role,
+            artifacts: input.artifacts
+          },
+          input.advanceTo === undefined
+            ? undefined
+            : { to: input.advanceTo, identity: identity.fields() }
+        );
         return posted.message;
       });
       reportPostedActivity(result, {
@@ -239,25 +261,4 @@ function reportPostedActivity(
     threadId: activity.message.threadId,
     agentId: activity.agentId
   }).catch(() => undefined);
-}
-
-async function withResolvedThread<Result>(
-  input: { threadId: string; bootstrapConfirmed?: boolean },
-  workspaceRoot: string,
-  read: (threadId: string) => Promise<Result>
-) {
-  if (input.bootstrapConfirmed !== true) {
-    return withBootstrap(input, async () => undefined);
-  }
-
-  const resolution = await resolveThreadId(workspaceRoot, input.threadId);
-  if (!resolution.ok) {
-    return toolError(
-      resolution.error.code,
-      resolution.error.message,
-      resolution.error.details
-    );
-  }
-
-  return withBootstrap(input, async () => read(resolution.threadId));
 }

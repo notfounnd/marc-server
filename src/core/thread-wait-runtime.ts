@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import fsp from "node:fs/promises";
 import path from "node:path";
+import { readThreadPolicy } from "./activation-policy-store.js";
 import { workspaceId } from "./ids.js";
 import { marcDir, resolveWorkspace } from "./paths.js";
 import { parseMessages } from "./markdown.js";
@@ -35,11 +36,29 @@ export async function createWaitRuntimeDeps(
   return {
     readSnapshot: async () => ({
       messages: parseMessages(await fsp.readFile(files.chatPath, "utf8")),
-      closed: await pathExists(files.summaryPath)
+      closed: await pathExists(files.summaryPath),
+      policyActive: await policyActiveIn(info, threadId)
     }),
     watch: (onChange) => watchDirectory(files.threadPath, onChange),
     timers: nodeTimers
   };
+}
+
+/**
+ * A thread is governed by its policy when policy.json is enabled. A file that exists but
+ * cannot be read or validated also counts as governed: the wait fails closed rather than
+ * releasing manual work it cannot account for. A missing file or a disabled policy keeps
+ * the manual flow.
+ */
+async function policyActiveIn(
+  info: WorkspaceInfo,
+  threadId: string
+): Promise<boolean> {
+  const stored = await readThreadPolicy(info, threadId);
+  if (stored.status === "none") return false;
+  if (stored.status === "invalid") return true;
+  if (stored.status === "outdated") return stored.enabled;
+  return stored.policy.enabled;
 }
 
 const nodeTimers: WaitTimers = {

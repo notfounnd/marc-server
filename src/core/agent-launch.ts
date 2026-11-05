@@ -6,6 +6,7 @@
  */
 
 import type { SlotStateName } from "./session-slots.js";
+import type { AgentProfileSummary } from "./types.js";
 
 export type LaunchMode = "new" | "resume";
 export type ToolShell = "bash" | "default";
@@ -38,17 +39,42 @@ const COMMANDS: Record<AgentLaunchInput["client"], string> = {
   "claude-code": "claude"
 };
 
+/** The executable of a client. Launches never run it through a shell. */
+export function commandFor(client: AgentLaunchInput["client"]): string {
+  return COMMANDS[client];
+}
+
 /**
- * F2 heuristic: the profile's `Model:` prefix names the client that runs it. Only Claude Code
- * launches so far, so a Codex or other model maps to no client. F5 replaces this table with an
- * explicit client field in the profile, once Codex can be launched.
+ * Without a `Client:` line, the profile's `Model:` prefix names the client that runs it. Only Claude
+ * Code launches so far, so any other model maps to no client.
  */
 const CLIENT_BY_MODEL_PREFIX: Record<string, AgentLaunchInput["client"]> = {
   "claude-": "claude-code"
 };
 
-/** The client that runs a profile's model, or undefined when the client is unsupported or the model is missing. */
-export function clientForModel(
+/**
+ * Explicit `Client:` values with a launch adapter. codex is recognized but has no adapter until F5,
+ * so it maps to no client. A value outside this map is unsupported too, and it never falls back to
+ * the model prefix.
+ */
+const CLIENT_BY_EXPLICIT_NAME = new Map<string, AgentLaunchInput["client"]>([
+  ["claude-code", "claude-code"]
+]);
+
+/**
+ * The client that runs a profile, or undefined when the client is unsupported or unknown. The
+ * explicit `Client:` field comes first; the model prefix is the fallback when the field is absent.
+ */
+export function clientOf(
+  profile: Pick<AgentProfileSummary, "model" | "client">
+): AgentLaunchInput["client"] | undefined {
+  if (profile.client !== undefined) {
+    return CLIENT_BY_EXPLICIT_NAME.get(profile.client);
+  }
+  return clientForModel(profile.model);
+}
+
+function clientForModel(
   model: string | undefined
 ): AgentLaunchInput["client"] | undefined {
   if (model === undefined) return undefined;
@@ -59,7 +85,7 @@ export function clientForModel(
   return CLIENT_BY_MODEL_PREFIX[prefix];
 }
 
-const SESSION_FLAGS: Record<LaunchMode, string> = {
+export const SESSION_FLAGS: Record<LaunchMode, string> = {
   new: "--session-id",
   resume: "--resume"
 };
@@ -71,13 +97,19 @@ const TOOL_SHELL_ENV: Record<ToolShell, Record<string, string>> = {
 };
 
 export function buildAgentLaunch(input: AgentLaunchInput): AgentLaunch {
-  const changes = envChanges(input);
   return {
-    command: COMMANDS[input.client],
+    command: commandFor(input.client),
     args: launchArgs(input),
-    env: { ...keptEnv(input), ...changes.set },
+    env: clientEnv(input),
     cwd: input.workspaceRoot
   };
+}
+
+/** The environment a client receives: the inherited one without the stripped names, plus the tool-shell changes. */
+export function clientEnv(
+  input: Pick<AgentLaunchInput, "baseEnv" | "toolShell" | "platform">
+): Record<string, string> {
+  return { ...keptEnv(input), ...envChanges(input).set };
 }
 
 /** The same changes buildAgentLaunch makes, as names and constant values, for dry-run output. */

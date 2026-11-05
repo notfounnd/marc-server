@@ -62,14 +62,19 @@ test("keeps i18n usage scoped to the web UI", () => {
     path.join("src", "ui", "main.tsx"),
     path.join("src", "ui", "modal-sheet-header.tsx"),
     path.join("src", "ui", "modals.tsx"),
+    path.join("src", "ui", "thread-activation-form.tsx"),
+    path.join("src", "ui", "thread-activation-menu.tsx"),
     path.join("src", "ui", "thread-sessions-menu.tsx"),
     path.join("src", "ui", "thread-view.tsx"),
     path.join("src", "ui", "thread-create-modal.tsx"),
     path.join("src", "ui", "use-workspace-memory-actions.ts"),
-    path.join("src", "ui", "workspace-settings-modal.tsx"),
     path.join("src", "ui", "workspace-overview.tsx"),
+    path.join("src", "ui", "workspace-pause-control.tsx"),
+    path.join("src", "ui", "workspace-settings-modal.tsx"),
     path.join("test", "i18n.test.ts"),
-    path.join("test", "ui-version.test.ts")
+    path.join("test", "ui-thread-activation-status.test.ts"),
+    path.join("test", "ui-version.test.ts"),
+    path.join("test", "ui-workspace-pause-catalog.test.ts")
   ];
   const violations: string[] = [];
 

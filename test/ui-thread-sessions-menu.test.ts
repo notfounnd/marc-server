@@ -111,8 +111,8 @@ test("the pending section is titled Pending, never Warnings, and lists nothing w
   const expanded = bodyHtml(readyState(viewOf({ warnings: WARNINGS })), OPEN);
 
   assert.equal(collapsed.includes("Was mentioned"), false);
-  assert.equal(collapsed.includes('class="sessions-eyebrow">Pending<'), false);
-  assert.ok(expanded.includes('class="sessions-eyebrow">Pending<'));
+  assert.equal(collapsed.includes('class="panel-eyebrow">Pending<'), false);
+  assert.ok(expanded.includes('class="panel-eyebrow">Pending<'));
   assert.equal(expanded.includes("Warnings"), false);
   assert.equal(expanded.includes("warning"), false);
 });
@@ -136,7 +136,7 @@ test("each pending item's go-to button targets the last message of its warning",
 test("with no warnings an open pending panel shows no pending section", () => {
   const html = bodyHtml(readyState(viewOf({ warnings: [] })), OPEN);
 
-  assert.equal(html.includes('class="sessions-eyebrow">Pending<'), false);
+  assert.equal(html.includes('class="panel-eyebrow">Pending<'), false);
 });
 
 test("the slots group into Active, Ended and a collapsed Other profiles toggle, in that order", () => {

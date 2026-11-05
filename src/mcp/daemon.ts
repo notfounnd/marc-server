@@ -1,10 +1,14 @@
 import { randomUUID } from "node:crypto";
 import { getWorkspaceInfo } from "../core/workspace.js";
 import type { WorkspaceInfo } from "../core/types.js";
+import type {
+  ActivityRecord,
+  ThreadActivitySnapshot
+} from "../core/thread-activity-markdown.js";
 import type { IdentityFields, SessionIdentity } from "./session-identity.js";
 import type { McpOptions } from "./types.js";
 
-type DaemonConnection = {
+export type DaemonConnection = {
   daemonUrl: string;
   token: string;
 };
@@ -105,7 +109,41 @@ export async function startDaemonLeaseHeartbeat(
   };
 }
 
-function daemonConnection(options: McpOptions): DaemonConnection | undefined {
+/** The closing summary waits at most this long for the daemon. It never blocks the closure. */
+export const ACTIVITY_QUERY_TIMEOUT_MS = 2_000;
+
+/**
+ * Asks the daemon for the thread's activity while the thread closes. The query has a finite
+ * timeout. With no daemon configured, the result is undefined: no session tracking existed,
+ * so nothing was lost and the summary omits the section. A configured daemon that is
+ * unreachable, times out, or fails gives "unavailable", which the summary records as an
+ * explicit line. Zero totals are never written in its place.
+ */
+export async function fetchThreadActivity(
+  options: McpOptions,
+  workspaceRoot: string,
+  threadId: string
+): Promise<ActivityRecord | undefined> {
+  const connection = daemonConnection(options);
+  if (!connection) return undefined;
+  try {
+    const workspace = await getWorkspaceInfo(workspaceRoot);
+    const pathname = `/api/workspaces/${encodeURIComponent(workspace.id)}/threads/${encodeURIComponent(threadId)}/activity`;
+    const response = await fetch(new URL(pathname, connection.daemonUrl), {
+      headers: { authorization: `Bearer ${connection.token}` },
+      signal: AbortSignal.timeout(ACTIVITY_QUERY_TIMEOUT_MS)
+    });
+    if (!response.ok) return { status: "unavailable" };
+    const snapshot = (await response.json()) as ThreadActivitySnapshot;
+    return { status: "recorded", snapshot };
+  } catch {
+    return { status: "unavailable" };
+  }
+}
+
+export function daemonConnection(
+  options: McpOptions
+): DaemonConnection | undefined {
   const daemonUrl = options.daemonUrl ?? process.env.MARC_DAEMON_URL;
   const token = options.token ?? process.env.MARC_TOKEN;
   return daemonUrl && token ? { daemonUrl, token } : undefined;

@@ -2,6 +2,19 @@ import type { ChatMessage } from "./types.js";
 
 const MESSAGE_START = "<!-- marc-message";
 const MESSAGE_END = "<!-- /marc-message -->";
+const CYCLE_PATTERN = /^[1-9]\d*$/;
+
+/** Header fields as raw strings, so a rebuild keeps values it cannot type. */
+type HeaderFields = {
+  id: string;
+  threadId: string;
+  timestamp: string;
+  agentId: string;
+  role?: string;
+  stage?: string;
+  cycle?: string;
+  artifacts: string[];
+};
 
 function escapeMeta(value: string): string {
   return value.replace(/\r?\n/g, " ").trim();
@@ -32,21 +45,49 @@ export function renderChatHeader(
   ].join("\n");
 }
 
-export function renderMessage(message: ChatMessage): string {
-  const meta = [
+/** The one header layout every writer uses. Optional fields are omitted when absent. */
+function headerLines(fields: HeaderFields): string[] {
+  return [
     MESSAGE_START,
-    `id: ${escapeMeta(message.id)}`,
-    `threadId: ${escapeMeta(message.threadId)}`,
-    `timestamp: ${escapeMeta(message.timestamp)}`,
-    `agentId: ${escapeMeta(message.agentId)}`,
-    message.role ? `role: ${escapeMeta(message.role)}` : undefined,
-    message.artifacts.length
-      ? `artifacts: ${message.artifacts.map(escapeMeta).join(", ")}`
+    `id: ${escapeMeta(fields.id)}`,
+    `threadId: ${escapeMeta(fields.threadId)}`,
+    `timestamp: ${escapeMeta(fields.timestamp)}`,
+    `agentId: ${escapeMeta(fields.agentId)}`,
+    fields.role ? `role: ${escapeMeta(fields.role)}` : undefined,
+    fields.stage ? `stage: ${escapeMeta(fields.stage)}` : undefined,
+    fields.cycle ? `cycle: ${escapeMeta(fields.cycle)}` : undefined,
+    fields.artifacts.length
+      ? `artifacts: ${fields.artifacts.map(escapeMeta).join(", ")}`
       : undefined,
     "-->"
-  ].filter(Boolean);
+  ].filter((line): line is string => Boolean(line));
+}
+
+export function renderMessage(message: ChatMessage): string {
+  const meta = headerLines({
+    id: message.id,
+    threadId: message.threadId,
+    timestamp: message.timestamp,
+    agentId: message.agentId,
+    role: message.role,
+    stage: message.stage,
+    cycle: message.cycle?.toString(),
+    artifacts: message.artifacts
+  });
 
   return ["", ...meta, "", message.body.trim(), "", MESSAGE_END, ""].join("\n");
+}
+
+/** Reads the optional block fields. A cycle that is not a positive integer is ignored. */
+function optionalBlockFields(
+  meta: Record<string, string>
+): Pick<ChatMessage, "stage" | "cycle"> {
+  return {
+    ...(meta.stage ? { stage: meta.stage } : {}),
+    ...(CYCLE_PATTERN.test(meta.cycle ?? "")
+      ? { cycle: Number(meta.cycle) }
+      : {})
+  };
 }
 
 export function parseMessages(markdown: string): ChatMessage[] {
@@ -67,6 +108,7 @@ export function parseMessages(markdown: string): ChatMessage[] {
       timestamp: meta.timestamp,
       agentId: meta.agentId,
       role: meta.role || undefined,
+      ...optionalBlockFields(meta),
       body: match[2].trim(),
       artifacts: meta.artifacts
         ? meta.artifacts
@@ -108,22 +150,18 @@ export function addArtifactToMessage(
         artifacts.push(artifact);
       }
 
-      const metaLines = [
-        MESSAGE_START,
-        `id: ${escapeMeta(meta.id)}`,
-        `threadId: ${escapeMeta(meta.threadId)}`,
-        `timestamp: ${escapeMeta(meta.timestamp)}`,
-        `agentId: ${escapeMeta(meta.agentId)}`,
-        meta.role ? `role: ${escapeMeta(meta.role)}` : undefined,
-        artifacts.length
-          ? `artifacts: ${artifacts.map(escapeMeta).join(", ")}`
-          : undefined,
-        "-->"
-      ].filter(Boolean);
+      const lines = headerLines({
+        id: meta.id,
+        threadId: meta.threadId,
+        timestamp: meta.timestamp,
+        agentId: meta.agentId,
+        role: meta.role,
+        stage: meta.stage,
+        cycle: meta.cycle,
+        artifacts
+      });
 
-      return [metaLines.join("\n"), "", body.trim(), "", MESSAGE_END].join(
-        "\n"
-      );
+      return [lines.join("\n"), "", body.trim(), "", MESSAGE_END].join("\n");
     }
   );
 

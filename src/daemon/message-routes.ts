@@ -1,10 +1,13 @@
 import type http from "node:http";
-import { appendMessage, registerAgent } from "../core/workspace.js";
+import { initWorkspace, registerAgent } from "../core/workspace.js";
+import type { ActivationServices } from "./activation-views.js";
+import { postUiMessageIn } from "./activation-stamp-store.js";
 import { json, readBody, text } from "./http.js";
 import type { UiEventBus } from "./events.js";
 import type { DaemonStore } from "./store.js";
 
 type MessageRouteContext = {
+  activation: ActivationServices;
   events: UiEventBus;
   request: http.IncomingMessage;
   response: http.ServerResponse;
@@ -45,11 +48,16 @@ export async function postWorkspaceThreadMessage(
     model: "human",
     role: body.role ?? "user"
   });
-  const message = await appendMessage(workspace.rootPath, decodedThreadId, {
-    agentId: body.agentId,
-    body: body.message,
-    role: body.role ?? "user"
-  });
+  const message = await postUiMessageIn(
+    context.activation,
+    await initWorkspace(workspace.rootPath),
+    decodedThreadId,
+    {
+      agentId: body.agentId,
+      body: body.message,
+      role: body.role ?? "user"
+    }
+  );
   context.events.send("workspace-changed", {
     at: new Date().toISOString(),
     threadId: decodedThreadId,

@@ -1,28 +1,26 @@
+import * as React from "react";
 import { useTranslation } from "react-i18next";
 import { Paperclip, Settings } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
-import { Button } from "./common.js";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { Button, isClosedThread } from "./common.js";
+import { HeaderMenu } from "./header-menu.js";
+import { ThreadActivationMenu } from "./thread-activation-menu.js";
 import type {
   Agent,
   ApiGet,
+  ApiWrite,
   ArtifactMenuItem,
   MarkdownLinkHandler,
   Thread,
   Workspace
 } from "./types.js";
-import {
-  PRESSED_TRIGGER_CLASS,
-  ThreadSessionsMenu
-} from "./thread-sessions-menu.js";
+import { ThreadSessionsMenu } from "./thread-sessions-menu.js";
+import { WorkspacePauseControl } from "./workspace-pause-control.js";
 
 export function ContentHeaderActions({
   api,
+  apiPost,
+  apiPut,
   lastSyncedAt,
   selectedAgent,
   selectedThread,
@@ -35,6 +33,8 @@ export function ContentHeaderActions({
   onShowWorkspaceSettingsChange
 }: {
   api: ApiGet;
+  apiPost: ApiWrite;
+  apiPut: ApiWrite;
   lastSyncedAt?: Date;
   selectedAgent?: Agent;
   selectedThread?: Thread;
@@ -48,13 +48,20 @@ export function ContentHeaderActions({
 }) {
   return (
     <div className="content-actions">
-      <div className="content-action-row">
+      <div className="action-row content-action-row">
         <ThreadArtifactMenu
           selectedThread={selectedThread}
           selectedThreadArtifacts={selectedThreadArtifacts}
           showArtifactMenu={showArtifactMenu}
           onOpenLink={onOpenLink}
           onShowArtifactMenuChange={onShowArtifactMenuChange}
+        />
+        <ThreadActivationSlot
+          apiPost={apiPost}
+          apiPut={apiPut}
+          selectedThread={selectedThread}
+          selectedWorkspace={selectedWorkspace}
+          onOpenLink={onOpenLink}
         />
         <ThreadSessionsSlot
           api={api}
@@ -64,6 +71,81 @@ export function ContentHeaderActions({
           onOpenLink={onOpenLink}
         />
       </div>
+      <WorkspaceActionsRow
+        api={api}
+        apiPost={apiPost}
+        lastSyncedAt={lastSyncedAt}
+        selectedAgent={selectedAgent}
+        selectedThread={selectedThread}
+        selectedWorkspace={selectedWorkspace}
+        showWorkspaceSettings={showWorkspaceSettings}
+        onShowWorkspaceSettingsChange={onShowWorkspaceSettingsChange}
+      />
+    </div>
+  );
+}
+
+/**
+ * The thread policy trigger. It is hidden without a thread, like the sessions trigger, and in a
+ * closed thread, whose policy file the daemon has already removed.
+ */
+export function ThreadActivationSlot({
+  apiPost,
+  apiPut,
+  selectedThread,
+  selectedWorkspace,
+  onOpenLink
+}: {
+  apiPost: ApiWrite;
+  apiPut: ApiWrite;
+  selectedThread?: Thread;
+  selectedWorkspace?: Workspace;
+  onOpenLink: MarkdownLinkHandler;
+}) {
+  if (!selectedThread || !selectedWorkspace) return null;
+  if (isClosedThread(selectedThread)) return null;
+
+  return (
+    <ThreadActivationMenu
+      apiPost={apiPost}
+      apiPut={apiPut}
+      workspace={selectedWorkspace}
+      thread={selectedThread}
+      onOpenLink={onOpenLink}
+    />
+  );
+}
+
+/** The workspace row: the pause control beside the settings button. It shows only in the workspace view. */
+function WorkspaceActionsRow({
+  api,
+  apiPost,
+  lastSyncedAt,
+  selectedAgent,
+  selectedThread,
+  selectedWorkspace,
+  showWorkspaceSettings,
+  onShowWorkspaceSettingsChange
+}: {
+  api: ApiGet;
+  apiPost: ApiWrite;
+  lastSyncedAt?: Date;
+  selectedAgent?: Agent;
+  selectedThread?: Thread;
+  selectedWorkspace?: Workspace;
+  showWorkspaceSettings: boolean;
+  onShowWorkspaceSettingsChange: (show: boolean) => void;
+}) {
+  if (!selectedWorkspace || selectedThread || selectedAgent) return null;
+
+  return (
+    <div className="action-row content-action-row">
+      <WorkspacePauseControl
+        api={api}
+        apiPost={apiPost}
+        workspace={selectedWorkspace}
+        syncMark={lastSyncedAt}
+      />
       <WorkspaceSettingsMenu
         selectedAgent={selectedAgent}
         selectedThread={selectedThread}
@@ -75,7 +157,11 @@ export function ContentHeaderActions({
   );
 }
 
-function ThreadSessionsSlot({
+/**
+ * The sessions trigger. It is hidden without a thread, and in a closed thread, which ends its
+ * session links with it, as the activation trigger does.
+ */
+export function ThreadSessionsSlot({
   api,
   lastSyncedAt,
   selectedThread,
@@ -89,6 +175,7 @@ function ThreadSessionsSlot({
   onOpenLink: MarkdownLinkHandler;
 }) {
   if (!selectedThread || !selectedWorkspace) return null;
+  if (isClosedThread(selectedThread)) return null;
 
   return (
     <ThreadSessionsMenu
@@ -118,41 +205,26 @@ function ThreadArtifactMenu({
   if (!selectedThread || !selectedThreadArtifacts.length) return null;
 
   return (
-    <div className="header-artifacts">
-      <DropdownMenu
-        open={showArtifactMenu}
-        onOpenChange={onShowArtifactMenuChange}
-        modal={false}
-      >
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant={showArtifactMenu ? "primary" : "secondary"}
-            className={`button-icon ${PRESSED_TRIGGER_CLASS}`}
-            title={t("Show thread artifacts")}
+    <HeaderMenu
+      icon={Paperclip}
+      label={t("Show thread artifacts")}
+      title={t("Artifacts")}
+      open={showArtifactMenu}
+      onOpenChange={onShowArtifactMenuChange}
+    >
+      <div className="artifact-menu-list">
+        {selectedThreadArtifacts.map(({ message, artifact, href }) => (
+          <DropdownMenuItem
+            className="artifact-menu-item"
+            key={`${message.id}:${artifact}`}
+            onSelect={() => void onOpenLink(href)}
           >
-            <Paperclip size={14} />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="artifact-menu">
-          <DropdownMenuLabel className="artifact-menu-head">
-            <Paperclip size={14} />
-            <span>{t("Artifacts")}</span>
-          </DropdownMenuLabel>
-          <div className="artifact-menu-list">
-            {selectedThreadArtifacts.map(({ message, artifact, href }) => (
-              <DropdownMenuItem
-                className="artifact-menu-item"
-                key={`${message.id}:${artifact}`}
-                onSelect={() => void onOpenLink(href)}
-              >
-                <span>{artifact.replace(/^artifacts\//, "")}</span>
-                <small>#{message.id}</small>
-              </DropdownMenuItem>
-            ))}
-          </div>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+            <span>{artifact.replace(/^artifacts\//, "")}</span>
+            <small>#{message.id}</small>
+          </DropdownMenuItem>
+        ))}
+      </div>
+    </HeaderMenu>
   );
 }
 
@@ -173,7 +245,7 @@ function WorkspaceSettingsMenu({
   if (!selectedWorkspace || selectedThread || selectedAgent) return null;
 
   return (
-    <div className="header-artifacts">
+    <div className="header-action">
       <Button
         variant={showWorkspaceSettings ? "primary" : "secondary"}
         className="button-icon"

@@ -1,5 +1,10 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import {
+  DEFAULT_CYCLES_PER_STAGE,
+  isCyclesPerStage,
+  type RawActivity
+} from "../activation-cycles.js";
 import { safeJoin } from "../paths.js";
 import type {
   WorkspaceDocumentSource,
@@ -23,7 +28,8 @@ const DEFAULT_SETTINGS: WorkspaceSettings = {
     autoRebuild: true,
     embeddingBatchSize: DEFAULT_MEMORY_EMBEDDING_BATCH_SIZE,
     documentSources: []
-  }
+  },
+  activation: { cyclesPerStage: DEFAULT_CYCLES_PER_STAGE }
 };
 
 type WorkspaceSettingsFile = Partial<{
@@ -32,6 +38,7 @@ type WorkspaceSettingsFile = Partial<{
     embeddingBatchSize: number;
     documentSources: unknown;
   }>;
+  activation: unknown;
 }>;
 
 export function isMemoryEmbeddingBatchSize(value: unknown): value is number {
@@ -54,16 +61,58 @@ export async function readWorkspaceSettingsInWorkspace(
   return normalizeWorkspaceSettings(JSON.parse(content));
 }
 
+/**
+ * Saves the settings. The activation section is passed through byte for byte unless the
+ * input carries a cycles value, so a memory save never drops or rewrites it.
+ */
 export async function updateWorkspaceSettingsInWorkspace(
   info: WorkspaceInfo,
   input: WorkspaceSettingsInput
 ): Promise<WorkspaceSettings> {
   const current = await readWorkspaceSettingsInWorkspace(info);
   const next = mergeWorkspaceSettings(current, input);
+  const raw = await readRawActivityInWorkspace(info);
+  const activation = activationToWrite(raw, input);
   await withWorkspaceWriteLock(info.marcPath, "workspace-settings", () =>
-    writeFileAtomically(workspaceSettingsPath(info), renderSettings(next))
+    writeFileAtomically(
+      workspaceSettingsPath(info),
+      renderSettings(next, activation)
+    )
   );
   return next;
+}
+
+/** The activation section as the file holds it. Unreadable JSON has no section to keep. */
+export async function readRawActivityInWorkspace(
+  info: WorkspaceInfo
+): Promise<RawActivity> {
+  const content = await readSettingsContent(info);
+  if (content === undefined) {
+    return { status: "readable", activation: undefined };
+  }
+  return rawActivityOf(content);
+}
+
+function rawActivityOf(content: string): RawActivity {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(content);
+  } catch {
+    return { status: "unreadable" };
+  }
+  if (!isRecord(parsed)) return { status: "unreadable" };
+  return { status: "readable", activation: parsed.activation };
+}
+
+function activationToWrite(
+  raw: RawActivity,
+  input: WorkspaceSettingsInput
+): unknown {
+  const kept = raw.status === "readable" ? raw.activation : undefined;
+  const values = input.activation;
+  if (values === undefined) return kept;
+  const base = isRecord(kept) ? kept : {};
+  return { ...base, ...values };
 }
 
 function mergeWorkspaceSettings(
@@ -78,8 +127,19 @@ function mergeWorkspaceSettings(
           : current.memory.autoRebuild,
       embeddingBatchSize: nextEmbeddingBatchSize(current, input),
       documentSources: current.memory.documentSources
-    }
+    },
+    activation: { cyclesPerStage: nextCyclesPerStage(current, input) }
   };
+}
+
+function nextCyclesPerStage(
+  current: WorkspaceSettings,
+  input: WorkspaceSettingsInput
+): number {
+  const next = input.activation?.cyclesPerStage;
+  if (next === undefined) return current.activation.cyclesPerStage;
+  if (isCyclesPerStage(next)) return next;
+  throw new Error("Cycles per stage must be an integer from 1 to 20.");
 }
 
 function nextEmbeddingBatchSize(
@@ -105,8 +165,15 @@ async function readSettingsContent(
   }
 }
 
-function renderSettings(settings: WorkspaceSettings): string {
-  return `${JSON.stringify(settings, null, 2)}\n`;
+function renderSettings(
+  settings: WorkspaceSettings,
+  activation: unknown
+): string {
+  const document = {
+    memory: settings.memory,
+    ...(activation === undefined ? {} : { activation })
+  };
+  return `${JSON.stringify(document, null, 2)}\n`;
 }
 
 function normalizeWorkspaceSettings(value: unknown): WorkspaceSettings {
@@ -123,8 +190,17 @@ function normalizeWorkspaceSettings(value: unknown): WorkspaceSettings {
         ? memory.embeddingBatchSize
         : DEFAULT_SETTINGS.memory.embeddingBatchSize,
       documentSources: normalizeDocumentSources(memory.documentSources)
-    }
+    },
+    activation: { cyclesPerStage: cyclesOf(input.activation) }
   };
+}
+
+/** The value a readable file holds, or the default. The authorized value is decided by the daemon. */
+function cyclesOf(value: unknown): number {
+  if (!isRecord(value)) return DEFAULT_CYCLES_PER_STAGE;
+  return isCyclesPerStage(value.cyclesPerStage)
+    ? value.cyclesPerStage
+    : DEFAULT_CYCLES_PER_STAGE;
 }
 
 function defaultSettings(): WorkspaceSettings {
@@ -133,7 +209,8 @@ function defaultSettings(): WorkspaceSettings {
       autoRebuild: DEFAULT_SETTINGS.memory.autoRebuild,
       embeddingBatchSize: DEFAULT_SETTINGS.memory.embeddingBatchSize,
       documentSources: []
-    }
+    },
+    activation: { cyclesPerStage: DEFAULT_CYCLES_PER_STAGE }
   };
 }
 

@@ -149,7 +149,7 @@ export function ThreadSessionRow({
       title={rowTitle(slot, t)}
     >
       <span
-        className="sessions-dot"
+        className="panel-dot sessions-dot"
         data-tone={toneOf(slot)}
         aria-hidden="true"
       />
@@ -159,7 +159,7 @@ export function ThreadSessionRow({
       </span>
       <button
         type="button"
-        className="sessions-copy"
+        className="icon-button"
         aria-label={t("Copy command")}
         title={t(blocked ?? "Copy command")}
         disabled={blocked !== undefined}
@@ -178,10 +178,27 @@ function subLine(slot: ThreadSessionSlot, t: Translate): string {
     .join(" · ");
 }
 
-/** The full reason, then the origin, generation and bound time of the binding. */
+/** The full reason, the note of an unbound developer, then the origin, generation and bound time of the binding. */
 function rowTitle(slot: ThreadSessionSlot, t: Translate): string {
   const reason = REASON_LABELS[slot.details.reason] ?? UNKNOWN_REASON;
-  return [t(reason), ...bindingLines(slot.binding, t)].join("\n");
+  return [
+    t(reason),
+    ...unboundRoleLines(slot, t),
+    ...bindingLines(slot.binding, t)
+  ].join("\n");
+}
+
+/** Dispatch table: the role of an unbound profile to the note its tooltip adds. Neutral on purpose: not every developer is a subagent. */
+const UNBOUND_ROLE_NOTES: Partial<Record<string, string>> = {
+  developer:
+    "Developer subagents run inside an architect's session and are never bound. A fixed developer session is bound through marc open."
+};
+
+/** The note only for a profile with no session, so the row explains why no session shows. */
+function unboundRoleLines(slot: ThreadSessionSlot, t: Translate): string[] {
+  if (slot.state !== "unbound") return [];
+  const note = UNBOUND_ROLE_NOTES[slot.role ?? ""];
+  return note === undefined ? [] : [t(note)];
 }
 
 function bindingLines(
@@ -260,6 +277,9 @@ export const ROW_LABEL_KEYS: string[] = [
   "Copy command",
   ...Object.values(COPY_BLOCKS).filter(
     (label): label is string => label !== undefined
+  ),
+  ...Object.values(UNBOUND_ROLE_NOTES).filter(
+    (note): note is string => note !== undefined
   ),
   AGENTS_NOTICE,
   REGISTRY_NOTICE,

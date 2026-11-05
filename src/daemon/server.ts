@@ -33,6 +33,28 @@ import {
   type RegistryDependencies
 } from "./session-registry.js";
 import type { SessionServices } from "./session-routes.js";
+import { createActivationLedger } from "./activation-ledger.js";
+import type { ActivationServices } from "./activation-routes.js";
+import type { SupervisionOptions } from "./supervision-runner.js";
+import {
+  createSupervisionService,
+  type SupervisionService
+} from "./supervision-service.js";
+import type { TurnRunner } from "./supervision-turn-runner.js";
+import { wireSupervision } from "./supervision-wiring.js";
+import { processesOf, type ProcessTablePort } from "./process-table-os.js";
+import {
+  closedThreadChecker,
+  forgetIfClosed,
+  removeClosedThreads
+} from "./thread-cleanup.js";
+import {
+  createThreadStore,
+  type ThreadStore,
+  type ThreadStoreDependencies
+} from "./thread-store.js";
+import { createWorkspaceStore } from "./workspace-store.js";
+import { writeFileAtomically } from "../core/write-coordination.js";
 import { daemonStatus } from "./status.js";
 import { DaemonStore } from "./store.js";
 import { renderUi } from "./ui.js";
@@ -44,26 +66,73 @@ export type DaemonServerDependencies = {
   registry?: Partial<RegistryDependencies>;
   /** The runtime the copied `marc open` commands start from. Production reads this process. */
   marcRuntime?: () => MarcRuntime;
+  /** The process table of the waiter's identity and of the turns' liveness. Production reads the operating system. */
+  processes?: ProcessTablePort;
+  /** The supervisor's runner, clock and ids. Production launches nothing yet; tests pass a fake runner. */
+  supervision?: Partial<SupervisionOptions>;
 };
 
 const DEFAULT_DAEMON_DEPENDENCIES: DaemonServerDependencies = {
   memoryRecall: recallMemory
 };
 
+/** The HTTP server plus the drain that waits for the daemon's background index writes. */
+export type DaemonServer = http.Server & {
+  drainBackground(): Promise<void>;
+  /** The supervisor, so a test can run its passes and sweeps without waiting for the file watcher. */
+  supervision: SupervisionService;
+  /** The thread store the daemon writes through, so a test edits a state file in the same queue. */
+  threads: ThreadStore;
+  /** The turn runner, so a test can start a held turn after it changed the state the second pass reads. */
+  turnRunner: TurnRunner;
+};
+
 export async function createDaemonServer(
   config: DaemonConfig,
   dependencies: DaemonServerDependencies = DEFAULT_DAEMON_DEPENDENCIES
-): Promise<http.Server> {
+): Promise<DaemonServer> {
   const store = await DaemonStore.open(config.dataDir);
   const leases = new Map<string, DaemonLease>();
+  const stateDeps: ThreadStoreDependencies = {
+    writeAtomic:
+      dependencies.registry?.writeAtomic ??
+      ((filePath, content) => writeFileAtomically(filePath, content)),
+    now: dependencies.registry?.now ?? (() => new Date().toISOString()),
+    isClosed: closedThreadChecker(store),
+    changed: (scope) =>
+      events.workspaceChanged(scope.workspaceId, scope.threadId)
+  };
+  const threads = createThreadStore(config.dataDir, stateDeps);
+  const workspaces = createWorkspaceStore(config.dataDir, stateDeps);
+  // The turns read the services and the sessions created below, when a turn starts.
+  const { options: supervisionOptions, turnRunner } = wireSupervision({
+    now: stateDeps.now,
+    registry: dependencies.registry,
+    supervision: dependencies.supervision,
+    host: () => ({ services: activation, sessions, now: stateDeps.now }),
+    changed: (workspaceId, threadId) =>
+      events.workspaceChanged(workspaceId, threadId)
+  });
+  const activation: ActivationServices = {
+    threads,
+    workspaces,
+    ledger: createActivationLedger({ threads, workspaces }, stateDeps.now),
+    supervision: supervisionOptions
+  };
   const sessions: SessionServices = {
-    registry: createSessionRegistry(config.dataDir, dependencies.registry),
+    registry: createSessionRegistry(
+      config.dataDir,
+      dependencies.registry,
+      threads
+    ),
     presence: createSessionPresence(dependencies.presence),
     leases,
     dataDir: config.dataDir,
     daemonUrl: () =>
       daemonUrlFor(config.host, listeningPort(server, config.port)),
-    marcRuntime: dependencies.marcRuntime ?? currentMarcRuntime
+    marcRuntime: dependencies.marcRuntime ?? currentMarcRuntime,
+    processes: processesOf(dependencies.processes),
+    isClosed: closedThreadChecker(store)
   };
   const startedAt = new Date().toISOString();
   let lastActivityAt = startedAt;
@@ -89,9 +158,28 @@ export async function createDaemonServer(
   }
 
   const events = new UiEventBus(trackActivity);
+  const supervision = createSupervisionService({
+    services: activation,
+    sessions,
+    options: supervisionOptions,
+    listWorkspaces: () => store.listWorkspaces(),
+    notify: (workspace, threadId) =>
+      events.send("workspace-changed", {
+        workspaceId: workspace.id,
+        threadId,
+        at: new Date().toISOString()
+      })
+  });
+  events.onThreadFolderChange((workspace, threadId) => {
+    forgetIfClosed(store, threads, workspace, threadId).catch(() => undefined);
+    supervision.onThreadChange(workspace, threadId);
+  });
+  await sessions.registry.prepare();
+  await removeClosedThreads(await store.listWorkspaces(), threads);
   for (const workspace of await store.listWorkspaces()) {
     await events.watchWorkspace(workspace);
   }
+  supervision.start();
 
   async function serveUi(
     url: URL,
@@ -176,6 +264,7 @@ export async function createDaemonServer(
         memoryRecall: dependencies.memoryRecall,
         request,
         response,
+        activation,
         sessions,
         store,
         url
@@ -202,10 +291,19 @@ export async function createDaemonServer(
   });
 
   server.on("close", () => {
+    supervision.stop();
     events.close();
     void disposeMemoryProviders().catch(() => undefined);
   });
-  return server;
+  return Object.assign(server, {
+    drainBackground: async () => {
+      await events.idle();
+      await supervision.idle();
+    },
+    supervision,
+    threads,
+    turnRunner
+  });
 }
 
 /** The port the server listens on. Port 0 asks the system for one, so the bound address is read. */

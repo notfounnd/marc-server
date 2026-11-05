@@ -3,6 +3,7 @@
 ID: `claude-software-architect`
 Role: architect
 Model: claude-opus-5-5
+Client: claude-code
 Description: Architect responsible for planning, developer orchestration, independent review, and technical approval in Claude Code sessions.
 
 ## Responsibilities

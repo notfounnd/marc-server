@@ -14,6 +14,8 @@ import {
   type SessionIdentity
 } from "./session-identity.js";
 import { registerThreadTools } from "./thread-tools.js";
+import { deadlineSourceOf } from "./deadline-notice.js";
+import { registerPermissionPromptTool } from "./permission-tool.js";
 import { McpToolCoordinator } from "./tool-registration.js";
 import type { McpOptions } from "./types.js";
 import { registerWorkspaceTools } from "./workspace-tools.js";
@@ -50,7 +52,7 @@ class ProtocolVersionGuidanceTransport extends StdioServerTransport {
 
 export function buildMcpServer(
   options: McpOptions = {},
-  coordinator = new McpToolCoordinator(),
+  coordinator = new McpToolCoordinator(undefined, deadlineSourceOf(options)),
   identity: SessionIdentity = createProcessIdentity()
 ): McpServer {
   const workspaceRoot = options.workspace ?? process.cwd();
@@ -69,6 +71,7 @@ export function buildMcpServer(
   registerThreadTools(server, coordinator, workspaceRoot, options, identity);
   registerAgentTools(server, coordinator, workspaceRoot);
   registerMemoryTools(server, workspaceRoot, coordinator);
+  registerPermissionPromptTool(server, options);
   return server;
 }
 
@@ -82,7 +85,10 @@ function createProcessIdentity(): SessionIdentity {
 }
 
 export async function runMcpServer(options: McpOptions = {}): Promise<void> {
-  const coordinator = new McpToolCoordinator();
+  const coordinator = new McpToolCoordinator(
+    undefined,
+    deadlineSourceOf(options)
+  );
   const identity = createProcessIdentity();
   const cleanupHeartbeat = await startDaemonLeaseHeartbeat(options, identity);
   const transport = new ProtocolVersionGuidanceTransport();
