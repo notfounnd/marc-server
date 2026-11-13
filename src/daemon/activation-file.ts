@@ -16,6 +16,7 @@ import type {
 import type { StageHistoryEntry } from "../core/activation-advance.js";
 import type { LeadChange } from "../core/activation-lead.js";
 import type { ReservationRecord } from "../core/activation-reservation-types.js";
+import { IDENTITY_CHECKS } from "../core/waiter-identity.js";
 
 /**
  * Shapes of the activation state kept beside the session slots. The counters live
@@ -169,8 +170,14 @@ function isReservationRecord(value: unknown): boolean {
     isOptionalCount(value.cycle) &&
     isOptionalText(value.reason) &&
     isOptionalText(value.answeredBy) &&
-    isOptionalText(value.revision)
+    isOptionalText(value.revision) &&
+    isOptionalIdentityCheck(value.identityCheck)
   );
+}
+
+function isOptionalIdentityCheck(value: unknown): boolean {
+  if (value === undefined) return true;
+  return isOneOf(value, IDENTITY_CHECKS);
 }
 
 function isOptionalHistory(value: unknown): boolean {

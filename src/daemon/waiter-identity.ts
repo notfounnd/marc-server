@@ -1,16 +1,18 @@
 import type { WorkspaceInfo } from "../core/types.js";
 import { slotKey } from "../core/session-slots.js";
-import { waiterIdentityVerified } from "../core/waiter-identity.js";
+import {
+  waiterIdentityCheck,
+  type IdentityCheck
+} from "../core/waiter-identity.js";
 import { processesOf } from "./process-table-os.js";
 import type { SessionServices } from "./session-views.js";
 import type { ThreadFile } from "./thread-store.js";
 
 /**
  * The waiter's identity as one step of the thread's queue: it receives the file the step writes, so the
- * binding it reads is the binding of that same snapshot. It answers whether the waiter descends from the
- * client that owns the slot.
+ * binding it reads is the binding of that same snapshot. It answers the check that failed, or `verified`.
  */
-export type WaiterIdentity = (file: ThreadFile) => Promise<boolean>;
+export type WaiterIdentity = (file: ThreadFile) => Promise<IdentityCheck>;
 
 export type WaiterCall = {
   workspace: WorkspaceInfo;
@@ -23,22 +25,22 @@ export type WaiterCall = {
   pid: number | undefined;
 };
 
-/** Builds the identity step of one reservation. Without a pid, or without a binding, nothing is read at all. */
+/** Builds the identity step of one reservation. Without a pid, or without a binding, nothing else is read. */
 export function waiterIdentityOf(
   sessions: SessionServices,
   call: WaiterCall
 ): WaiterIdentity {
   return async (file) => {
-    if (call.pid === undefined) return false;
+    if (call.pid === undefined) return "no_pid";
     const key = slotKey({
       workspaceId: call.workspace.id,
       threadId: call.threadId,
       profile: call.recipient
     });
     const binding = file.slots[key];
-    if (binding === undefined) return false;
+    if (binding === undefined) return "no_binding";
     const table = await processesOf(sessions.processes).list();
-    return waiterIdentityVerified({
+    return waiterIdentityCheck({
       pid: call.pid,
       holder: call.holder,
       binding,

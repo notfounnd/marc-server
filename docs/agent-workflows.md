@@ -323,6 +323,20 @@ Exit codes:
 | 130 | `interrupted` | Do not re-arm without a request. |
 
 Exit 7 with a `held` list means a reservation was still retained when the time limit ended: the mention was not delivered and the cursor did not move. Re-arm with the same cursor only if the human still wants to listen.
+A reservation held by an identity check names that check, and the ⚡ panel warns with the same check. To find out which fact failed, run `marc diagnose` for the thread and your own profile:
+```text
+marc diagnose --thread <threadId|suffix> --profile <agent-id> [--workspace <path>] [--data-dir <path>] [--daemon-url <url>]
+```
+It prints one JSON line. Read the `identityCheck` of your reservation in `reservations`, and the binding of your slot in `slots`, with its `clientPid`, its `clientStartedAt` and the `processes` it links. The codes:
+- `no_pid`: the listener did not send its pid.
+- `no_binding`: no session holds the slot yet.
+- `session_mismatch`: another session holds the slot.
+- `no_client_pid`: the slot does not record its client process.
+- `process_table_unavailable`: the process table could not be read.
+- `not_descendant`: the listener does not run under the slot's client.
+- `agents_unavailable`: the client list could not be read.
+- `start_mismatch`: the client is not running, or it started again after the slot was bound.
+Exit 0 prints the view, and `--profile` narrows it to that profile's slot and records. Exit 5 prints `{"status":"error","reason":...}` for an unknown thread, a daemon that does not answer, a token that is missing or refused, or an unreadable flag. The token is never printed. The flags follow `marc open`: the data directory and the daemon URL come from the flag, then `MARC_DAEMON_DIR` or `MARC_DAEMON_URL`, then the workspace's `.marc-daemon`. The token comes from the data directory, then `MARC_TOKEN`.
 
 Rules:
 

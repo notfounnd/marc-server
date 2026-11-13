@@ -1,6 +1,6 @@
 import { GoToButton } from "./go-to-button.js";
 import { holdOriginOf } from "./thread-activation-people.js";
-import { waitTextOf } from "./thread-activation-waiting-model.js";
+import { holdTextOf } from "./thread-activation-waiting-model.js";
 import type { ActivationHoldView, Message, Translate } from "./types.js";
 
 /**
@@ -19,7 +19,7 @@ export function HoldRow({
   t: Translate;
 }) {
   const origin = holdOriginOf(hold, messages);
-  const text = waitTextOf(hold.reason);
+  const text = holdTextOf(hold);
   const goButton = (
     <GoToButton
       reference={`marc://#${hold.messageId}`}

@@ -125,26 +125,35 @@ export function spawnLaunch(launch: AgentLaunch): LaunchedChild {
   };
 }
 
+/**
+ * One JSON call to the daemon, with the token only in the Authorization header. The reply keeps its
+ * status, so the caller decides what a refusal means.
+ */
+export async function callDaemon(
+  access: DaemonAccess,
+  method: string,
+  route: string,
+  body?: unknown,
+  fetcher: typeof fetch = fetch
+): Promise<DaemonReply> {
+  const response = await fetcher(new URL(route, access.baseUrl), {
+    method,
+    headers: {
+      authorization: `Bearer ${access.token}`,
+      "content-type": "application/json"
+    },
+    body: body === undefined ? undefined : JSON.stringify(body)
+  });
+  return { status: response.status, body: parseJson(await response.text()) };
+}
+
 /** One function per daemon route. The token is only sent as a bearer header. */
 export function createDaemonClient(
   access: DaemonAccess,
   fetcher: typeof fetch = fetch
 ): DaemonClient {
-  const call = async (
-    method: string,
-    route: string,
-    body?: unknown
-  ): Promise<DaemonReply> => {
-    const response = await fetcher(new URL(route, access.baseUrl), {
-      method,
-      headers: {
-        authorization: `Bearer ${access.token}`,
-        "content-type": "application/json"
-      },
-      body: body === undefined ? undefined : JSON.stringify(body)
-    });
-    return { status: response.status, body: parseJson(await response.text()) };
-  };
+  const call = (method: string, route: string, body?: unknown) =>
+    callDaemon(access, method, route, body, fetcher);
   return {
     status: () => call("GET", "/api/status"),
     sessions: (workspaceId, threadId) =>

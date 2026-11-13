@@ -1,7 +1,7 @@
 {
   "schemaVersion": 7,
-  "builtAt": "2026-11-12T17:09:49.240Z",
-  "generation": "20261112170947976_8856bbe8",
+  "builtAt": "2026-11-13T00:20:05.864Z",
+  "generation": "20261113002004586_10c346f2",
   "embeddingProvider": {
     "id": "transformers-js-local-e5",
     "name": "Transformers.js local multilingual E5 retrieval",
@@ -1450,6 +1450,28 @@
       "layer": 0,
       "authority": "decision",
       "sourcePath": ".marc/threads/oportunidade-revisao-en-us-do-projeto-c14150b8/SUMMARY.md"
+    },
+    {
+      "threadId": "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf",
+      "title": "Oportunidade - Rota de diagnóstico de sessões e ativação",
+      "closedAt": "2026-11-13T00:18:38.631Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf/SUMMARY.md",
+      "reference": "marc://$oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf",
+      "sha256": "9a25ba6cbdab099450d9a30e2ecd3dc78381609c993d8d3661b7e091da61c9fc",
+      "mtimeMs": 1794529118640.848,
+      "recordIds": [
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:identity",
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:source:activity:passage:001",
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:source:objetivo-e-contexto:passage:001",
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:source:o-que-foi-entregue:passage:001",
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:source:execucao-e-revisao:passage:001",
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:source:limites-e-pendencias:passage:001"
+      ],
+      "sourceType": "summary",
+      "layer": 0,
+      "authority": "decision",
+      "sourcePath": ".marc/threads/oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf/SUMMARY.md"
     },
     {
       "threadId": "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9",
@@ -9811,6 +9833,60 @@
       "sourcePath": ".marc/threads/oportunidade-revisao-en-us-do-projeto-c14150b8/artifacts/plano-i18n-interface-e-auditoria-en-us.md"
     },
     {
+      "threadId": "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf",
+      "title": "Oportunidade - Rota de diagnóstico de sessões e ativação / plano-rota-diagnostico.md",
+      "closedAt": "2026-11-13T00:18:38.631Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf/SUMMARY.md",
+      "reference": "marc://$oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf",
+      "sha256": "9e56773debc2157973fae036112a3bb387836da4e69f47a85ce06ccad38bb384",
+      "mtimeMs": 1794506973148.1958,
+      "recordIds": [
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:artifact:plano-rota-diagnostico.md:source:contexto:passage:001",
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:artifact:plano-rota-diagnostico.md:source:desenho:passage:001",
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:artifact:plano-rota-diagnostico.md:source:desenho:passage:002",
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:artifact:plano-rota-diagnostico.md:source:desenho:passage:003",
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:artifact:plano-rota-diagnostico.md:source:desenho:passage:004",
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:artifact:plano-rota-diagnostico.md:source:desenho:passage:005",
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:artifact:plano-rota-diagnostico.md:source:desenho:passage:006",
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:artifact:plano-rota-diagnostico.md:source:tarefas-um-dev-por-vez-claude-dev-general-purpose-haiku-effort-x:passage:001",
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:artifact:plano-rota-diagnostico.md:source:execucao-depois-da-aprovacao-deste-plano:passage:001",
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:artifact:plano-rota-diagnostico.md:source:verificacao:passage:001",
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:artifact:plano-rota-diagnostico.md:source:verificacao:passage:002"
+      ],
+      "sourceType": "artifact",
+      "layer": 1,
+      "authority": "artifact",
+      "sourcePath": ".marc/threads/oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf/artifacts/plano-rota-diagnostico.md"
+    },
+    {
+      "threadId": "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf",
+      "title": "Oportunidade - Rota de diagnóstico de sessões e ativação / revisao-integrada-diagnostico.md",
+      "closedAt": "2026-11-13T00:18:38.631Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf/SUMMARY.md",
+      "reference": "marc://$oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf",
+      "sha256": "b1dfffa33e674b2cc6623d4e185710b0f11eaae239e6f0f018b80c44a1767697",
+      "mtimeMs": 1794524437316.4258,
+      "recordIds": [
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:artifact:revisao-integrada-diagnostico.md:source:veredito:passage:001",
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:artifact:revisao-integrada-diagnostico.md:source:escopo-e-fontes-revisados:passage:001",
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:artifact:revisao-integrada-diagnostico.md:source:criterios-e-evidencia:passage:001",
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:artifact:revisao-integrada-diagnostico.md:source:criterios-e-evidencia:passage:002",
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:artifact:revisao-integrada-diagnostico.md:source:criterios-e-evidencia:passage:003",
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:artifact:revisao-integrada-diagnostico.md:source:achados-e-decisoes-aceitas-na-revisao:passage:001",
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:artifact:revisao-integrada-diagnostico.md:source:checagens-do-estado-final-principal:passage:001",
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:artifact:revisao-integrada-diagnostico.md:source:limites:passage:001",
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:artifact:revisao-integrada-diagnostico.md:source:achado-do-codex-e-reavaliacao:passage:001",
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:artifact:revisao-integrada-diagnostico.md:source:achado-do-codex-e-reavaliacao:passage:002",
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:artifact:revisao-integrada-diagnostico.md:source:para-o-humano:passage:001"
+      ],
+      "sourceType": "artifact",
+      "layer": 1,
+      "authority": "artifact",
+      "sourcePath": ".marc/threads/oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf/artifacts/revisao-integrada-diagnostico.md"
+    },
+    {
       "threadId": "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9",
       "title": "Oportunidade - Settings estruturado em JSON para reduzir parser customizado / plano-settings-json.md",
       "closedAt": "2026-07-13T23:31:15.250Z",
@@ -12259,6 +12335,35 @@
       "layer": 2,
       "authority": "conversation",
       "sourcePath": ".marc/threads/oportunidade-revisao-en-us-do-projeto-c14150b8/CHAT.md"
+    },
+    {
+      "threadId": "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf",
+      "title": "Oportunidade - Rota de diagnóstico de sessões e ativação",
+      "closedAt": "2026-11-13T00:18:38.631Z",
+      "summaryPath": "C:\\Projetos\\marc\\.marc\\threads\\oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf\\SUMMARY.md",
+      "relativeSummaryPath": "threads/oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf/SUMMARY.md",
+      "reference": "marc://$oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf",
+      "sha256": "1da20058bb582e509d84d47d7ee71bf9a919d198f6501de612195559676578dc",
+      "mtimeMs": 1794524687719.7886,
+      "recordIds": [
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:chat:msg_fdd475873e9b4e3ebb:passage:001",
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:chat:msg_fdd475873e9b4e3ebb:passage:002",
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:chat:msg_e4de21145b474a5e99:passage:001",
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:chat:msg_e4de21145b474a5e99:passage:002",
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:chat:msg_5aaa86acfd17463faf:passage:001",
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:chat:msg_e0707b1e1c15490fbe:passage:001",
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:chat:msg_fb850fc5fce84bbdbc:passage:001",
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:chat:msg_ebca46944352498684:passage:001",
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:chat:msg_ebca46944352498684:passage:002",
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:chat:msg_d68ebc5970404ed3a2:passage:001",
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:chat:msg_f4667dd42e074fb8be:passage:001",
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:chat:msg_f2d1e7c78ac045c3ac:passage:001",
+        "oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf:chat:msg_f2d1e7c78ac045c3ac:passage:002"
+      ],
+      "sourceType": "chat",
+      "layer": 2,
+      "authority": "conversation",
+      "sourcePath": ".marc/threads/oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf/CHAT.md"
     },
     {
       "threadId": "oportunidade-settings-estruturado-em-json-para-reduzir-parser-cu-df4229a9",

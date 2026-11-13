@@ -19,6 +19,7 @@ import type {
   ReservationRecord,
   ReservationStatus
 } from "./activation-reservation-types.js";
+import type { IdentityCheck } from "./waiter-identity.js";
 
 export type { ReservationInput } from "./activation-reservation-facts.js";
 
@@ -88,7 +89,7 @@ function gateStep(facts: Facts): Stop | undefined {
   if (!gate.enabled) return refuse("policy_disabled");
   if (gate.hold === undefined) return undefined;
   if (heldByOther(facts)) return refuse("already_reserved");
-  return holdWith(facts, gate.hold);
+  return holdWith(facts, gate.hold, gate.identityCheck);
 }
 
 /** Step 5: deduplication by message and recipient, the holder check, replays, stale holds and attempts. */
@@ -280,13 +281,19 @@ function grantStop(
       status: "granted",
       granted: true,
       reason: undefined,
+      identityCheck: undefined,
       revision: facts.input.revision ?? next.revision
     },
     cycleUpdates
   };
 }
 
-function holdWith(facts: Facts, reason: string): Stop {
+/** A hold replaces the check of an earlier hold: only an identity hold carries one. */
+function holdWith(
+  facts: Facts,
+  reason: string,
+  identityCheck?: IdentityCheck
+): Stop {
   return {
     status: "held",
     reason,
@@ -295,7 +302,8 @@ function holdWith(facts: Facts, reason: string): Stop {
       ...baseOf(facts),
       status: "held",
       reason,
-      runId: facts.input.request.runId
+      runId: facts.input.request.runId,
+      identityCheck
     },
     cycleUpdates: []
   };

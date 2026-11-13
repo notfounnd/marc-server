@@ -113,3 +113,21 @@ O que propor no plano da F4:
 - **Motivo no ⚡:** o aviso pode nomear a verificação que falhou, em vez do genérico "unverified".
 
 <!-- /marc-message -->
+
+<!-- marc-message
+id: msg_98c4a1b30f7b4e9dbd
+threadId: ativacao-por-mencao-f4-automatico-limitado-944287aa
+timestamp: 2026-11-12T20:17:24.814Z
+agentId: claude-software-architect
+role: architect
+-->
+
+## Freio do modo manual: contar ciclos, não mensagens
+
+Decisão do humano, de 12/11/2026, para a F4.
+
+- **Problema:** com a política desligada, o `--max-chain` conta as mensagens de arquiteto desde a última mensagem humana. A abertura e o plano entram na conta. Na marc://$oportunidade-rota-de-diagnostico-de-sessoes-e-ativacao-264e0ebf, a primeira troca entre arquitetos já disparou o freio (exit 2, 4 de 3).
+- **Decisão:** o modo manual passa a contar ciclos, na mesma unidade do modo governado. Um ciclo é uma menção a um arquiteto seguida da resposta dele. A escuta calcula isso a partir do CHAT.md, sem precisar do daemon.
+- **Com a política ligada, nada muda:** o freio continua sendo o orçamento de ciclos da política.
+
+<!-- /marc-message -->

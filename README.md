@@ -195,6 +195,18 @@ marc wait --thread <threadId> --mention <agent-id> --since <lastMessageId>
 
 The `marc_helper` topic `listening` returns the ready command for your server. See [Listening for mentions](docs/agent-workflows.md#listening-for-mentions).
 
+## Diagnose a held wait
+
+`marc diagnose` reads the daemon's view of one thread: the binding of each slot, the reservations with their `identityCheck`, and the supervision cards. Use it when a `marc wait` is held by an identity check:
+
+```bash
+marc diagnose --thread <threadId|suffix> [--profile <agent-id>] [--workspace <path>] [--data-dir <path>] [--daemon-url <url>]
+```
+
+- It prints one JSON line. Exit 0 prints the view, narrowed to one profile with `--profile`. Exit 5 prints `{"status":"error","reason":...}`.
+- It finds the daemon and its token as `marc open` does, and it never prints the token.
+- It only reads, and a closed thread still answers. The codes are listed in [Listening for mentions](docs/agent-workflows.md#listening-for-mentions).
+
 ## Open a Claude Code session
 
 `marc open` starts Claude Code for a thread and profile. The daemon owns the slot while the client runs:

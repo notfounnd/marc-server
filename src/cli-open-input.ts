@@ -47,7 +47,7 @@ export function parseOpenInput(
   };
 }
 
-function dataDirOption(
+export function dataDirOption(
   values: OpenValues,
   env: NodeJS.ProcessEnv,
   workspaceRoot: string,
@@ -66,7 +66,7 @@ function workspaceDataDir(workspaceRoot: string, probes: OpenProbes): string {
 }
 
 /** The flag wins over MARC_DAEMON_URL. A value that is not a URL is refused before any call. */
-function daemonUrlOption(
+export function daemonUrlOption(
   values: OpenValues,
   env: NodeJS.ProcessEnv
 ): string | undefined {
@@ -80,7 +80,10 @@ function daemonUrlOption(
   }
 }
 
-function textOption(values: OpenValues, key: string): string | undefined {
+export function textOption(
+  values: OpenValues,
+  key: string
+): string | undefined {
   const value = values[key];
   if (value === true)
     throw new OpenError("input_error", `${key}_value_required`);

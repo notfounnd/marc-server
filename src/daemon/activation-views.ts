@@ -28,6 +28,7 @@ import {
 } from "../core/activation-stages.js";
 import { messagesOfThreadInWorkspace } from "../core/threads.js";
 import type { WorkspaceInfo } from "../core/types.js";
+import type { IdentityCheck } from "../core/waiter-identity.js";
 import { listAgentProfiles } from "../core/workspace.js";
 import type { ActivationLedger } from "./activation-ledger.js";
 import type { ThreadScope, ThreadStore } from "./thread-store.js";
@@ -106,6 +107,8 @@ export type HoldView = {
   recipient: string;
   stage: string;
   reason: string;
+  /** The identity check that failed, on an identity hold only. Copied from the retained record. */
+  identityCheck?: IdentityCheck;
 };
 
 export async function activationBody(
@@ -193,7 +196,8 @@ async function extrasView(
         messageId: record.messageId,
         recipient: record.recipient,
         stage: record.stage,
-        reason: record.reason ?? ""
+        reason: record.reason ?? "",
+        identityCheck: record.identityCheck
       })),
     stageHistory: view.file.stageHistory ?? [],
     lead: view.file.lead,

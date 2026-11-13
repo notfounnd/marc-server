@@ -389,5 +389,13 @@
   "{{count}} h": "{{count}} h",
   "{{count}} min": "{{count}} min",
   "{{time}} left": "{{time}} left",
+  "The listener did not say which process it is": "The listener did not say which process it is",
+  "No session holds this slot yet": "No session holds this slot yet",
+  "A different session holds this slot": "A different session holds this slot",
+  "The slot does not record its client process": "The slot does not record its client process",
+  "The process table could not be read": "The process table could not be read",
+  "The listener does not run under the slot's client": "The listener does not run under the slot's client",
+  "The client list could not be read": "The client list could not be read",
+  "The slot's client is not running, or started again": "The slot's client is not running, or started again",
   "A turn the daemon starts is warned in its last 10 minutes and stopped 2 minutes after the limit. Sessions you open yourself are never stopped. Between {{min}} and {{max}}.": "A turn the daemon starts is warned in its last 10 minutes and stopped 2 minutes after the limit. Sessions you open yourself are never stopped. Between {{min}} and {{max}}."
 }

@@ -335,6 +335,8 @@ export type ActivationHoldView = {
   recipient: string;
   stage: string;
   reason: string;
+  /** The identity check that failed, on an identity hold only. Absent for every other hold. */
+  identityCheck?: string;
 };
 
 /** One stage move. `by` says who moved it; an agent move names its agent. */

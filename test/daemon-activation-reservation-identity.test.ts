@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import fs from "node:fs/promises";
+import path from "node:path";
 import test from "node:test";
 import { appendMessageInWorkspace } from "../src/core/threads.js";
 import type { ProcessTableRead } from "../src/core/process-table.js";
@@ -89,4 +91,137 @@ test("a held identity leaves the reservation budget untouched", async (t) => {
   );
   const view = parse(await get(daemon.baseUrl, base));
   assert.equal((view.budget as { cyclesUsed: number }).cyclesUsed, 0);
+});
+
+/** The reservation record of one message, read from the thread's state file. */
+async function recordOf(
+  dataDir: string,
+  workspaceId: string,
+  threadId: string,
+  messageId: string
+): Promise<Record<string, unknown> | undefined> {
+  const file = JSON.parse(
+    await fs.readFile(
+      path.join(dataDir, "threads", workspaceId, `${threadId}.json`),
+      "utf8"
+    )
+  ) as { reservations?: Array<Record<string, unknown>> };
+  return file.reservations?.find((item) => item.messageId === messageId);
+}
+
+/** A held identity records the check that failed on its reservation, as the state file keeps it. */
+const RECORDED: ReadonlyArray<{
+  name: string;
+  table: ProcessTableRead;
+  pid: number | undefined;
+  expected: string;
+}> = [
+  {
+    name: "a waiter without a pid is recorded as no_pid",
+    table: { status: "available", rows: TREE },
+    pid: undefined,
+    expected: "no_pid"
+  },
+  {
+    name: "a waiter outside the tree is recorded as not_descendant",
+    table: { status: "available", rows: TREE },
+    pid: 9999,
+    expected: "not_descendant"
+  },
+  {
+    name: "an unreadable table is recorded as process_table_unavailable",
+    table: UNREADABLE,
+    pid: WAITER_PID,
+    expected: "process_table_unavailable"
+  }
+];
+
+for (const row of RECORDED) {
+  test(`reservation identity records the check: ${row.name}`, async (t) => {
+    const { daemon, ws, base } = await started(t, tableOf(row.table));
+    const message = await appendMessageInWorkspace(ws.info, ws.threadId, {
+      agentId: ARCHITECT,
+      body: mention(),
+      role: "architect"
+    });
+    await send(
+      daemon.baseUrl,
+      "POST",
+      `${base}/reservations`,
+      reservationBody(message.id, { pid: row.pid })
+    );
+    const record = await recordOf(
+      daemon.dataDir,
+      ws.info.id,
+      ws.threadId,
+      message.id
+    );
+    assert.equal(record?.identityCheck, row.expected);
+  });
+}
+
+test("a later failed check replaces the recorded one while the hold stands", async (t) => {
+  const { daemon, ws, base } = await started(
+    t,
+    tableOf({ status: "available", rows: TREE })
+  );
+  const message = await appendMessageInWorkspace(ws.info, ws.threadId, {
+    agentId: ARCHITECT,
+    body: mention(),
+    role: "architect"
+  });
+  await send(
+    daemon.baseUrl,
+    "POST",
+    `${base}/reservations`,
+    reservationBody(message.id, { pid: undefined })
+  );
+  await send(
+    daemon.baseUrl,
+    "POST",
+    `${base}/reservations`,
+    reservationBody(message.id, { pid: 9999 })
+  );
+  const record = await recordOf(
+    daemon.dataDir,
+    ws.info.id,
+    ws.threadId,
+    message.id
+  );
+  assert.equal(record?.identityCheck, "not_descendant");
+});
+
+test("a grant after an identity hold removes the recorded check", async (t) => {
+  const { daemon, ws, base } = await started(
+    t,
+    tableOf({ status: "available", rows: TREE })
+  );
+  const message = await appendMessageInWorkspace(ws.info, ws.threadId, {
+    agentId: ARCHITECT,
+    body: mention(),
+    role: "architect"
+  });
+  await send(
+    daemon.baseUrl,
+    "POST",
+    `${base}/reservations`,
+    reservationBody(message.id, { pid: undefined })
+  );
+  const granted = parse(
+    await send(
+      daemon.baseUrl,
+      "POST",
+      `${base}/reservations`,
+      reservationBody(message.id)
+    )
+  );
+  assert.deepEqual([granted.decision, granted.reason], ["granted", undefined]);
+  const record = await recordOf(
+    daemon.dataDir,
+    ws.info.id,
+    ws.threadId,
+    message.id
+  );
+  assert.equal(record?.identityCheck, undefined);
+  assert.equal(record?.granted, true);
 });

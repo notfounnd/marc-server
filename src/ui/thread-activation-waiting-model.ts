@@ -208,6 +208,32 @@ export function waitTextOf(reason: string | undefined): WaitText {
   return WAIT_TEXT[reason ?? ""] ?? WAIT_FALLBACK;
 }
 
+/** The en-US detail of an identity hold, by the check that failed. A code not listed keeps the general detail. */
+const IDENTITY_DETAIL: Partial<Record<string, string>> = {
+  no_pid: "The listener did not say which process it is",
+  no_binding: "No session holds this slot yet",
+  session_mismatch: "A different session holds this slot",
+  no_client_pid: "The slot does not record its client process",
+  process_table_unavailable: "The process table could not be read",
+  not_descendant: "The listener does not run under the slot's client",
+  agents_unavailable: "The client list could not be read",
+  start_mismatch: "The slot's client is not running, or started again"
+};
+
+/**
+ * The text of a hold row. An identity hold whose recorded check is listed names the check that failed; any
+ * other hold, a hold without a check, or an unknown check keeps the general text of its reason.
+ */
+export function holdTextOf(
+  hold: Pick<ActivationHoldView, "reason" | "identityCheck">
+): WaitText {
+  const text = waitTextOf(hold.reason);
+  if (hold.reason !== "identity_unverified") return text;
+  const detail = IDENTITY_DETAIL[hold.identityCheck ?? ""];
+  if (detail === undefined) return text;
+  return { title: text.title, detail };
+}
+
 /** The card actions the daemon names, and the permission decisions the panel sends. */
 export type CardAction = "approve" | "decline" | "retry" | "continue";
 export type PermissionDecision = "allow" | "deny";
@@ -246,5 +272,8 @@ export const WAITING_LABEL_KEYS: string[] = [
     text === undefined ? [] : [text.title, text.detail]
   ),
   WAIT_FALLBACK.title,
-  WAIT_FALLBACK.detail
+  WAIT_FALLBACK.detail,
+  ...Object.values(IDENTITY_DETAIL).filter(
+    (text): text is string => text !== undefined
+  )
 ];

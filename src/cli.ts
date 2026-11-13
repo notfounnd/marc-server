@@ -65,7 +65,8 @@ function usage(): never {
   marc memory deep --query <text> [--thread <id>] [--source-types summary,artifact,chat,rules,document] [--limit <n>] [--query-mode auto|literal]
   marc mcp [--workspace <path>] [--daemon-url http://127.0.0.1:4187] [--token <token>]
   marc wait --thread <id> --mention <agent-id> --since <messageId> [--workspace <path>] [--max-chain <n>] [--timeout-minutes <n>] [--session <id>]
-  marc open --thread <id|suffix> --profile <agent-id> [--workspace <path>] [--data-dir <path>] [--daemon-url <url>] [--tool-shell bash|default] [--new] [--dry-run]`);
+  marc open --thread <id|suffix> --profile <agent-id> [--workspace <path>] [--data-dir <path>] [--daemon-url <url>] [--tool-shell bash|default] [--new] [--dry-run]
+  marc diagnose --thread <id|suffix> [--workspace <path>] [--data-dir <path>] [--daemon-url <url>] [--profile <agent-id>]`);
   process.exit(1);
 }
 
@@ -242,6 +243,13 @@ async function main(): Promise<void> {
     return;
   }
 
+  if (parsed.command === "diagnose") {
+    const { runDiagnoseCommand } = await import("./cli-diagnose-command.js");
+    process.exitCode = await runDiagnoseCommand(parsed.values, {
+      print: (line) => console.log(line)
+    });
+    return;
+  }
   if (parsed.command === "mcp") {
     const { runMcpServer } = await import("./mcp/server.js");
     await runMcpServer({

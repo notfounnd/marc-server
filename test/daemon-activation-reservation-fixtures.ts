@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
+import path from "node:path";
 import { registerAgent } from "../src/core/workspace.js";
 import type {
   ProcessRow,
@@ -52,12 +53,16 @@ export function mention(): string {
   return `marc://@${CODEX} please review the plan.`;
 }
 
-/** A daemon with a workspace, the architect profile and the policy enabled; the waiter's session is bound. */
+/**
+ * A daemon with a workspace, the architect profile and the policy enabled; the waiter's session is bound.
+ * Extra live processes join the bound client in the agents inventory, for tests that need other sessions.
+ */
 export async function started(
   t: { after(fn: () => unknown): void },
-  table: ProcessTablePort = tableOf({ status: "available", rows: TREE })
+  table: ProcessTablePort = tableOf({ status: "available", rows: TREE }),
+  extra: readonly LiveProcess[] = []
 ) {
-  const daemon = await startDaemon([CLIENT], table);
+  const daemon = await startDaemon([CLIENT, ...extra], table);
   t.after(() => daemon.close());
   const ws = await workspaceWithThread();
   t.after(() => fs.rm(ws.root, { recursive: true, force: true }));
@@ -93,6 +98,27 @@ async function bindWaiter(
     }
   });
   assert.equal(reply.status, 200);
+}
+
+/**
+ * Edits the thread's state file in place, the way a test needs it. The daemon reads the file again on each
+ * request, so the edit is what the next route sees.
+ */
+export async function patchStateFile<T>(
+  dataDir: string,
+  workspaceId: string,
+  threadId: string,
+  edit: (file: T) => void
+): Promise<void> {
+  const filePath = path.join(
+    dataDir,
+    "threads",
+    workspaceId,
+    `${threadId}.json`
+  );
+  const file = JSON.parse(await fs.readFile(filePath, "utf8")) as T;
+  edit(file);
+  await fs.writeFile(filePath, JSON.stringify(file));
 }
 
 export function reservationBody(

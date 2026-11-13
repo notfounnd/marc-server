@@ -1,4 +1,5 @@
 import type { FixedStage } from "./activation-stages.js";
+import type { IdentityCheck } from "./waiter-identity.js";
 
 /** Delivery state of a reservation. A granted record keeps `granted` after a later hold or refusal. */
 export type ReservationStatus = "granted" | "held" | "refused";
@@ -26,6 +27,8 @@ export type ReservationRecord = {
   stage: FixedStage;
   status: ReservationStatus;
   reason?: string;
+  /** The identity check that held this record, set only by an identity hold. A grant removes it. */
+  identityCheck?: IdentityCheck;
   /** True once a grant happened. A later hold or refusal never erases it. */
   granted: boolean;
   /** Re-deliveries admitted after the first grant. */
@@ -52,7 +55,13 @@ export type ReservationRequest = {
 export type ThreadGate =
   | { kind: "closed" }
   | { kind: "unreadable"; reason: "ledger_lost" | "ledger_invalid" }
-  | { kind: "open"; enabled: boolean; hold?: string };
+  | {
+      kind: "open";
+      enabled: boolean;
+      hold?: string;
+      /** The identity check behind an identity hold. Absent for every other hold. */
+      identityCheck?: IdentityCheck;
+    };
 
 /** The canonical message, read from CHAT.md. The daemon never trusts a sender supplied by the caller. */
 export type OriginMessage = {

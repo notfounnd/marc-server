@@ -18,6 +18,7 @@ import {
 import { mentionsProfile } from "../core/thread-mentions.js";
 import { messagesOfThreadInWorkspace } from "../core/threads.js";
 import type { ChatMessage, WorkspaceInfo } from "../core/types.js";
+import type { IdentityCheck } from "../core/waiter-identity.js";
 import { cyclesCountersOf } from "./activation-activity.js";
 import type { ThreadActivity } from "./activation-file.js";
 import { reasonOf } from "./activation-ledger.js";
@@ -62,8 +63,8 @@ export async function reserveIn(
     scopeOf(workspace, threadId),
     async (file) => {
       const facts = await readQueueFacts(services, workspace, threadId);
-      const verified = await verifiedOf(identity, file);
-      const decision = judgeInQueue(facts, file, request, verified);
+      const check = await checkOf(identity, file);
+      const decision = judgeInQueue(facts, file, request, check);
       return {
         value: decision,
         file: decision.write ? applyDecision(file, decision) : undefined
@@ -87,32 +88,33 @@ export function judgeInQueue(
   facts: QueueFacts,
   file: ThreadFile,
   request: ReservationRequest,
-  identityVerified?: boolean
+  identityCheck?: IdentityCheck
 ): ReservationDecision {
-  return judgeReservation(inputOf(request, facts, file, identityVerified));
+  return judgeReservation(inputOf(request, facts, file, identityCheck));
 }
 
-/** The waiter's identity, read in the step when a waiter asks; the supervisor's own requests have none. */
-async function verifiedOf(
+/** The waiter's identity check, read in the step when a waiter asks; the supervisor's own requests have none. */
+async function checkOf(
   identity: WaiterIdentity | undefined,
   file: ThreadFile
-): Promise<boolean | undefined> {
+): Promise<IdentityCheck | undefined> {
   if (identity === undefined) return undefined;
   return identity(file);
 }
 
 /**
- * An unverified identity holds a delivery that would otherwise be judged open and enabled. A pause, a state
- * that resolves in the panel, a disabled policy or a closed thread keep their own answer.
+ * A failed identity check holds a delivery that would otherwise be judged open and enabled, and the hold
+ * carries the check that failed. A pause, a state that resolves in the panel, a disabled policy or a closed
+ * thread keep their own answer, and a verified or absent check changes nothing.
  */
 function withIdentityGate(
   gate: ThreadGate,
-  identityVerified: boolean | undefined
+  check: IdentityCheck | undefined
 ): ThreadGate {
-  if (identityVerified !== false) return gate;
+  if (check === undefined || check === "verified") return gate;
   if (gate.kind !== "open" || !gate.enabled) return gate;
   if (gate.hold !== undefined) return gate;
-  return { ...gate, hold: IDENTITY_HOLD };
+  return { ...gate, hold: IDENTITY_HOLD, identityCheck: check };
 }
 
 /** Per-stage budgets: the cycles used, and the authorized cycles plus the grants. */
@@ -208,12 +210,12 @@ function inputOf(
   request: ReservationRequest,
   facts: QueueFacts,
   file: ThreadFile,
-  identityVerified: boolean | undefined
+  identityCheck: IdentityCheck | undefined
 ): ReservationInput {
   const message = originOf(facts.messages, request);
   return {
     request,
-    gate: withIdentityGate(gateOf(facts, file.activation), identityVerified),
+    gate: withIdentityGate(gateOf(facts, file.activation), identityCheck),
     message,
     uiMessage: (file.uiMessages ?? []).some(
       (item) => item.messageId === request.messageId
