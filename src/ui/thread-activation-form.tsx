@@ -43,6 +43,7 @@ import type {
   Message,
   ThreadActivationView
 } from "./types.js";
+import { approvalWarningOf } from "./thread-activation-status.js";
 
 /**
  * The policy panel. It mounts once the saved view has loaded and keeps the switch while the view
@@ -219,6 +220,7 @@ export function ActivationForm({
 
   const failureLines = failure ? failureLinesOf(failure, t) : [];
   const busy = saving || acting || recovering;
+  const approvals = view.approvedAgents ?? [];
 
   return (
     <div>
@@ -261,6 +263,7 @@ export function ActivationForm({
           <ParticipantsSection
             participants={view.participants}
             lead={view.lead}
+            approved={approvals}
             busy={busy}
             onMakeLead={(agentId) => void makeLead(agentId)}
             t={t}
@@ -276,6 +279,11 @@ export function ActivationForm({
             {t(
               "Saving moves this thread from an earlier stage to Planning. Its cycle history is kept."
             )}
+          </p>
+        ) : null}
+        {approvals.length > 0 ? (
+          <p className="activation-line" data-tone="warn">
+            {approvalWarningOf(approvals.length, t)}
           </p>
         ) : null}
         <div className="activation-errors" role="alert">

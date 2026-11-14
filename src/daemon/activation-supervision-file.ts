@@ -48,7 +48,8 @@ function isOptionalTurn(value: unknown): boolean {
     isText(value.fingerprint) &&
     typeof value.continuation === "boolean" &&
     (value.pid === undefined || isCount(value.pid)) &&
-    isOptionalText(value.startedAt)
+    isOptionalText(value.startedAt) &&
+    (value.auto === undefined || typeof value.auto === "boolean")
   );
 }
 

@@ -63,23 +63,73 @@ const rows: Array<{
     expected: []
   },
   {
-    name: "three architect messages without a user message reach the chain limit",
+    name: "three architect cycles without a user message reach the chain limit",
     messages: [
-      message("a1", ARCHITECT.id, "architect", "um"),
-      message("a2", ARCHITECT.id, "architect", "dois"),
-      message("a3", ARCHITECT.id, "architect", "três")
+      message(
+        "a1",
+        ARCHITECT.id,
+        "architect",
+        "um marc://@codex-software-architect"
+      ),
+      message(
+        "a2",
+        "codex-software-architect",
+        "architect",
+        "dois marc://@claude-software-architect"
+      ),
+      message(
+        "a3",
+        ARCHITECT.id,
+        "architect",
+        "três marc://@codex-software-architect"
+      ),
+      message(
+        "a4",
+        "codex-software-architect",
+        "architect",
+        "quatro marc://@claude-software-architect"
+      ),
+      message(
+        "a5",
+        ARCHITECT.id,
+        "architect",
+        "cinco marc://@codex-software-architect"
+      ),
+      message(
+        "a6",
+        "codex-software-architect",
+        "architect",
+        "seis marc://@claude-software-architect"
+      )
     ],
     expected: [
-      { kind: "chain_limit", length: 3, messageIds: ["a1", "a2", "a3"] }
+      { kind: "pending_mention", profile: ARCHITECT.id, messageIds: ["a6"] },
+      {
+        kind: "chain_limit",
+        length: 3,
+        messageIds: ["a1", "a2", "a3", "a4", "a5", "a6"]
+      }
     ]
   },
   {
-    name: "two architect messages stay below the chain limit",
+    name: "one exchange between architects stays below the chain limit",
     messages: [
-      message("a1", ARCHITECT.id, "architect", "um"),
-      message("a2", ARCHITECT.id, "architect", "dois")
+      message(
+        "a1",
+        ARCHITECT.id,
+        "architect",
+        "um marc://@codex-software-architect"
+      ),
+      message(
+        "a2",
+        "codex-software-architect",
+        "architect",
+        "dois marc://@claude-software-architect"
+      )
     ],
-    expected: []
+    expected: [
+      { kind: "pending_mention", profile: ARCHITECT.id, messageIds: ["a2"] }
+    ]
   },
   {
     name: "an architect mention of a user profile with no later user message awaits the human",

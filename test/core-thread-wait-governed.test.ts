@@ -106,6 +106,7 @@ function optionsOf(timeoutMs: number, maxChain = 3): WaitOptions {
   return {
     afterMessageId: CURSOR.id,
     mention: "claude-dev",
+    architects: ["claude-software-architect", "codex-software-architect"],
     maxChain,
     timeoutMs,
     pollMs: 2,
@@ -217,12 +218,39 @@ test("the chain brake does not apply in a governed thread: three architect messa
   assert.deepEqual(governed.asked, [[MENTION.id]]);
 });
 
-test("the same three-architect sequence in a manual thread still ends with chain_limit", async () => {
+test("three architect cycles in a manual thread still end with chain_limit", async () => {
   const chain = [
-    message("msg-a1", "claude-software-architect", "architect", "One."),
-    message("msg-a2", "codex-software-architect", "architect", "Two."),
-    message("msg-a3", "claude-software-architect", "architect", "Three."),
-    MENTION
+    message(
+      "msg-a1",
+      "claude-software-architect",
+      "architect",
+      "One for marc://@codex-software-architect."
+    ),
+    message(
+      "msg-a2",
+      "codex-software-architect",
+      "architect",
+      "Two for marc://@claude-software-architect."
+    ),
+    message(
+      "msg-a3",
+      "claude-software-architect",
+      "architect",
+      "Three for marc://@codex-software-architect."
+    ),
+    message(
+      "msg-a4",
+      "codex-software-architect",
+      "architect",
+      "Four for marc://@claude-software-architect."
+    ),
+    message(
+      "msg-a5",
+      "claude-software-architect",
+      "architect",
+      "Five for marc://@codex-software-architect."
+    ),
+    message("msg-a6", "codex-software-architect", "architect", MENTION.body)
   ];
   const outcome = await waitForMention(
     optionsOf(3000),

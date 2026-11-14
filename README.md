@@ -187,7 +187,7 @@ Thread read tools accept a full thread ID or a unique 8-character hexadecimal su
 
 ## Wait for mentions
 
-An agent session can listen to a thread for a mention of its profile with `marc wait`. The command prints one JSON line when it ends. Arm it only when you ask an agent to listen, and run it in the background:
+An agent session can listen to a thread for a mention of its profile with `marc wait`. The command prints one JSON line when it ends. Arm it when you ask the principal agent to listen, or when the workspace setting "Listen to threads by default" is on. That setting is off by default, and then the principal agent asks you first. Delegated developer agents never arm it. Run it in the background:
 
 ```bash
 marc wait --thread <threadId> --mention <agent-id> --since <lastMessageId>

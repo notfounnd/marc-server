@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
-  architectChainLength,
+  architectCycleCount,
   mentionsProfile
 } from "../src/core/thread-mentions.js";
 import type { ChatMessage } from "../src/core/types.js";
@@ -66,42 +66,89 @@ MENTION_SCENARIOS.forEach((scenario) =>
   })
 );
 
+const ARCHITECTS = ["claude-software-architect", "codex-software-architect"];
+
 const CHAIN_SCENARIOS: Array<{
   name: string;
   messages: ChatMessage[];
   expected: number;
 }> = [
   {
-    name: "without any user message, every architect message counts",
+    name: "without any user message, a closed architect cycle counts",
     messages: [
-      message("msg_1", "claude-software-architect", "architect", "a"),
-      message("msg_2", "codex-software-architect", "architect", "b")
-    ],
-    expected: 2
-  },
-  {
-    name: "only architect messages after the last user message count",
-    messages: [
-      message("msg_1", "claude-software-architect", "architect", "a"),
-      message("msg_2", "owner", "user", "b"),
-      message("msg_3", "codex-software-architect", "architect", "c")
+      message(
+        "msg_1",
+        "claude-software-architect",
+        "architect",
+        "a marc://@codex-software-architect"
+      ),
+      message(
+        "msg_2",
+        "codex-software-architect",
+        "architect",
+        "b marc://@claude-software-architect"
+      )
     ],
     expected: 1
   },
   {
-    name: "unknown roles neither count nor reset",
+    name: "only cycles after the last user message count",
+    messages: [
+      message(
+        "msg_1",
+        "claude-software-architect",
+        "architect",
+        "a marc://@codex-software-architect"
+      ),
+      message(
+        "msg_2",
+        "codex-software-architect",
+        "architect",
+        "b marc://@claude-software-architect"
+      ),
+      message("msg_3", "owner", "user", "c"),
+      message(
+        "msg_4",
+        "claude-software-architect",
+        "architect",
+        "d marc://@codex-software-architect"
+      ),
+      message(
+        "msg_5",
+        "codex-software-architect",
+        "architect",
+        "e marc://@claude-software-architect"
+      )
+    ],
+    expected: 1
+  },
+  {
+    name: "unknown roles neither count nor reset an open request",
     messages: [
       message("msg_1", "owner", "user", "a"),
-      message("msg_2", "claude-software-architect", "architect", "b"),
+      message(
+        "msg_2",
+        "claude-software-architect",
+        "architect",
+        "b marc://@codex-software-architect"
+      ),
       message("msg_3", "someone", undefined, "c"),
-      message("msg_4", "someone", "reviewer", "d")
+      message(
+        "msg_4",
+        "codex-software-architect",
+        "architect",
+        "d marc://@claude-software-architect"
+      )
     ],
     expected: 1
   }
 ];
 
 CHAIN_SCENARIOS.forEach((scenario) =>
-  test(`architectChainLength: ${scenario.name}`, () => {
-    assert.equal(architectChainLength(scenario.messages), scenario.expected);
+  test(`architectCycleCount: ${scenario.name}`, () => {
+    assert.equal(
+      architectCycleCount(scenario.messages, ARCHITECTS),
+      scenario.expected
+    );
   })
 );

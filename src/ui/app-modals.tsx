@@ -6,6 +6,7 @@ import {
 import { WorkspaceSettingsModal } from "./workspace-settings-modal.js";
 import type { WorkspaceCycles } from "./workspace-settings-cycles.js";
 import type { WorkspaceTurnTimeout } from "./workspace-settings-turn-timeout.js";
+import type { WorkspaceListening } from "./workspace-settings-listening.js";
 import { ThreadCreateModal } from "./thread-create-modal.js";
 import type { ThreadCreationController } from "./use-thread-creation.js";
 import type {
@@ -60,6 +61,7 @@ export function AppModals({
   workspaceSettings: {
     cycles: WorkspaceCycles;
     turnTimeout: WorkspaceTurnTimeout;
+    listening: WorkspaceListening;
   };
 }) {
   return (
@@ -88,6 +90,8 @@ export function AppModals({
           onCyclesPerStageChange={workspaceSettings.cycles.save}
           turnTimeoutMinutes={workspaceSettings.turnTimeout.value}
           onTurnTimeoutMinutesChange={workspaceSettings.turnTimeout.save}
+          listeningDefaultOn={workspaceSettings.listening.value}
+          onListeningDefaultOnChange={workspaceSettings.listening.save}
           onAutoRebuildChange={onWorkspaceAutoRebuildChange}
           onEmbeddingBatchSizeChange={onWorkspaceEmbeddingBatchSizeChange}
           onClose={() => onShowWorkspaceSettingsChange(false)}

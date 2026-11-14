@@ -2,7 +2,12 @@
  * Pending-action warnings for a thread's session view. Pure: it reuses the
  * mention parser from thread-mentions and adds no parser of its own.
  */
-import { architectChainLength, mentionsProfile } from "./thread-mentions.js";
+import { participantsOf } from "./activation-policy.js";
+import {
+  architectCycleCount,
+  messagesSinceLastUser,
+  mentionsProfile
+} from "./thread-mentions.js";
 import type { ChatMessage } from "./types.js";
 
 export const CHAIN_WARNING_LIMIT = 3;
@@ -75,9 +80,12 @@ function pendingFor(
   ];
 }
 
-/** Architect messages since the last user message, as the wait command counts them. */
-function chainLimitWarnings({ messages }: WarningInput): SessionWarning[] {
-  const length = architectChainLength(messages);
+/** Architect cycles since the last user message, as the wait command counts them. */
+function chainLimitWarnings({
+  messages,
+  profiles
+}: WarningInput): SessionWarning[] {
+  const length = architectCycleCount(messages, participantsOf(profiles));
   if (length < CHAIN_WARNING_LIMIT) return [];
   return [
     {
@@ -117,11 +125,9 @@ function awaitingHumanWarnings({
 }
 
 function chainMessages(messages: readonly ChatMessage[]): ChatMessage[] {
-  const start =
-    lastIndexWhere(messages, (message) => message.role === "user") + 1;
-  return messages
-    .slice(start)
-    .filter((message) => message.role === "architect");
+  return messagesSinceLastUser(messages).filter(
+    (message) => message.role === "architect"
+  );
 }
 
 function lastIndexWhere(

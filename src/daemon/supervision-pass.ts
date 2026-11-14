@@ -18,8 +18,11 @@ import type { FixedStage } from "../core/activation-stages.js";
 import { slotKey } from "../core/session-slots.js";
 import { mentionsProfile } from "../core/thread-mentions.js";
 import type { ChatMessage, WorkspaceInfo } from "../core/types.js";
+import type { ThreadActivity } from "./activation-file.js";
+import { isApprovedAt } from "./activation-activity.js";
 import { readQueueFacts, type QueueFacts } from "./activation-queue-facts.js";
 import { judgeInQueue } from "./activation-reservation-store.js";
+import type { CardRef } from "./supervision-start.js";
 import type { ActivationServices } from "./activation-views.js";
 import { scopeOf } from "./activation-views.js";
 import type { ThreadFile } from "./thread-store.js";
@@ -48,6 +51,14 @@ export type PassInput = {
 /** Changed means the thread's supervision state was written. Closed or unreadable threads are unchanged. */
 export type PassOutcome = "changed" | "unchanged";
 
+/**
+ * What a pass hands the service: the outcome, and the awaiting cards whose architect already holds a valid
+ * approval in this thread. Those cards may start without a card; the service starts them outside the queue.
+ */
+export type PassResult = { outcome: PassOutcome; autoCards: CardRef[] };
+
+const NO_PASS: PassResult = { outcome: "unchanged", autoCards: [] };
+
 /** One mention and one architect it names, the unit a pass judges. */
 type Pair = { message: ChatMessage; recipient: string };
 
@@ -64,8 +75,8 @@ export function supervisionOf(file: ThreadFile): SupervisionState {
  */
 export async function runSupervisionPass(
   input: PassInput
-): Promise<PassOutcome> {
-  const result = await input.services.threads.update<boolean>(
+): Promise<PassResult> {
+  const result = await input.services.threads.update<PassResult>(
     scopeOf(input.workspace, input.threadId),
     async (file) => {
       const facts = await readQueueFacts(
@@ -74,7 +85,7 @@ export async function runSupervisionPass(
         input.threadId
       );
       const ttlMinutes = pendingTtlOf(facts);
-      if (ttlMinutes === undefined) return { value: false };
+      if (ttlMinutes === undefined) return { value: NO_PASS };
       const recipients = await supportedArchitectsOf(input.workspace);
       const pairs = mentionPairs(facts.messages, recipients);
       const current = supervisionOf(file);
@@ -86,12 +97,42 @@ export async function runSupervisionPass(
         pairs,
         ttlMinutes
       );
-      if (next === current) return { value: false };
-      return { value: true, file: { ...file, supervision: next } };
+      const autoCards = autoCardsOf(next, file.activation, revisionOf(facts));
+      const outcome: PassOutcome = next === current ? "unchanged" : "changed";
+      if (next === current) return { value: { outcome, autoCards } };
+      return {
+        value: { outcome, autoCards },
+        file: { ...file, supervision: next }
+      };
     }
   );
-  if (result.status !== "done") return "unchanged";
-  return result.value ? "changed" : "unchanged";
+  if (result.status !== "done") return NO_PASS;
+  return result.value;
+}
+
+/** The awaiting cards whose architect holds an approval under the revision in force. */
+function autoCardsOf(
+  state: SupervisionState,
+  activation: ThreadActivity | undefined,
+  revision: string | undefined
+): CardRef[] {
+  return state.records
+    .filter(
+      (record) =>
+        record.status === "awaiting_confirmation" &&
+        isApprovedAt(activation, record.recipient, revision)
+    )
+    .map((record) => ({
+      messageId: record.messageId,
+      recipient: record.recipient
+    }));
+}
+
+/** The revision of a policy that is ready. A policy that is not ready has none, so no approval counts. */
+function revisionOf(facts: QueueFacts): string | undefined {
+  return facts.policy.status === "ready"
+    ? facts.policy.policy.revision
+    : undefined;
 }
 
 /** The pending TTL of a ready and enabled policy. Anything else answers undefined: no card is judged. */

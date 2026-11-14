@@ -263,7 +263,7 @@ The identity never contains a daemon or owner token. Invalid identity values are
 
 **Slot states.** `unbound`, `online` (the owner's pid, startedAt and session match), `reserved` (acquired but no client yet), `ended` (only with proof that the owner and its session are gone), `unknown` (missing source, other host, or unproven identity), and `conflict`. A recorded conflict on an active owner wins over `online`.
 
-**Routes.** `GET /api/workspaces/:id/threads/:threadId/sessions` returns the slots, warnings (`pending_mention`, `chain_limit`, `awaiting_human`), and source status. `awaiting_human` carries `askedBy`, the author of its last request to the human. Each slot carries `openCommand`, the short `marc open` command, and `copyCommand`, the native Claude command the menu copies, for an ended or unbound slot only. A profile whose client is not supported has neither, and `copyBlockedReason` (`unsupported_client`) names why Copy is disabled. It never returns an owner token. `POST /api/sessions/acquire` returns the owner token only to the caller that acquires the slot. `heartbeat` and `release` require the owner token and generation; a refusal returns `409` and changes nothing. Adoption rules above apply to `observe`, which always answers `200`.
+**Routes.** `GET /api/workspaces/:id/threads/:threadId/sessions` returns the slots, warnings (`pending_mention`, `chain_limit` for architect cycles since the last user message, `awaiting_human`), and source status. `awaiting_human` carries `askedBy`, the author of its last request to the human. Each slot carries `openCommand`, the short `marc open` command, and `copyCommand`, the native Claude command the menu copies, for an ended or unbound slot only. A profile whose client is not supported has neither, and `copyBlockedReason` (`unsupported_client`) names why Copy is disabled. It never returns an owner token. `POST /api/sessions/acquire` returns the owner token only to the caller that acquires the slot. `heartbeat` and `release` require the owner token and generation; a refusal returns `409` and changes nothing. Adoption rules above apply to `observe`, which always answers `200`.
 
 ## Efficient reading pattern
 
@@ -323,7 +323,7 @@ listening
 all
 ```
 
-The `listening` topic adds a `command` field. It is the `marc wait` command built from this server's Node runtime and workspace, ready to run in the background to listen for a mention of a profile. Its exit codes and rules are in [Listening for mentions](agent-workflows.md#listening-for-mentions).
+The `listening` topic adds a `command` field and a `listeningDefault` field (`off` or `on`). The command is the `marc wait` command built from this server's Node runtime and workspace, ready to run in the background to listen for a mention of a profile. `listeningDefault` is the workspace listening default, read from `.marc/marc.config.json`, and it is `off` when the file is missing or unreadable. Only the principal agent arms a wait from it; a delegated developer never does. Its exit codes and rules are in [Listening for mentions](agent-workflows.md#listening-for-mentions).
 
 ## Also see
 

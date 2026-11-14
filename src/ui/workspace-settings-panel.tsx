@@ -5,6 +5,7 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Button, classNames } from "./common.js";
 import { CyclesPerStageField } from "./workspace-settings-cycles.js";
+import { ListeningDefaultField } from "./workspace-settings-listening.js";
 import { TurnTimeoutField } from "./workspace-settings-turn-timeout.js";
 import type { MemoryIndexHealth } from "./types.js";
 
@@ -13,9 +14,11 @@ export function WorkspaceSettingsPanel({
   t,
   cyclesPerStage,
   turnTimeoutMinutes,
+  listeningDefaultOn,
   onAutoRebuildChange,
   onCyclesPerStageChange,
   onTurnTimeoutMinutesChange,
+  onListeningDefaultOnChange,
   onEmbeddingBatchSizeChange,
   onPrepareModel,
   onPurge,
@@ -25,9 +28,11 @@ export function WorkspaceSettingsPanel({
   t: (key: string, options?: Record<string, string | number>) => string;
   cyclesPerStage?: number;
   turnTimeoutMinutes?: number;
+  listeningDefaultOn?: boolean;
   onAutoRebuildChange: (autoRebuild: boolean) => void;
   onCyclesPerStageChange?: (cycles: number) => Promise<void>;
   onTurnTimeoutMinutesChange?: (minutes: number) => Promise<void>;
+  onListeningDefaultOnChange?: (defaultOn: boolean) => Promise<void>;
   onEmbeddingBatchSizeChange: (embeddingBatchSize: number) => void;
   onPrepareModel: () => void;
   onPurge: () => void;
@@ -75,6 +80,13 @@ export function WorkspaceSettingsPanel({
         <TurnTimeoutField
           turnTimeoutMinutes={turnTimeoutMinutes}
           onSave={onTurnTimeoutMinutesChange}
+          t={t}
+        />
+      ) : null}
+      {listeningDefaultOn !== undefined && onListeningDefaultOnChange ? (
+        <ListeningDefaultField
+          defaultOn={listeningDefaultOn}
+          onSave={onListeningDefaultOnChange}
           t={t}
         />
       ) : null}

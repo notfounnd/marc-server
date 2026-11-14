@@ -230,7 +230,8 @@ function settingsFor(
       embeddingBatchSize: 4,
       documentSources
     },
-    activation: { cyclesPerStage: 5 }
+    activation: { cyclesPerStage: 5 },
+    listening: { defaultOn: false }
   };
 }
 

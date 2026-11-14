@@ -6,6 +6,7 @@ import {
 } from "../src/cli-diagnose-command.js";
 import { appendMessageInWorkspace } from "../src/core/threads.js";
 import type { ThreadDiagnostics } from "../src/daemon/diagnostics-view.js";
+import { AGENTS_CACHE_MS } from "../src/daemon/presence.js";
 import { ARCHITECT, send, TOKEN } from "./daemon-session-http-fixtures.js";
 import {
   CLIENT_PID,
@@ -24,12 +25,22 @@ type StateFile = {
   >;
 };
 
+/** A session that reuses the bound client's pid. It is not the bound session, so no process resumes that one. */
+const OTHER_SESSION = "session-other";
+
 /**
- * End to end, on a temporary daemon: a client that restarted after its slot was bound holds the waiter as
- * identity_unverified, and marc diagnose names start_mismatch as the check that failed.
+ * End to end, on a temporary daemon: the bound client's pid is reused by another session with a later start,
+ * so no process resumes the bound session. The waiter is held as identity_unverified, and marc diagnose names
+ * start_mismatch as the check that failed.
  */
 test("marc diagnose names the start_mismatch that holds a waiter", async (t) => {
-  const { daemon, ws, base } = await started(t);
+  const { daemon, ws, base, live, clock } = await started(t);
+  live.splice(0, live.length, {
+    pid: CLIENT_PID,
+    sessionId: OTHER_SESSION,
+    startedAt: 1000
+  });
+  clock.now += AGENTS_CACHE_MS + 1;
   await patchStateFile<StateFile>(
     daemon.dataDir,
     ws.info.id,

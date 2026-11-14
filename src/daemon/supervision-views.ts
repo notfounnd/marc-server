@@ -129,7 +129,7 @@ function turnMinutesOf(turn: SupervisionTurn | undefined): number | undefined {
 /** Offers an action when the same rule the start uses accepts the card now. Without a cap, nothing is offered. */
 function offers(
   record: SupervisionRecord,
-  action: Exclude<StartAction, "approve">,
+  action: Exclude<StartAction, "approve" | "auto">,
   attemptCap: number | undefined
 ): boolean {
   if (attemptCap === undefined) return false;

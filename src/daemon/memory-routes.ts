@@ -21,6 +21,7 @@ import {
   type ActivationSettingsInput
 } from "../core/activation-settings-input.js";
 import { DEFAULT_TURN_TIMEOUT_MINUTES } from "../core/activation-turn-timeout.js";
+import { listeningSettingsInputOf } from "../core/listening-settings-input.js";
 import type { ActivationServices } from "./activation-routes.js";
 import type { TurnTimeoutRead } from "./activation-turn-timeout-ledger.js";
 import { json, readBody, text } from "./http.js";
@@ -53,6 +54,7 @@ type WorkspaceSettingsBody = Partial<{
   activation: Partial<{
     cyclesPerStage: number;
   }>;
+  listening: Partial<{ defaultOn: boolean }>;
 }>;
 
 type MemoryRebuildBody = Partial<{
@@ -279,10 +281,13 @@ function workspaceSettingsInput(body: unknown): SettingsSave | undefined {
     return undefined;
   const activation = activationSettingsInputOf(input.activation);
   if (activation === "invalid") return undefined;
+  const listening = listeningSettingsInputOf(input.listening);
+  if (listening === "invalid") return undefined;
   return {
     input: {
       memory: { autoRebuild, embeddingBatchSize },
-      ...(activation === undefined ? {} : { activation })
+      ...(activation === undefined ? {} : { activation }),
+      ...(listening === undefined ? {} : { listening })
     },
     activation
   };

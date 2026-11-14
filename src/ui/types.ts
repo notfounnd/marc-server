@@ -313,6 +313,8 @@ export type ThreadActivationView = {
   stageHistory?: ActivationStageMove[];
   /** The supervisor's cards still on the panel. No run id, pid, host or session id. */
   supervision?: ActivationSupervisionCard[];
+  /** The architects whose approval is valid under the policy in force. A save clears them. */
+  approvedAgents?: string[];
 };
 
 export type {

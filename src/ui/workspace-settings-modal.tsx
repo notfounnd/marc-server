@@ -11,9 +11,11 @@ export function WorkspaceSettingsModal({
   workspace,
   cyclesPerStage,
   turnTimeoutMinutes,
+  listeningDefaultOn,
   onAutoRebuildChange,
   onCyclesPerStageChange,
   onTurnTimeoutMinutesChange,
+  onListeningDefaultOnChange,
   onEmbeddingBatchSizeChange,
   onClose,
   onPrepareModel,
@@ -24,9 +26,11 @@ export function WorkspaceSettingsModal({
   workspace: Workspace;
   cyclesPerStage?: number;
   turnTimeoutMinutes?: number;
+  listeningDefaultOn?: boolean;
   onAutoRebuildChange: (autoRebuild: boolean) => void;
   onCyclesPerStageChange?: (cycles: number) => Promise<void>;
   onTurnTimeoutMinutesChange?: (minutes: number) => Promise<void>;
+  onListeningDefaultOnChange?: (defaultOn: boolean) => Promise<void>;
   onEmbeddingBatchSizeChange: (embeddingBatchSize: number) => void;
   onClose: () => void;
   onPrepareModel: () => void;
@@ -61,9 +65,11 @@ export function WorkspaceSettingsModal({
             t={t}
             cyclesPerStage={cyclesPerStage}
             turnTimeoutMinutes={turnTimeoutMinutes}
+            listeningDefaultOn={listeningDefaultOn}
             onAutoRebuildChange={onAutoRebuildChange}
             onCyclesPerStageChange={onCyclesPerStageChange}
             onTurnTimeoutMinutesChange={onTurnTimeoutMinutesChange}
+            onListeningDefaultOnChange={onListeningDefaultOnChange}
             onEmbeddingBatchSizeChange={onEmbeddingBatchSizeChange}
             onPrepareModel={onPrepareModel}
             onPurge={onPurge}

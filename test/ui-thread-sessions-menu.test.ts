@@ -96,7 +96,7 @@ test("pending items show two lines, each with its own title and no concatenation
   assert.ok(html.includes('title="Architect exchange"'));
   assert.ok(
     html.includes(
-      'title="Waiting for a human message after 3 architect messages"'
+      'title="Waiting for a human message after 3 architect cycles"'
     )
   );
   assert.ok(html.includes('title="ui-user"'));

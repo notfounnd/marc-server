@@ -45,6 +45,8 @@ export type SupervisionTurn = {
   deadlineAt?: string;
   /** The instant the card went running. The presence grace of the process counts from it when no start is known. */
   runningAt?: string;
+  /** True only on a turn the daemon started without a card, under an approval the human gave in this thread. */
+  auto?: boolean;
 };
 
 /** One card per mention and recipient, kept in the thread's activity state. */

@@ -64,6 +64,7 @@ export type WaitDeps = {
 export type WaitOptions = {
   afterMessageId: string;
   mention: string;
+  architects: readonly string[];
   maxChain: number;
   timeoutMs: number;
   pollMs: number;
@@ -245,6 +246,7 @@ class WaitLoop {
       messages,
       afterMessageId: this.options.afterMessageId,
       mention: this.options.mention,
+      architects: this.options.architects,
       maxChain: this.options.maxChain,
       closed
     };

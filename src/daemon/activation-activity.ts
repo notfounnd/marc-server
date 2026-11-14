@@ -15,7 +15,7 @@ import {
   type StageCounters,
   type StoredStage
 } from "../core/activation-stages.js";
-import type { ThreadActivity } from "./activation-file.js";
+import type { ActivationApproval, ThreadActivity } from "./activation-file.js";
 
 /**
  * Pure rules of the thread's activation state. The ledger applies them inside each
@@ -54,6 +54,7 @@ export function stageForSave(
 /**
  * The activity after an authorized save. Fixed-stage counters keep cycles and grants; any
  * F3a counter moves to legacyStages as history. Passes are never converted into cycles.
+ * The approvals are not carried over: a save clears them, so each architect asks again.
  */
 export function activityAfterSave(
   previous: ThreadActivity | undefined,
@@ -70,6 +71,36 @@ export function activityAfterSave(
       ...legacyCountersOf(previous?.stages)
     }
   };
+}
+
+/** Adds the approval of one architect, replacing its earlier one. An architect keeps at most one approval. */
+export function withApproval(
+  activation: ThreadActivity,
+  approval: ActivationApproval
+): ThreadActivity {
+  const others = (activation.approvals ?? []).filter(
+    (item) => item.agentId !== approval.agentId
+  );
+  return { ...activation, approvals: [...others, approval] };
+}
+
+/** The architects whose approval is valid under the policy revision in force. An approval of another revision never counts. */
+export function approvedAgentsOf(
+  activation: ThreadActivity | undefined,
+  revision: string | undefined
+): string[] {
+  if (revision === undefined) return [];
+  return (activation?.approvals ?? [])
+    .filter((item) => item.revision === revision)
+    .map((item) => item.agentId);
+}
+
+export function isApprovedAt(
+  activation: ThreadActivity | undefined,
+  agentId: string,
+  revision: string | undefined
+): boolean {
+  return approvedAgentsOf(activation, revision).includes(agentId);
 }
 
 /**

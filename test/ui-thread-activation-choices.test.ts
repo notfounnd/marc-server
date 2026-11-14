@@ -77,9 +77,9 @@ const NOTE_ROWS: Array<{
   key: string | undefined;
 }> = [
   {
-    name: "a switch that is on shows no note in F3b",
+    name: "a switch that is on explains the first-start approval of F4",
     enabled: true,
-    key: undefined
+    key: "Each agent's first start asks for your approval. After that it starts on its own in this thread, within the cycles."
   },
   {
     name: "a switch that is off keeps its note",

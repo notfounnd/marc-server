@@ -45,10 +45,46 @@ const ROW_CASES: Array<{
 
 for (const row of ROW_CASES) {
   test(`participants: ${row.name}`, () => {
-    const rows = participantRowsOf(ARCHITECTS, row.lead);
+    const rows = participantRowsOf(ARCHITECTS, row.lead, []);
     assert.deepEqual(
       rows.map((item) => item.leads),
       row.leads
+    );
+  });
+}
+
+const APPROVED_CASES: Array<{
+  name: string;
+  approved: string[];
+  marks: boolean[];
+}> = [
+  {
+    name: "an approved architect carries the approval mark",
+    approved: ["codex-software-architect"],
+    marks: [false, true]
+  },
+  {
+    name: "no approval marks nobody",
+    approved: [],
+    marks: [false, false]
+  },
+  {
+    name: "every approved architect carries the mark",
+    approved: ARCHITECTS,
+    marks: [true, true]
+  }
+];
+
+for (const row of APPROVED_CASES) {
+  test(`participants approval: ${row.name}`, () => {
+    const rows = participantRowsOf(ARCHITECTS, null, row.approved);
+    assert.deepEqual(
+      rows.map((item) => item.approved),
+      row.marks
+    );
+    assert.deepEqual(
+      rows.map((item) => item.leads),
+      [false, false]
     );
   });
 }

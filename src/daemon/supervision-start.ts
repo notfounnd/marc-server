@@ -7,12 +7,15 @@ import {
 } from "../core/activation-supervision-records.js";
 import type {
   SupervisionRecord,
-  SupervisionStatus
+  SupervisionStatus,
+  SupervisionTurn
 } from "../core/activation-supervision-types.js";
 import type { TurnTimeoutState } from "../core/activation-turn-timeout.js";
 import { slotKey } from "../core/session-slots.js";
 import type { WorkspaceInfo } from "../core/types.js";
 import type { ThreadStep, ThreadFile } from "./thread-store.js";
+import type { ActivationApproval, ThreadActivity } from "./activation-file.js";
+import { isApprovedAt, withApproval } from "./activation-activity.js";
 import { readQueueFacts } from "./activation-queue-facts.js";
 import { applyDecision, judgeInQueue } from "./activation-reservation-store.js";
 import type { TurnTimeoutRead } from "./activation-turn-timeout-ledger.js";
@@ -34,8 +37,12 @@ import { supervisionOf } from "./supervision-pass.js";
 import { turnFingerprintOf } from "../core/supervision-turn-recheck.js";
 import { authorizedMinutesOf } from "./supervision-turn-steps.js";
 
-/** The actions that start a turn from a card. Approve starts an awaiting card; retry and continue restart a failed one. */
-export type StartAction = "approve" | "retry" | "continue";
+/**
+ * The actions that start a turn from a card. Approve starts an awaiting card and records the human's
+ * approval of its architect; retry and continue restart a failed one; auto starts an awaiting card of an
+ * architect the human already approved in this thread. Only the first three are routes.
+ */
+export type StartAction = "approve" | "retry" | "continue" | "auto";
 
 export type CardRef = { messageId: string; recipient: string };
 
@@ -62,8 +69,15 @@ export type StartContext = {
   threadId: string;
 };
 
-/** The refusal reason of a start rule, or undefined when the card may start. */
-type StartRule = (record: SupervisionRecord, cap: number) => string | undefined;
+/**
+ * The refusal reason of a start rule, or undefined when the card may start. `approved` says whether the
+ * card's architect holds a valid approval in this thread; only the auto rule reads it.
+ */
+type StartRule = (
+  record: SupervisionRecord,
+  cap: number,
+  approved: boolean
+) => string | undefined;
 
 const START_RULES: Record<StartAction, StartRule> = {
   approve: (record) =>
@@ -81,8 +95,19 @@ const START_RULES: Record<StartAction, StartRule> = {
       cap,
       (reason) => reason === "timeout",
       "not_continuable"
-    )
+    ),
+  auto: (record, _cap, approved) => autoRefusal(record, approved)
 };
+
+/** An automatic start needs an awaiting card and the architect's approval. A failed card is never restarted here. */
+function autoRefusal(
+  record: SupervisionRecord,
+  approved: boolean
+): string | undefined {
+  if (record.status !== "awaiting_confirmation") return "not_awaiting";
+  if (!approved) return "not_approved";
+  return undefined;
+}
 
 function failedRefusal(
   record: SupervisionRecord,
@@ -102,14 +127,15 @@ function failedRefusal(
 export function startRefusalOf(
   action: StartAction,
   record: SupervisionRecord,
-  cap: number
+  cap: number,
+  approved: boolean = false
 ): string | undefined {
-  return START_RULES[action](record, cap);
+  return START_RULES[action](record, cap, approved);
 }
 
 /**
- * The card the slot table judges. Approve judges the card as it is. Retry and continue judge a waiting
- * copy of the failed card, so the same table decides whether the slot is free and the mention granted.
+ * The card the slot table judges. Approve and auto judge the card as it is. Retry and continue judge a
+ * waiting copy of the failed card, so the same table decides whether the slot is free and the mention granted.
  */
 const JUDGED_VIEW: Record<
   StartAction,
@@ -117,7 +143,31 @@ const JUDGED_VIEW: Record<
 > = {
   approve: (record) => record,
   retry: asWaiting,
-  continue: asWaiting
+  continue: asWaiting,
+  auto: (record) => record
+};
+
+/** The activation an action leaves behind. Only an Approve records the approval; the other actions keep the activation. */
+const ACTIVATION_AFTER: Record<
+  StartAction,
+  (
+    activation: ThreadActivity | undefined,
+    approval: ActivationApproval
+  ) => ThreadActivity | undefined
+> = {
+  approve: (activation, approval) =>
+    activation && withApproval(activation, approval),
+  retry: (activation) => activation,
+  continue: (activation) => activation,
+  auto: (activation) => activation
+};
+
+/** The mark a turn carries. Only a turn the daemon starts without a card is marked automatic. */
+const TURN_MARK: Record<StartAction, Pick<SupervisionTurn, "auto">> = {
+  approve: {},
+  retry: {},
+  continue: {},
+  auto: { auto: true }
 };
 
 function asWaiting(record: SupervisionRecord): SupervisionRecord {
@@ -181,10 +231,13 @@ async function startStep(
   if (facts.policy.status !== "ready") {
     return refuse("policy_not_ready", record.status);
   }
+  const revision = facts.policy.policy.revision;
+  const approved = isApprovedAt(file.activation, card.recipient, revision);
   const ruleRefusal = startRefusalOf(
     action,
     record,
-    facts.policy.policy.attemptCap
+    facts.policy.policy.attemptCap,
+    approved
   );
   if (ruleRefusal) return refuse(ruleRefusal, record.status);
 
@@ -244,10 +297,16 @@ async function startStep(
         cyclesPerStage: facts.cyclesPerStage,
         turnTimeoutMinutes
       }),
-      continuation: action === "continue"
+      continuation: action === "continue",
+      ...TURN_MARK[action]
     }
   });
   if (started === undefined) return refuse("not_startable", record.status);
+  const approval: ActivationApproval = {
+    agentId: card.recipient,
+    revision,
+    at: options.now()
+  };
   return {
     value: {
       response: {
@@ -260,6 +319,7 @@ async function startStep(
     },
     file: {
       ...reserved,
+      activation: ACTIVATION_AFTER[action](reserved.activation, approval),
       supervision: pruneSupervision({
         records: upsertRecord(state.records, started),
         floors: state.floors

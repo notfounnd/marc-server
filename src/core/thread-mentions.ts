@@ -27,25 +27,60 @@ export type ReconcileInput = {
   messages: readonly ChatMessage[];
   afterMessageId: string;
   mention: string;
+  architects: readonly string[];
   maxChain: number;
   closed: boolean;
 };
 
 const QUOTE_LINE_PATTERN = /^\s*>/;
 
-/** A reference is a call only outside code and quotes: quoting a profile does not call it. */
-export function mentionsProfile(body: string, agentId: string): boolean {
+/** Agent ids that a body calls. Code and quotes do not call: quoting a profile does not call it. */
+export function mentionedAgentIds(body: string): string[] {
   const visible = removeQuoteLines(removeFencedMarkdownCode(body));
-  return messageReferences(visible).some((reference) =>
-    isAgentReference(reference, agentId)
-  );
+  return messageReferences(visible).flatMap((reference) => {
+    const parsed = parseMarcReference(reference);
+    if (parsed?.type !== "agent") return [];
+    return [parsed.agentId];
+  });
 }
 
-/** Architect messages since the last user message. Developer and unknown roles neither count nor reset. */
-export function architectChainLength(messages: readonly ChatMessage[]): number {
-  const start = lastUserIndex(messages) + 1;
-  return messages.slice(start).filter((message) => message.role === "architect")
-    .length;
+export function mentionsProfile(body: string, agentId: string): boolean {
+  return mentionedAgentIds(body).includes(agentId);
+}
+
+/** The messages after the last user message. A user message starts a new count. */
+export function messagesSinceLastUser(
+  messages: readonly ChatMessage[]
+): ChatMessage[] {
+  return messages.slice(lastUserIndex(messages) + 1);
+}
+
+/**
+ * Architect cycles since the last user message. A cycle opens when an architect
+ * mentions another architect, and closes when that architect posts next. The
+ * closing message opens nothing: it is the answer. Developer messages neither
+ * count nor reset.
+ */
+export function architectCycleCount(
+  messages: readonly ChatMessage[],
+  profileArchitects: readonly string[]
+): number {
+  const architects = architectIdsOf(messages, profileArchitects);
+  const pending = new Set<string>();
+  let cycles = 0;
+  for (const message of messagesSinceLastUser(messages)) {
+    if (!isArchitectTurn(message, architects)) continue;
+    if (pending.delete(message.agentId)) {
+      cycles += 1;
+      continue;
+    }
+    for (const target of mentionedAgentIds(message.body)) {
+      if (target !== message.agentId && architects.has(target)) {
+        pending.add(target);
+      }
+    }
+  }
+  return cycles;
 }
 
 export function reconcileMentions(input: ReconcileInput): WaitDecision {
@@ -69,7 +104,7 @@ export function reconcileMentions(input: ReconcileInput): WaitDecision {
     messageIds: eligible.map((message) => message.id),
     authors: uniqueAuthors(eligible),
     chain: {
-      count: architectChainLength(input.messages),
+      count: architectCycleCount(input.messages, input.architects),
       max: input.maxChain
     }
   };
@@ -86,9 +121,24 @@ function removeQuoteLines(content: string): string {
     .join("\n");
 }
 
-function isAgentReference(reference: string, agentId: string): boolean {
-  const parsed = parseMarcReference(reference);
-  return parsed?.type === "agent" && parsed.agentId === agentId;
+/** The profile architects plus every author that has posted with the architect role. */
+function architectIdsOf(
+  messages: readonly ChatMessage[],
+  profileArchitects: readonly string[]
+): Set<string> {
+  const ids = new Set(profileArchitects);
+  const posted = messages.filter((message) => message.role === "architect");
+  for (const message of posted) {
+    ids.add(message.agentId);
+  }
+  return ids;
+}
+
+function isArchitectTurn(
+  message: ChatMessage,
+  architects: ReadonlySet<string>
+): boolean {
+  return message.role !== "developer" && architects.has(message.agentId);
 }
 
 function lastUserIndex(messages: readonly ChatMessage[]): number {

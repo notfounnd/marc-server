@@ -267,25 +267,11 @@ export type MemoryIndexHealth = {
   message: string;
 };
 
-export type WorkspaceDocumentSource = {
-  path: string;
-  authority: "normative" | "reference";
-};
-
-/** activation.cyclesPerStage: the value in force, the file's value or the default when absent or invalid. */
-export type WorkspaceSettings = {
-  memory: {
-    autoRebuild: boolean;
-    embeddingBatchSize: number;
-    documentSources: WorkspaceDocumentSource[];
-  };
-  activation: { cyclesPerStage: number };
-};
-
-export type WorkspaceSettingsInput = {
-  memory?: { autoRebuild?: boolean; embeddingBatchSize?: number };
-  activation?: { cyclesPerStage?: number };
-};
+export type {
+  WorkspaceDocumentSource,
+  WorkspaceSettings,
+  WorkspaceSettingsInput
+} from "./workspace-settings-types.js";
 
 export type WorkspaceStatus = {
   ok: boolean;

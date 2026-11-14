@@ -8,6 +8,7 @@ import {
 } from "../core/activation-budget.js";
 import { cyclesValueOf } from "../core/activation-cycles.js";
 import { derivedLeadOf, stampedFloorOf } from "../core/activation-floor.js";
+import { approvedAgentsOf } from "./activation-activity.js";
 import type { StageHistoryEntry } from "../core/activation-advance.js";
 import {
   readThreadPolicy,
@@ -82,6 +83,8 @@ export type ActivationBody = {
   stageHistory: StageHistoryEntry[];
   /** The supervisor's cards still on the panel. No run id, outcome or process data. */
   supervision: SupervisionCardView[];
+  /** The architects whose approval is valid under the policy revision in force. A save clears them. */
+  approvedAgents: string[];
 };
 
 type ExtrasView = {
@@ -91,6 +94,7 @@ type ExtrasView = {
   leadChanges: LeadChange[];
   currentStage: FixedStage;
   supervision: SupervisionCardView[];
+  approvedAgents: string[];
 };
 
 const NO_EXTRAS: ExtrasView = {
@@ -99,7 +103,8 @@ const NO_EXTRAS: ExtrasView = {
   lead: undefined,
   leadChanges: [],
   currentStage: FIXED_STAGES[0],
-  supervision: []
+  supervision: [],
+  approvedAgents: []
 };
 
 export type HoldView = {
@@ -137,7 +142,8 @@ export async function activationBody(
     services.threads,
     scope,
     openRequestsOf(services),
-    attemptCapOf(view)
+    attemptCapOf(view),
+    revisionOf(view)
   );
   const architects = new Set(participantsOf(profiles));
   const lead = effectiveLeadOf(
@@ -162,7 +168,8 @@ export async function activationBody(
     nextStages: stagesAheadOf(extras.currentStage),
     holds: extras.holds,
     stageHistory: extras.stageHistory,
-    supervision: extras.supervision
+    supervision: extras.supervision,
+    approvedAgents: extras.approvedAgents
   };
 }
 
@@ -180,11 +187,18 @@ function attemptCapOf(view: PolicyView): number | undefined {
   return view.policy.attemptCap;
 }
 
+/** The revision of the policy in force. Undefined while the policy is not ready, so no approval shows. */
+function revisionOf(view: PolicyView): string | undefined {
+  if (view.status !== "ready") return undefined;
+  return view.policy.revision;
+}
+
 async function extrasView(
   threads: ThreadStore,
   scope: ThreadScope,
   openOf: OpenRequestsOf,
-  attemptCap: number | undefined
+  attemptCap: number | undefined,
+  revision: string | undefined
 ): Promise<ExtrasView> {
   const view = await threads.read(scope);
   if (view.status === "invalid") return NO_EXTRAS;
@@ -203,7 +217,8 @@ async function extrasView(
     lead: view.file.lead,
     leadChanges: view.file.leadChanges ?? [],
     currentStage: currentStageOf(view.file.activation?.currentStage),
-    supervision: supervisionCardsOf(view.file.supervision, openOf, attemptCap)
+    supervision: supervisionCardsOf(view.file.supervision, openOf, attemptCap),
+    approvedAgents: approvedAgentsOf(view.file.activation, revision)
   };
 }
 

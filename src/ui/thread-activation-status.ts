@@ -1,10 +1,20 @@
 import type {
   ActivationStageId,
   ActivationWarning,
-  ThreadActivationView
+  ThreadActivationView,
+  Translate
 } from "./types.js";
 
 export type Tone = "muted" | "on" | "warn" | "stop";
+
+/**
+ * The footer line that a save clears the approvals the panel shows. The singular and the plural have
+ * their own en-US keys, so the catalog holds each sentence as written.
+ */
+export function approvalWarningOf(count: number, t: Translate): string {
+  if (count === 1) return t("Saving clears the approval of 1 agent.");
+  return t("Saving clears the approval of {{count}} agents.", { count });
+}
 
 /** A line the policy editor shows: its tone, and the en-US message key it translates. */
 export type Line = { tone: Tone; key: string };
@@ -48,11 +58,11 @@ export function pillOf(view: ThreadActivationView): Line {
 }
 
 /**
- * Dispatch table: the note under the switch, by its position. The on state has no note in F3b: the
- * confirm mode that a note would describe belongs to the supervisor of F3c.
+ * Dispatch table: the note under the switch, by its position. The on state explains the approval of F4:
+ * the first start of each agent asks, and the later starts in the thread follow within the cycles.
  */
 const STATUS_NOTES: Record<string, string | undefined> = {
-  true: undefined,
+  true: "Each agent's first start asks for your approval. After that it starts on its own in this thread, within the cycles.",
   false:
     "Agents wake only when you ask them. Turn this on to let a mention wake the agent it names."
 };
@@ -205,5 +215,7 @@ export const STATUS_LABEL_KEYS: string[] = [
   ...RECOVER_NOTE_RULES.map((rule) => rule.key),
   ...DROP_RULES.map((rule) => rule.key),
   PAUSED_LINE.key,
-  UNREADABLE_LINE.key
+  UNREADABLE_LINE.key,
+  "Saving clears the approval of 1 agent.",
+  "Saving clears the approval of {{count}} agents."
 ];

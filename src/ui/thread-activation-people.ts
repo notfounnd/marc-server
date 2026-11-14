@@ -1,13 +1,25 @@
 import type { ActivationHoldView, Message } from "./types.js";
 
-export type ParticipantRow = { agentId: string; leads: boolean };
+export type ParticipantRow = {
+  agentId: string;
+  leads: boolean;
+  approved: boolean;
+};
 
-/** One row per architect profile, marked when it is the lead. */
+/**
+ * One row per architect profile, marked when it is the lead and when the human approved it in this thread,
+ * so its starts need no card.
+ */
 export function participantRowsOf(
   participants: readonly string[],
-  lead: string | null | undefined
+  lead: string | null | undefined,
+  approved: readonly string[]
 ): ParticipantRow[] {
-  return participants.map((agentId) => ({ agentId, leads: agentId === lead }));
+  return participants.map((agentId) => ({
+    agentId,
+    leads: agentId === lead,
+    approved: approved.includes(agentId)
+  }));
 }
 
 /** The body of a lead change: the architect the human picked, and the lead the panel saw. */

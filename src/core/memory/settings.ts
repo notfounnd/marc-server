@@ -12,12 +12,11 @@ import type {
   WorkspaceSettings,
   WorkspaceSettingsInput
 } from "../types.js";
+import { SETTINGS_FILE } from "../workspace-settings-file.js";
 import {
   withWorkspaceWriteLock,
   writeFileAtomically
 } from "../write-coordination.js";
-
-const SETTINGS_FILE = "marc.config.json";
 
 export const DEFAULT_MEMORY_EMBEDDING_BATCH_SIZE = 4;
 export const MIN_MEMORY_EMBEDDING_BATCH_SIZE = 2;
@@ -29,7 +28,8 @@ const DEFAULT_SETTINGS: WorkspaceSettings = {
     embeddingBatchSize: DEFAULT_MEMORY_EMBEDDING_BATCH_SIZE,
     documentSources: []
   },
-  activation: { cyclesPerStage: DEFAULT_CYCLES_PER_STAGE }
+  activation: { cyclesPerStage: DEFAULT_CYCLES_PER_STAGE },
+  listening: { defaultOn: false }
 };
 
 type WorkspaceSettingsFile = Partial<{
@@ -39,6 +39,7 @@ type WorkspaceSettingsFile = Partial<{
     documentSources: unknown;
   }>;
   activation: unknown;
+  listening: unknown;
 }>;
 
 export function isMemoryEmbeddingBatchSize(value: unknown): value is number {
@@ -62,8 +63,8 @@ export async function readWorkspaceSettingsInWorkspace(
 }
 
 /**
- * Saves the settings. The activation section is passed through byte for byte unless the
- * input carries a cycles value, so a memory save never drops or rewrites it.
+ * Saves the settings. The activation and listening sections are passed through as the file holds them
+ * unless the input carries a value for them, so a memory save never drops or rewrites either one.
  */
 export async function updateWorkspaceSettingsInWorkspace(
   info: WorkspaceInfo,
@@ -73,13 +74,43 @@ export async function updateWorkspaceSettingsInWorkspace(
   const next = mergeWorkspaceSettings(current, input);
   const raw = await readRawActivityInWorkspace(info);
   const activation = activationToWrite(raw, input);
+  const kept = await readRawListeningInWorkspace(info);
+  const listening = listeningToWrite(kept, input, next);
   await withWorkspaceWriteLock(info.marcPath, "workspace-settings", () =>
     writeFileAtomically(
       workspaceSettingsPath(info),
-      renderSettings(next, activation)
+      renderSettings(next, activation, listening)
     )
   );
   return next;
+}
+
+/** The listening section as the file holds it. Unreadable JSON has no section to keep. */
+async function readRawListeningInWorkspace(
+  info: WorkspaceInfo
+): Promise<unknown> {
+  const content = await readSettingsContent(info);
+  if (content === undefined) return undefined;
+  return rawListeningOf(content);
+}
+
+function rawListeningOf(content: string): unknown {
+  try {
+    const parsed: unknown = JSON.parse(content);
+    return isRecord(parsed) ? parsed.listening : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function listeningToWrite(
+  kept: unknown,
+  input: WorkspaceSettingsInput,
+  next: WorkspaceSettings
+): unknown {
+  if (input.listening === undefined) return kept;
+  const base = isRecord(kept) ? kept : {};
+  return { ...base, defaultOn: next.listening.defaultOn };
 }
 
 /** The activation section as the file holds it. Unreadable JSON has no section to keep. */
@@ -128,8 +159,18 @@ function mergeWorkspaceSettings(
       embeddingBatchSize: nextEmbeddingBatchSize(current, input),
       documentSources: current.memory.documentSources
     },
-    activation: { cyclesPerStage: nextCyclesPerStage(current, input) }
+    activation: { cyclesPerStage: nextCyclesPerStage(current, input) },
+    listening: { defaultOn: nextListeningDefaultOn(current, input) }
   };
+}
+
+function nextListeningDefaultOn(
+  current: WorkspaceSettings,
+  input: WorkspaceSettingsInput
+): boolean {
+  const next = input.listening?.defaultOn;
+  if (typeof next !== "boolean") return current.listening.defaultOn;
+  return next;
 }
 
 function nextCyclesPerStage(
@@ -167,11 +208,13 @@ async function readSettingsContent(
 
 function renderSettings(
   settings: WorkspaceSettings,
-  activation: unknown
+  activation: unknown,
+  listening: unknown
 ): string {
   const document = {
     memory: settings.memory,
-    ...(activation === undefined ? {} : { activation })
+    ...(activation === undefined ? {} : { activation }),
+    ...(listening === undefined ? {} : { listening })
   };
   return `${JSON.stringify(document, null, 2)}\n`;
 }
@@ -191,7 +234,8 @@ function normalizeWorkspaceSettings(value: unknown): WorkspaceSettings {
         : DEFAULT_SETTINGS.memory.embeddingBatchSize,
       documentSources: normalizeDocumentSources(memory.documentSources)
     },
-    activation: { cyclesPerStage: cyclesOf(input.activation) }
+    activation: { cyclesPerStage: cyclesOf(input.activation) },
+    listening: listeningOf(input.listening)
   };
 }
 
@@ -203,6 +247,18 @@ function cyclesOf(value: unknown): number {
     : DEFAULT_CYCLES_PER_STAGE;
 }
 
+/** A preference, not an authorization: a file value that is not a boolean reads as the default. */
+function listeningOf(value: unknown): WorkspaceSettings["listening"] {
+  if (!isRecord(value))
+    return { defaultOn: DEFAULT_SETTINGS.listening.defaultOn };
+  return {
+    defaultOn:
+      typeof value.defaultOn === "boolean"
+        ? value.defaultOn
+        : DEFAULT_SETTINGS.listening.defaultOn
+  };
+}
+
 function defaultSettings(): WorkspaceSettings {
   return {
     memory: {
@@ -210,7 +266,8 @@ function defaultSettings(): WorkspaceSettings {
       embeddingBatchSize: DEFAULT_SETTINGS.memory.embeddingBatchSize,
       documentSources: []
     },
-    activation: { cyclesPerStage: DEFAULT_CYCLES_PER_STAGE }
+    activation: { cyclesPerStage: DEFAULT_CYCLES_PER_STAGE },
+    listening: { defaultOn: DEFAULT_SETTINGS.listening.defaultOn }
   };
 }
 

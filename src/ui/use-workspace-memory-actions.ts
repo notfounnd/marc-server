@@ -13,6 +13,7 @@ type ApiPost = <T>(path: string, body: unknown) => Promise<T>;
 /** The part of the workspace settings view this hook reads and writes. */
 type WorkspaceSettingsView = {
   activation: { cyclesPerStage: number; turnTimeoutMinutes: number };
+  listening: { defaultOn: boolean };
 };
 type Refresh = (options?: {
   force?: boolean;
@@ -50,6 +51,9 @@ export function useWorkspaceMemoryActions({
   const [turnTimeoutMinutes, setTurnTimeoutMinutes] = useState<
     number | undefined
   >();
+  const [listeningDefaultOn, setListeningDefaultOn] = useState<
+    boolean | undefined
+  >();
 
   useEffect(() => {
     if (!workspaceId) return;
@@ -61,6 +65,7 @@ export function useWorkspaceMemoryActions({
         if (!active) return;
         setCyclesPerStage(settings.activation.cyclesPerStage);
         setTurnTimeoutMinutes(settings.activation.turnTimeoutMinutes);
+        setListeningDefaultOn(settings.listening.defaultOn);
       })
       .catch(() => undefined);
     return () => {
@@ -139,6 +144,16 @@ export function useWorkspaceMemoryActions({
             { activation: { turnTimeoutMinutes: minutes } }
           );
           if (saved) setTurnTimeoutMinutes(minutes);
+        }
+      },
+      listening: {
+        value: listeningDefaultOn,
+        save: async (defaultOn: boolean): Promise<void> => {
+          const saved = await postWorkspace<WorkspaceSettingsView>(
+            "/settings",
+            { listening: { defaultOn } }
+          );
+          if (saved) setListeningDefaultOn(defaultOn);
         }
       }
     }

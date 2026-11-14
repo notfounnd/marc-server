@@ -1,4 +1,6 @@
+import assert from "node:assert/strict";
 import test from "node:test";
+import { parseWaitInput } from "../src/cli-wait-command.js";
 import {
   MENTION_BODY,
   SESSION,
@@ -74,9 +76,37 @@ const SCENARIOS: Scenario[] = [
   {
     name: "a chain at its limit ends with code 2",
     setup: async (fx) => {
-      await mention(fx, "claude-software-architect", "architect", "Proposal.");
-      await mention(fx, "codex-software-architect", "architect", "Review.");
-      await mention(fx, "claude-software-architect", "architect", MENTION_BODY);
+      await mention(
+        fx,
+        "claude-software-architect",
+        "architect",
+        "Proposal for marc://@codex-software-architect."
+      );
+      await mention(
+        fx,
+        "codex-software-architect",
+        "architect",
+        "Review for marc://@claude-software-architect."
+      );
+      await mention(
+        fx,
+        "claude-software-architect",
+        "architect",
+        "Next for marc://@codex-software-architect."
+      );
+      await mention(
+        fx,
+        "codex-software-architect",
+        "architect",
+        "Answer for marc://@claude-software-architect."
+      );
+      await mention(
+        fx,
+        "claude-software-architect",
+        "architect",
+        "Ask for marc://@codex-software-architect."
+      );
+      await mention(fx, "codex-software-architect", "architect", MENTION_BODY);
     },
     args: (fx) => [
       ...baseArgs(fx, fx.cursor, fx.threadId),
@@ -100,3 +130,11 @@ const SCENARIOS: Scenario[] = [
 SCENARIOS.forEach((scenario) =>
   test(`marc wait: ${scenario.name}`, () => runScenario(scenario))
 );
+
+test("marc wait: the default timeout is 480 minutes", () => {
+  const input = parseWaitInput(
+    { thread: "thread-1", mention: "claude-dev", since: "msg_1" },
+    undefined
+  );
+  assert.equal(input.timeoutMinutes, 480);
+});

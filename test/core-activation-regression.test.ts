@@ -52,6 +52,7 @@ const INPUT: ReconcileInput = {
   messages: MESSAGES,
   afterMessageId: "msg_user",
   mention: "claude-dev",
+  architects: ["claude-software-architect"],
   maxChain: 3,
   closed: false
 };
@@ -61,7 +62,7 @@ test("a thread without a policy keeps the manual mention decision unchanged", ()
     status: "mention",
     messageIds: ["msg_review"],
     authors: [{ agentId: "claude-software-architect", role: "architect" }],
-    chain: { count: 1, max: 3 }
+    chain: { count: 0, max: 3 }
   });
 });
 

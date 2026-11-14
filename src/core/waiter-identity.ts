@@ -14,6 +14,11 @@ export type WaiterFacts = {
   binding: SessionBinding | undefined;
   table: ProcessTableRead;
   agents: AgentsSource;
+  /**
+   * The process that resumed the holder's session, when the slot reads session_resumed for it. The client is
+   * judged on this process instead of the recorded owner, which the resume has left behind.
+   */
+  resumedBy?: { pid: number; startedAt: number };
 };
 
 /** The codes of the identity table, in the order the table checks them. `verified` means every check passed. */
@@ -69,7 +74,8 @@ const CHECKS: readonly CheckRow[] = [
 
 /**
  * The first check that fails, or `verified` when every row passes. The waiter must descend from the
- * client that owns the slot, within the climb limit, and the client's start must match the one recorded.
+ * client that owns the slot, or from the process that resumed it, within the climb limit, and that
+ * client's start must match the one recorded.
  */
 export function waiterIdentityCheck(facts: WaiterFacts): IdentityCheck {
   for (const row of CHECKS) {
@@ -83,12 +89,13 @@ export function waiterIdentityVerified(facts: WaiterFacts): boolean {
   return waiterIdentityCheck(facts) === "verified";
 }
 
+/** The client the waiter must descend from: the process that resumed the session, else the recorded owner. */
 function clientPidOf(facts: WaiterFacts): number | undefined {
-  return facts.binding?.owner.clientPid;
+  return facts.resumedBy?.pid ?? facts.binding?.owner.clientPid;
 }
 
 function recordedStartOf(facts: WaiterFacts): number | undefined {
-  return facts.binding?.owner.clientStartedAt;
+  return facts.resumedBy?.startedAt ?? facts.binding?.owner.clientStartedAt;
 }
 
 /** The waiter's pid sits under the client's pid within the climb limit, in a readable table. */

@@ -1,4 +1,5 @@
 import { auditWorkspace } from "../core/audit.js";
+import { resolveWorkspace } from "../core/paths.js";
 import {
   getWorkspaceInfo,
   initWorkspace,
@@ -23,7 +24,7 @@ export function registerWorkspaceTools(
   options: McpOptions,
   identity: SessionIdentity
 ): void {
-  const workspaceRoot = options.workspace ?? process.cwd();
+  const workspaceRoot = resolveWorkspace(options.workspace);
 
   registerMcpTool(
     server,

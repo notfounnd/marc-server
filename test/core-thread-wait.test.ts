@@ -122,6 +122,7 @@ function harness(thread: FakeThread): {
     options: {
       afterMessageId: CURSOR_ID,
       mention: PROFILE,
+      architects: [],
       maxChain: 3,
       timeoutMs: TIMEOUT_MS,
       pollMs: POLL_MS,
@@ -147,7 +148,7 @@ test("a message written between starting the watcher and the first read is not l
     status: "mention",
     messageIds: ["msg_2"],
     authors: [{ agentId: "claude-software-architect", role: "architect" }],
-    chain: { count: 1, max: 3 }
+    chain: { count: 0, max: 3 }
   });
   assert.equal(timers.active().length, 0);
 });

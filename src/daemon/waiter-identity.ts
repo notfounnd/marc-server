@@ -1,11 +1,11 @@
 import type { WorkspaceInfo } from "../core/types.js";
-import { slotKey } from "../core/session-slots.js";
+import { slotKey, type SlotState } from "../core/session-slots.js";
 import {
   waiterIdentityCheck,
   type IdentityCheck
 } from "../core/waiter-identity.js";
 import { processesOf } from "./process-table-os.js";
-import type { SessionServices } from "./session-views.js";
+import { probeFor, type SessionServices } from "./session-views.js";
 import type { ThreadFile } from "./thread-store.js";
 
 /**
@@ -40,12 +40,28 @@ export function waiterIdentityOf(
     const binding = file.slots[key];
     if (binding === undefined) return "no_binding";
     const table = await processesOf(sessions.processes).list();
+    const state = await probeFor(sessions, call.workspace)(binding);
     return waiterIdentityCheck({
       pid: call.pid,
       holder: call.holder,
       binding,
       table,
-      agents: await sessions.presence.agents()
+      agents: await sessions.presence.agents(),
+      resumedBy: resumedByOf(state, call.holder)
     });
   };
+}
+
+/**
+ * The process that resumed the holder's session, when the slot reads session_resumed for that holder. Any
+ * other state answers undefined, so the recorded owner stays the client.
+ */
+function resumedByOf(
+  state: SlotState,
+  holder: string
+): { pid: number; startedAt: number } | undefined {
+  if (state.details.reason !== "session_resumed") return undefined;
+  const resumed = state.resumedBy;
+  if (resumed === undefined || resumed.sessionId !== holder) return undefined;
+  return { pid: resumed.pid, startedAt: resumed.startedAt };
 }

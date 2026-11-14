@@ -33,6 +33,15 @@ export type ThreadActivity = {
   stages: Record<string, StageCounters | LegacyCounters>;
   /** F3a counters kept as history. Never read as cycles. */
   legacyStages?: Record<string, LegacyCounters>;
+  /** The human's Approve per architect. Valid only under the policy revision it was given with; a save clears them. */
+  approvals?: ActivationApproval[];
+};
+
+/** One Approve of an architect in this thread, under the policy revision in force at the time. */
+export type ActivationApproval = {
+  agentId: string;
+  revision: string;
+  at: string;
 };
 
 export type RecoveryRecord = {
@@ -236,7 +245,20 @@ function isOptionalActivation(value: unknown): boolean {
     isText(value.authorizedHash) &&
     isText(value.currentStage) &&
     isRecordOf(value.stages, isStoredStage) &&
-    isOptionalLegacyStages(value.legacyStages)
+    isOptionalLegacyStages(value.legacyStages) &&
+    isOptionalApprovals(value.approvals)
+  );
+}
+
+function isOptionalApprovals(value: unknown): boolean {
+  if (value === undefined) return true;
+  if (!Array.isArray(value)) return false;
+  return value.every(
+    (entry) =>
+      isRecord(entry) &&
+      isText(entry.agentId) &&
+      isText(entry.revision) &&
+      isText(entry.at)
   );
 }
 

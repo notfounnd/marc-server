@@ -27,10 +27,9 @@ const PENDING_LINES: {
   }),
   chain_limit: (t, warning) => ({
     head: t("Architect exchange"),
-    detail: t(
-      "Waiting for a human message after {{count}} architect messages",
-      { count: warning.length }
-    ),
+    detail: t("Waiting for a human message after {{count}} architect cycles", {
+      count: warning.length
+    }),
     goLabel: t("Go to the latest message")
   }),
   awaiting_human: (t, warning) => ({
@@ -139,7 +138,7 @@ export const PENDING_LABEL_KEYS: string[] = [
   "Pending",
   "Architect exchange",
   "Was mentioned and has not replied yet",
-  "Waiting for a human message after {{count}} architect messages",
+  "Waiting for a human message after {{count}} architect cycles",
   "{{askedBy}} asked you something",
   "Go to the message",
   "Go to the latest message",

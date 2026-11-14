@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { participantsOf } from "./core/activation-policy.js";
 import { listAgentProfilesInWorkspace } from "./core/agents.js";
 import type { WaitAuthor, WaitChain } from "./core/thread-mentions.js";
 import { resolveThreadId } from "./core/thread-resolution.js";
@@ -58,7 +59,7 @@ type WaitResult = {
 };
 
 const DEFAULT_MAX_CHAIN = 3;
-const DEFAULT_TIMEOUT_MINUTES = 120;
+const DEFAULT_TIMEOUT_MINUTES = 480;
 const POLL_MS = 2000;
 const LOCK_STALE_MS = 30000;
 const STOP_SIGNALS: NodeJS.Signals[] = ["SIGINT", "SIGTERM"];
@@ -134,7 +135,14 @@ async function executeWait(
 
   const threadId = resolution.threadId;
   const governed = governedConfigOf(input, info, threadId);
-  const run = await runWait(input, info, threadId, governed, signal);
+  const run = await runWait(
+    input,
+    info,
+    threadId,
+    governed,
+    signal,
+    participantsOf(profiles)
+  );
   return { ...base, threadId, ...run.outcome, sessionLock: run.sessionLock };
 }
 
@@ -162,7 +170,8 @@ async function runWait(
   info: ReturnType<typeof workspaceInfoFor>,
   threadId: string,
   governed: GovernedConfig,
-  signal: AbortSignal
+  signal: AbortSignal,
+  architects: readonly string[]
 ): Promise<{
   outcome: WaitOutcome | { status: "already_waiting" };
   sessionLock: SessionLock;
@@ -170,6 +179,7 @@ async function runWait(
   const waitOptions: WaitOptions = {
     afterMessageId: input.afterMessageId,
     mention: input.mention,
+    architects,
     maxChain: input.maxChain,
     timeoutMs: input.timeoutMinutes * 60_000,
     pollMs: POLL_MS,

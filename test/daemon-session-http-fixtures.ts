@@ -43,14 +43,18 @@ export type LiveProcess = {
   status?: string;
 };
 
+/** The clock the presence reads. A test advances it past the agents cache window to see a new listing. */
+export type PresenceClock = { now: number };
+
 /**
- * A daemon with a fixed clock and an agents runner. By default it reports no live process; a test
- * passes the live client processes it wants the presence to resolve, and nothing else changes. The process
- * table is the operating system's unless a test passes its own.
+ * A daemon with an agents runner and a clock, fixed at NOW unless a test passes its own. By default it reports
+ * no live process; a test passes the live client processes it wants the presence to resolve, and nothing else
+ * changes. The process table is the operating system's unless a test passes its own.
  */
 export async function startDaemon(
   live: readonly LiveProcess[] = [],
-  processes: ProcessTablePort = OS_PROCESS_TABLE
+  processes: ProcessTablePort = OS_PROCESS_TABLE,
+  clock: PresenceClock = { now: NOW }
 ): Promise<Started> {
   const dataDir = await fs.mkdtemp(
     path.join(os.tmpdir(), "marc-session-routes-")
@@ -60,7 +64,7 @@ export async function startDaemon(
     memoryRecall: recallMemory,
     presence: {
       hostId: HOST,
-      now: () => NOW,
+      now: () => clock.now,
       runAgents: async () => JSON.stringify(live)
     },
     registry: {

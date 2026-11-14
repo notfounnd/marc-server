@@ -9,7 +9,10 @@ import type { ChatMessage } from "../src/core/types.js";
 
 const CURSOR_ID = "msg_cursor";
 const PROFILE = "claude-dev";
+const ARCHITECTS = ["claude-software-architect", "codex-software-architect"];
 const MENTION = "Please review marc://@claude-dev.";
+const CODEX_CALL = "Ask marc://@codex-software-architect.";
+const CLAUDE_CALL = "Answer marc://@claude-software-architect.";
 
 function message(
   id: string,
@@ -115,7 +118,7 @@ const RECONCILE_SCENARIOS: ReconcileScenario[] = [
       status: "mention",
       messageIds: ["msg_2"],
       authors: [{ agentId: "claude-software-architect", role: "architect" }],
-      chain: { count: 1, max: 3 }
+      chain: { count: 0, max: 3 }
     }
   },
   {
@@ -130,7 +133,7 @@ const RECONCILE_SCENARIOS: ReconcileScenario[] = [
       status: "mention",
       messageIds: ["msg_3"],
       authors: [{ agentId: "claude-software-architect", role: "architect" }],
-      chain: { count: 2, max: 3 }
+      chain: { count: 0, max: 3 }
     }
   },
   {
@@ -155,7 +158,7 @@ const RECONCILE_SCENARIOS: ReconcileScenario[] = [
         { agentId: "claude-software-architect", role: "architect" },
         { agentId: "codex-software-architect", role: "architect" }
       ],
-      chain: { count: 3, max: 5 }
+      chain: { count: 0, max: 5 }
     }
   },
   {
@@ -184,14 +187,17 @@ const RECONCILE_SCENARIOS: ReconcileScenario[] = [
     name: "a chain at its limit returns chain_limit",
     messages: [
       cursor,
-      message("msg_2", "claude-software-architect", "architect", "Proposal."),
-      message("msg_3", "codex-software-architect", "architect", "Review."),
-      message("msg_4", "claude-software-architect", "architect", MENTION)
+      message("msg_2", "claude-software-architect", "architect", CODEX_CALL),
+      message("msg_3", "codex-software-architect", "architect", CLAUDE_CALL),
+      message("msg_4", "claude-software-architect", "architect", CODEX_CALL),
+      message("msg_5", "codex-software-architect", "architect", CLAUDE_CALL),
+      message("msg_6", "claude-software-architect", "architect", CODEX_CALL),
+      message("msg_7", "codex-software-architect", "architect", MENTION)
     ],
     expected: {
       status: "chain_limit",
-      messageIds: ["msg_4"],
-      authors: [{ agentId: "claude-software-architect", role: "architect" }],
+      messageIds: ["msg_7"],
+      authors: [{ agentId: "codex-software-architect", role: "architect" }],
       chain: { count: 3, max: 3 }
     }
   },
@@ -203,13 +209,13 @@ const RECONCILE_SCENARIOS: ReconcileScenario[] = [
         "msg_0",
         "claude-software-architect",
         "architect",
-        "Earlier proposal."
+        "Earlier proposal for marc://@codex-software-architect."
       ),
       message(
         "msg_1",
         "codex-software-architect",
         "architect",
-        "Earlier review."
+        "Earlier review for marc://@claude-software-architect."
       ),
       message("msg_u", "owner", "user", "Human decision."),
       cursor,
@@ -220,7 +226,7 @@ const RECONCILE_SCENARIOS: ReconcileScenario[] = [
       status: "mention",
       messageIds: ["msg_4"],
       authors: [{ agentId: "claude-software-architect", role: "architect" }],
-      chain: { count: 1, max: 3 }
+      chain: { count: 0, max: 3 }
     }
   },
   {
@@ -232,10 +238,15 @@ const RECONCILE_SCENARIOS: ReconcileScenario[] = [
   {
     ...DEFAULTS,
     name: "developer messages neither count nor reset the chain",
-    maxChain: 2,
+    maxChain: 1,
     messages: [
       cursor,
-      message("msg_2", "claude-software-architect", "architect", "Proposal."),
+      message(
+        "msg_2",
+        "claude-software-architect",
+        "architect",
+        "Proposal for marc://@codex-software-architect."
+      ),
       message("msg_3", "codex-dev", "developer", "Implementation note."),
       message("msg_4", "codex-software-architect", "architect", MENTION)
     ],
@@ -243,7 +254,7 @@ const RECONCILE_SCENARIOS: ReconcileScenario[] = [
       status: "chain_limit",
       messageIds: ["msg_4"],
       authors: [{ agentId: "codex-software-architect", role: "architect" }],
-      chain: { count: 2, max: 2 }
+      chain: { count: 1, max: 1 }
     }
   },
   {
@@ -254,7 +265,7 @@ const RECONCILE_SCENARIOS: ReconcileScenario[] = [
       status: "mention",
       messageIds: ["msg_2"],
       authors: [{ agentId: PROFILE, role: "architect" }],
-      chain: { count: 1, max: 3 }
+      chain: { count: 0, max: 3 }
     }
   }
 ];
@@ -265,6 +276,7 @@ RECONCILE_SCENARIOS.forEach((scenario) =>
       messages: scenario.messages,
       afterMessageId: scenario.afterMessageId,
       mention: PROFILE,
+      architects: ARCHITECTS,
       maxChain: scenario.maxChain,
       closed: scenario.closed
     };

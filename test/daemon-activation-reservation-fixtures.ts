@@ -7,13 +7,14 @@ import type {
   ProcessTableRead
 } from "../src/core/process-table.js";
 import type { ProcessTablePort } from "../src/daemon/process-table-os.js";
-import { HOST } from "./daemon-session-fixtures.js";
+import { HOST, NOW } from "./daemon-session-fixtures.js";
 import {
   registered,
   send,
   startDaemon,
   workspaceWithThread,
   type LiveProcess,
+  type PresenceClock,
   type Reply
 } from "./daemon-session-http-fixtures.js";
 
@@ -56,13 +57,17 @@ export function mention(): string {
 /**
  * A daemon with a workspace, the architect profile and the policy enabled; the waiter's session is bound.
  * Extra live processes join the bound client in the agents inventory, for tests that need other sessions.
+ * The live list and the clock come back too, so a test can change the listing and advance the clock past
+ * the agents cache window.
  */
 export async function started(
   t: { after(fn: () => unknown): void },
   table: ProcessTablePort = tableOf({ status: "available", rows: TREE }),
   extra: readonly LiveProcess[] = []
 ) {
-  const daemon = await startDaemon([CLIENT, ...extra], table);
+  const live: LiveProcess[] = [CLIENT, ...extra];
+  const clock: PresenceClock = { now: NOW };
+  const daemon = await startDaemon(live, table, clock);
   t.after(() => daemon.close());
   const ws = await workspaceWithThread();
   t.after(() => fs.rm(ws.root, { recursive: true, force: true }));
@@ -76,7 +81,7 @@ export async function started(
   const base = `/api/workspaces/${ws.info.id}/threads/${ws.threadId}/activation`;
   await send(daemon.baseUrl, "PUT", `${base}/policy`, POLICY_BODY);
   await bindWaiter(daemon.baseUrl, ws.info, ws.threadId);
-  return { daemon, ws, base };
+  return { daemon, ws, base, live, clock };
 }
 
 /** The waiter's session observed as the slot's binding, through the same route the MCP uses. */

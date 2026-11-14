@@ -9,6 +9,7 @@ import {
 } from "./supervision-reconcile.js";
 import type { SupervisionOptions } from "./supervision-runner.js";
 import { sweepThreadIn } from "./supervision-sweep.js";
+import { startIn, type CardRef } from "./supervision-start.js";
 
 /** The expiry sweep runs this often, and its timer never keeps the process alive. */
 export const SWEEP_INTERVAL_MS = 5 * 60_000;
@@ -66,14 +67,42 @@ export function createSupervisionService(
     threadId: string
   ): Promise<void> {
     if (stopped) return;
-    const outcome = await runSupervisionPass({
+    const pass = await runSupervisionPass({
       services: host.services,
       sessions: host.sessions,
       options: host.options,
       workspace,
       threadId
     });
-    if (outcome === "changed") host.notify(workspace, threadId);
+    if (pass.outcome === "changed") host.notify(workspace, threadId);
+    for (const card of pass.autoCards) {
+      await startApproved(workspace, threadId, card);
+    }
+  }
+
+  /**
+   * Starts an awaiting card of an approved architect, judged in the same queue as an Approve. A refusal
+   * writes nothing and leaves the card awaiting, so the next pass tries again; nothing retries at once.
+   */
+  async function startApproved(
+    workspace: WorkspaceInfo,
+    threadId: string,
+    card: CardRef
+  ): Promise<void> {
+    const outcome = await startIn(
+      {
+        services: host.services,
+        sessions: host.sessions,
+        options: host.options,
+        workspace,
+        threadId
+      },
+      "auto",
+      card
+    );
+    if (outcome.started === undefined) return;
+    host.options.runner.start({ workspace, threadId }, outcome.started);
+    host.notify(workspace, threadId);
   }
 
   /** Threads are listed from their state files, so the pass writes nothing else in the workspace. */

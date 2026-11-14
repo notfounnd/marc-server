@@ -5,6 +5,7 @@ import {
   StdioServerTransport,
   serveStdio
 } from "@modelcontextprotocol/server/stdio";
+import { resolveWorkspace } from "../core/paths.js";
 import { disposeMemoryProviders } from "../core/workspace-memory.js";
 import { registerAgentTools } from "./agent-tools.js";
 import { startDaemonLeaseHeartbeat } from "./daemon.js";
@@ -55,7 +56,7 @@ export function buildMcpServer(
   coordinator = new McpToolCoordinator(undefined, deadlineSourceOf(options)),
   identity: SessionIdentity = createProcessIdentity()
 ): McpServer {
-  const workspaceRoot = options.workspace ?? process.cwd();
+  const workspaceRoot = resolveWorkspace(options.workspace);
   const server = new McpServer(
     { name: "marc", version: PROCESS_PACKAGE_VERSION },
     {

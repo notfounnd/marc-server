@@ -2,6 +2,9 @@
   "memory": {
     "autoRebuild": false,
     "embeddingBatchSize": 4,
-    "searchRetryDepth": 0
+    "documentSources": []
+  },
+  "listening": {
+    "defaultOn": true
   }
 }

@@ -105,13 +105,17 @@ test("the second mention resumes the session, and its cost is the delta of the t
 
   fakeClient(thread, "success", "0.005");
   const second = await mention(thread);
-  const reply = parseReply(await cardAction(thread, "approve", second));
-  assert.equal(reply.mode, "resume");
   const records = await waitForCards(thread, (cards) =>
     terminal(cards.find((card) => card.messageId === second))
   );
   const card = cardFor(records, second);
 
+  assert.equal(card.turn?.mode, "resume");
+  assert.equal(
+    card.turn?.auto,
+    true,
+    "the architect was approved, so it starts on its own"
+  );
   assert.equal(card.status, "done");
   assert.ok(
     Math.abs((card.outcome?.costUsd ?? -1) - 0.004) < 1e-9,
